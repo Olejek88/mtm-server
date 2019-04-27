@@ -2,8 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\EquipmentSearchStatus;
-use common\models\EquipmentStatus;
+use backend\models\DeviceSearchStatus;
+use common\models\DeviceStatus;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -43,7 +43,7 @@ class EquipmentStatusController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new EquipmentSearchStatus();
+        $searchModel = new DeviceSearchStatus();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
         return $this->render('index', [
@@ -71,8 +71,8 @@ class EquipmentStatusController extends Controller
      */
     public function actionCreate()
     {
-        $model = new EquipmentStatus();
-        $searchModel = new EquipmentSearchStatus();
+        $model = new DeviceStatus();
+        $searchModel = new DeviceSearchStatus();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -118,12 +118,12 @@ class EquipmentStatusController extends Controller
      * Finds the EquipmentStatus model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return EquipmentStatus the loaded model
+     * @return DeviceStatus the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = EquipmentStatus::findOne($id)) !== null) {
+        if (($model = DeviceStatus::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

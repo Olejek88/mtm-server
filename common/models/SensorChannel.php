@@ -14,7 +14,7 @@ use yii\db\ActiveRecord;
  * @property string $createdAt
  * @property string $changedAt
  */
-class RequestType extends ActiveRecord
+class SensorChannel extends ActiveRecord
 {
     const GENERAL = "E49AE9AD-3C31-42F8-A751-AAEB890C2190";
 

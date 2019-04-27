@@ -4,8 +4,8 @@ use common\models\EquipmentTypeTree;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-/* @var $model common\models\EquipmentType */
-/* @var $searchModel backend\models\EquipmentSearchType */
+/* @var $model common\models\DeviceType */
+/* @var $searchModel backend\models\DeviceSearchType */
 
 $this->title = Yii::t('app', 'Типы оборудования');
 ?>

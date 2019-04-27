@@ -2,9 +2,9 @@
 
 namespace backend\controllers;
 
-use backend\models\RequestTypeSearch;
+use backend\models\SensorChannelSearch;
 use common\models\RequestStatus;
-use common\models\RequestType;
+use common\models\SensorChannel;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -57,7 +57,7 @@ class RequestTypeController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new RequestTypeSearch();
+        $searchModel = new SensorChannelSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 100;
 
@@ -78,8 +78,8 @@ class RequestTypeController extends Controller
      */
     public function actionCreate()
     {
-        $model = new RequestType();
-        $searchModel = new RequestTypeSearch();
+        $model = new SensorChannel();
+        $searchModel = new SensorChannelSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 10;
 

@@ -5,7 +5,7 @@
 
 use common\components\MainFunctions;
 use common\models\DocumentationType;
-use common\models\Equipment;
+use common\models\Device;
 use kartik\select2\Select2;
 use kartik\widgets\FileInput;
 use yii\bootstrap\ActiveForm;
@@ -64,7 +64,7 @@ use yii\helpers\Html;
     }
     if (!$equipmentTypeUuid && !$equipmentUuid) {
         echo $form->field($documentation, 'equipmentTypeUuid')->hiddenInput(['value' => null])->label(false);
-        $equipment = Equipment::find()->all();
+        $equipment = Device::find()->all();
         $items = ArrayHelper::map($equipment, 'uuid', 'title');
         echo $form->field($documentation, 'equipmentUuid')->widget(Select2::class,
             [

@@ -5,7 +5,7 @@ namespace backend\controllers;
 use backend\models\CitySearch;
 use backend\models\ContragentRegisterSearch;
 use common\models\City;
-use common\models\Contragent;
+use common\models\Organisation;
 use common\models\ContragentRegister;
 use Yii;
 use yii\filters\VerbFilter;

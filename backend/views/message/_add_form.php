@@ -5,7 +5,7 @@
 use common\components\MainFunctions;
 use common\models\CriticalType;
 use common\models\EquipmentModel;
-use common\models\EquipmentStatus;
+use common\models\DeviceStatus;
 use common\models\Objects;
 use common\models\Users;
 use kartik\select2\Select2;

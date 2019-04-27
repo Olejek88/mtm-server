@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/* @var $model common\models\EquipmentStatus */
+/* @var $model common\models\DeviceStatus */
 
 $this->title = Yii::t('app', 'Обновить статус оборудования');
 ?>

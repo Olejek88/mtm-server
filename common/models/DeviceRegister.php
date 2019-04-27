@@ -17,11 +17,11 @@ use yii\db\ActiveRecord;
  * @property string $description
  *
  * @property User $user
- * @property Equipment $equipment
+ * @property Device $equipment
  * @property EquipmentRegisterType $equipmentRegisterType
  */
 
-class EquipmentRegister extends ActiveRecord
+class DeviceRegister extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -96,7 +96,7 @@ class EquipmentRegister extends ActiveRecord
     public function getEquipment()
     {
         return $this->hasOne(
-            Equipment::class, ['uuid' => 'equipmentUuid']
+            Device::class, ['uuid' => 'equipmentUuid']
         );
     }
 

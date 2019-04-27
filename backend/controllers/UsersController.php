@@ -6,9 +6,9 @@ use api\controllers\TokenController;
 use backend\models\UsersSearch;
 use common\components\MainFunctions;
 use common\models\Alarm;
-use common\models\Contragent;
+use common\models\Organisation;
 use common\models\Defect;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\ObjectContragent;
 use common\models\Objects;
 use common\models\Gpstrack;
@@ -251,7 +251,7 @@ class UsersController extends Controller
                 $flats = Objects::find()->where(['uuid' => $user_house['houseUuid']])->all();
                 foreach ($flats as $flat) {
                     $user_flats++;
-                    $equipment = Equipment::find()->where(['objectUuid' => $flat['uuid']])->orderBy('createdAt DESC')->one();
+                    $equipment = Device::find()->where(['objectUuid' => $flat['uuid']])->orderBy('createdAt DESC')->one();
                     if ($equipment) {
                         $user_measure = Measure::find()->where(['equipmentUuid' => $equipment['uuid']])->
                         andWhere('date > NOW() - INTERVAL 14 DAY')->count();

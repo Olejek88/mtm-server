@@ -5,9 +5,9 @@ use backend\models\UsersSearch;
 use common\components\MainFunctions;
 use common\models\Alarm;
 use common\models\City;
-use common\models\Contragent;
-use common\models\Equipment;
-use common\models\EquipmentType;
+use common\models\Organisation;
+use common\models\Device;
+use common\models\DeviceType;
 use common\models\Objects;
 use common\models\Gpstrack;
 use common\models\LoginForm;
@@ -326,9 +326,9 @@ class SiteController extends Controller
         $cityCount = City::find()->count();
         $streetCount = Street::find()->count();
         $flatCount = Objects::find()->count();
-        $equipmentCount = Equipment::find()->count();
-        $contragentCount = Contragent::find()->count();
-        $equipmentTypeCount = EquipmentType::find()->count();
+        $equipmentCount = Device::find()->count();
+        $contragentCount = Organisation::find()->count();
+        $equipmentTypeCount = DeviceType::find()->count();
         $usersCount = Users::find()->count();
 
         $last_measures = Measure::find()
@@ -342,7 +342,7 @@ class SiteController extends Controller
             ->orderBy('date')
             ->all();
 
-        $equipments = Equipment::find()
+        $equipments = Device::find()
             ->orderBy('_id DESC')
             ->limit(20)
             ->all();

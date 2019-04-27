@@ -14,7 +14,7 @@
  * @var $categories
  * @var $bar
  * @var $orders
- * @var $equipments \common\models\Equipment[]
+ * @var $equipments \common\models\Device[]
  * @var $messagesChat
  * @var $usersCount
  * @var $currentUser

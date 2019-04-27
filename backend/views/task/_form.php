@@ -1,6 +1,6 @@
 <?php
 
-use common\models\Equipment;
+use common\models\Device;
 use common\models\TaskTemplate;
 use common\models\Users;
 use kartik\select2\Select2;
@@ -31,7 +31,7 @@ use common\models\WorkStatus;
     ?>
 
     <?php
-    $equipment = Equipment::find()->orderBy(['changedAt' => SORT_DESC])->all();
+    $equipment = Device::find()->orderBy(['changedAt' => SORT_DESC])->all();
     $items = ArrayHelper::map($equipment, 'uuid', 'title');
     echo $form->field($model, 'equipmentUuid')->widget(Select2::class,
         [

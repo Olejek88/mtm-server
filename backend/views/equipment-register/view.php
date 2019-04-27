@@ -2,7 +2,7 @@
 
 use yii\widgets\DetailView;
 
-/* @var $model \common\models\EquipmentRegister */
+/* @var $model \common\models\DeviceRegister */
 
 $this->title = 'Запись в журнале событий';
 $this->params['breadcrumbs'][] = [

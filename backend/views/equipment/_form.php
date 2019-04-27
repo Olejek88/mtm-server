@@ -1,8 +1,8 @@
 <?php
 
 use common\components\MainFunctions;
-use common\models\EquipmentStatus;
-use common\models\EquipmentType;
+use common\models\DeviceStatus;
+use common\models\DeviceType;
 use common\models\Objects;
 use common\models\Users;
 use kartik\date\DatePicker;
@@ -12,7 +12,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Equipment */
+/* @var $model common\models\Device */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -39,7 +39,7 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?php
-    $equipmentType = EquipmentType::find()->all();
+    $equipmentType = DeviceType::find()->all();
     $items = ArrayHelper::map($equipmentType, 'uuid', 'title');
     echo $form->field($model, 'equipmentTypeUuid',
         ['template' => MainFunctions::getAddButton("/equipment-type/create")])->widget(Select2::class,
@@ -57,7 +57,7 @@ use yii\widgets\ActiveForm;
 
     <?php
 
-    $equipmentStatus = EquipmentStatus::find()->all();
+    $equipmentStatus = DeviceStatus::find()->all();
     $items = ArrayHelper::map($equipmentStatus, 'uuid', 'title');
     echo $form->field($model, 'equipmentStatusUuid',
         ['template' => MainFunctions::getAddButton("/equipment-status/create")])->widget(Select2::class,

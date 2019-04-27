@@ -2,8 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\ShutdownSearch;
-use common\models\Shutdown;
+use backend\models\SensorConfigSearch;
+use common\models\SensorConfig;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -45,7 +45,7 @@ class ShutdownController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ShutdownSearch();
+        $searchModel = new SensorConfigSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 100;
 
@@ -74,10 +74,10 @@ class ShutdownController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Shutdown();
+        $model = new SensorConfig();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $searchModel = new ShutdownSearch();
+            $searchModel = new SensorConfigSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
             $dataProvider->pagination->pageSize = 15;
             return $this->render('index', [
@@ -127,12 +127,12 @@ class ShutdownController extends Controller
      * Finds the Shutdown model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Shutdown the loaded model
+     * @return SensorConfig the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Shutdown::findOne($id)) !== null) {
+        if (($model = SensorConfig::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

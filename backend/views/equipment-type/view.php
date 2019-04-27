@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/* @var $model common\models\EquipmentType */
+/* @var $model common\models\DeviceType */
 /* @var $parentType string */
 
 $this->title = $model->title;

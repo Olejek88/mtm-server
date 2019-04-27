@@ -3,7 +3,7 @@
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-/* @var $searchModel backend\models\EquipmentSearchStatus */
+/* @var $searchModel backend\models\DeviceSearchStatus */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Статусы оборудования');

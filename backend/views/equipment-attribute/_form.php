@@ -2,7 +2,7 @@
 
 use app\commands\MainFunctions;
 use common\models\AttributeType;
-use common\models\Equipment;
+use common\models\Device;
 use dosamigos\datetimepicker\DateTimePicker;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -47,7 +47,7 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php
-    $equipment = Equipment::find()->orderBy(["changedAt" => SORT_DESC])->all();
+    $equipment = Device::find()->orderBy(["changedAt" => SORT_DESC])->all();
     $items = ArrayHelper::map($equipment, 'uuid', 'title');
     echo $form->field($model, 'equipmentUuid')->dropDownList($items);
     ?>

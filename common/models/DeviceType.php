@@ -4,24 +4,27 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\Expression;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
+
 /**
- * This is the model class for table "work_status".
+ * This is the model class for table "equipment_type".
  *
  * @property integer $_id
  * @property string $uuid
  * @property string $title
+ * @property string $equipmentSystemUuid
  * @property string $createdAt
  * @property string $changedAt
+ *
+ * @property EquipmentSystem $equipmentSystem
  */
-class WorkStatus extends ActiveRecord
+class DeviceType extends ActiveRecord
 {
-    const NEW_OPERATION = "18D3D5D4-336F-4B25-BA2B-00A6C7D5EB6C";
-    const IN_WORK = "78063CCA-4463-45AD-9124-88CEA2B51017";
-    const COMPLETE = "626FC9E9-9F1F-4DE7-937D-74DAD54ED751";
-    const UN_COMPLETE = "0F733A22-B65A-4D96-AF86-34F7E6A62B0B";
-    const CANCELED = "1A277EB1-1A22-400F-9E03-F094E19FEEDE";
+    const EQUIPMENT_HVS = '7AB0B720-9FDB-448C-86C1-4649A7FCF279';
+    const EQUIPMENT_GVS = '4F50C767-A044-465B-A69F-02DD321BC5FB';
+    const EQUIPMENT_ELECTRO = 'B6904443-363B-4F01-B940-F47B463E66D8';
+    const EQUIPMENT_HEAT_COUNTER = '42686CFC-34D0-45FF-95A4-04B0D865EC35';
 
     public function behaviors()
     {
@@ -34,12 +37,13 @@ class WorkStatus extends ActiveRecord
             ],
         ];
     }
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'work_status';
+        return 'equipment_type';
     }
 
     /**
@@ -50,8 +54,22 @@ class WorkStatus extends ActiveRecord
         return [
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid'], 'string', 'max' => 45],
-            [['title'], 'string', 'max' => 200],
+            [['uuid', 'title', 'equipmentSystemUuid'], 'string', 'max' => 45],
+        ];
+    }
+
+    public function fields()
+    {
+        return [
+            '_id',
+            'uuid',
+            'title',
+            'equipmentSystemUuid',
+            'equipmentSystem' => function ($model) {
+                return $model->equipmentSystem;
+            },
+            'createdAt',
+            'changedAt',
         ];
     }
 
@@ -64,13 +82,10 @@ class WorkStatus extends ActiveRecord
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'title' => Yii::t('app', 'Название'),
+            'equipmentSystem' => Yii::t('app', 'Ин.Система'),
+            'equipmentSystemUuid' => Yii::t('app', 'Ин.Система'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
-    }
-
-    public function getWorkStatus()
-    {
-        return $this->hasOne(WorkStatus::class, ['uuid' => 'workStatusUuid']);
     }
 }

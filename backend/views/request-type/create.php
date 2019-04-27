@@ -1,5 +1,5 @@
 <?php
-/* @var $model common\models\RequestType */
+/* @var $model common\models\SensorChannel */
 
 use kartik\grid\GridView;
 use yii\helpers\Html;

@@ -1,5 +1,5 @@
 <?php
-/* @var $model common\models\RequestType */
+/* @var $model common\models\SensorChannel */
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;

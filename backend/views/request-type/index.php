@@ -1,5 +1,5 @@
 <?php
-/* @var $searchModel  backend\models\RequestTypeSearch */
+/* @var $searchModel  backend\models\SensorChannelSearch */
 
 use yii\helpers\Html;
 use yii\grid\GridView;

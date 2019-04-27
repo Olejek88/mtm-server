@@ -2,8 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\ContragentSearch;
-use common\models\Contragent;
+use backend\models\OrganisationSearch;
+use common\models\Organisation;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -53,7 +53,7 @@ class ContragentController extends Controller
     public function actionTable()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = Contragent::find()
+            $model = Organisation::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'title') {
@@ -78,7 +78,7 @@ class ContragentController extends Controller
             return json_encode('');
         }
 
-        $searchModel = new ContragentSearch();
+        $searchModel = new OrganisationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
@@ -107,8 +107,8 @@ class ContragentController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Contragent();
-        $searchModel = new ContragentSearch();
+        $model = new Organisation();
+        $searchModel = new OrganisationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
@@ -161,12 +161,12 @@ class ContragentController extends Controller
      * Finds the Contragent model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Contragent the loaded model
+     * @return Organisation the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Contragent::findOne($id)) !== null) {
+        if (($model = Organisation::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

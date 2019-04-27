@@ -2,15 +2,14 @@
 
 namespace backend\models;
 
-
-use common\models\EquipmentType;
+use common\models\DeviceStatus;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentSearchType represents the model behind the search form about `common\models\EquipmentType`.
+ * EquipmentSearchStatus represents the model behind the search form about `common\models\EquipmentStatusController.php`.
  */
-class EquipmentSearchType extends EquipmentType
+class DeviceSearchStatus extends DeviceStatus
 {
     /**
      * @inheritdoc
@@ -41,7 +40,7 @@ class EquipmentSearchType extends EquipmentType
      */
     public function search($params)
     {
-        $query = EquipmentType::find();
+        $query = DeviceStatus::find();
 
         // add conditions that should always apply here
 

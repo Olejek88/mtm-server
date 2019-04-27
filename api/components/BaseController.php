@@ -6,8 +6,8 @@ use common\components\IPhoto;
 use common\models\AlarmStatus;
 use common\models\AlarmType;
 use common\models\City;
-use common\models\EquipmentStatus;
-use common\models\EquipmentType;
+use common\models\DeviceStatus;
+use common\models\DeviceType;
 use common\models\ObjectStatus;
 use common\models\ObjectType;
 use common\models\HouseStatus;
@@ -90,8 +90,8 @@ class BaseController extends Controller
             case HouseStatus::class :
             case ObjectType::class :
             case ObjectStatus::class :
-            case EquipmentType::class :
-            case EquipmentStatus::class :
+            case DeviceType::class :
+            case DeviceStatus::class :
             case Users::class :
                 // выбираем данные из базы
                 $result = $query->all();

@@ -2,16 +2,14 @@
 
 namespace backend\models;
 
-use common\models\Group;
-use common\models\RequestStatus;
-use common\models\RequestType;
+use common\models\DeviceRegister;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * RequestTypeSearch represents the model behind the search form about `common\models\RequestType`.
+ * EquipmentRegisterSearch represents the model behind the search form about `common\models\EquipmentRegister`.
  */
-class RequestTypeSearch extends RequestType
+class DeviceRegisterSearch extends DeviceRegister
 {
     /**
      * @inheritdoc
@@ -19,8 +17,7 @@ class RequestTypeSearch extends RequestType
     public function rules()
     {
         return [
-            [['_id'], 'integer'],
-            [['uuid', 'title', 'createdAt', 'changedAt'], 'safe'],
+            [['userUuid', 'registerType', 'equipmentUuid', 'date'], 'safe'],
         ];
     }
 
@@ -42,7 +39,7 @@ class RequestTypeSearch extends RequestType
      */
     public function search($params)
     {
-        $query = RequestType::find();
+        $query = DeviceRegister::find();
 
         // add conditions that should always apply here
 
@@ -60,13 +57,17 @@ class RequestTypeSearch extends RequestType
 
         // grid filtering conditions
         $query->andFilterWhere([
-            '_id' => $this->_id,
-            'createdAt' => $this->createdAt,
-            'changedAt' => $this->changedAt,
+            'date' => $this->date,
+            'registerType' => $this->registerType,
+            'equipmentUuid' => $this->equipmentUuid,
+            'userUuid' => $this->userUuid,
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'title', $this->title]);
+            ->andFilterWhere(['like', 'equipmentUuid', $this->equipmentUuid])
+            ->andFilterWhere(['like', 'registerType', $this->registerType])
+            ->andFilterWhere(['like', 'userUuid', $this->userUuid])
+            ->orderBy(['date' => SORT_DESC]);
 
         return $dataProvider;
     }

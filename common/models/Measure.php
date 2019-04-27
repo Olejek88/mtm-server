@@ -22,7 +22,7 @@ use yii\db\Expression;
  * @property string $changedAt
  *
  * @property Users $user
- * @property Equipment $equipment
+ * @property Device $equipment
  */
 class Measure extends ActiveRecord
 {
@@ -155,7 +155,7 @@ class Measure extends ActiveRecord
      */
     public function getEquipment()
     {
-        return $this->hasOne(Equipment::class, ['uuid' => 'equipmentUuid']);
+        return $this->hasOne(Device::class, ['uuid' => 'equipmentUuid']);
     }
 
     /**

@@ -1,5 +1,5 @@
 <?php
-/* @var $model common\models\Contragent */
+/* @var $model common\models\Organisation */
 
 use yii\helpers\Html;
 

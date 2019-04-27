@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/* @var $model common\models\EquipmentRegister */
+/* @var $model common\models\DeviceRegister */
 
 $this->title = Yii::t('app', 'Создать запись в журнале оборудования');
 ?>

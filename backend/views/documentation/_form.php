@@ -1,11 +1,11 @@
 <?php
 
-use common\models\EquipmentType;
+use common\models\DeviceType;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use common\models\DocumentationType;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\EquipmentModel;
 use app\commands\MainFunctions;
 use kartik\file\FileInput;
@@ -102,14 +102,14 @@ use kartik\file\FileInput;
     ?>
 
     <?php
-    $equipment = Equipment::find()->orderBy(['changedAt' => SORT_DESC])->all();
+    $equipment = Device::find()->orderBy(['changedAt' => SORT_DESC])->all();
     $items = ['' => 'нет'];
     $items += ArrayHelper::map($equipment, 'uuid', 'title');
     echo $form->field($model, 'equipmentUuid')->dropDownList($items);
     ?>
 
     <?php
-    $equipmentType = EquipmentType::find()
+    $equipmentType = DeviceType::find()
         ->orderBy(['changedAt' => SORT_DESC])->all();
     $items = ['' => 'нет'];
     $items += ArrayHelper::map($equipmentType, 'uuid', 'title');

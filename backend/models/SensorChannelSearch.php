@@ -2,14 +2,16 @@
 
 namespace backend\models;
 
-use common\models\Equipment;
+use common\models\Group;
+use common\models\RequestStatus;
+use common\models\SensorChannel;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentSearch represents the model behind the search form about `common\models\Equipment`.
+ * RequestTypeSearch represents the model behind the search form about `common\models\RequestType`.
  */
-class EquipmentSearch extends Equipment
+class SensorChannelSearch extends SensorChannel
 {
     /**
      * @inheritdoc
@@ -18,7 +20,7 @@ class EquipmentSearch extends Equipment
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'equipmentTypeUuid', 'objectUuid', 'testDate', 'equipmentStatusUuid', 'serial', 'tag', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -40,7 +42,7 @@ class EquipmentSearch extends Equipment
      */
     public function search($params)
     {
-        $query = Equipment::find();
+        $query = SensorChannel::find();
 
         // add conditions that should always apply here
 
@@ -64,11 +66,7 @@ class EquipmentSearch extends Equipment
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'objectUuid', $this->objectUuid])
-            ->andFilterWhere(['like', 'equipmentTypeUuid', $this->equipmentTypeUuid])
-            ->andFilterWhere(['like', 'equipmentStatusUuid', $this->equipmentStatusUuid])
-            ->andFilterWhere(['like', 'serial', $this->serial])
-            ->orderBy(['changedAt' => SORT_DESC]);
+            ->andFilterWhere(['like', 'title', $this->title]);
 
         return $dataProvider;
     }

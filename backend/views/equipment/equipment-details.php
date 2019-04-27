@@ -1,18 +1,18 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\Measure;
 use common\models\Photo;
 use common\models\PhotoEquipment;
 use yii\helpers\Html;
 
-/* @var $model \common\models\Equipment */
+/* @var $model \common\models\Device */
 
-$equipment = Equipment::find()
+$equipment = Device::find()
     ->where(['uuid' => $model['uuid']])
     ->one();
-$models = Equipment::findOne($model['_id']);
+$models = Device::findOne($model['_id']);
 
 $measures = Measure::find()
     ->where(['equipmentUuid' => $equipment['uuid']])

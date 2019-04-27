@@ -7,17 +7,21 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "operation_template".
+ * This is the model class for table "shutdown".
  *
  * @property integer $_id
  * @property string $oid идентификатор организации
  * @property string $uuid
- * @property string $title
- * @property string $description
+ * @property string $startDate
+ * @property string $endDate
+ * @property string $comment
+ * @property string $contragentUuid
  * @property string $createdAt
  * @property string $changedAt
+ *
+ * @property Organisation $contragent
  */
-class OperationTemplate extends ActiveRecord
+class SensorConfig extends ActiveRecord
 {
     /**
      * Behaviors
@@ -45,7 +49,7 @@ class OperationTemplate extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'operation_template';
+        return 'shutdown';
     }
 
     /**
@@ -53,7 +57,7 @@ class OperationTemplate extends ActiveRecord
      *
      * @inheritdoc
      *
-     * @return $mixes
+     * @return array
      */
     public function rules()
     {
@@ -61,17 +65,20 @@ class OperationTemplate extends ActiveRecord
             [
                 [
                     'uuid',
-                    'title',
-                    'description'
+                    'contragentUuid',
+                    'startDate',
+                    'endDate'
                 ],
                 'required'
             ],
-            [['description'], 'string'],
             [['createdAt', 'changedAt'], 'safe'],
             [
-                ['uuid','oid'], 'string', 'max' => 45
+                [
+                    'uuid',
+                    'contragentUuid'
+                ],
+                'string', 'max' => 45
             ],
-            [['title'], 'string', 'max' => 200],
         ];
     }
 
@@ -83,14 +90,18 @@ class OperationTemplate extends ActiveRecord
     public function fields()
     {
         return ['_id', 'uuid',
-            'title', 'description',
+            'contragentUuid',
+            'contragent' => function ($model) {
+                return $model->contragent;
+            },
+            'startDate',
+            'endDate',
             'createdAt', 'changedAt'
         ];
     }
 
-
     /**
-     * Attribute labels
+     * Названия отрибутов
      *
      * @inheritdoc
      *
@@ -101,24 +112,38 @@ class OperationTemplate extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'title' => Yii::t('app', 'Название'),
-            'description' => Yii::t('app', 'Описание'),
+            'contragentUuid' => Yii::t('app', 'Контрагент'),
+            'startDate' => Yii::t('app', 'Начало работ'),
+            'endDate' => Yii::t('app', 'Окончание работ'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
     }
 
     /**
-     * Upload
+     * Объект связанного поля.
      *
-     * @return bool
+     * @return \yii\db\ActiveRecord
      */
-    public function upload()
+    public function getContragent()
     {
-        if ($this->validate()) {
-            return true;
-        } else {
-            return false;
-        }
+        $contragent = Organisation::find()
+            ->select('*')
+            ->where(['uuid' => $this->contragentUuid])
+            ->one();
+        return $contragent;
     }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWorkStatus()
+    {
+        return $this->hasOne(
+            WorkStatus::class, ['uuid' => 'workStatusUuid']
+        );
+    }
+
 }

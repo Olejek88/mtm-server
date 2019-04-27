@@ -1,7 +1,7 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Contragent;
+use common\models\Organisation;
 use common\models\Users;
 use dosamigos\datetimepicker\DateTimePicker;
 use yii\helpers\ArrayHelper;
@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
 
     <?php
-    $Contragent = Contragent::find()->orderBy("title")->all();
+    $Contragent = Organisation::find()->orderBy("title")->all();
     $items = ArrayHelper::map($Contragent, 'uuid', 'title');
     echo $form->field($model, 'contragentUuid')->dropDownList($items);
     ?>

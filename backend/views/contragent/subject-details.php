@@ -1,12 +1,12 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\PhotoEquipment;
 use common\models\PhotoFlat;
 use yii\helpers\Html;
 
-/* @var $model \common\models\Contragent */
+/* @var $model \common\models\Organisation */
 
 ?>
 <div class="kv-expand-row kv-grid-demo">

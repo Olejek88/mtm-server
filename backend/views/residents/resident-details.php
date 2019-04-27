@@ -1,19 +1,19 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\PhotoEquipment;
 use common\models\PhotoFlat;
 use yii\helpers\Html;
 
-/* @var $model \common\models\Equipment */
+/* @var $model \common\models\Device */
 /* @var $resident \common\models\Resident */
 
 $photoFlat = PhotoFlat::find()
     ->where(['flatUuid' => $model['flatUuid']])
     ->orderBy('createdAt DESC')
     ->one();
-$equipments = Equipment::find()
+$equipments = Device::find()
     ->where(['flatUuid' => $model['flatUuid']])
     ->all();
 $counts = 0;

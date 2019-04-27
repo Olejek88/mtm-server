@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\EquipmentStatus */
+/* @var $model common\models\DeviceStatus */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

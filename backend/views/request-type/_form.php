@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 use app\commands\MainFunctions;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\RequestType */
+/* @var $model common\models\SensorChannel */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 

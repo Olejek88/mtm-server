@@ -2,7 +2,7 @@
 
 namespace common\components;
 
-use common\models\EquipmentStatus;
+use common\models\DeviceStatus;
 use common\models\Journal;
 use common\models\TaskVerdict;
 use common\models\Users;
@@ -178,11 +178,11 @@ class MainFunctions
                 $label = '<div class="progress"><div class="critical1">' . $status['title'] . '</div></div>';
         }
         if ($type == 'equipment_status') {
-            if ($status['uuid'] == EquipmentStatus::NOT_MOUNTED) {
+            if ($status['uuid'] == DeviceStatus::NOT_MOUNTED) {
                 $label = 'critical1';
-            } elseif ($status['uuid'] == EquipmentStatus::NOT_WORK) {
+            } elseif ($status['uuid'] == DeviceStatus::NOT_WORK) {
                 $label = 'critical2';
-            } elseif ($status['uuid'] == EquipmentStatus::UNKNOWN) {
+            } elseif ($status['uuid'] == DeviceStatus::UNKNOWN) {
                 $label = 'critical4';
             } else {
                 $label = 'critical3';

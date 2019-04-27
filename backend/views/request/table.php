@@ -1,7 +1,7 @@
 <?php
 /* @var $searchModel backend\models\RequestSearch */
 
-use common\models\EquipmentStatus;
+use common\models\DeviceStatus;
 use common\models\RequestStatus;
 use common\models\Stage;
 use common\models\StageStatus;
@@ -81,7 +81,7 @@ $gridColumns = [
         'headerOptions' => ['class' => 'kartik-sheet-style'],
         'value' => function ($model) {
             if ($model->equipmentUuid) {
-                if ($model['equipment']['equipmentStatusUuid']==EquipmentStatus::WORK)
+                if ($model['equipment']['equipmentStatusUuid']==DeviceStatus::WORK)
                     return "<span class='badge' style='background-color: green; height: 22px'>" . $model['equipment']->title . "</span>";
                 else
                     return "<span class='badge' style='background-color: lightgrey; height: 22px'>" . $model['equipment']->title . "</span>";

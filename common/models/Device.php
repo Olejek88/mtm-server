@@ -23,12 +23,12 @@ use yii\db\Expression;
  * @property string $changedAt
  * @property boolean $deleted
  *
- * @property EquipmentStatus $equipmentStatus
- * @property EquipmentType $equipmentType
+ * @property DeviceStatus $equipmentStatus
+ * @property DeviceType $equipmentType
  * @property Object $object
  * @property Photo $photo
  */
-class Equipment extends ActiveRecord
+class Device extends ActiveRecord
 {
 
     /**
@@ -172,7 +172,7 @@ class Equipment extends ActiveRecord
     public function getEquipmentStatus()
     {
         return $this->hasOne(
-            EquipmentStatus::class, ['uuid' => 'equipmentStatusUuid']
+            DeviceStatus::class, ['uuid' => 'equipmentStatusUuid']
         );
     }
 
@@ -184,7 +184,7 @@ class Equipment extends ActiveRecord
     public function getEquipmentType()
     {
         return $this->hasOne(
-            EquipmentType::class, ['uuid' => 'equipmentTypeUuid']
+            DeviceType::class, ['uuid' => 'equipmentTypeUuid']
         );
     }
 

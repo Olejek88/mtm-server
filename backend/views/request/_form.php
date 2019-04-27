@@ -1,16 +1,16 @@
 <?php
 
 use common\components\MainFunctions;
-use common\models\Contragent;
+use common\models\Organisation;
 use common\models\Objects;
-use common\models\RequestType;
+use common\models\SensorChannel;
 use common\models\Task;
 use common\models\Users;
 use kartik\widgets\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\requestStatus;
 
 /* @var $this yii\web\View */
@@ -38,7 +38,7 @@ use common\models\requestStatus;
     ?>
 
     <?php
-    $type = RequestType::find()->all();
+    $type = SensorChannel::find()->all();
     $items = ArrayHelper::map($type, 'uuid', 'title');
     echo $form->field($model, 'requestTypeUuid',
         ['template' => MainFunctions::getAddButton("/request-type/create")])->widget(Select2::class,
@@ -55,7 +55,7 @@ use common\models\requestStatus;
     ?>
 
     <?php
-    $contragents = Contragent::find()->all();
+    $contragents = Organisation::find()->all();
     $items = ArrayHelper::map($contragents, 'uuid', 'title');
     echo $form->field($model, 'contragentUuid',
         ['template' => MainFunctions::getAddButton("/contragent/create")])->widget(Select2::class,
@@ -88,7 +88,7 @@ use common\models\requestStatus;
     ?>
 
     <?php
-    $equipments = Equipment::find()->all();
+    $equipments = Device::find()->all();
     $items = ArrayHelper::map($equipments, 'uuid', 'title');
     echo $form->field($model, 'equipmentUuid',
         ['template' => MainFunctions::getAddButton("/equipment/create")])->widget(Select2::class,

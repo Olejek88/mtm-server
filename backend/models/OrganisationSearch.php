@@ -3,14 +3,14 @@
 namespace backend\models;
 
 use common\models\City;
-use common\models\Contragent;
+use common\models\Organisation;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
  * ContragentSearch represents the model behind the search form about `common\models\Contragent`.
  */
-class ContragentSearch extends Contragent
+class OrganisationSearch extends Organisation
 {
     /**
      * @inheritdoc
@@ -42,7 +42,7 @@ class ContragentSearch extends Contragent
      */
     public function search($params)
     {
-        $query = Contragent::find();
+        $query = Organisation::find();
 
         // add conditions that should always apply here
 

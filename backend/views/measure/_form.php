@@ -1,7 +1,7 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\MeasureType;
 use common\models\Users;
 use dosamigos\datetimepicker\DateTimePicker;
@@ -37,7 +37,7 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php
-    $equipments = Equipment::find()->all();
+    $equipments = Device::find()->all();
     $items = ArrayHelper::map($equipments, 'uuid', function ($model) {
         return $model['equipmentType']['title'] . ' (' . $model['object']['house']['street']['title'] . ', ' .
             $model['object']['house']['number'] . ', ' .

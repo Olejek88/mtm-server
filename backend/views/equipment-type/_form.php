@@ -8,7 +8,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\EquipmentType */
+/* @var $model common\models\DeviceType */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $parentModel yii\base\DynamicModel */
 ?>

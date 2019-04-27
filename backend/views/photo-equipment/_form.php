@@ -1,7 +1,7 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\Users;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
@@ -53,7 +53,7 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php
-    $equipment = Equipment::find()->all();
+    $equipment = Device::find()->all();
     $items = ArrayHelper::map($equipment, 'uuid', function ($model) {
         return $model['flat']['house']['street']->title . ', ' . $model['flat']['house']->number . ', ' .
             $model['flat']['number'] . ' ' . $model['equipmentType']->title;

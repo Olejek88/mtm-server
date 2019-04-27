@@ -3,14 +3,14 @@
 namespace api\controllers;
 
 use api\components\BaseController;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\User;
 use yii\db\ActiveRecord;
 
 class EquipmentController extends BaseController
 {
     /** @var ActiveRecord $modelClass */
-    public $modelClass = Equipment::class;
+    public $modelClass = Device::class;
 
     public function actionIndex()
     {

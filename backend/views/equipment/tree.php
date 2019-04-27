@@ -5,7 +5,7 @@ use yii\web\JsExpression;
 
 $this->title = 'Дерево моделей оборудования';
 
-/* @var $registers common\models\EquipmentRegister */
+/* @var $registers common\models\DeviceRegister */
 
 ?>
 <script type="text/javascript">

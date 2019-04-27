@@ -3,7 +3,7 @@ namespace backend\controllers;
 
 use ArrayObject;
 use common\models\EquipmentSystem;
-use common\models\EquipmentType;
+use common\models\DeviceType;
 use common\models\TaskUser;
 use Yii;
 use yii\web\Controller;
@@ -12,7 +12,7 @@ use yii\filters\VerbFilter;
 use yii\web\UnauthorizedHttpException;
 
 use common\models\Task;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\Operation;
 use backend\models\TaskSearch;
 
@@ -185,12 +185,12 @@ class TaskController extends Controller
         foreach ($systems as $system) {
             $tree['children'][] = ['title' => $system['title'], 'key' => $system['_id'] . "", 'folder' => true];
             $childIdx = count($tree['children']) - 1;
-            $types = EquipmentType::find()->where(['equipmentSystemUuid' => $system['uuid']])->all();
+            $types = DeviceType::find()->where(['equipmentSystemUuid' => $system['uuid']])->all();
             foreach ($types as $type) {
                 $tree['children'][$childIdx]['children'][] =
                     ['title' => $type['title'], 'key' => $type['_id'], 'folder' => true];
                 $childIdx2 = count($tree['children'][$childIdx]['children']) - 1;
-                $equipments = Equipment::find()->where(['equipmentTypeUuid' => $type['uuid']])->all();
+                $equipments = Device::find()->where(['equipmentTypeUuid' => $type['uuid']])->all();
                 foreach ($equipments as $equipment) {
                     $tree['children'][$childIdx]['children'][$childIdx2]['children'][] =
                         ['title' => $equipment['title'], 'key' => $equipment['_id'], 'folder' => true];

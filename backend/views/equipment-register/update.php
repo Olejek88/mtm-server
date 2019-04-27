@@ -1,5 +1,5 @@
 <?php
-/* @var $model \common\models\EquipmentRegister */
+/* @var $model \common\models\DeviceRegister */
 
 use yii\helpers\Html;
 

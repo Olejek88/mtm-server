@@ -2,8 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\EquipmentSearchType;
-use common\models\EquipmentType;
+use backend\models\DeviceSearchType;
+use common\models\DeviceType;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -56,7 +56,7 @@ class EquipmentTypeController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new EquipmentSearchType();
+        $searchModel = new DeviceSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 100;
 
@@ -94,8 +94,8 @@ class EquipmentTypeController extends Controller
      */
     public function actionCreate()
     {
-        $model = new EquipmentType();
-        $searchModel = new EquipmentSearchType();
+        $model = new DeviceType();
+        $searchModel = new DeviceSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 10;
 
@@ -160,12 +160,12 @@ class EquipmentTypeController extends Controller
      *
      * @param integer $id Id
      *
-     * @return EquipmentType the loaded model
+     * @return DeviceType the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = EquipmentType::findOne($id)) !== null) {
+        if (($model = DeviceType::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

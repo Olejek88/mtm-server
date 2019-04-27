@@ -1,7 +1,7 @@
 <?php
 
 use app\commands\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\EquipmentRegisterType;
 use common\models\Users;
 use dosamigos\datetimepicker\DateTimePicker;
@@ -10,7 +10,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\EquipmentRegister */
+/* @var $model common\models\DeviceRegister */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -37,7 +37,7 @@ use yii\widgets\ActiveForm;
     $items = ArrayHelper::map($registerTypes, 'uuid', 'title');
     echo $form->field($model, 'registerTypeUuid')->dropDownList($items);
 
-    $equipment = Equipment::find()->orderBy("title")->all();
+    $equipment = Device::find()->orderBy("title")->all();
     $items = ArrayHelper::map($equipment, 'uuid', 'title');
     echo $form->field($model, 'equipmentUuid')->dropDownList($items);
 

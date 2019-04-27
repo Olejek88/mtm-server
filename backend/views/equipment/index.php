@@ -1,8 +1,8 @@
 <?php
-/* @var $searchModel backend\models\EquipmentSearch */
+/* @var $searchModel backend\models\DeviceSearch */
 
-use common\models\EquipmentStatus;
-use common\models\EquipmentType;
+use common\models\DeviceStatus;
+use common\models\DeviceType;
 use kartik\datecontrol\DateControl;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
@@ -66,7 +66,7 @@ $gridColumns = [
         'header' => 'Тип ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
                 '/equipment-type/create?from=equipment/index',
                 ['title' => Yii::t('app', 'Добавить')]),
-        'filter' => ArrayHelper::map(EquipmentType::find()->orderBy('title')->all(),
+        'filter' => ArrayHelper::map(DeviceType::find()->orderBy('title')->all(),
             'uuid', 'title'),
         'filterWidgetOptions' => [
             'pluginOptions' => ['allowClear' => true],
@@ -77,7 +77,7 @@ $gridColumns = [
             'class' => 'table_class'
         ],
         'editableOptions' => function ($model, $key, $index, $widget) {
-            $models = ArrayHelper::map(EquipmentType::find()->orderBy('title')->all(), 'uuid', 'title');
+            $models = ArrayHelper::map(DeviceType::find()->orderBy('title')->all(), 'uuid', 'title');
             return [
                 'header' => 'Тип оборудования',
                 'size' => 'lg',
@@ -103,15 +103,15 @@ $gridColumns = [
         'editableOptions' => function () {
             $status = [];
             $list = [];
-            $statuses = EquipmentStatus::find()->orderBy('title')->all();
+            $statuses = DeviceStatus::find()->orderBy('title')->all();
             foreach ($statuses as $stat) {
                 $color = 'background-color: white';
-                if ($stat['uuid'] == EquipmentStatus::UNKNOWN ||
-                    $stat['uuid'] == EquipmentStatus::NOT_MOUNTED)
+                if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
+                    $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
                     $color = 'background-color: gray';
-                if ($stat['uuid'] == EquipmentStatus::NOT_WORK)
+                if ($stat['uuid'] == DeviceStatus::NOT_WORK)
                     $color = 'background-color: lightred';
-                if ($stat['uuid'] == EquipmentStatus::WORK)
+                if ($stat['uuid'] == DeviceStatus::WORK)
                     $color = 'background-color: green';
                 $list[$stat['uuid']] = $stat['title'];
                 $status[$stat['uuid']] = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;" .

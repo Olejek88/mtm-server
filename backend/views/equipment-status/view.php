@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/* @var $model common\models\EquipmentStatus */
+/* @var $model common\models\DeviceStatus */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Статусы оборудования'), 'url' => ['index']];

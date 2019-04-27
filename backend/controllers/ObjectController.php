@@ -4,7 +4,7 @@ namespace backend\controllers;
 
 use backend\models\ObjectsSearch;
 use common\components\MainFunctions;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\House;
 use common\models\Measure;
 use common\models\ObjectContragent;
@@ -250,7 +250,7 @@ class ObjectController extends Controller
                 foreach ($objects as $object) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Equipment::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $equipments = Device::find()->where(['objectUuid' => $object['uuid']])->all();
                     foreach ($equipments as $equipment) {
                         $fullTree[$oCnt0][$c][$oCnt1]['title']
                             = Html::a(

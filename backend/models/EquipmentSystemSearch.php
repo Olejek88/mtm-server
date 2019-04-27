@@ -2,7 +2,7 @@
 
 namespace backend\models;
 
-use common\models\EquipmentStatus;
+use common\models\DeviceStatus;
 use common\models\EquipmentSystem;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;

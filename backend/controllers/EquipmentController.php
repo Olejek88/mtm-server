@@ -3,10 +3,10 @@
 namespace backend\controllers;
 
 use app\commands\MainFunctions;
-use backend\models\EquipmentSearch;
-use common\models\Equipment;
-use common\models\EquipmentStatus;
-use common\models\EquipmentType;
+use backend\models\DeviceSearch;
+use common\models\Device;
+use common\models\DeviceStatus;
+use common\models\DeviceType;
 use common\models\Objects;
 use common\models\House;
 use common\models\Measure;
@@ -69,7 +69,7 @@ class EquipmentController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = Equipment::find()
+            $model = Device::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'serial') {
@@ -91,7 +91,7 @@ class EquipmentController extends Controller
             return json_encode('');
         }
 
-        $searchModel = new EquipmentSearch();
+        $searchModel = new DeviceSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
@@ -129,7 +129,7 @@ class EquipmentController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Equipment();
+        $model = new Device();
 
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
@@ -159,17 +159,17 @@ class EquipmentController extends Controller
             ->select('*')
             ->all();
         foreach ($objects as $object) {
-            $equipment = Equipment::find()
+            $equipment = Device::find()
                 ->select('*')
                 ->where(['objectUuid' => $object['uuid']])
                 ->one();
             if ($equipment == null) {
-                $equipment = new Equipment();
+                $equipment = new Device();
                 $equipment->uuid = MainFunctions::GUID();
                 $equipment->equipmentSystemUuid = $equipment['equipmentSystem']->uuid;
                 $equipment->objectUuid = $object['uuid'];
-                $equipment->equipmentTypeUuid = EquipmentType::EQUIPMENT_HVS;
-                $equipment->equipmentStatusUuid = EquipmentStatus::UNKNOWN;
+                $equipment->equipmentTypeUuid = DeviceType::EQUIPMENT_HVS;
+                $equipment->equipmentStatusUuid = DeviceStatus::UNKNOWN;
                 $equipment->serial = '222222';
                 $equipment->tag = '111111';
                 $equipment->testDate = date('Y-m-d H:i:s');
@@ -179,8 +179,8 @@ class EquipmentController extends Controller
                 $equipments[$equipment_count] = $equipment;
                 $equipment_count++;
             } else {
-                if ($equipment['equipmentTypeUuid'] != EquipmentType::EQUIPMENT_HVS) {
-                    $equipment['equipmentTypeUuid'] = EquipmentType::EQUIPMENT_HVS;
+                if ($equipment['equipmentTypeUuid'] != DeviceType::EQUIPMENT_HVS) {
+                    $equipment['equipmentTypeUuid'] = DeviceType::EQUIPMENT_HVS;
                     $equipment['changedAt'] = date('Y-m-d H:i:s');
                     $equipment->save();
                     echo $equipment['uuid'] . '<br/>';
@@ -232,7 +232,7 @@ class EquipmentController extends Controller
     {
         $c = 'children';
         $fullTree = array();
-        $types = EquipmentType::find()
+        $types = DeviceType::find()
             ->select('*')
             ->orderBy('title')
             ->all();
@@ -242,7 +242,7 @@ class EquipmentController extends Controller
                 $type['title'],
                 ['equipment-type/view', 'id' => $type['_id']]
             );
-            $equipments = Equipment::find()
+            $equipments = Device::find()
                 ->select('*')
                 ->where(['equipmentTypeUuid' => $type['uuid']])
                 ->orderBy('serial')
@@ -254,9 +254,9 @@ class EquipmentController extends Controller
                     'ул.' . $equipment['house']['street']['title'] . ', д.' . $equipment['house']['number'] . ', кв.' . $equipment['flat']['number'],
                     ['equipment/view', 'id' => $equipment['_id']]
                 );
-                if ($equipment['equipmentStatusUuid'] == EquipmentStatus::NOT_MOUNTED) {
+                if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                     $class = 'critical1';
-                } elseif ($equipment['equipmentStatusUuid'] == EquipmentStatus::NOT_WORK) {
+                } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
                     $class = 'critical2';
                 } else {
                     $class = 'critical3';
@@ -333,7 +333,7 @@ class EquipmentController extends Controller
             foreach ($user_houses as $user_house) {
                 $flats = Objects::find()->select('uuid')->where(['houseUuid' => $user_house['houseUuid']])->all();
                 foreach ($flats as $flat) {
-                    $equipment = Equipment::find()
+                    $equipment = Device::find()
                         ->select('*')
                         ->where(['flatUuid' => $flat['uuid']])
                         ->orderBy('changedAt desc')
@@ -471,7 +471,7 @@ class EquipmentController extends Controller
             foreach ($user_houses as $user_house) {
                 $flats = Objects::find()->select('uuid')->where(['houseUuid' => $user_house['houseUuid']])->all();
                 foreach ($flats as $flat) {
-                    $equipment = Equipment::find()
+                    $equipment = Device::find()
                         ->select('*')
                         ->where(['flatUuid' => $flat['uuid']])
                         ->orderBy('changedAt desc')
@@ -545,11 +545,11 @@ class EquipmentController extends Controller
                             $measure_total_count++;
                         }
 
-                        if ($equipment['equipmentStatusUuid'] == EquipmentStatus::NOT_MOUNTED) {
+                        if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                             $class = 'critical1';
-                        } elseif ($equipment['equipmentStatusUuid'] == EquipmentStatus::NOT_WORK) {
+                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
                             $class = 'critical2';
-                        } elseif ($equipment['equipmentStatusUuid'] == EquipmentStatus::UNKNOWN) {
+                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::UNKNOWN) {
                             $class = 'critical4';
                         } else {
                             $class = 'critical3';
@@ -651,7 +651,7 @@ class EquipmentController extends Controller
                 foreach ($flats as $flat) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Equipment::find()->where(['flatUuid' => $flat['uuid']])->all();
+                    $equipments = Device::find()->where(['flatUuid' => $flat['uuid']])->all();
                     foreach ($equipments as $equipment) {
                         $fullTree[$oCnt0][$c][$oCnt1]['title']
                             = Html::a(
@@ -665,11 +665,11 @@ class EquipmentController extends Controller
                                 ['user-house/delete', 'id' => $user_house['_id']], ['target' => '_blank']
                             );
 
-                        if ($equipment['equipmentStatusUuid'] == EquipmentStatus::NOT_MOUNTED) {
+                        if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                             $class = 'critical1';
-                        } elseif ($equipment['equipmentStatusUuid'] == EquipmentStatus::NOT_WORK) {
+                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
                             $class = 'critical2';
-                        } elseif ($equipment['equipmentStatusUuid'] == EquipmentStatus::UNKNOWN) {
+                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::UNKNOWN) {
                             $class = 'critical4';
                         } else {
                             $class = 'critical3';
@@ -791,7 +791,7 @@ class EquipmentController extends Controller
                 foreach ($objects as $object) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Equipment::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $equipments = Device::find()->where(['objectUuid' => $object['uuid']])->all();
                     foreach ($equipments as $equipment) {
                         $fullTree[$oCnt0]['title']
                             = Html::a(
@@ -912,13 +912,13 @@ class EquipmentController extends Controller
      *
      * @param integer $id Id
      *
-     * @return Equipment the loaded model
+     * @return Device the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected
     function findModel($id)
     {
-        if (($model = Equipment::findOne($id)) !== null) {
+        if (($model = Device::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -1,5 +1,5 @@
 <?php
-/* @var $model common\models\EquipmentStatus */
+/* @var $model common\models\DeviceStatus */
 
 use kartik\grid\GridView;
 use yii\helpers\Html;

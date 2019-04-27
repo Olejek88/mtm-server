@@ -2,14 +2,15 @@
 
 namespace backend\models;
 
-use common\models\EquipmentRegister;
+use common\models\Objects;
+use common\models\SensorConfig;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentRegisterSearch represents the model behind the search form about `common\models\EquipmentRegister`.
+ * ShutdownSearch represents the model behind the search form about `common\models\Shutdown`.
  */
-class EquipmentRegisterSearch extends EquipmentRegister
+class SensorConfigSearch extends SensorConfig
 {
     /**
      * @inheritdoc
@@ -17,7 +18,8 @@ class EquipmentRegisterSearch extends EquipmentRegister
     public function rules()
     {
         return [
-            [['userUuid', 'registerType', 'equipmentUuid', 'date'], 'safe'],
+            [['_id'], 'integer'],
+            [['uuid', 'contragentUuid', 'startDate', 'endDate', 'changedAt'], 'safe'],
         ];
     }
 
@@ -39,7 +41,7 @@ class EquipmentRegisterSearch extends EquipmentRegister
      */
     public function search($params)
     {
-        $query = EquipmentRegister::find();
+        $query = Objects::find();
 
         // add conditions that should always apply here
 
@@ -57,17 +59,13 @@ class EquipmentRegisterSearch extends EquipmentRegister
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'date' => $this->date,
-            'registerType' => $this->registerType,
-            'equipmentUuid' => $this->equipmentUuid,
-            'userUuid' => $this->userUuid,
+            '_id' => $this->_id,
+            'contragentUuid' => $this->contragentUuid,
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+            'createdAt' => $this->createdAt,
+            'changedAt' => $this->changedAt,
         ]);
-
-        $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'equipmentUuid', $this->equipmentUuid])
-            ->andFilterWhere(['like', 'registerType', $this->registerType])
-            ->andFilterWhere(['like', 'userUuid', $this->userUuid])
-            ->orderBy(['date' => SORT_DESC]);
 
         return $dataProvider;
     }

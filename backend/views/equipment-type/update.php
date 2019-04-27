@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\EquipmentType */
+/* @var $model common\models\DeviceType */
 /* @var $parentModel \yii\base\DynamicModel */
 
 $this->title = 'Типы оборудования';

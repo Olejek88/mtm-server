@@ -2,15 +2,15 @@
 
 namespace backend\models;
 
-use common\models\Objects;
-use common\models\Shutdown;
+
+use common\models\DeviceType;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * ShutdownSearch represents the model behind the search form about `common\models\Shutdown`.
+ * EquipmentSearchType represents the model behind the search form about `common\models\EquipmentType`.
  */
-class ShutdownSearch extends Shutdown
+class DeviceSearchType extends DeviceType
 {
     /**
      * @inheritdoc
@@ -19,7 +19,7 @@ class ShutdownSearch extends Shutdown
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'contragentUuid', 'startDate', 'endDate', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class ShutdownSearch extends Shutdown
      */
     public function search($params)
     {
-        $query = Objects::find();
+        $query = DeviceType::find();
 
         // add conditions that should always apply here
 
@@ -60,12 +60,12 @@ class ShutdownSearch extends Shutdown
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'contragentUuid' => $this->contragentUuid,
-            'startDate' => $this->startDate,
-            'endDate' => $this->endDate,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);
+
+        $query->andFilterWhere(['like', 'uuid', $this->uuid])
+            ->andFilterWhere(['like', 'title', $this->title]);
 
         return $dataProvider;
     }

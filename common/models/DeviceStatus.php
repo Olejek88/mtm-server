@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "alarm_type".
+ * This is the model class for table "equipment_status".
  *
  * @property integer $_id
  * @property string $uuid
@@ -16,8 +16,12 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  */
-class AlarmType extends ActiveRecord
+class DeviceStatus extends ActiveRecord
 {
+    const NOT_MOUNTED = "A01B7550-4211-4D7A-9935-80A2FC257E92";
+    const WORK = "E681926C-F4A3-44BD-9F96-F0493712798D";
+    const NOT_WORK = "D5D31037-6640-4A8B-8385-355FC71DEBD7";
+    const UNKNOWN = "ED20012C-629A-4275-9BFA-A81D08B45758";
 
     public function behaviors()
     {
@@ -30,13 +34,12 @@ class AlarmType extends ActiveRecord
             ],
         ];
     }
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'alarm_type';
+        return 'equipment_status';
     }
 
     /**
@@ -47,18 +50,8 @@ class AlarmType extends ActiveRecord
         return [
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid', 'title'], 'string', 'max' => 50],
-        ];
-    }
-
-    public function fields()
-    {
-        return [
-            '_id',
-            'uuid',
-            'title',
-            'createdAt',
-            'changedAt',
+            [['uuid'], 'string', 'max' => 50],
+            [['title'], 'string', 'max' => 100],
         ];
     }
 

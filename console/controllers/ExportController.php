@@ -4,7 +4,7 @@ namespace console\controllers;
 
 use common\components\MainFunctions;
 use common\models\City;
-use common\models\Equipment;
+use common\models\Device;
 use common\models\Objects;
 use common\models\House;
 use common\models\HouseType;
@@ -287,7 +287,7 @@ class ExportController extends Controller
                                     $photo->delete();
                                 }
 
-                                $equipments = Equipment::find()->where(['flatUuid' => $flat['uuid']])->all();
+                                $equipments = Device::find()->where(['flatUuid' => $flat['uuid']])->all();
                                 foreach ($equipments as $equipment) {
                                     $measures = Measure::find()->where(['equipmentUuid' => $equipment['uuid']])->all();
                                     foreach ($measures as $measure) {

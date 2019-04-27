@@ -2,8 +2,8 @@
 
 use yii\helpers\Html;
 
-/* @var $model \common\models\Equipment */
-/* @var $equipments \common\models\Equipment[] */
+/* @var $model \common\models\Device */
+/* @var $equipments \common\models\Device[] */
 
 $this->title = 'Добавляем оборудование';
 ?>

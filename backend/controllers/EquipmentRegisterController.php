@@ -2,8 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\EquipmentRegisterSearch;
-use common\models\EquipmentRegister;
+use backend\models\DeviceRegisterSearch;
+use common\models\DeviceRegister;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -45,7 +45,7 @@ class EquipmentRegisterController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new EquipmentRegisterSearch();
+        $searchModel = new DeviceRegisterSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
@@ -74,7 +74,7 @@ class EquipmentRegisterController extends Controller
      */
     public function actionCreate()
     {
-        $model = new EquipmentRegister();
+        $model = new DeviceRegister();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
@@ -120,12 +120,12 @@ class EquipmentRegisterController extends Controller
      * Finds the EquipmentRegister model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return EquipmentRegister the loaded model
+     * @return DeviceRegister the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = EquipmentRegister::findOne($id)) !== null) {
+        if (($model = DeviceRegister::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

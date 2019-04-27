@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/* @var $model \common\models\Equipment */
+/* @var $model \common\models\Device */
 
 $this->title = Yii::t('app', 'Создать оборудование');
 ?>
