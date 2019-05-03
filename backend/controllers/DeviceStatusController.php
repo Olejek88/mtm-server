@@ -2,29 +2,50 @@
 
 namespace backend\controllers;
 
+use backend\models\DeviceSearchStatus;
+use common\models\DeviceStatus;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use common\models\TaskVerdict;
-use backend\models\TaskSearchVerdict;
+use yii\web\UnauthorizedHttpException;
 
 /**
- * TaskVerdictController implements the CRUD actions for TaskVerdict model.
+ * EquipmentStatusController implements the CRUD actions for EquipmentStatus model.
  */
-class TaskVerdictController extends Controller
+class DeviceStatusController extends Controller
 {
-    protected $modelClass = TaskVerdict::class;
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    public function init()
+    {
+        if (\Yii::$app->getUser()->isGuest) {
+            throw new UnauthorizedHttpException();
+        }
+    }
 
     /**
-     * Lists all TaskVerdict models.
+     * Lists all EquipmentStatus models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TaskSearchVerdict();
+        $searchModel = new DeviceSearchStatus();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -32,53 +53,46 @@ class TaskVerdictController extends Controller
     }
 
     /**
-     * Displays a single TaskVerdict model.
+     * Displays a single EquipmentStatus model.
      * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
-        $taskVerdict   = TaskVerdict::find()
-                            ->where(['_id' => $id])
-                            ->asArray()
-                            ->one();
-
         return $this->render('view', [
-            'taskVerdict' => $taskVerdict,
             'model' => $this->findModel($id),
         ]);
     }
 
     /**
-     * Creates a new TaskVerdict model.
+     * Creates a new EquipmentStatus model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new TaskVerdict();
-
+        $model = new DeviceStatus();
+        $searchModel = new DeviceSearchStatus();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 15;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
             return $this->render('create', [
-                'model' => $model,
+                'model' => $model, 'dataProvider' => $dataProvider
             ]);
         }
     }
 
     /**
-     * Updates an existing TaskVerdict model.
+     * Updates an existing EquipmentStatus model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -89,34 +103,32 @@ class TaskVerdictController extends Controller
     }
 
     /**
-     * Deletes an existing TaskVerdict model.
+     * Deletes an existing EquipmentStatus model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the TaskVerdict model based on its primary key value.
+     * Finds the EquipmentStatus model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return TaskVerdict the loaded model
+     * @return DeviceStatus the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = TaskVerdict::findOne($id)) !== null) {
+        if (($model = DeviceStatus::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 }
+
+?>

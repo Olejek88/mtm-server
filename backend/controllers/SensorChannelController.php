@@ -34,7 +34,7 @@ use yii\web\NotFoundHttpException;
  * @license  http://www.yiiframework.com/license/ License name
  * @link     http://www.toirus.ru
  */
-class StageOperationController extends ToirusController
+class SensorChannelController extends ToirusController
 {
     protected $modelClass = TaskOperation::class;
 

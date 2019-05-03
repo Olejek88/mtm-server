@@ -2,11 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\CitySearch;
-use backend\models\ContragentRegisterSearch;
-use common\models\City;
-use common\models\Organisation;
-use common\models\ContragentRegister;
+use backend\models\DeviceRegisterSearch;
+use common\models\DeviceRegister;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -14,9 +11,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * ContragentRegisterController implements the CRUD actions for ContragentRegister model.
+ * EquipmentRegisterController implements the CRUD actions for EquipmentRegister model.
  */
-class ContragentRegisterController extends Controller
+class DeviceRegisterController extends Controller
 {
     /**
      * @inheritdoc
@@ -43,12 +40,12 @@ class ContragentRegisterController extends Controller
     }
 
     /**
-     * Lists all ContragentRegister models.
+     * Lists all EquipmentRegister models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new ContragentRegisterSearch();
+        $searchModel = new DeviceRegisterSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
@@ -59,7 +56,7 @@ class ContragentRegisterController extends Controller
     }
 
     /**
-     * Displays a single ContragentRegister model.
+     * Displays a single EquipmentRegister model.
      * @param integer $id
      * @return mixed
      */
@@ -71,22 +68,15 @@ class ContragentRegisterController extends Controller
     }
 
     /**
-     * Creates a new ContragentRegister model.
+     * Creates a new EquipmentRegister model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new ContragentRegister();
-
+        $model = new DeviceRegister();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $searchModel = new ContragentRegisterSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            $dataProvider->pagination->pageSize = 15;
-            return $this->render('index', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -95,7 +85,7 @@ class ContragentRegisterController extends Controller
     }
 
     /**
-     * Updates an existing ContragentRegister model.
+     * Updates an existing EquipmentRegister model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -105,7 +95,7 @@ class ContragentRegisterController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->_id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -114,7 +104,7 @@ class ContragentRegisterController extends Controller
     }
 
     /**
-     * Deletes an existing ContragentRegister model.
+     * Deletes an existing EquipmentRegister model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -127,15 +117,15 @@ class ContragentRegisterController extends Controller
     }
 
     /**
-     * Finds the ContragentRegister model based on its primary key value.
+     * Finds the EquipmentRegister model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return ContragentRegister the loaded model
+     * @return DeviceRegister the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = ContragentRegister::findOne($id)) !== null) {
+        if (($model = DeviceRegister::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

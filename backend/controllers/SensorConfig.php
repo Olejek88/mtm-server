@@ -1,9 +1,9 @@
 <?php
+
 namespace backend\controllers;
 
-use backend\models\ReceiptSearch;
-use common\models\Receipt;
-use common\models\Resident;
+use backend\models\SubjectSearch;
+use common\models\Subject;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -11,9 +11,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * ReceiptController implements the CRUD actions for Receipt model.
+ * SubjectController implements the CRUD actions for Subject model.
  */
-class ReceiptController extends Controller
+class SensorConfig extends Controller
 {
     /**
      * Behaviors
@@ -26,7 +26,7 @@ class ReceiptController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::class,
+                'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -48,25 +48,28 @@ class ReceiptController extends Controller
     }
 
     /**
-     * Lists all Receipt models.
+     * Lists all Subjects models.
      *
      * @return mixed
      */
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = Receipt::find()
+            $model = Subject::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-//            if ($_POST['editableAttribute'] == 'inn') {
-//                $model['inn'] = $_POST['Resident'][$_POST['editableIndex']]['inn'];
-//            }
+            if ($_POST['editableAttribute'] == 'owner') {
+                $model['owner'] = $_POST['Subject'][$_POST['editableIndex']]['owner'];
+            }
+            if ($_POST['editableAttribute'] == 'inn') {
+                $model['inn'] = $_POST['Subject'][$_POST['editableIndex']]['inn'];
+            }
             if ($model->save())
                 return json_encode('success');
             return json_encode('failed');
         }
 
-        $searchModel = new ReceiptSearch();
+        $searchModel = new SubjectSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
         return $this->render('table', [
@@ -76,25 +79,28 @@ class ReceiptController extends Controller
     }
 
     /**
-     * Lists all Receipt models.
+     * Lists all Subjects models.
      *
      * @return mixed
      */
     public function actionTable()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = Resident::find()
+            $model = Subject::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-/*            if ($_POST['editableAttribute'] == 'inn') {
-                $model['inn'] = $_POST['Resident'][$_POST['editableIndex']]['inn'];
-            }*/
+            if ($_POST['editableAttribute'] == 'owner') {
+                $model['owner'] = $_POST['Subject'][$_POST['editableIndex']]['owner'];
+            }
+            if ($_POST['editableAttribute'] == 'inn') {
+                $model['inn'] = $_POST['Subject'][$_POST['editableIndex']]['inn'];
+            }
             if ($model->save())
                 return json_encode('success');
             return json_encode('failed');
         }
 
-        $searchModel = new ReceiptSearch();
+        $searchModel = new SubjectSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
         return $this->render('table', [
@@ -111,20 +117,20 @@ class ReceiptController extends Controller
      */
     public function actionList()
     {
-        $listReceipt = Receipt::find()
+        $listSubjects = Subject::find()
             ->asArray()
             ->all();
 
         return $this->render(
             'list',
             [
-                'model' => $listReceipt
+                'model' => $listSubjects
             ]
         );
     }
 
     /**
-     * Displays a single Receipt model.
+     * Displays a single Subject model.
      *
      * @param integer $id Id
      *
@@ -141,21 +147,23 @@ class ReceiptController extends Controller
     }
 
     /**
-     * Creates a new Receipt model.
+     * Creates a new Subject model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Receipt();
-        $searchModel = new ReceiptSearch();
+        $model = new Subject();
+        $searchModel = new SubjectSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
 
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
+                echo var_dump($model);
+                echo var_dump($model->errors);
                 return $this->render('create', ['model' => $model, 'dataProvider' => $dataProvider]);
             }
 
@@ -171,7 +179,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * Updates an existing Receipt model.
+     * Updates an existing Subject model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param integer $id Id
@@ -204,7 +212,7 @@ class ReceiptController extends Controller
     }
 
     /**
-     * Deletes an existing Receipt model.
+     * Deletes an existing Subject model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
@@ -219,17 +227,17 @@ class ReceiptController extends Controller
     }
 
     /**
-     * Finds the Receipt model based on its primary key value.
+     * Finds the Subject model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id
      *
-     * @return Receipt the loaded model
+     * @return Subject the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Receipt::findOne($id)) !== null) {
+        if (($model = Subject::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

@@ -2,9 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\SensorChannelSearch;
-use common\models\RequestStatus;
-use common\models\SensorChannel;
+use backend\models\DeviceSearchType;
+use common\models\DeviceType;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -12,9 +11,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * RequestTypeController implements the CRUD actions for RequestType model.
+ * EquipmentTypeController implements the CRUD actions for EquipmentType model.
  */
-class RequestTypeController extends Controller
+class DeviceTypeController extends Controller
 {
     /**
      * Behaviors
@@ -51,13 +50,13 @@ class RequestTypeController extends Controller
     }
 
     /**
-     * Lists all Group models.
+     * Lists all StageTemplate models.
      *
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new SensorChannelSearch();
+        $searchModel = new DeviceSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 100;
 
@@ -71,29 +70,52 @@ class RequestTypeController extends Controller
     }
 
     /**
-     * Creates a new RequestStatus model.
+     * Displays a single EquipmentType model.
+     *
+     * @param integer $id Id
+     *
+     * @return mixed
+     */
+    public function actionView($id)
+    {
+        return $this->render(
+            'view',
+            [
+                'model' => $this->findModel($id)
+            ]
+        );
+    }
+
+    /**
+     * Creates a new EquipmentType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new SensorChannel();
-        $searchModel = new SensorChannelSearch();
+        $model = new DeviceType();
+        $searchModel = new DeviceSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 10;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model, 'dataProvider' => $dataProvider
-            ]);
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->_id]);
+            }
         }
+        return $this->render(
+            'create',
+            [
+                'model' => $model,
+                'dataProvider' => $dataProvider
+            ]
+        );
     }
 
     /**
-     * Updates an existing RequestStatus model.
+     * Updates an existing EquipmentType model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param integer $id Id
@@ -103,18 +125,23 @@ class RequestTypeController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if (Yii::$app->request->isPost) {
+            // $model->load(Yii::$app->request->post()) && $model->save()
+            $model->load(Yii::$app->request->post());
+            $model->save();
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            return $this->render(
+                'update',
+                [
+                    'model' => $model
+                ]
+            );
         }
     }
 
     /**
-     * Deletes an existing RequestStatus model.
+     * Deletes an existing EquipmentType model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
@@ -128,37 +155,20 @@ class RequestTypeController extends Controller
     }
 
     /**
-     * Finds the RequestStatus model based on its primary key value.
+     * Finds the EquipmentType model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id
      *
-     * @return RequestStatus the loaded model
+     * @return DeviceType the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = RequestStatus::findOne($id)) !== null) {
+        if (($model = DeviceType::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-    }
-
-    /**
-     * Displays a single Service model.
-     *
-     * @param integer $id Id
-     *
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render(
-            'view',
-            [
-                'model' => $this->findModel($id),
-            ]
-        );
     }
 }

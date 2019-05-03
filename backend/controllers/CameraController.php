@@ -2,18 +2,17 @@
 
 namespace backend\controllers;
 
-use backend\models\DeviceSearchStatus;
-use common\models\DeviceStatus;
+use backend\models\AlarmSearch;
+use common\models\Alarm;
+use common\models\Camera;
+use common\models\Users;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
-/**
- * EquipmentStatusController implements the CRUD actions for EquipmentStatus model.
- */
-class EquipmentStatusController extends Controller
+class CameraController extends Controller
 {
     /**
      * @inheritdoc
@@ -32,20 +31,23 @@ class EquipmentStatusController extends Controller
 
     public function init()
     {
+
         if (\Yii::$app->getUser()->isGuest) {
             throw new UnauthorizedHttpException();
         }
+
     }
 
     /**
-     * Lists all EquipmentStatus models.
+     * Lists all Camera models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new DeviceSearchStatus();
+        $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -53,7 +55,7 @@ class EquipmentStatusController extends Controller
     }
 
     /**
-     * Displays a single EquipmentStatus model.
+     * Displays a single Camera model.
      * @param integer $id
      * @return mixed
      */
@@ -65,16 +67,17 @@ class EquipmentStatusController extends Controller
     }
 
     /**
-     * Creates a new EquipmentStatus model.
+     * Creates a new Camera model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new DeviceStatus();
-        $searchModel = new DeviceSearchStatus();
+        $model = new Camera();
+        $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -85,7 +88,7 @@ class EquipmentStatusController extends Controller
     }
 
     /**
-     * Updates an existing EquipmentStatus model.
+     * Updates an existing Camera model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -93,6 +96,7 @@ class EquipmentStatusController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -103,7 +107,7 @@ class EquipmentStatusController extends Controller
     }
 
     /**
-     * Deletes an existing EquipmentStatus model.
+     * Deletes an existing Camera model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -111,24 +115,23 @@ class EquipmentStatusController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
+
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the EquipmentStatus model based on its primary key value.
+     * Finds the Camera model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return DeviceStatus the loaded model
+     * @return Camera the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = DeviceStatus::findOne($id)) !== null) {
+        if (($model = Camera::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 }
-
-?>
