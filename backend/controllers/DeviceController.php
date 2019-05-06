@@ -2,8 +2,8 @@
 
 namespace backend\controllers;
 
-use app\commands\MainFunctions;
 use backend\models\DeviceSearch;
+use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -13,7 +13,6 @@ use common\models\Measure;
 use common\models\Message;
 use common\models\Photo;
 use common\models\Street;
-use common\models\UserHouse;
 use common\models\Users;
 use Yii;
 use yii\filters\VerbFilter;
@@ -23,9 +22,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * EquipmentController implements the CRUD actions for Equipment model.
+ * DeviceController implements the CRUD actions for Device model.
  */
-class EquipmentController extends Controller
+class DeviceController extends Controller
 {
     /**
      * Behaviors
@@ -62,7 +61,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Lists all Equipment models.
+     * Lists all Device models.
      *
      * @return mixed
      */
@@ -73,19 +72,19 @@ class EquipmentController extends Controller
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'serial') {
-                $model['serial'] = $_POST['Equipment'][$_POST['editableIndex']]['serial'];
+                $model['serial'] = $_POST['Device'][$_POST['editableIndex']]['serial'];
             }
-            if ($_POST['editableAttribute'] == 'tag') {
-                $model['tag'] = $_POST['Equipment'][$_POST['editableIndex']]['tag'];
+            if ($_POST['editableAttribute'] == 'port') {
+                $model['tag'] = $_POST['Device'][$_POST['editableIndex']]['port'];
             }
-            if ($_POST['editableAttribute'] == 'equipmentTypeUuid') {
-                $model['equipmentTypeUuid'] = $_POST['Equipment'][$_POST['editableIndex']]['equipmentTypeUuid'];
+            if ($_POST['editableAttribute'] == 'deviceTypeUuid') {
+                $model['deviceTypeUuid'] = $_POST['Device'][$_POST['editableIndex']]['deviceTypeUuid'];
             }
-            if ($_POST['editableAttribute'] == 'equipmentStatusUuid') {
-                $model['equipmentStatusUuid'] = $_POST['Equipment'][$_POST['editableIndex']]['equipmentStatusUuid'];
+            if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
+                $model['deviceStatusUuid'] = $_POST['Device'][$_POST['editableIndex']]['deviceStatusUuid'];
             }
-            if ($_POST['editableAttribute'] == 'testDate') {
-                $model['testDate'] = date("Y-m-d H:i:s", $_POST['Equipment'][$_POST['editableIndex']]['testDate']);
+            if ($_POST['editableAttribute'] == 'date') {
+                $model['date'] = date("Y-m-d H:i:s", $_POST['Device'][$_POST['editableIndex']]['date']);
             }
             $model->save();
             return json_encode('');
@@ -105,7 +104,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Displays a single Equipment model.
+     * Displays a single Device model.
      *
      * @param integer $id Id
      *
@@ -122,7 +121,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Creates a new Equipment model.
+     * Creates a new Device model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
@@ -147,52 +146,51 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Creates a new Equipment models.
+     * Creates a new Device models.
      *
      * @return mixed
      */
     public function actionNew()
     {
-        $equipments = array();
-        $equipment_count = 0;
+        $devices = array();
+        $device_count = 0;
         $objects = Objects::find()
             ->select('*')
             ->all();
         foreach ($objects as $object) {
-            $equipment = Device::find()
+            $device = Device::find()
                 ->select('*')
                 ->where(['objectUuid' => $object['uuid']])
                 ->one();
-            if ($equipment == null) {
-                $equipment = new Device();
-                $equipment->uuid = MainFunctions::GUID();
-                $equipment->equipmentSystemUuid = $equipment['equipmentSystem']->uuid;
-                $equipment->objectUuid = $object['uuid'];
-                $equipment->equipmentTypeUuid = DeviceType::EQUIPMENT_HVS;
-                $equipment->equipmentStatusUuid = DeviceStatus::UNKNOWN;
-                $equipment->serial = '222222';
-                $equipment->tag = '111111';
-                $equipment->testDate = date('Y-m-d H:i:s');
-                $equipment->changedAt = date('Y-m-d H:i:s');
-                $equipment->createdAt = date('Y-m-d H:i:s');
-                $equipment->save();
-                $equipments[$equipment_count] = $equipment;
-                $equipment_count++;
+            if ($device == null) {
+                $device = new Device();
+                $device->uuid = MainFunctions::GUID();
+                $device->nodeUuid = $object['uuid'];
+                $device->deviceTypeUuid = DeviceType::EQUIPMENT_HVS;
+                $device->deviceStatusUuid = DeviceStatus::UNKNOWN;
+                $device->serial = '222222';
+                $device->interface = 1;
+                $device->date = date('Y-m-d H:i:s');
+                $device->changedAt = date('Y-m-d H:i:s');
+                $device->createdAt = date('Y-m-d H:i:s');
+                $device->save();
+                $devices[$device_count] = $device;
+                $device_count++;
             } else {
-                if ($equipment['equipmentTypeUuid'] != DeviceType::EQUIPMENT_HVS) {
-                    $equipment['equipmentTypeUuid'] = DeviceType::EQUIPMENT_HVS;
-                    $equipment['changedAt'] = date('Y-m-d H:i:s');
-                    $equipment->save();
-                    echo $equipment['uuid'] . '<br/>';
+                if ($device['deviceTypeUuid'] != DeviceType::EQUIPMENT_HVS) {
+                    $device['deviceTypeUuid'] = DeviceType::EQUIPMENT_HVS;
+                    $device['changedAt'] = date('Y-m-d H:i:s');
+                    $device->save();
+                    echo $device['uuid'] . '<br/>';
                 }
             }
         }
-        return $this->render('new', ['equipments' => $equipments]);
+        return $this->render('new', ['devices' => $devices]);
     }
 
 
     /**
-     * Updates an existing Equipment model.
+     * Updates an existing Device model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param integer $id Id
@@ -224,7 +222,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Build tree of equipment
+     * Build tree of device
      *
      * @return mixed
      */
@@ -240,35 +238,35 @@ class EquipmentController extends Controller
         foreach ($types as $type) {
             $fullTree[$oCnt0]['title'] = Html::a(
                 $type['title'],
-                ['equipment-type/view', 'id' => $type['_id']]
+                ['device-type/view', 'id' => $type['_id']]
             );
-            $equipments = Device::find()
+            $devices = Device::find()
                 ->select('*')
-                ->where(['equipmentTypeUuid' => $type['uuid']])
+                ->where(['deviceTypeUuid' => $type['uuid']])
                 ->orderBy('serial')
                 ->all();
             $oCnt1 = 0;
-            foreach ($equipments as $equipment) {
+            foreach ($devices as $device) {
                 $fullTree[$oCnt0][$c][$oCnt1]['title']
                     = Html::a(
-                    'ул.' . $equipment['house']['street']['title'] . ', д.' . $equipment['house']['number'] . ', кв.' . $equipment['flat']['number'],
-                    ['equipment/view', 'id' => $equipment['_id']]
+                    'ул.' . $device['house']['street']['title'] . ', д.' . $device['house']['number'] . ', кв.' . $device['flat']['number'],
+                    ['device/view', 'id' => $device['_id']]
                 );
-                if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                     $class = 'critical1';
-                } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
+                } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
                     $class = 'critical2';
                 } else {
                     $class = 'critical3';
                 }
                 $fullTree[$oCnt0][$c][$oCnt1]['status'] = '<div class="progress"><div class="'
-                    . $class . '">' . $equipment['equipmentStatus']->title . '</div></div>';
-                $fullTree[$oCnt0][$c][$oCnt1]['date'] = $equipment['testDate'];
-                $fullTree[$oCnt0][$c][$oCnt1]['serial'] = $equipment['serial'];
+                    . $class . '">' . $device['deviceStatus']->title . '</div></div>';
+                $fullTree[$oCnt0][$c][$oCnt1]['date'] = $device['testDate'];
+                $fullTree[$oCnt0][$c][$oCnt1]['serial'] = $device['serial'];
 
                 $measure = Measure::find()
                     ->select('*')
-                    ->where(['equipmentUuid' => $equipment['uuid']])
+                    ->where(['deviceUuid' => $device['uuid']])
                     ->orderBy('date DESC')
                     ->one();
                 if ($measure) {
@@ -276,21 +274,21 @@ class EquipmentController extends Controller
                     $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = $measure['value'];
                     $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = $measure['user']->name;
                 } else {
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $equipment['changedAt'];
+                    $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $device['changedAt'];
                     $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = "не снимались";
                     $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = "-";
                 }
 
                 $photo = Photo::find()
                     ->select('*')
-                    ->where(['objectUuid' => $equipment['uuid']])
+                    ->where(['objectUuid' => $device['uuid']])
                     ->orderBy('createdAt DESC')
                     ->one();
                 if ($photo) {
                     $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = $photo['createdAt'];
                     $fullTree[$oCnt0][$c][$oCnt1]['photo'] = Html::a(
-                        '<img width="100px" src="/storage/equipment/' . $photo['uuid'] . '.jpg" />',
-                        ['storage/equipment/' . $photo['uuid'] . '.jpg']
+                        '<img width="100px" src="/storage/device/' . $photo['uuid'] . '.jpg" />',
+                        ['storage/device/' . $photo['uuid'] . '.jpg']
                     );
                     $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = $photo['user']->name;
                 } else {
@@ -304,12 +302,12 @@ class EquipmentController extends Controller
         }
         return $this->render(
             'tree',
-            ['equipment' => $fullTree]
+            ['device' => $fullTree]
         );
     }
 
     /**
-     * Build tree of equipment by user
+     * Build tree of device by user
      *
      * @param integer $id Id
      * @param $date_start
@@ -333,23 +331,23 @@ class EquipmentController extends Controller
             foreach ($user_houses as $user_house) {
                 $flats = Objects::find()->select('uuid')->where(['houseUuid' => $user_house['houseUuid']])->all();
                 foreach ($flats as $flat) {
-                    $equipment = Device::find()
+                    $device = Device::find()
                         ->select('*')
                         ->where(['flatUuid' => $flat['uuid']])
                         ->orderBy('changedAt desc')
                         ->one();
-                    if ($equipment) {
+                    if ($device) {
                         $gut=0;
                         $object_count++;
                         $fullTree[$oCnt1]['title']
                             = Html::a(
-                            'ул.' . $equipment['house']['street']['title'] . ', д.' .
-                            $equipment['house']['number'] . ', кв.' . $equipment['flat']['number'],
-                            ['equipment/view', 'id' => $equipment['_id']]
+                            'ул.' . $device['house']['street']['title'] . ', д.' .
+                            $device['house']['number'] . ', кв.' . $device['flat']['number'],
+                            ['device/view', 'id' => $device['_id']]
                         );
 
                         $measures = Measure::find()
-                            ->where(['equipmentUuid' => $equipment['uuid']])
+                            ->where(['deviceUuid' => $device['uuid']])
                             ->orderBy('date DESC')
                             ->all();
                         $oCnt2=0;
@@ -360,7 +358,7 @@ class EquipmentController extends Controller
                             $fullTree[$oCnt1][$c][$oCnt2]
                                 ['measure'] = $measure['value'];
                             $photo_flat_count = Photo::find()
-                                ->where(['objectUuid' => $equipment['uuid']])
+                                ->where(['objectUuid' => $device['uuid']])
                                 ->andWhere(['date' >= ($measure['date']-3600)])
                                 ->andWhere(['date' < ($measure['date']+3600)])
                                 ->count();
@@ -380,18 +378,18 @@ class EquipmentController extends Controller
 
                         // есть комментарий,  нет измерения, есть/нет фото
                         $messages = Message::find()
-                            ->where(['flatUuid' => $equipment['flat']['uuid']])
+                            ->where(['flatUuid' => $device['flat']['uuid']])
                             ->orderBy('date DESC')
                             ->all();
                         foreach ($messages as $message) {
                             $measure_count = Measure::find()
-                                ->where(['equipmentUuid' => $equipment['uuid']])
+                                ->where(['deviceUuid' => $device['uuid']])
                                 ->andWhere(['date' >= ($message['date'] - 1200)])
                                 ->andWhere(['date' < ($message['date'] + 1200)])
                                 ->count();
 
                             $photo_flat_count = Photo::find()
-                                ->where(['objectUuid' => $equipment['uuid']])
+                                ->where(['objectUuid' => $device['uuid']])
                                 ->andWhere(['date' >= ($message['date'] - 1200)])
                                 ->andWhere(['date' < ($message['date'] + 1200)])
                                 ->count();
@@ -428,12 +426,12 @@ class EquipmentController extends Controller
         }
         return $this->render(
             'tree-user',
-            ['equipment' => $fullTree]
+            ['device' => $fullTree]
         );
     }
 
     /**
-     * Build tree of equipment by user
+     * Build tree of device by user
      *
      * @return mixed
      */
@@ -454,14 +452,14 @@ class EquipmentController extends Controller
                 $user['name'],
                 ['user/view', 'id' => $user['_id']]
             );
-            /*            $query = Equipment::find()
+            /*            $query = Device::find()
                             ->select('*')
                             ->where(['flatUuid' => (
                                 Flat::find()->select('uuid')->where(['houseUuid' => (
                                     UserHouse::find()->select('houseUuid')->where(['userUuid' => $user['uuid']])->all()
                                 )]))]);
                         //$query->with('house');
-                        $equipments = $query->orderBy('changedAt')->groupBy('flatUuid')->all();*/
+                        $devices = $query->orderBy('changedAt')->groupBy('flatUuid')->all();*/
             $oCnt1 = 0;
             $measure_total_count = 0;
             $measure_count = 0;
@@ -471,30 +469,30 @@ class EquipmentController extends Controller
             foreach ($user_houses as $user_house) {
                 $flats = Objects::find()->select('uuid')->where(['houseUuid' => $user_house['houseUuid']])->all();
                 foreach ($flats as $flat) {
-                    $equipment = Device::find()
+                    $device = Device::find()
                         ->select('*')
                         ->where(['flatUuid' => $flat['uuid']])
                         ->orderBy('changedAt desc')
                         ->one();
-                    if ($equipment) {
+                    if ($device) {
                         $fullTree[$oCnt0][$c][$oCnt1]['title']
                             = Html::a(
-                            'ул.' . $equipment['house']['street']['title'] . ', д.' .
-                            $equipment['house']['number'] . ', кв.' . $equipment['flat']['number'],
-                            ['equipment/view', 'id' => $equipment['_id']]
+                            'ул.' . $device['house']['street']['title'] . ', д.' .
+                            $device['house']['number'] . ', кв.' . $device['flat']['number'],
+                            ['device/view', 'id' => $device['_id']]
                         );
 
                         $message_flat_count = Message::find()
-                            ->where(['flatUuid' => $equipment['flat']['uuid']])
+                            ->where(['flatUuid' => $device['flat']['uuid']])
                             ->count();
                         $photo_flat_count = Photo::find()
-                            ->where(['objectUuid' => $equipment['uuid']])
+                            ->where(['objectUuid' => $device['uuid']])
                             ->count();
 
                         $message = Message::find()
                             ->select('*')
                             ->orderBy('date DESC')
-                            ->where(['flatUuid' => $equipment['flat']['uuid']])
+                            ->where(['flatUuid' => $device['flat']['uuid']])
                             ->one();
                         $message_text = '[' . $photo_flat_count . '/' . $message_flat_count . '] ['.$message['date'].']';
                         if ($message != null) {
@@ -505,12 +503,12 @@ class EquipmentController extends Controller
 
                         $photo = Photo::find()
                             ->select('*')
-                            ->where(['objectUuid' => $equipment['uuid']])
+                            ->where(['objectUuid' => $device['uuid']])
                             ->orderBy('createdAt DESC')
                             ->one();
                         if ($photo) {
                             $fullTree[$oCnt0][$c][$oCnt1]['photo'] = Html::a($photo['createdAt'],
-                                ['storage/equipment/' . $photo['uuid'] . '.jpg']
+                                ['storage/device/' . $photo['uuid'] . '.jpg']
                             );
                             $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = $photo['user']->name;
                             $photo_count++;
@@ -521,7 +519,7 @@ class EquipmentController extends Controller
 
                         $measures = Measure::find()
                             ->select('*')
-                            ->where(['equipmentUuid' => $equipment['uuid']])
+                            ->where(['deviceUuid' => $device['uuid']])
                             ->orderBy('date')
                             ->all();
                         $measure_count_column=0;
@@ -545,17 +543,17 @@ class EquipmentController extends Controller
                             $measure_total_count++;
                         }
 
-                        if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                        if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                             $class = 'critical1';
-                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
+                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
                             $class = 'critical2';
-                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::UNKNOWN) {
+                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::UNKNOWN) {
                             $class = 'critical4';
                         } else {
                             $class = 'critical3';
                         }
 
-                        $status = $equipment['equipmentStatus']->title;
+                        $status = $device['deviceStatus']->title;
                         if ($measure) {
                             //echo $measure['date'].' | '.time() .'-'. strtotime($measure['date']). ' < ' . (3600 * 24 * 7 * 1).'<br/>';
                             if (time() - strtotime($measure['date']) > (3600 * 24 * 7 * 1)) {
@@ -581,8 +579,8 @@ class EquipmentController extends Controller
                         $fullTree[$oCnt0][$c][$oCnt1]['status'] = '<div class="progress"><div class="'
                             . $class . '">' . $status . '</div></div>';
 
-                        $fullTree[$oCnt0][$c][$oCnt1]['date'] = $equipment['testDate'];
-                        $fullTree[$oCnt0][$c][$oCnt1]['serial'] = $equipment['serial'];
+                        $fullTree[$oCnt0][$c][$oCnt1]['date'] = $device['testDate'];
+                        $fullTree[$oCnt0][$c][$oCnt1]['serial'] = $device['serial'];
 
                         $oCnt1++;
                     }
@@ -610,12 +608,12 @@ class EquipmentController extends Controller
         }
         return $this->render(
             'tree-user',
-            ['equipment' => $fullTree]
+            ['device' => $fullTree]
         );
     }
 
     /**
-     * Build tree of equipment by user
+     * Build tree of device by user
      *
      * @return mixed
      */
@@ -651,12 +649,12 @@ class EquipmentController extends Controller
                 foreach ($flats as $flat) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Device::find()->where(['flatUuid' => $flat['uuid']])->all();
-                    foreach ($equipments as $equipment) {
+                    $devices = Device::find()->where(['flatUuid' => $flat['uuid']])->all();
+                    foreach ($devices as $device) {
                         $fullTree[$oCnt0][$c][$oCnt1]['title']
                             = Html::a(
-                            'ул.' . $equipment['house']['street']['title'] . ', д.' . $equipment['house']['number'] . ', кв.' . $equipment['flat']['number'],
-                            ['equipment/view', 'id' => $equipment['_id']]
+                            'ул.' . $device['house']['street']['title'] . ', д.' . $device['house']['number'] . ', кв.' . $device['flat']['number'],
+                            ['device/view', 'id' => $device['_id']]
                         );
 
                         if ($user != null)
@@ -665,23 +663,23 @@ class EquipmentController extends Controller
                                 ['user-house/delete', 'id' => $user_house['_id']], ['target' => '_blank']
                             );
 
-                        if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                        if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                             $class = 'critical1';
-                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
+                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
                             $class = 'critical2';
-                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::UNKNOWN) {
+                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::UNKNOWN) {
                             $class = 'critical4';
                         } else {
                             $class = 'critical3';
                         }
                         $fullTree[$oCnt0][$c][$oCnt1]['status'] = '<div class="progress"><div class="'
-                            . $class . '">' . $equipment['equipmentStatus']->title . '</div></div>';
-                        $fullTree[$oCnt0][$c][$oCnt1]['date'] = $equipment['testDate'];
-                        //$fullTree[$oCnt0][$c][$oCnt1]['serial'] = $equipment['serial'];
+                            . $class . '">' . $device['deviceStatus']->title . '</div></div>';
+                        $fullTree[$oCnt0][$c][$oCnt1]['date'] = $device['testDate'];
+                        //$fullTree[$oCnt0][$c][$oCnt1]['serial'] = $device['serial'];
 
                         $measure = Measure::find()
                             ->select('*')
-                            ->where(['equipmentUuid' => $equipment['uuid']])
+                            ->where(['deviceUuid' => $device['uuid']])
                             ->orderBy('date DESC')
                             ->one();
                         if ($measure) {
@@ -693,7 +691,7 @@ class EquipmentController extends Controller
                             $house_visited++;
                             $visited++;
                         } else {
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $equipment['changedAt'];
+                            $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $device['changedAt'];
                             $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = "не снимались";
                             $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = "-";
                         }
@@ -701,7 +699,7 @@ class EquipmentController extends Controller
                         $message = Message::find()
                             ->select('*')
                             ->orderBy('date DESC')
-                            ->where(['flatUuid' => $equipment['flat']['uuid']])
+                            ->where(['flatUuid' => $device['flat']['uuid']])
                             ->one();
                         if ($message != null) {
                             $fullTree[$oCnt0][$c][$oCnt1]['message'] =
@@ -713,13 +711,13 @@ class EquipmentController extends Controller
 
                         $photo = Photo::find()
                             ->select('*')
-                            ->where(['objectuid' => $equipment['uuid']])
+                            ->where(['objectuid' => $device['uuid']])
                             ->orderBy('createdAt DESC')
                             ->one();
                         if ($photo) {
                             $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = $photo['createdAt'];
                             $fullTree[$oCnt0][$c][$oCnt1]['photo'] = Html::a('фото',
-                                ['storage/equipment/' . $photo['uuid'] . '.jpg']
+                                ['storage/device/' . $photo['uuid'] . '.jpg']
                             );
                             $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = $photo['user']->name;
                             $last_user = $photo['user']->name;
@@ -763,12 +761,12 @@ class EquipmentController extends Controller
         }
         return $this->render(
             'tree-street',
-            ['equipment' => $fullTree]
+            ['device' => $fullTree]
         );
     }
 
     /**
-     * Build tree of equipment by user
+     * Build tree of device by user
      *
      * @return mixed
      */
@@ -791,17 +789,17 @@ class EquipmentController extends Controller
                 foreach ($objects as $object) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Device::find()->where(['objectUuid' => $object['uuid']])->all();
-                    foreach ($equipments as $equipment) {
+                    $devices = Device::find()->where(['objectUuid' => $object['uuid']])->all();
+                    foreach ($devices as $device) {
                         $fullTree[$oCnt0]['title']
                             = Html::a(
-                            'ул.' . $equipment['house']['street']['title'] . ', д.' . $equipment['house']['number'] . ', кв.' . $equipment['object']['number'],
-                            ['equipment/view', 'id' => $equipment['_id']]
+                            'ул.' . $device['house']['street']['title'] . ', д.' . $device['house']['number'] . ', кв.' . $device['object']['number'],
+                            ['device/view', 'id' => $device['_id']]
                         );
 
                         $measures = Measure::find()
                             ->select('*')
-                            ->where(['equipmentUuid' => $equipment['uuid']])
+                            ->where(['deviceUuid' => $device['uuid']])
                             ->orderBy('date')
                             ->all();
 
@@ -854,7 +852,7 @@ class EquipmentController extends Controller
                         $message = Message::find()
                             ->select('*')
                             ->orderBy('date DESC')
-                            ->where(['flatUuid' => $equipment['flat']['uuid']])
+                            ->where(['flatUuid' => $device['flat']['uuid']])
                             ->one();
                         if ($message != null) {
                             $fullTree[$oCnt0]['message'] =
@@ -870,12 +868,12 @@ class EquipmentController extends Controller
         }
         return $this->render(
             'tree-measure',
-            ['equipment' => $fullTree]
+            ['device' => $fullTree]
         );
     }
 
     /**
-     * Deletes an existing Equipment model.
+     * Deletes an existing Device model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
@@ -885,10 +883,10 @@ class EquipmentController extends Controller
     public
     function actionDelete($id)
     {
-        $equipment = $this->findModel($id);
+        $device = $this->findModel($id);
         $photos = Photo::find()
             ->select('*')
-            ->where(['equipmentUuid' => $equipment['uuid']])
+            ->where(['deviceUuid' => $device['uuid']])
             ->all();
         foreach ($photos as $photo) {
             $photo->delete();
@@ -896,7 +894,7 @@ class EquipmentController extends Controller
 
         $measures = Measure::find()
             ->select('*')
-            ->where(['equipmentUuid' => $equipment['uuid']])
+            ->where(['deviceUuid' => $device['uuid']])
             ->all();
         foreach ($measures as $measure) {
             $measure->delete();
@@ -907,7 +905,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Finds the Equipment model based on its primary key value.
+     * Finds the Device model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id

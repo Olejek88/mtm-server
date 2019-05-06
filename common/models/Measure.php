@@ -13,16 +13,15 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $oid идентификатор организации
  * @property string $uuid
- * @property string $equipmentUuid
- * @property string $userUuid
+ * @property string $sensorChannelUuid
  * @property string $measureTypeUuid
  * @property double $value
  * @property string $date
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property Users $user
- * @property Device $equipment
+ * @property SensorChannel $sensorChannel
+ * @property MeasureType $measureType
  */
 class Measure extends ActiveRecord
 {

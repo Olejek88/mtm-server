@@ -13,9 +13,7 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $uuid
  * @property string $oid идентификатор организации
- * @property string $gis_id глобальный идентификатор в ГИС ЖКХ
  * @property string $number
- * @property string $houseStatusUuid
  * @property string $streetUuid
  * @property string $createdAt
  * @property string $changedAt
@@ -23,8 +21,6 @@ use yii\db\Expression;
  * @property boolean $deleted
  *
  * @property Street $street
- * @property HouseStatus $houseStatus
- * @property Photo $photo
  * @property HouseType $houseType
  */
 class House extends ActiveRecord

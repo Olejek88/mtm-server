@@ -7,7 +7,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentSearch represents the model behind the search form about `common\models\Equipment`.
+ * NodeSearch represents the model behind the search form about `common\models\Node`.
  */
 class DeviceSearch extends Device
 {
@@ -18,7 +18,7 @@ class DeviceSearch extends Device
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'equipmentTypeUuid', 'objectUuid', 'testDate', 'equipmentStatusUuid', 'serial', 'tag', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'deviceTypeUuid', 'nodeUuid', 'date', 'deviceStatusUuid', 'serial', 'port', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -64,9 +64,9 @@ class DeviceSearch extends Device
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'objectUuid', $this->objectUuid])
-            ->andFilterWhere(['like', 'equipmentTypeUuid', $this->equipmentTypeUuid])
-            ->andFilterWhere(['like', 'equipmentStatusUuid', $this->equipmentStatusUuid])
+            ->andFilterWhere(['like', 'nodeUuid', $this->nodeUuid])
+            ->andFilterWhere(['like', 'deviceTypeUuid', $this->deviceTypeUuid])
+            ->andFilterWhere(['like', 'deviceStatusUuid', $this->deviceStatusUuid])
             ->andFilterWhere(['like', 'serial', $this->serial])
             ->orderBy(['changedAt' => SORT_DESC]);
 

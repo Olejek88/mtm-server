@@ -11,7 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * EquipmentStatusController implements the CRUD actions for EquipmentStatus model.
+ * DeviceStatusController implements the CRUD actions for DeviceStatus model.
  */
 class DeviceStatusController extends Controller
 {
@@ -38,7 +38,7 @@ class DeviceStatusController extends Controller
     }
 
     /**
-     * Lists all EquipmentStatus models.
+     * Lists all DeviceStatus models.
      * @return mixed
      */
     public function actionIndex()
@@ -53,7 +53,7 @@ class DeviceStatusController extends Controller
     }
 
     /**
-     * Displays a single EquipmentStatus model.
+     * Displays a single DeviceStatus model.
      * @param integer $id
      * @return mixed
      */
@@ -65,7 +65,7 @@ class DeviceStatusController extends Controller
     }
 
     /**
-     * Creates a new EquipmentStatus model.
+     * Creates a new DeviceStatus model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
@@ -85,7 +85,7 @@ class DeviceStatusController extends Controller
     }
 
     /**
-     * Updates an existing EquipmentStatus model.
+     * Updates an existing DeviceStatus model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -103,7 +103,7 @@ class DeviceStatusController extends Controller
     }
 
     /**
-     * Deletes an existing EquipmentStatus model.
+     * Deletes an existing DeviceStatus model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -115,7 +115,7 @@ class DeviceStatusController extends Controller
     }
 
     /**
-     * Finds the EquipmentStatus model based on its primary key value.
+     * Finds the DeviceStatus model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
      * @return DeviceStatus the loaded model

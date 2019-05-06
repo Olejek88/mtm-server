@@ -7,7 +7,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentSearchStatus represents the model behind the search form about `common\models\EquipmentStatusController.php`.
+ * DeviceSearchStatus represents the model behind the search form about `common\models\DeviceStatusController.php`.
  */
 class DeviceSearchStatus extends DeviceStatus
 {

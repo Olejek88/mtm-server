@@ -2,14 +2,14 @@
 
 namespace backend\models;
 
-use common\models\ContragentType;
+use common\models\Camera;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * ContragentSearchType represents the model behind the search form about `common\models\ContragentType`.
+ * OperationSearchStatus represents the model behind the search form about `common\models\Camera`.
  */
-class ContragentSearchType extends ContragentType
+class CameraSearch extends Camera
 {
     /**
      * @inheritdoc
@@ -18,7 +18,7 @@ class ContragentSearchType extends ContragentType
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'deviceStatus', 'object', 'deleted', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class ContragentSearchType extends ContragentType
      */
     public function search($params)
     {
-        $query = ContragentType::find();
+        $query = Camera::find();
 
         // add conditions that should always apply here
 

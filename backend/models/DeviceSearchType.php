@@ -8,7 +8,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentSearchType represents the model behind the search form about `common\models\EquipmentType`.
+ * DeviceSearchType represents the model behind the search form about `common\models\DeviceType`.
  */
 class DeviceSearchType extends DeviceType
 {

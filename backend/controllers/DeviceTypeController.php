@@ -11,7 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * EquipmentTypeController implements the CRUD actions for EquipmentType model.
+ * DeviceTypeController implements the CRUD actions for DeviceType model.
  */
 class DeviceTypeController extends Controller
 {
@@ -70,7 +70,7 @@ class DeviceTypeController extends Controller
     }
 
     /**
-     * Displays a single EquipmentType model.
+     * Displays a single DeviceType model.
      *
      * @param integer $id Id
      *
@@ -87,7 +87,7 @@ class DeviceTypeController extends Controller
     }
 
     /**
-     * Creates a new EquipmentType model.
+     * Creates a new DeviceType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
@@ -115,7 +115,7 @@ class DeviceTypeController extends Controller
     }
 
     /**
-     * Updates an existing EquipmentType model.
+     * Updates an existing DeviceType model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param integer $id Id
@@ -141,7 +141,7 @@ class DeviceTypeController extends Controller
     }
 
     /**
-     * Deletes an existing EquipmentType model.
+     * Deletes an existing DeviceType model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
@@ -155,7 +155,7 @@ class DeviceTypeController extends Controller
     }
 
     /**
-     * Finds the EquipmentType model based on its primary key value.
+     * Finds the DeviceType model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id

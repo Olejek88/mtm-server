@@ -6,19 +6,16 @@ use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "equipment_register".
+ * This is the model class for table "device_register".
  *
  * @property string $uuid
  * @property string $oid идентификатор организации
- * @property string $equipmentUuid
- * @property string $registerTypeUuid
- * @property string $userUuid
+ * @property string $deviceUuid
  * @property string $date
  * @property string $description
  *
  * @property User $user
- * @property Device $equipment
- * @property EquipmentRegisterType $equipmentRegisterType
+ * @property Device $device
  */
 
 class DeviceRegister extends ActiveRecord
@@ -37,10 +34,10 @@ class DeviceRegister extends ActiveRecord
     public function rules()
     {
         return [
-            [['uuid','userUuid', 'registerTypeUuid', 'equipmentUuid', 'date'], 'required'],
+            [['uuid', 'deviceUuid', 'date'], 'required'],
             [['data'], 'safe'],
-            [['uuid','userUuid', 'registerTypeUuid', 'equipmentUuid'], 'string', 'max' => 50],
-            [['description','oid'], 'string', 'max' => 250],
+            [['uuid', 'deviceUuid', 'oid'], 'string', 'max' => 50],
+            [['description'], 'string', 'max' => 250],
         ];
     }
 
@@ -55,63 +52,32 @@ class DeviceRegister extends ActiveRecord
     {
         return [
             'uuid' => Yii::t('app', 'Uuid'),
-            'equipmentUuid' => Yii::t('app', 'Оборудование'),
-            'equipment' => Yii::t('app', 'Оборудование'),
-            'userUuid' => Yii::t('app', 'Пользователь'),
-            'user' => Yii::t('app', 'Пользователь'),
+            'deviceUuid' => Yii::t('app', 'Оборудование'),
+            'device' => Yii::t('app', 'Оборудование'),
             'description' => Yii::t('app', 'Запись'),
             'date' => Yii::t('app', 'Дата'),
-            'registerType' => Yii::t('app', 'Тип события'),
-            'registerTypeUuid' => Yii::t('app', 'Тип события'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(Users::class, ['uuid' => 'userUuid']);
-    }
-
-    /**
      * Объект связанного поля.
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRegisterType()
+    public function getDevice()
     {
         return $this->hasOne(
-            EquipmentRegisterType::class, ['uuid' => 'registerTypeUuid']
-        );
-    }
-
-    /**
-     * Объект связанного поля.
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEquipment()
-    {
-        return $this->hasOne(
-            Device::class, ['uuid' => 'equipmentUuid']
+            Device::class, ['uuid' => 'deviceUuid']
         );
     }
 
     public function fields()
     {
         return ['uuid',
-            'equipment' => function ($model) {
-                return $model->equipment;
-            },
-            'user' => function ($model) {
-                return $model->user;
-            },
-            'registerTypeUuid',
-            'registerType' => function ($model) {
-                return $model->registerType;
+            'device' => function ($model) {
+                return $model->device;
             }, 'date', 'description', 'createdAt', 'changedAt'
         ];
     }

@@ -11,7 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * EquipmentRegisterController implements the CRUD actions for EquipmentRegister model.
+ * DeviceRegisterController implements the CRUD actions for DeviceRegister model.
  */
 class DeviceRegisterController extends Controller
 {
@@ -40,7 +40,7 @@ class DeviceRegisterController extends Controller
     }
 
     /**
-     * Lists all EquipmentRegister models.
+     * Lists all DeviceRegister models.
      * @return mixed
      */
     public function actionIndex()
@@ -56,7 +56,7 @@ class DeviceRegisterController extends Controller
     }
 
     /**
-     * Displays a single EquipmentRegister model.
+     * Displays a single DeviceRegister model.
      * @param integer $id
      * @return mixed
      */
@@ -68,7 +68,7 @@ class DeviceRegisterController extends Controller
     }
 
     /**
-     * Creates a new EquipmentRegister model.
+     * Creates a new DeviceRegister model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
@@ -85,7 +85,7 @@ class DeviceRegisterController extends Controller
     }
 
     /**
-     * Updates an existing EquipmentRegister model.
+     * Updates an existing DeviceRegister model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -104,7 +104,7 @@ class DeviceRegisterController extends Controller
     }
 
     /**
-     * Deletes an existing EquipmentRegister model.
+     * Deletes an existing DeviceRegister model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -117,7 +117,7 @@ class DeviceRegisterController extends Controller
     }
 
     /**
-     * Finds the EquipmentRegister model based on its primary key value.
+     * Finds the DeviceRegister model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
      * @return DeviceRegister the loaded model

@@ -7,26 +7,26 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "equipment".
+ * This is the model class for table "device".
  *
  * @property integer $_id
  * @property string $uuid
  * @property string $oid идентификатор организации
- * @property string $title
- * @property string $equipmentTypeUuid
+ * @property string $address
+ * @property string $deviceTypeUuid
  * @property string $serial
- * @property string $tag
- * @property string $equipmentStatusUuid
- * @property string $testDate
- * @property string $objectUuid
+ * @property string $port
+ * @property integer $interface
+ * @property string $deviceStatusUuid
+ * @property string $date
+ * @property string $nodeUuid
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
  *
- * @property DeviceStatus $equipmentStatus
- * @property DeviceType $equipmentType
- * @property Object $object
- * @property Photo $photo
+ * @property DeviceStatus $deviceStatus
+ * @property DeviceType $deviceType
+ * @property Node $node
  */
 class Device extends ActiveRecord
 {
@@ -55,7 +55,7 @@ class Device extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'equipment';
+        return 'device';
     }
 
     /**
@@ -65,20 +65,20 @@ class Device extends ActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'title',
-            'objectUuid',
-            'object' => function ($model) {
-                return $model->object;
+        return ['_id', 'uuid', 'address',
+            'nodeUuid',
+            'node' => function ($model) {
+                return $model->node;
             },
-            'equipmentTypeUuid',
-            'equipmentType' => function ($model) {
-                return $model->equipmentType;
+            'deviceTypeUuid',
+            'deviceType' => function ($model) {
+                return $model->deviceType;
             },
-            'equipmentStatusUuid',
-            'equipmentStatus' => function ($model) {
-                return $model->equipmentStatus;
+            'deviceStatusUuid',
+            'deviceStatus' => function ($model) {
+                return $model->deviceStatus;
             },
-            'serial', 'testDate', 'tag', 'deleted',
+            'serial', 'date', 'port', 'deleted', 'interface',
             'createdAt', 'changedAt'
         ];
     }
@@ -94,34 +94,29 @@ class Device extends ActiveRecord
             [
                 [
                     'uuid',
-                    'title',
-                    'equipmentTypeUuid',
-                    'equipmentStatusUuid',
+                    'nodeUuid',
+                    'deviceTypeUuid',
+                    'deviceStatusUuid',
                     'serial',
+                    'interface',
+                    'port'
                 ],
                 'required'
             ],
-            [['testDate', 'createdAt', 'changedAt'], 'safe'],
+            [['date', 'createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
             [
                 [
                     'uuid',
-                    'equipmentTypeUuid',
-                    'equipmentStatusUuid',
+                    'deviceTypeUuid',
+                    'deviceStatusUuid',
                     'serial',
-                    'tag',
-                    'oid',
-                    'objectUuid'
+                    'port',
+                    'nodeUuid'
                 ],
                 'string', 'max' => 50
             ],
-            [
-                [
-                    'title'
-                ],
-                'string', 'max' => 150
-            ],
-
+            [['interface'], 'integer'],
         ];
     }
 
@@ -135,15 +130,15 @@ class Device extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'title' => Yii::t('app', 'Название'),
-            'equipmentTypeUuid' => Yii::t('app', 'Тип оборудования'),
-            'equipmentType' => Yii::t('app', 'Тип'),
-            'testDate' => Yii::t('app', 'Дата последней поверки'),
-            'equipmentStatusUuid' => Yii::t('app', 'Статус'),
-            'equipmentStatus' => Yii::t('app', 'Статус'),
-            'objectUuid' => Yii::t('app', 'Объект'),
-            'object' => Yii::t('app', 'Объект'),
-            'tag' => Yii::t('app', 'Метка'),
+            'interface' => Yii::t('app', 'Интерфейс'),
+            'deviceTypeUuid' => Yii::t('app', 'Тип оборудования'),
+            'deviceType' => Yii::t('app', 'Тип'),
+            'date' => Yii::t('app', 'Дата последней связи'),
+            'deviceStatusUuid' => Yii::t('app', 'Статус'),
+            'deviceStatus' => Yii::t('app', 'Статус'),
+            'nodeUuid' => Yii::t('app', 'Шкаф установки'),
+            'node' => Yii::t('app', 'Шкаф установки'),
+            'port' => Yii::t('app', 'Порт'),
             'serial' => Yii::t('app', 'Серийный номер'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
@@ -169,10 +164,10 @@ class Device extends ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getEquipmentStatus()
+    public function getDeviceStatus()
     {
         return $this->hasOne(
-            DeviceStatus::class, ['uuid' => 'equipmentStatusUuid']
+            DeviceStatus::class, ['uuid' => 'deviceStatusUuid']
         );
     }
 
@@ -181,10 +176,10 @@ class Device extends ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getEquipmentType()
+    public function getDeviceType()
     {
         return $this->hasOne(
-            DeviceType::class, ['uuid' => 'equipmentTypeUuid']
+            DeviceType::class, ['uuid' => 'deviceTypeUuid']
         );
     }
 
@@ -193,12 +188,9 @@ class Device extends ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getObject()
+    public function getNode()
     {
-        return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
+        return $this->hasOne(Node::class, ['uuid' => 'nodeUuid']);
     }
 
-    public function getPhoto() {
-        return $this->hasMany(Photo::class, ['equipmentUuid' => 'uuid']);
-    }
 }

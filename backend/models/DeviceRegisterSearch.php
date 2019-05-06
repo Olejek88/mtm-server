@@ -7,7 +7,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * EquipmentRegisterSearch represents the model behind the search form about `common\models\EquipmentRegister`.
+ * DeviceRegisterSearch represents the model behind the search form about `common\models\DeviceRegister`.
  */
 class DeviceRegisterSearch extends DeviceRegister
 {
@@ -17,7 +17,7 @@ class DeviceRegisterSearch extends DeviceRegister
     public function rules()
     {
         return [
-            [['userUuid', 'registerType', 'equipmentUuid', 'date'], 'safe'],
+            [['description', 'deviceUuid', 'date'], 'safe'],
         ];
     }
 
@@ -58,15 +58,10 @@ class DeviceRegisterSearch extends DeviceRegister
         // grid filtering conditions
         $query->andFilterWhere([
             'date' => $this->date,
-            'registerType' => $this->registerType,
-            'equipmentUuid' => $this->equipmentUuid,
-            'userUuid' => $this->userUuid,
+            'deviceUuid' => $this->deviceUuid
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'equipmentUuid', $this->equipmentUuid])
-            ->andFilterWhere(['like', 'registerType', $this->registerType])
-            ->andFilterWhere(['like', 'userUuid', $this->userUuid])
             ->orderBy(['date' => SORT_DESC]);
 
         return $dataProvider;
