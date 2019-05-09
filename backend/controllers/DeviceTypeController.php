@@ -75,6 +75,7 @@ class DeviceTypeController extends Controller
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -121,6 +122,7 @@ class DeviceTypeController extends Controller
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -147,6 +149,7 @@ class DeviceTypeController extends Controller
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {

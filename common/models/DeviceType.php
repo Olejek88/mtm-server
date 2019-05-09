@@ -13,11 +13,9 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $uuid
  * @property string $title
- * @property string $equipmentSystemUuid
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property EquipmentSystem $equipmentSystem
  */
 class DeviceType extends ActiveRecord
 {

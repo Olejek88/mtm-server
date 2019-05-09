@@ -3,6 +3,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -162,7 +163,7 @@ class Device extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getDeviceStatus()
     {
@@ -174,7 +175,7 @@ class Device extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getDeviceType()
     {
@@ -186,7 +187,7 @@ class Device extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getNode()
     {

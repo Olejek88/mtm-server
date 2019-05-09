@@ -30,10 +30,13 @@ class DeviceRegisterController extends Controller
         ];
     }
 
+    /**
+     * @throws UnauthorizedHttpException
+     */
     public function init()
     {
 
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             throw new UnauthorizedHttpException();
         }
 
@@ -59,6 +62,7 @@ class DeviceRegisterController extends Controller
      * Displays a single DeviceRegister model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -108,6 +112,7 @@ class DeviceRegisterController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {

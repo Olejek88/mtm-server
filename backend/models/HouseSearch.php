@@ -60,7 +60,6 @@ class HouseSearch extends House
         $query->andFilterWhere([
             '_id' => $this->_id,
             'streetUuid' => $this->streetUuid,
-            'houseStatusUuid' => $this->houseStatusUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -64,7 +65,7 @@ class DeviceRegister extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getDevice()
     {

@@ -51,9 +51,9 @@ class House extends ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'houseStatusUuid', 'streetUuid'], 'required'],
+            [['uuid', 'streetUuid'], 'required'],
             [['createdAt', 'changedAt', 'deleted'], 'safe'],
-            [['uuid', 'number', 'houseStatusUuid', 'houseTypeUuid', 'streetUuid', 'oid'], 'string', 'max' => 50],
+            [['uuid', 'number', 'houseTypeUuid', 'streetUuid', 'oid'], 'string', 'max' => 50],
         ];
     }
 
@@ -63,10 +63,6 @@ class House extends ActiveRecord
             '_id',
             'uuid',
             'number',
-            'houseStatusUuid',
-            'houseStatus' => function ($model) {
-                return $model->houseStatus;
-            },
             'houseTypeUuid',
             'houseType' => function ($model) {
                 return $model->houseType;
@@ -80,10 +76,6 @@ class House extends ActiveRecord
         ];
     }
 
-    public function getHouseStatus()
-    {
-        return $this->hasOne(HouseStatus::class, ['uuid' => 'houseStatusUuid']);
-    }
 
     public function getStreet()
     {
@@ -99,9 +91,7 @@ class House extends ActiveRecord
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'number' => Yii::t('app', 'Номер дома'),
-            'houseStatus' => Yii::t('app', 'Статус здания'),
             'street' => Yii::t('app', 'Улица'),
-            'houseStatusUuid' => Yii::t('app', 'Статус здания'),
             'streetUuid' => Yii::t('app', 'Улица'),
             'houseTypeUuid' => Yii::t('app', 'Тип дома'),
             'houseType' => Yii::t('app', 'Тип дома'),

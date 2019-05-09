@@ -2,10 +2,8 @@
 
 namespace backend\controllers;
 
-use backend\models\AlarmSearch;
-use common\models\Alarm;
+use backend\models\CameraSearch;
 use common\models\Camera;
-use common\models\Users;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -29,10 +27,13 @@ class CameraController extends Controller
         ];
     }
 
+    /**
+     * @throws UnauthorizedHttpException
+     */
     public function init()
     {
 
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             throw new UnauthorizedHttpException();
         }
 
@@ -58,6 +59,7 @@ class CameraController extends Controller
      * Displays a single Camera model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -92,6 +94,7 @@ class CameraController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -111,11 +114,11 @@ class CameraController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
     }
 
