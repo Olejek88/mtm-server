@@ -124,7 +124,6 @@ class MessageController extends Controller
 
     /**
      * Creates a new Message model in chat for all users
-     * @throws NotFoundHttpException
      * @return mixed
      */
     public function actionSend()

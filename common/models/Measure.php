@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -150,7 +151,7 @@ class Measure extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getEquipment()
     {
@@ -160,7 +161,7 @@ class Measure extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
@@ -170,7 +171,7 @@ class Measure extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getMeasureType()
     {

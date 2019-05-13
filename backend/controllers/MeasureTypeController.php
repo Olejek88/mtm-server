@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\MeasureSearchType;
 use common\models\MeasureType;
 use Yii;
+use yii\db\StaleObjectException as StaleObjectExceptionAlias;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -30,10 +31,13 @@ class MeasureTypeController extends Controller
         ];
     }
 
+    /**
+     * @throws UnauthorizedHttpException
+     */
     public function init()
     {
 
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             throw new UnauthorizedHttpException();
         }
 
@@ -59,6 +63,7 @@ class MeasureTypeController extends Controller
      * Displays a single MeasureType model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -94,6 +99,7 @@ class MeasureTypeController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -112,6 +118,9 @@ class MeasureTypeController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectExceptionAlias
      */
     public function actionDelete($id)
     {

@@ -65,8 +65,7 @@ class MeasureSearch extends Measure
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'equipmentUuid', $this->equipmentUuid])
-            ->andFilterWhere(['like', 'userUuid', $this->userUuid])
+            ->andFilterWhere(['like', 'sensorChannelUuid', $this->sensorChannelUuid])
             ->andFilterWhere(['like', 'value', $this->value]);
 
         return $dataProvider;

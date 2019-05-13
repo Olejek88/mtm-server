@@ -3,23 +3,22 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "shutdown".
+ * This is the model class for table "sensor_config".
  *
  * @property integer $_id
  * @property string $oid идентификатор организации
  * @property string $uuid
- * @property string $startDate
- * @property string $endDate
- * @property string $comment
- * @property string $contragentUuid
+ * @property string $sensorChannelUuid
+ * @property string $config
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property Organisation $contragent
+ * @property SensorChannel $sensorChannel
  */
 class SensorConfig extends ActiveRecord
 {
@@ -49,7 +48,7 @@ class SensorConfig extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'shutdown';
+        return 'sensor_channel';
     }
 
     /**
@@ -65,9 +64,8 @@ class SensorConfig extends ActiveRecord
             [
                 [
                     'uuid',
-                    'contragentUuid',
-                    'startDate',
-                    'endDate'
+                    'sensorChannelUuid',
+                    'config',
                 ],
                 'required'
             ],
@@ -75,7 +73,7 @@ class SensorConfig extends ActiveRecord
             [
                 [
                     'uuid',
-                    'contragentUuid'
+                    'sensorChannelUuid'
                 ],
                 'string', 'max' => 45
             ],
@@ -89,13 +87,11 @@ class SensorConfig extends ActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid',
-            'contragentUuid',
-            'contragent' => function ($model) {
+        return ['_id', 'uuid', 'config',
+            'sensorChannelUuid',
+            'sensorChannel' => function ($model) {
                 return $model->contragent;
             },
-            'startDate',
-            'endDate',
             'createdAt', 'changedAt'
         ];
     }
@@ -112,9 +108,8 @@ class SensorConfig extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'contragentUuid' => Yii::t('app', 'Контрагент'),
-            'startDate' => Yii::t('app', 'Начало работ'),
-            'endDate' => Yii::t('app', 'Окончание работ'),
+            'sensorChannelUuid' => Yii::t('app', 'Канал/устройство'),
+            'config' => Yii::t('app', 'Конфигурация'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -123,26 +118,12 @@ class SensorConfig extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveRecord
+     * @return ActiveQuery
      */
-    public function getContragent()
-    {
-        $contragent = Organisation::find()
-            ->select('*')
-            ->where(['uuid' => $this->contragentUuid])
-            ->one();
-        return $contragent;
-    }
-
-    /**
-     * Объект связанного поля.
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWorkStatus()
+    public function getSensorChannel()
     {
         return $this->hasOne(
-            WorkStatus::class, ['uuid' => 'workStatusUuid']
+            SensorChannel::class, ['uuid' => 'sensorChannelUuid']
         );
     }
 

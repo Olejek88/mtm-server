@@ -2,8 +2,9 @@
 
 namespace common\models;
 
+use Exception;
 use Yii;
-use yii\base\NotSupportedException;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -106,7 +107,6 @@ class User extends ActiveRecord implements IdentityInterface
      * @inheritdoc
      *
      * @return User
-     * @throws NotSupportedException
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
@@ -242,7 +242,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @param string $password Пароль.
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function setPassword($password)
     {
@@ -253,7 +253,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Generates "remember me" authentication key
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function generateAuthKey()
     {
@@ -265,7 +265,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function generatePasswordResetToken()
     {
@@ -286,15 +286,15 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @param null $duration
      * @return mixed
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function generateAccessToken($duration = null)
     {
         if ($duration === null) {
-            $duration = \Yii::$app->params['duration']['week'];
+            $duration = Yii::$app->params['duration']['week'];
         }
 
-        $token = \Yii::createObject([
+        $token = Yii::createObject([
             'class' => UserTokenAuth::class,
             'valid_till' => date(DATE_W3C, time() + $duration),
 //            'type' => UserTokenAuth::AUTH_TYPE,

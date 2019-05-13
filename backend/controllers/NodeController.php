@@ -23,9 +23,9 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * EquipmentController implements the CRUD actions for Equipment model.
+ * NodeController implements the CRUD actions for Node model.
  */
-class EquipmentController extends Controller
+class NodeController extends Controller
 {
     /**
      * Behaviors
@@ -62,7 +62,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Lists all Equipment models.
+     * Lists all Node models.
      *
      * @return mixed
      */
@@ -73,19 +73,19 @@ class EquipmentController extends Controller
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'serial') {
-                $model['serial'] = $_POST['Equipment'][$_POST['editableIndex']]['serial'];
+                $model['serial'] = $_POST['Node'][$_POST['editableIndex']]['serial'];
             }
             if ($_POST['editableAttribute'] == 'tag') {
-                $model['tag'] = $_POST['Equipment'][$_POST['editableIndex']]['tag'];
+                $model['tag'] = $_POST['Node'][$_POST['editableIndex']]['tag'];
             }
             if ($_POST['editableAttribute'] == 'equipmentTypeUuid') {
-                $model['equipmentTypeUuid'] = $_POST['Equipment'][$_POST['editableIndex']]['equipmentTypeUuid'];
+                $model['equipmentTypeUuid'] = $_POST['Node'][$_POST['editableIndex']]['equipmentTypeUuid'];
             }
             if ($_POST['editableAttribute'] == 'equipmentStatusUuid') {
-                $model['equipmentStatusUuid'] = $_POST['Equipment'][$_POST['editableIndex']]['equipmentStatusUuid'];
+                $model['equipmentStatusUuid'] = $_POST['Node'][$_POST['editableIndex']]['equipmentStatusUuid'];
             }
             if ($_POST['editableAttribute'] == 'testDate') {
-                $model['testDate'] = date("Y-m-d H:i:s", $_POST['Equipment'][$_POST['editableIndex']]['testDate']);
+                $model['testDate'] = date("Y-m-d H:i:s", $_POST['Node'][$_POST['editableIndex']]['testDate']);
             }
             $model->save();
             return json_encode('');
@@ -105,7 +105,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Displays a single Equipment model.
+     * Displays a single Node model.
      *
      * @param integer $id Id
      *
@@ -122,7 +122,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Creates a new Equipment model.
+     * Creates a new Node model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
@@ -147,7 +147,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Creates a new Equipment models.
+     * Creates a new Node models.
      *
      * @return mixed
      */
@@ -192,7 +192,7 @@ class EquipmentController extends Controller
 
 
     /**
-     * Updates an existing Equipment model.
+     * Updates an existing Node model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param integer $id Id
@@ -454,7 +454,7 @@ class EquipmentController extends Controller
                 $user['name'],
                 ['user/view', 'id' => $user['_id']]
             );
-            /*            $query = Equipment::find()
+            /*            $query = Node::find()
                             ->select('*')
                             ->where(['flatUuid' => (
                                 Flat::find()->select('uuid')->where(['houseUuid' => (
@@ -875,7 +875,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Deletes an existing Equipment model.
+     * Deletes an existing Node model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
@@ -907,7 +907,7 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Finds the Equipment model based on its primary key value.
+     * Finds the Node model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id

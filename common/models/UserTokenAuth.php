@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use Yii;
+
 /**
  * Class UserTokenAuth
  * @package common\models
@@ -42,7 +44,7 @@ class UserTokenAuth extends UserToken
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $this->setAttribute('token', \Yii::$app->security->generateRandomString());
+                $this->setAttribute('token', Yii::$app->security->generateRandomString());
             }
             return true;
         }
