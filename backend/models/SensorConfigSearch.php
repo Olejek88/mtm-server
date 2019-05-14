@@ -19,7 +19,7 @@ class SensorConfigSearch extends SensorConfig
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'contragentUuid', 'startDate', 'endDate', 'changedAt'], 'safe'],
+            [['uuid', 'sensorChannelUuid', 'config', 'changedAt'], 'safe'],
         ];
     }
 
@@ -60,9 +60,8 @@ class SensorConfigSearch extends SensorConfig
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'contragentUuid' => $this->contragentUuid,
-            'startDate' => $this->startDate,
-            'endDate' => $this->endDate,
+            'sensorChannelUuid' => $this->sensorChannelUuid,
+            'config' => $this->config,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);

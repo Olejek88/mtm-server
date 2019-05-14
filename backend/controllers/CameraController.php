@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\CameraSearch;
 use common\models\Camera;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -115,6 +116,8 @@ class CameraController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

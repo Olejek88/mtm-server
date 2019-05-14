@@ -13,9 +13,7 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $uuid
  * @property string $oid идентификатор организации
- * @property string $gis_id глобальный идентификатор в ГИС ЖКХ
  * @property string $title
- * @property string $objectStatusUuid
  * @property string $houseUuid
  * @property string $createdAt
  * @property string $changedAt
@@ -23,7 +21,6 @@ use yii\db\Expression;
  * @property boolean $deleted
  *
  * @property House $house
- * @property ObjectStatus $objectStatus
  * @property Photo $photo
  * @property ObjectType $objectType
  */

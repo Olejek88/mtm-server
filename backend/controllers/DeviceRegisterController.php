@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\DeviceRegisterSearch;
 use common\models\DeviceRegister;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -93,6 +94,7 @@ class DeviceRegisterController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -113,6 +115,8 @@ class DeviceRegisterController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

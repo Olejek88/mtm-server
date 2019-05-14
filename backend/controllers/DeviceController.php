@@ -71,9 +71,6 @@ class DeviceController extends Controller
             $model = Device::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-            if ($_POST['editableAttribute'] == 'serial') {
-                $model['serial'] = $_POST['Device'][$_POST['editableIndex']]['serial'];
-            }
             if ($_POST['editableAttribute'] == 'port') {
                 $model['tag'] = $_POST['Device'][$_POST['editableIndex']]['port'];
             }

@@ -13,17 +13,11 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $oid идентификатор организации
  * @property string $uuid
- * @property string $fromUserUuid
- * @property string $toUserUuid
- * @property string $text
- * @property string $date
- * @property integer $status
+ * @property string $link
  * @property string $createdAt
  * @property string $changedAt
- *
- * @property Users $fromUser
- * @property Users $toUser
  */
+
 class Message extends ActiveRecord
 {
     /**
@@ -60,15 +54,7 @@ class Message extends ActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'date', 'text', 'status',
-            'fromUserUuid' => function ($model) {
-                return $model->name;
-            },
-            'toUserUuid' => function ($model) {
-                return $model->name;
-            },
-            'createdAt', 'changedAt'
-        ];
+        return ['_id', 'uuid', 'link', 'createdAt', 'changedAt'];
     }
 
     /**
@@ -82,27 +68,15 @@ class Message extends ActiveRecord
             [
                 [
                     'uuid',
-                    'fromUserUuid',
-                    'toUserUuid',
-                    'text',
-                    'status',
-                    'date'
+                    'link'
                 ],
                 'required'
             ],
             [['createdAt', 'changedAt'], 'safe'],
             [
-                [
-                    'uuid',
-                    'fromUserUuid',
-                    'toUserUuid',
-                    'oid',
-                    'date'
-                ],
-                'string', 'max' => 50
+                [ 'uuid' ], 'string', 'max' => 50
             ],
-            [['status'], 'integer'],
-            [['text'], 'string'],
+            [['link'], 'string'],
         ];
     }
 
@@ -116,11 +90,7 @@ class Message extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'fromUserUuid' => Yii::t('app', 'Отправитель'),
-            'toUserUuid' => Yii::t('app', 'Получатель'),
-            'date' => Yii::t('app', 'Дата'),
-            'status' => Yii::t('app', 'Статус'),
-            'text' => Yii::t('app', 'Текст'),
+            'link' => Yii::t('app', 'Ссылка'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -138,29 +108,5 @@ class Message extends ActiveRecord
         } else {
             return false;
         }
-    }
-
-    /**
-     * Объект связанного поля.
-     *
-     * @return ActiveQuery
-     */
-    public function getFromUser()
-    {
-        return $this->hasOne(
-            Users::class, ['uuid' => 'fromUserUuid']
-        );
-    }
-
-    /**
-     * Объект связанного поля.
-     *
-     * @return ActiveQuery
-     */
-    public function getToUser()
-    {
-        return $this->hasOne(
-            Users::class, ['uuid' => 'toUserUuid']
-        );
     }
 }

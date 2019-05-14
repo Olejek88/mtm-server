@@ -2,18 +2,19 @@
 
 namespace backend\controllers;
 
-use backend\models\SubjectSearch;
-use common\models\Subject;
+use backend\models\SensorConfigSearch;
+use common\models\SensorConfig;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * SubjectController implements the CRUD actions for Subject model.
+ * SensorConfigController implements the CRUD actions for SensorConfig model.
  */
-class SensorConfig extends Controller
+class SensorConfigController extends Controller
 {
     /**
      * Behaviors
@@ -26,7 +27,7 @@ class SensorConfig extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -42,34 +43,28 @@ class SensorConfig extends Controller
      */
     public function init()
     {
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             throw new UnauthorizedHttpException();
         }
     }
 
     /**
-     * Lists all Subjects models.
+     * Lists all SensorConfig models.
      *
      * @return mixed
      */
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = Subject::find()
+            $model = SensorConfig::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-            if ($_POST['editableAttribute'] == 'owner') {
-                $model['owner'] = $_POST['Subject'][$_POST['editableIndex']]['owner'];
-            }
-            if ($_POST['editableAttribute'] == 'inn') {
-                $model['inn'] = $_POST['Subject'][$_POST['editableIndex']]['inn'];
-            }
             if ($model->save())
                 return json_encode('success');
             return json_encode('failed');
         }
 
-        $searchModel = new SubjectSearch();
+        $searchModel = new SensorConfigSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
         return $this->render('table', [
@@ -79,62 +74,12 @@ class SensorConfig extends Controller
     }
 
     /**
-     * Lists all Subjects models.
-     *
-     * @return mixed
-     */
-    public function actionTable()
-    {
-        if (isset($_POST['editableAttribute'])) {
-            $model = Subject::find()
-                ->where(['_id' => $_POST['editableKey']])
-                ->one();
-            if ($_POST['editableAttribute'] == 'owner') {
-                $model['owner'] = $_POST['Subject'][$_POST['editableIndex']]['owner'];
-            }
-            if ($_POST['editableAttribute'] == 'inn') {
-                $model['inn'] = $_POST['Subject'][$_POST['editableIndex']]['inn'];
-            }
-            if ($model->save())
-                return json_encode('success');
-            return json_encode('failed');
-        }
-
-        $searchModel = new SubjectSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->pagination->pageSize = 50;
-        return $this->render('table', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Action list
-     *
-     * @return mixed
-     * @throws UnauthorizedHttpException
-     */
-    public function actionList()
-    {
-        $listSubjects = Subject::find()
-            ->asArray()
-            ->all();
-
-        return $this->render(
-            'list',
-            [
-                'model' => $listSubjects
-            ]
-        );
-    }
-
-    /**
-     * Displays a single Subject model.
+     * Displays a single SensorConfig model.
      *
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -147,15 +92,15 @@ class SensorConfig extends Controller
     }
 
     /**
-     * Creates a new Subject model.
+     * Creates a new SensorConfig model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Subject();
-        $searchModel = new SubjectSearch();
+        $model = new SensorConfig();
+        $searchModel = new SensorConfigSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
 
@@ -179,12 +124,13 @@ class SensorConfig extends Controller
     }
 
     /**
-     * Updates an existing Subject model.
+     * Updates an existing SensorConfig model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -212,12 +158,15 @@ class SensorConfig extends Controller
     }
 
     /**
-     * Deletes an existing Subject model.
+     * Deletes an existing SensorConfig model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      *
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -227,17 +176,17 @@ class SensorConfig extends Controller
     }
 
     /**
-     * Finds the Subject model based on its primary key value.
+     * Finds the SensorConfig model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
      * @param integer $id Id
      *
-     * @return Subject the loaded model
+     * @return SensorConfig the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Subject::findOne($id)) !== null) {
+        if (($model = SensorConfig::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

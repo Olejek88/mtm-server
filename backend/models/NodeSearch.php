@@ -2,14 +2,14 @@
 
 namespace backend\models;
 
-use common\models\Message;
+use common\models\Node;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * MessageSearch represents the model behind the search form about `common\models\Message`.
+ * NodeSearch represents the model behind the search form about `common\models\Node`.
  */
-class MessageSearch extends Message
+class NodeSearch extends Node
 {
     /**
      * @inheritdoc
@@ -18,7 +18,7 @@ class MessageSearch extends Message
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'link', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'address', 'nodeUuid', 'objectUuid', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class MessageSearch extends Message
      */
     public function search($params)
     {
-        $query = Message::find()->orderBy('date DESC');
+        $query = Node::find();
 
         // add conditions that should always apply here
 
@@ -59,11 +59,15 @@ class MessageSearch extends Message
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'nodeUuid' => $this->nodeUuid,
+            'objectUuid' => $this->objectUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);
 
-        $query->andFilterWhere(['like', 'uuid', $this->uuid]);
+        $query->andFilterWhere(['like', 'uuid', $this->uuid])
+            ->andFilterWhere(['like', 'address', $this->address]);
+
         return $dataProvider;
     }
 }

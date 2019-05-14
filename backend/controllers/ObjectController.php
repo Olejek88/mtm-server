@@ -14,6 +14,7 @@ use common\models\Street;
 use common\models\UserHouse;
 use common\models\Users;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
@@ -43,7 +44,7 @@ class ObjectController extends Controller
     public function init()
     {
 
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             throw new UnauthorizedHttpException();
         }
 
@@ -78,6 +79,7 @@ class ObjectController extends Controller
      * Displays a single Object model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -119,6 +121,7 @@ class ObjectController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
@@ -138,6 +141,9 @@ class ObjectController extends Controller
      * If deletion is successful, the browser will be redirected to the 'table' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -183,10 +189,6 @@ class ObjectController extends Controller
             $houses = House::find()->select('uuid, number')->where(['streetUuid' => $street['uuid']])->
             orderBy('number')->all();
             foreach ($houses as $house) {
-                $user_house = UserHouse::find()->select('_id')->where(['houseUuid' => $house['uuid']])->one();
-                $user = Users::find()->where(['uuid' =>
-                    UserHouse::find()->where(['houseUuid' => $house['uuid']])->one()
-                ])->one();
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
                     'title' => $house['number'],
@@ -199,14 +201,14 @@ class ObjectController extends Controller
                         'title' => $object['objectType']['title'].' '.$object['title'],
                         'folder' => true
                     ];
-                    $contragents = ObjectContragent::find()->where(['objectUuid' => $object['uuid']])->all();
+/*                    $contragents = ObjectContragent::find()->where(['objectUuid' => $object['uuid']])->all();
                     foreach ($contragents as $contragent) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
                             'title' => $contragent['title'],
                             'folder' => true
                         ];
-                    }
+                    }*/
                 }
             }
         }
@@ -215,132 +217,4 @@ class ObjectController extends Controller
             ['contragents' => $fullTree]
         );
     }
-
-    /**
-     * Build tree of equipment by user
-     *
-     * @return mixed
-     */
-    public function actionTrees()
-    {
-        ini_set('memory_limit', '-1');
-        $c = 'children';
-        $fullTree = array();
-        $streets = Street::find()
-            ->select('*')
-            ->orderBy('title')
-            ->all();
-        $oCnt0 = 0;
-        foreach ($streets as $street) {
-            $last_user = '';
-            $last_date = '';
-            $house_count = 0;
-            $house_visited = 0;
-            $photo_count = 0;
-            $fullTree[$oCnt0]['title'] = $street['title'];
-            $oCnt1 = 0;
-            $houses = House::find()->select('uuid,number')->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
-            foreach ($houses as $house) {
-                $user_house = UserHouse::find()->select('_id')->where(['houseUuid' => $house['uuid']])->one();
-                $user = Users::find()->where(['uuid' =>
-                    UserHouse::find()->where(['houseUuid' => $house['uuid']])->one()
-                ])->one();
-                $objects = Objects::find()->select('uuid,title')->where(['houseUuid' => $house['uuid']])->all();
-                foreach ($objects as $object) {
-                    $house_count++;
-                    $visited = 0;
-                    $equipments = Device::find()->where(['objectUuid' => $object['uuid']])->all();
-                    foreach ($equipments as $equipment) {
-                        $fullTree[$oCnt0][$c][$oCnt1]['title']
-                            = Html::a(
-                            'ул.' . $equipment['house']['street']['title'] . ', д.' . $equipment['house']['number'] . ', ' . $equipment['object']['title'],
-                            ['equipment/view', 'id' => $equipment['_id']]
-                        );
-
-                        if ($user != null)
-                            $fullTree[$oCnt0][$c][$oCnt1]['user'] = Html::a(
-                                $user['name'],
-                                ['user-house/delete', 'id' => $user_house['_id']], ['target' => '_blank']
-                            );
-                        $status = MainFunctions::getColorLabelByStatus($equipment['equipmentStatusUuid'],'equipment_status');
-
-                        $fullTree[$oCnt0][$c][$oCnt1]['status'] = $status;
-                        $fullTree[$oCnt0][$c][$oCnt1]['date'] = $equipment['testDate'];
-
-                        $measure = Measure::find()
-                            ->select('*')
-                            ->where(['equipmentUuid' => $equipment['uuid']])
-                            ->orderBy('date DESC')
-                            ->one();
-                        if ($measure) {
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $measure['date'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = $measure['value'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = $measure['user']->name;
-                            $last_user = $measure['user']->name;
-                            $last_date = $measure['date'];
-                            $house_visited++;
-                            $visited++;
-                        } else {
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $equipment['changedAt'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = "не снимались";
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = "-";
-                        }
-
-                        $photo = Photo::find()
-                            ->select('*')
-                            ->where(['objectUuid' => $equipment['uuid']])
-                            ->orderBy('createdAt DESC')
-                            ->one();
-                        if ($photo) {
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = $photo['createdAt'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo'] = Html::a('фото',
-                                ['storage/equipment/' . $photo['uuid'] . '.jpg']
-                            );
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = $photo['user']->name;
-                            $last_user = $photo['user']->name;
-                            $photo_count++;
-                            if ($visited == 0) {
-                                $visited = 1;
-                                $house_visited++;
-                            }
-                        } else {
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = 'нет фото';
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo'] = '-';
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = '-';
-                        }
-                        $oCnt1++;
-                    }
-                }
-            }
-            $fullTree[$oCnt0]['measure_user'] = $last_user;
-            $fullTree[$oCnt0]['measure_date'] = $last_date;
-            $fullTree[$oCnt0]['photo_user'] = $last_user;
-            $fullTree[$oCnt0]['photo_date'] = $last_date;
-            $fullTree[$oCnt0]['photo'] = $photo_count;
-            $ok = 0;
-            if ($house_count > 0)
-                $ok = $house_visited * 100 / $house_count;
-            if ($ok > 100) $ok = 100;
-            if ($ok < 20) {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical1">' .
-                    number_format($ok, 2) . '%</div></div>';
-            } elseif ($ok < 45) {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical2">' .
-                    number_format($ok, 2) . '%</div></div>';
-            } elseif ($ok < 70) {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical4">' .
-                    number_format($ok, 2) . '%</div></div>';
-            } else {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical3">' .
-                    number_format($ok, 2) . '%</div></div>';
-            }
-            $oCnt0++;
-        }
-        return $this->render(
-            'tree',
-            ['equipment' => $fullTree]
-        );
-    }
-
 }

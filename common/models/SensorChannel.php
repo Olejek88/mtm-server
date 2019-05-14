@@ -6,24 +6,26 @@ use Yii;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "request_type".
+ * This is the model class for table "sensor_channel".
  *
  * @property integer $_id
  * @property string $uuid
+ * @property string $oid идентификатор организации
  * @property string $title
+ * @property string $register
+ * @property string $deviceUuid
+ * @property string $measureTypeUuid
  * @property string $createdAt
  * @property string $changedAt
  */
 class SensorChannel extends ActiveRecord
 {
-    const GENERAL = "E49AE9AD-3C31-42F8-A751-AAEB890C2190";
-
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'request_type';
+        return 'sensor_channel';
     }
 
     /**
@@ -32,9 +34,9 @@ class SensorChannel extends ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'title'], 'required'],
+            [['uuid', 'title', 'deviceUuid', 'measureTypeUuid'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid'], 'string', 'max' => 50],
+            [['uuid', 'deviceUuid', 'register', 'measureTypeUuid'], 'string', 'max' => 50],
             [['title'], 'string', 'max' => 100],
         ];
     }
@@ -62,6 +64,11 @@ class SensorChannel extends ActiveRecord
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'title' => Yii::t('app', 'Название'),
+            'device' => Yii::t('app', 'Устройство'),
+            'deviceUuid' => Yii::t('app', 'Устройство'),
+            'measureType' => Yii::t('app', 'Тип измерения'),
+            'measureTypeUuid' => Yii::t('app', 'Тип измерения'),
+            'register' => Yii::t('app', 'Регистр'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

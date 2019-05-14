@@ -8,7 +8,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * ContragentSearch represents the model behind the search form about `common\models\Contragent`.
+ * ContragentSearch represents the model behind the search form about `common\models\Organisation`.
  */
 class OrganisationSearch extends Organisation
 {
@@ -19,8 +19,7 @@ class OrganisationSearch extends Organisation
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'address', 'phone', 'inn', 'director', 'email',
-                'status', 'contragentType', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -66,10 +65,7 @@ class OrganisationSearch extends Organisation
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'title', $this->address])
-            ->andFilterWhere(['like', 'title', $this->phone])
-            ->andFilterWhere(['like', 'title', $this->inn]);
+            ->andFilterWhere(['like', 'title', $this->title]);
 
         return $dataProvider;
     }

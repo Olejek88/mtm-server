@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\DeviceSearchType;
 use common\models\DeviceType;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -150,6 +151,8 @@ class DeviceTypeController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {

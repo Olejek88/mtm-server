@@ -75,9 +75,6 @@ class NodeController extends Controller
             if ($_POST['editableAttribute'] == 'serial') {
                 $model['serial'] = $_POST['Node'][$_POST['editableIndex']]['serial'];
             }
-            if ($_POST['editableAttribute'] == 'tag') {
-                $model['tag'] = $_POST['Node'][$_POST['editableIndex']]['tag'];
-            }
             if ($_POST['editableAttribute'] == 'equipmentTypeUuid') {
                 $model['equipmentTypeUuid'] = $_POST['Node'][$_POST['editableIndex']]['equipmentTypeUuid'];
             }
@@ -110,6 +107,7 @@ class NodeController extends Controller
      * @param integer $id Id
      *
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {

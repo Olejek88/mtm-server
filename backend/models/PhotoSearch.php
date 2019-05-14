@@ -2,9 +2,7 @@
 
 namespace backend\models;
 
-use common\models\EventAttributeType;
 use common\models\Photo;
-use common\models\PhotoEquipment;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 

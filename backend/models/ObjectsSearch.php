@@ -18,7 +18,7 @@ class ObjectsSearch extends Objects
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'houseUuid', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'houseUuid', 'objectTypeUuid', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -59,14 +59,14 @@ class ObjectsSearch extends Objects
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'title' => $this->title,
             'houseUuid' => $this->houseUuid,
-            'objectStatusUuid' => $this->objectStatusUuid,
+            'objectTypeUuid' => $this->objectTypeUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            /*            ->andFilterWhere(['like', 'house.title', $this->fullTitle])*/
             ->andFilterWhere(['like', 'number', $this->title]);
 
         return $dataProvider;

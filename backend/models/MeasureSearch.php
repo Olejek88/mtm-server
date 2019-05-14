@@ -18,7 +18,7 @@ class MeasureSearch extends Measure
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'equipmentUuid', 'userUuid', 'date', 'value', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'sensorChannelUuid', 'date', 'value', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 

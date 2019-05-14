@@ -21,6 +21,8 @@ use yii\db\Expression;
  * @property string $deviceStatusUuid
  * @property string $date
  * @property string $nodeUuid
+ * @property double $latitude
+ * @property double $longitude
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted

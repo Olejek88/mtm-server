@@ -4,7 +4,10 @@ namespace backend\controllers;
 
 use common\components\MainFunctions;
 use common\models\Users;
+use Exception;
 use Yii;
+use yii\db\StaleObjectException;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use common\models\Message;
@@ -46,36 +49,6 @@ class MessageController extends Controller
         ]);
     }
 
-    /**
-     * Displays a messagebox
-     * @return mixed
-     */
-    public function actionList()
-    {
-        $accountUser = Yii::$app->user->identity;
-        $currentUser = Users::find()
-            ->where(['userId' => $accountUser['id']])
-            ->asArray()
-            ->one();
-
-        $messages = Message::find()->where(['fromUserUuid' => $currentUser['uuid']])
-            ->orWhere(['toUserUuid' => $currentUser['uuid']])
-            ->orderBy('date DESC')
-            ->all();
-        $income = Message::find()->where(['toUserUuid' => $currentUser['uuid']])
-            ->orderBy('date DESC')
-            ->all();
-        $sent = Message::find()->where(['fromUserUuid' => $currentUser['uuid']])
-            ->orderBy('date DESC')
-            ->all();
-
-        return $this->render('list', [
-            'messages' => $messages,
-            'income' => $income,
-            'sent' => $sent
-        ]);
-    }
-
     public function actionSearch()
     {
         /**
@@ -110,7 +83,7 @@ class MessageController extends Controller
     /**
      * @param $action
      * @return bool
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      */
     public function beforeAction($action)
     {
@@ -123,26 +96,6 @@ class MessageController extends Controller
     }
 
     /**
-     * Creates a new Message model in chat for all users
-     * @return mixed
-     */
-    public function actionSend()
-    {
-        $this->enableCsrfValidation = false;
-        $model = new Message();
-        $model->uuid = MainFunctions::GUID();
-        $accountUser = Yii::$app->user->identity;
-        $currentUser = Users::findOne(['userId' => $accountUser['id']]);
-        $model->fromUserUuid = $currentUser['uuid'];
-        $model->text = $_POST["message"];
-        $model->toUserUuid = $model->fromUserUuid;
-        $model->status = 0;
-        $model->date = date("Ymd");
-        $model->save();
-        return $this->redirect(['/site/dashboard']);
-    }
-
-/**
      * Updates an existing Message model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
@@ -168,9 +121,9 @@ class MessageController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
+     * @throws Exception
      * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
