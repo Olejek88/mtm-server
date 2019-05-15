@@ -12,7 +12,6 @@ use yii\db\Expression;
  *
  * @property integer $_id
  * @property string $uuid
- * @property string $oid идентификатор организации
  * @property string $title
  * @property string $createdAt
  * @property string $changedAt
@@ -49,7 +48,7 @@ class HouseType extends ActiveRecord
         return [
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid', 'title', 'oid'], 'string', 'max' => 50],
+            [['uuid', 'title'], 'string', 'max' => 50],
         ];
     }
 

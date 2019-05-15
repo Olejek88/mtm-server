@@ -13,6 +13,7 @@ use yii\web\IdentityInterface;
  * User model
  *
  * @property integer $_id
+ * @property string $uuid
  * @property string $oid идентификатор организации
  * @property string $username
  * @property string $password_hash
@@ -25,8 +26,15 @@ use yii\web\IdentityInterface;
  * @property int $id
  * @property string $authKey
  * @property string $password write-only password
+ * @property string $type
+ * @property string $name
+ * @property string $whoIs
+ * @property string $contact
+ * @property string $image
+ * @property boolean $deleted
  *
- * @property Users $users
+ * @property string $photoUrl
+ * @property null|string $imageDir
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -42,6 +50,10 @@ class User extends ActiveRecord implements IdentityInterface
     const PERMISSION_OPERATOR = 'permissionOperator';
     const PERMISSION_ANALYST = 'permissionAnalyst';
     const PERMISSION_USER = 'permissionUser';
+
+    private static $_IMAGE_ROOT = 'users';
+    public const USER_SERVICE_UUID = '00000000-9BF0-4542-B127-F4ECEFCE49DA';
+    public const ORGANISATION_UUID = '00000001-DA70-4FFE-8B40-DC6F2AC8BAB0';
 
     /**
      * Table name.
@@ -81,6 +93,20 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            [
+                [
+                    'uuid',
+                    'name',
+                    'type',
+                    'contact'
+                ],
+                'required'
+            ],
+            [['image'], 'file'],
+            [['type'], 'integer'],
+            [['deleted'], 'boolean'],
+            [['uuid', 'whoIs'], 'string', 'max' => 45],
+            [['name', 'contact'], 'string', 'max' => 100],
         ];
     }
 
@@ -348,5 +374,33 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getUsers() {
         return Users::findOne(['user_id' => $this->_id]);
+    }
+
+    /**
+     * URL изображения.
+     *
+     * @return string | null
+     */
+    public function getImageDir()
+    {
+        $localPath = 'storage/' . self::$_IMAGE_ROOT . '/';
+        return $localPath;
+    }
+
+    /**
+     * URL изображения.
+     *
+     * @return string
+     */
+    public function getPhotoUrl()
+    {
+        $localPath = '/storage/' . self::$_IMAGE_ROOT . '/' . $this->uuid . '.jpg';
+        if (file_exists(Yii::getAlias('@backend/web/' . $localPath))) {
+            $url = $localPath;
+        } else {
+            $url = null;
+        }
+
+        return $url;
     }
 }

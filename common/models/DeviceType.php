@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "equipment_type".
+ * This is the model class for table "device_type".
  *
  * @property integer $_id
  * @property string $uuid

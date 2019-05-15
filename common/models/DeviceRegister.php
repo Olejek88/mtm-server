@@ -15,7 +15,6 @@ use yii\db\ActiveRecord;
  * @property string $date
  * @property string $description
  *
- * @property User $user
  * @property Device $device
  */
 
@@ -26,7 +25,7 @@ class DeviceRegister extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'equipment_register';
+        return 'device_register';
     }
 
     /**
