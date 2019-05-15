@@ -1,27 +1,19 @@
 <?php
 
-use common\models\UserHouse;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-/* @var $searchModel  backend\models\HouseSearch */
+/* @var $searchModel */
 
-$this->title = Yii::t('app', 'Дом');
+$this->title = Yii::t('app', 'Журнал оборудования');
 ?>
-<div class="orders-index box-padding-index">
+<div class="equipment-index box-padding-index">
 
     <div class="panel panel-default">
         <div class="panel-heading" style="background: #fff;">
             <h3 class="text-center" style="color: #333;">
                 <?= Html::encode($this->title) ?>
             </h3>
-
-            <ul class="nav nav-tabs" style="width: 305px; margin: 0 auto;">
-                <li class=""><a href="/city">Города</a></li>
-                <li class=""><a href="/street">Улицы</a></li>
-                <li class="active"><a href="/house">Дома</a></li>
-                <li class=""><a href="/object">Объекты</a></li>
-            </ul>
         </div>
         <div class="panel-body">
 
@@ -39,57 +31,57 @@ $this->title = Yii::t('app', 'Дом');
                             'tableOptions' => [
                                 'class' => 'table-striped table table-bordered table-hover table-condensed'
                             ],
+                            'layout' => "{summary}\n{items}\n<div align='center'>{pager}</div>",
                             'columns' => [
                                 [
-                                    'attribute' => '_id',
+                                    'attribute' => 'registerTypeUuid',
                                     'contentOptions' => [
                                         'class' => 'table_class',
-                                        'style' => 'width: 50px; text-align: center'
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'value' => 'registerType.title',
+                                ],
+                                [
+                                    'attribute' => 'userUuid',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'value' => 'user.name',
+                                ],
+                                [
+                                    'attribute' => 'equipmentUuid',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'value' => 'equipment.title',
+                                ],
+                                [
+                                    'attribute' => 'date',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
                                     'content' => function ($data) {
-                                        return $data->_id;
+                                        return $data->date;
                                     }
                                 ],
                                 [
-                                    'attribute' => 'number',
+                                    'attribute' => 'description',
                                     'contentOptions' => [
-                                        'class' => 'table_class'
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'content' => function ($data) {
-                                        $userHouseId = UserHouse::find()
-                                            ->select('_id')
-                                            ->where(['houseUuid' => $data['uuid']])
-                                            ->one();
-                                        return Html::a($data->number,
-                                            '/user-house/update?id=' . $userHouseId['_id']);
-                                    }
-                                ],
-                                [
-                                    'attribute' => 'street',
-                                    'contentOptions' => [
-                                        'class' => 'table_class'
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'street.title',
-                                ],
-                                [
-                                    'attribute' => 'houseType',
-                                    'contentOptions' => [
-                                        'class' => 'table_class'
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'houseType.title',
                                 ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',
                                     'header' => 'Действия',
                                     'headerOptions' => ['class' => 'text-center', 'width' => '70'],
                                     'contentOptions' => [
-                                        'class' => 'text-center'
+                                        'class' => 'text-center',
                                     ],
-                                    'template' => '{view} {update} {delete}{link}',
+                                    'template' => '{view} {update} {delete}',
                                 ],
                             ],
                         ]); ?>

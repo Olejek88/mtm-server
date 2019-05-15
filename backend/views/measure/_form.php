@@ -1,6 +1,6 @@
 <?php
 
-use app\commands\MainFunctions;
+use common\components\MainFunctions;
 use common\models\Device;
 use common\models\MeasureType;
 use common\models\Users;

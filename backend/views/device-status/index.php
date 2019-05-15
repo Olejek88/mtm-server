@@ -1,27 +1,22 @@
 <?php
 
-use common\models\UserHouse;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-/* @var $searchModel  backend\models\HouseSearch */
+/* @var $searchModel backend\models\DeviceSearchStatus */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Дом');
+$this->title = Yii::t('app', 'Статусы оборудования');
 ?>
-<div class="orders-index box-padding-index">
-
-    <div class="panel panel-default">
+<div class="order-status-view box-padding" style="width: 95%; min-height: 782px">
+    <?php
+    echo $this->render('@backend/views/yii2-app/layouts/references-menu.php');
+    ?>
+    <div class="panel panel-default" style="float: right; width: 75%">
         <div class="panel-heading" style="background: #fff;">
             <h3 class="text-center" style="color: #333;">
                 <?= Html::encode($this->title) ?>
             </h3>
-
-            <ul class="nav nav-tabs" style="width: 305px; margin: 0 auto;">
-                <li class=""><a href="/city">Города</a></li>
-                <li class=""><a href="/street">Улицы</a></li>
-                <li class="active"><a href="/house">Дома</a></li>
-                <li class=""><a href="/object">Объекты</a></li>
-            </ul>
         </div>
         <div class="panel-body">
 
@@ -52,42 +47,31 @@ $this->title = Yii::t('app', 'Дом');
                                     }
                                 ],
                                 [
-                                    'attribute' => 'number',
+                                    'attribute' => 'uuid',
                                     'contentOptions' => [
-                                        'class' => 'table_class'
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
                                     'content' => function ($data) {
-                                        $userHouseId = UserHouse::find()
-                                            ->select('_id')
-                                            ->where(['houseUuid' => $data['uuid']])
-                                            ->one();
-                                        return Html::a($data->number,
-                                            '/user-house/update?id=' . $userHouseId['_id']);
+                                        return $data->uuid;
                                     }
                                 ],
                                 [
-                                    'attribute' => 'street',
+                                    'attribute' => 'title',
                                     'contentOptions' => [
-                                        'class' => 'table_class'
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'street.title',
-                                ],
-                                [
-                                    'attribute' => 'houseType',
-                                    'contentOptions' => [
-                                        'class' => 'table_class'
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'houseType.title',
+                                    'content' => function ($data) {
+                                        return $data->title;
+                                    }
                                 ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',
                                     'header' => 'Действия',
                                     'headerOptions' => ['class' => 'text-center', 'width' => '70'],
                                     'contentOptions' => [
-                                        'class' => 'text-center'
+                                        'class' => 'text-center',
                                     ],
                                     'template' => '{view} {update} {delete}{link}',
                                 ],

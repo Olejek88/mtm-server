@@ -1,6 +1,6 @@
 <?php
 
-use app\commands\MainFunctions;
+use common\components\MainFunctions;
 use common\models\City;
 use common\models\Users;
 use yii\helpers\ArrayHelper;

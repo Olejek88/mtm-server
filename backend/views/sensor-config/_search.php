@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\HouseSearch */
+/* @var $model backend\models\SensorConfigSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="task-search box-padding">
+<div class="request-status-search box-padding">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -19,11 +19,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'uuid') ?>
 
-    <?= $form->field($model, 'number') ?>
+    <?= $form->field($model, 'title') ?>
 
-    <?= $form->field($model, 'streetUuid') ?>
+    <?= $form->field($model, 'createdAt') ?>
 
-    <?= $form->field($model, 'houseTypeUuid') ?>
+    <?= $form->field($model, 'changedAt') ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

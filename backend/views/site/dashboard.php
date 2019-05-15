@@ -1,8 +1,9 @@
 <?php
 /* @var $cityCount
  * @var $streetCount
- * @var $flatCount
- * @var $subjectCount
+ * @var $objectCount
+ * @var $nodesCount
+ * @var $channelsCount
  * @var $equipmentCount
  * @var $equipmentTypeCount
  * @var $contragentCount
@@ -50,8 +51,8 @@ $this->title = Yii::t('app', 'Сводная');
 
             <div class="info-box-content">
                 <span>Городов <?= $cityCount; ?> / Улиц <?= $streetCount; ?></span><br/>
-                <span>Квартир <?= $flatCount; ?> / Абонентов <?= $contragentCount; ?></span><br/>
-                <span>Выполнено <?= $last_measures; ?> [<?= $complete; ?> %]</span><br/>
+                <span>Объектов <?= $objectCount; ?> /  Шкафов <?= $nodesCount; ?></span><br/>
+                <span>Каналов <?= $channelsCount; ?></span><br/>
             </div>
             <!-- /.info-box-content -->
         </div>

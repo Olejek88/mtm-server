@@ -1,12 +1,10 @@
 <?php
+/* @var $searchModel backend\models\CameraSearch */
 
-use common\models\UserHouse;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-/* @var $searchModel  backend\models\HouseSearch */
-
-$this->title = Yii::t('app', 'Дом');
+$this->title = Yii::t('app', 'Камеры');
 ?>
 <div class="orders-index box-padding-index">
 
@@ -15,13 +13,6 @@ $this->title = Yii::t('app', 'Дом');
             <h3 class="text-center" style="color: #333;">
                 <?= Html::encode($this->title) ?>
             </h3>
-
-            <ul class="nav nav-tabs" style="width: 305px; margin: 0 auto;">
-                <li class=""><a href="/city">Города</a></li>
-                <li class=""><a href="/street">Улицы</a></li>
-                <li class="active"><a href="/house">Дома</a></li>
-                <li class=""><a href="/object">Объекты</a></li>
-            </ul>
         </div>
         <div class="panel-body">
 
@@ -44,7 +35,7 @@ $this->title = Yii::t('app', 'Дом');
                                     'attribute' => '_id',
                                     'contentOptions' => [
                                         'class' => 'table_class',
-                                        'style' => 'width: 50px; text-align: center'
+                                        'style' => 'width: 50px; text-align: center;'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
                                     'content' => function ($data) {
@@ -52,42 +43,61 @@ $this->title = Yii::t('app', 'Дом');
                                     }
                                 ],
                                 [
-                                    'attribute' => 'number',
+                                    'attribute' => 'user',
                                     'contentOptions' => [
-                                        'class' => 'table_class'
+                                        'class' => 'table_class',
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'value' => 'user.name',
+                                ],
+                                [
+                                    'attribute' => 'date',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
                                     'content' => function ($data) {
-                                        $userHouseId = UserHouse::find()
-                                            ->select('_id')
-                                            ->where(['houseUuid' => $data['uuid']])
-                                            ->one();
-                                        return Html::a($data->number,
-                                            '/user-house/update?id=' . $userHouseId['_id']);
+                                        return $data->date;
                                     }
                                 ],
                                 [
-                                    'attribute' => 'street',
+                                    'attribute' => 'alarmType',
                                     'contentOptions' => [
-                                        'class' => 'table_class'
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'street.title',
+                                    'value' => 'alarmType.title',
                                 ],
                                 [
-                                    'attribute' => 'houseType',
+                                    'attribute' => 'alarmStatus',
                                     'contentOptions' => [
-                                        'class' => 'table_class'
+                                        'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'houseType.title',
+                                    'value' => 'alarmStatus.title',
+                                ],
+                                [
+                                    'attribute' => 'latitude',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'value' => 'latitude',
+                                ],
+                                [
+                                    'attribute' => 'longitude',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'value' => 'longitude',
                                 ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',
                                     'header' => 'Действия',
                                     'headerOptions' => ['class' => 'text-center', 'width' => '70'],
                                     'contentOptions' => [
-                                        'class' => 'text-center'
+                                        'class' => 'text-center',
                                     ],
                                     'template' => '{view} {update} {delete}{link}',
                                 ],
