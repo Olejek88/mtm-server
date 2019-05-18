@@ -3,6 +3,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -14,13 +15,13 @@ use yii\db\Expression;
  * @property string $oid идентификатор организации
  * @property string $title
  * @property string $deviceStatusUuid
- * @property string $objectUuid
+ * @property string $nodesUuid
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
  *
  * @property DeviceStatus $deviceStatus
- * @property Object $object
+ * @property Node $node
  */
 class Camera extends ActiveRecord
 {
@@ -36,6 +37,7 @@ class Camera extends ActiveRecord
             [
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'createdAt',
+
                 'updatedAtAttribute' => 'changedAt',
                 'value' => new Expression('NOW()'),
             ],
@@ -60,9 +62,9 @@ class Camera extends ActiveRecord
     public function fields()
     {
         return ['_id', 'uuid', 'title',
-            'objectUuid',
-            'object' => function ($model) {
-                return $model->object;
+            'nodeUuid',
+            'node' => function ($model) {
+                return $model->node;
             },
             'deviceStatusUuid',
             'deviceStatus' => function ($model) {
@@ -95,7 +97,7 @@ class Camera extends ActiveRecord
                     'uuid',
                     'deviceStatusUuid',
                     'oid',
-                    'objectUuid'
+                    'nodeUuid'
                 ],
                 'string', 'max' => 50
             ],
@@ -121,8 +123,8 @@ class Camera extends ActiveRecord
             'title' => Yii::t('app', 'Название'),
             'deviceStatusUuid' => Yii::t('app', 'Статус'),
             'deviceStatus' => Yii::t('app', 'Статус'),
-            'objectUuid' => Yii::t('app', 'Объект'),
-            'object' => Yii::t('app', 'Объект'),
+            'nodeUuid' => Yii::t('app', 'Контроллер'),
+            'node' => Yii::t('app', 'Контроллер'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -145,7 +147,7 @@ class Camera extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getDeviceStatus()
     {
@@ -157,11 +159,11 @@ class Camera extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getObject()
+    public function getNode()
     {
-        return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
+        return $this->hasOne(Node::class, ['uuid' => 'nodeUuid']);
     }
 
     public function getPhoto() {

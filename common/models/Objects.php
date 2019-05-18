@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -17,11 +18,12 @@ use yii\db\Expression;
  * @property string $houseUuid
  * @property string $createdAt
  * @property string $changedAt
+ * @property double $latitude
+ * @property double $longitude
  * @property string $objectTypeUuid
  * @property boolean $deleted
  *
  * @property House $house
- * @property Photo $photo
  * @property ObjectType $objectType
  */
 class Objects extends ActiveRecord
@@ -52,10 +54,11 @@ class Objects extends ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'objectStatusUuid', 'objectTypeUuid', 'houseUuid'], 'required'],
+            [['uuid', 'objectTypeUuid', 'houseUuid'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
-            [['uuid', 'title', 'objectStatusUuid', 'objectTypeUuid', 'houseUuid', 'oid'], 'string', 'max' => 50],
+            [['uuid', 'title', 'objectTypeUuid', 'houseUuid', 'oid'], 'string', 'max' => 50],
+            [['latitude', 'longitude'], 'float'],
         ];
     }
 
@@ -69,22 +72,14 @@ class Objects extends ActiveRecord
             'objectStatus' => function ($model) {
                 return $model->objectStatus;
             },
-            'objectTypeUuid',
-            'objectType' => function($model) {
-                return $model->objectType;
-            },
             'houseUuid',
             'house' => function ($model) {
                 return $model->house;
             },
+            'latitude','longitude',
             'createdAt',
             'changedAt',
         ];
-    }
-
-    public function getObjectStatus()
-    {
-        return $this->hasOne(ObjectStatus::class, ['uuid' => 'objectStatusUuid']);
     }
 
     public function getHouse()
@@ -101,26 +96,19 @@ class Objects extends ActiveRecord
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'title' => Yii::t('app', 'Название'),
-            'objectStatusUuid' => Yii::t('app', 'Статус объекта'),
-            'objectStatus' => Yii::t('app', 'Статус объекта'),
             'objectTypeUuid' => Yii::t('app', 'Тип объекта'),
             'objectType' => Yii::t('app', 'Тип объекта'),
             'houseUuid' => Yii::t('app', 'Дом'),
             'house' => Yii::t('app', 'Дом'),
+            'latitude' => Yii::t('app', 'Широта'),
+            'longitude' => Yii::t('app', 'Долгота'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPhoto() {
-        return $this->hasMany(Photo::class, ['objectUuid' => 'uuid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getObjectType() {
         return $this->hasOne(ObjectType::class, ['uuid' => 'objectTypeUuid']);

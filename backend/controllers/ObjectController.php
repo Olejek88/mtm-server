@@ -3,20 +3,12 @@
 namespace backend\controllers;
 
 use backend\models\ObjectsSearch;
-use common\components\MainFunctions;
-use common\models\Device;
 use common\models\House;
-use common\models\Measure;
-use common\models\ObjectContragent;
 use common\models\Objects;
-use common\models\Photo;
 use common\models\Street;
-use common\models\UserHouse;
-use common\models\Users;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
-use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
@@ -41,6 +33,9 @@ class ObjectController extends Controller
         ];
     }
 
+    /**
+     * @throws UnauthorizedHttpException
+     */
     public function init()
     {
 
@@ -201,14 +196,6 @@ class ObjectController extends Controller
                         'title' => $object['objectType']['title'].' '.$object['title'],
                         'folder' => true
                     ];
-/*                    $contragents = ObjectContragent::find()->where(['objectUuid' => $object['uuid']])->all();
-                    foreach ($contragents as $contragent) {
-                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
-                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'title' => $contragent['title'],
-                            'folder' => true
-                        ];
-                    }*/
                 }
             }
         }

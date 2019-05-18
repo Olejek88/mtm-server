@@ -3,7 +3,7 @@
 
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Обновить статус');
+$this->title = Yii::t('app', 'Обновить');
 ?>
 <div class="order-status-view box-padding" style="width: 95%; min-height: 782px">
     <?php

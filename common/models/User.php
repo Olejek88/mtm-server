@@ -4,7 +4,7 @@ namespace common\models;
 
 use Exception;
 use Yii;
-use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -125,26 +125,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Поиск пользователя по accessToken.
-     *
-     * @param string $token Токен.
-     * @param string $type Тип.
-     *
-     * @inheritdoc
-     *
-     * @return User
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        $userToken = UserToken::findOne(['token' => $token]);
-        if ($userToken != null && $userToken->isValid()) {
-            return User::findOne($userToken->user_id);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Finds user by username
      *
      * @param string $username Имя/логин пользователя.
@@ -250,20 +230,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Validates pin
-     *
-     * @param string $pin pin to validate
-     *
-     * @return bool if pin provided is valid for current user
-     */
-    public function validatePin($pin)
-    {
-        $users = Users::findOne(['user_id' => $this->_id]);
-//        return Yii::$app->security->validatePassword($pin, $users->pin);
-        return $pin == $users->pin;
-    }
-
-    /**
      * Generates password hash from password and sets it to the model
      * @param string $password Пароль.
      *
@@ -309,28 +275,6 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    /**
-     * @param null $duration
-     * @return mixed
-     * @throws InvalidConfigException
-     */
-    public function generateAccessToken($duration = null)
-    {
-        if ($duration === null) {
-            $duration = Yii::$app->params['duration']['week'];
-        }
-
-        $token = Yii::createObject([
-            'class' => UserTokenAuth::class,
-            'valid_till' => date(DATE_W3C, time() + $duration),
-//            'type' => UserTokenAuth::AUTH_TYPE,
-        ]);
-
-        $token->link('user', $this);
-
-
-        return $token->token;
-    }
 
     /**
      * Finds user by username or email
@@ -347,33 +291,6 @@ class User extends ActiveRecord implements IdentityInterface
                 'status' => self::STATUS_ACTIVE,
             ])
             ->one();
-    }
-
-    /**
-     * Finds user by Users->uuid
-     *
-     * @param string $usersUuid
-     * @return array|User|null|ActiveRecord
-     */
-    public static function findByUuid($usersUuid)
-    {
-        $users = Users::findOne(['uuid' => $usersUuid]);
-        if ($users != null) {
-            return static::find()
-                ->where([
-                    '_id' => $users->user_id,
-                    'status' => self::STATUS_ACTIVE,
-                ])->one();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return null|Users
-     */
-    public function getUsers() {
-        return Users::findOne(['user_id' => $this->_id]);
     }
 
     /**
@@ -402,5 +319,23 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return $url;
+    }
+
+    /**
+     * Поиск пользователя по accessToken.
+     *
+     * @param string $token Токен.
+     * @param string $type  Тип.
+     *
+     * @inheritdoc
+     *
+     * @return void
+     * @throws NotSupportedException
+     */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        throw new NotSupportedException(
+            '"findIdentityByAccessToken" is not implemented.'
+        );
     }
 }

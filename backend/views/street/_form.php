@@ -2,6 +2,7 @@
 
 use common\components\MainFunctions;
 use common\models\City;
+use common\models\User;
 use common\models\Users;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -26,7 +27,7 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <?php
     $cities = City::find()->all();

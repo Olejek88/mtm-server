@@ -64,18 +64,6 @@ class m190412_104112_init_new extends Migration
             'updated_at' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
-        $this->createTable(self::CAMERA, [
-            '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'oid' => $this->string(45)->notNull(),
-            'title' => $this->string()->notNull(),
-            'deviceStatusUuid' => $this->string(45)->notNull(),
-            'objectUuid' => $this->string(45)->notNull(),
-            'deleted' => $this->smallInteger()->defaultValue(0),
-            'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-            'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-        ], $tableOptions);
-
         $this->createTable(self::CITY, [
             '_id' => $this->primaryKey(),
             'uuid' => $this->string(45)->notNull()->unique(),
@@ -179,6 +167,8 @@ class m190412_104112_init_new extends Migration
             'title' => $this->string()->notNull(),
             'houseUuid' => $this->string(45)->notNull(),
             'objectTypeUuid' => $this->string(45)->notNull(),
+            'longitude' => $this->double(),
+            'latitude' => $this->double(),
             'deleted' => $this->smallInteger()->defaultValue(0),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -216,6 +206,68 @@ class m190412_104112_init_new extends Migration
             $update = 'CASCADE'
         );
 
+        $this->createTable(self::DEVICE_TYPE, [
+            '_id' => $this->primaryKey(),
+            'uuid' => $this->string(45)->notNull()->unique(),
+            'title' => $this->string()->notNull(),
+            'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+            'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+        ], $tableOptions);
+
+        $this->createTable(self::DEVICE_STATUS, [
+            '_id' => $this->primaryKey(),
+            'uuid' => $this->string(45)->notNull()->unique(),
+            'title' => $this->string()->notNull(),
+            'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+            'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+        ], $tableOptions);
+
+        $this->createTable(
+            self::NODE,
+            [
+                '_id' => $this->primaryKey()->comment("Id"),
+                'uuid' => $this->string(45)->unique()->notNull(),
+                'oid' => $this->string(45)->notNull(),
+                'deviceStatusUuid' => $this->string(45)->notNull(),
+                'objectUuid' => $this->string(45)->notNull(),
+                'deleted' => $this->smallInteger()->defaultValue(0),
+                'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+                'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+            ], $tableOptions
+        );
+
+        $this->createIndex(
+            'idx-deviceStatusUuid',
+            self::NODE,
+            'deviceStatusUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-node-deviceStatusUuid',
+            self::NODE,
+            'deviceStatusUuid',
+            'device_status',
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
+
+        $this->createIndex(
+            'idx-node-objectUuid',
+            self::NODE,
+            'objectUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-node-objectUuid',
+            self::NODE,
+            'objectUuid',
+            'object',
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
+
         //--------------------------------------------------------------------------------------------------------------
         $this->createTable(
             self::CAMERA,
@@ -224,7 +276,7 @@ class m190412_104112_init_new extends Migration
                 'uuid' => $this->string(45)->unique()->notNull(),
                 'oid' => $this->string(45)->notNull(),
                 'deviceStatusUuid' => $this->string(45)->notNull(),
-                'objectUuid' => $this->string(45)->notNull(),
+                'nodeUuid' => $this->string(45)->notNull(),
                 'deleted' => $this->smallInteger()->defaultValue(0),
                 'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
                 'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -248,16 +300,16 @@ class m190412_104112_init_new extends Migration
         );
 
         $this->createIndex(
-            'idx-alarm-objectUuid',
+            'idx-camera-nodeUuid',
             self::CAMERA,
-            'objectUuid'
+            'nodeUuid'
         );
 
         $this->addForeignKey(
-            'fk-alarm-objectUuid',
+            'fk-camera-nodeUuid',
             self::CAMERA,
-            'objectUuid',
-            'object',
+            'nodeUuid',
+            'node',
             'uuid',
             $delete = 'RESTRICT',
             $update = 'CASCADE'
@@ -274,22 +326,6 @@ class m190412_104112_init_new extends Migration
         ], $tableOptions);
         //--------------------------------------------------------------------------------------------------------------
 
-        $this->createTable(self::DEVICE_TYPE, [
-            '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'title' => $this->string()->notNull(),
-            'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-            'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-        ], $tableOptions);
-
-        $this->createTable(self::DEVICE_STATUS, [
-            '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'title' => $this->string()->notNull(),
-            'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-            'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-        ], $tableOptions);
-
         $this->createTable(self::DEVICE, [
             '_id' => $this->primaryKey(),
             'uuid' => $this->string(45)->notNull()->unique(),
@@ -300,8 +336,6 @@ class m190412_104112_init_new extends Migration
             'deviceStatusUuid' => $this->string(45)->notNull(),
             'port' => $this->string(),
             'serial' => $this->string(),
-            'longitude' => $this->double(),
-            'latitude' => $this->double(),
             'interface' => $this->smallInteger()->defaultValue(1),
             'date' => $this->timestamp()->defaultValue('2019-01-01'),
             'deleted' => $this->smallInteger()->defaultValue(0),
@@ -402,7 +436,7 @@ class m190412_104112_init_new extends Migration
             'fk-journal-userUuid',
             'journal',
             'userUuid',
-            'users',
+            'user',
             'uuid',
             $delete = 'RESTRICT',
             $update = 'CASCADE'
@@ -434,6 +468,35 @@ class m190412_104112_init_new extends Migration
             self::MEASURE,
             'sensorChannelUuid'
         );
+
+        $this->createTable(self::SENSOR_CHANNEL, [
+            '_id' => $this->primaryKey(),
+            'uuid' => $this->string(45)->notNull()->unique(),
+            'oid' => $this->string(45)->notNull(),
+            'title' => $this->string()->notNull(),
+            'register' => $this->string()->notNull(),
+            'deviceUuid' => $this->string(45),
+            'measureTypeUuid' => $this->string(45)->notNull(),
+            'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+            'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+        ], $tableOptions);
+
+        $this->createIndex(
+            'idx-deviceUuid',
+            self::SENSOR_CHANNEL,
+            'deviceUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-sensor_channel-deviceUuid',
+            self::SENSOR_CHANNEL,
+            'deviceUuid',
+            self::DEVICE,
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
+
 
         $this->addForeignKey(
             'fk-measure-sensorChannelUuid',
@@ -471,33 +534,6 @@ class m190412_104112_init_new extends Migration
             'changedAt' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
-        $this->createTable(self::SENSOR_CHANNEL, [
-            '_id' => $this->primaryKey(),
-            'uuid' => $this->string(45)->notNull()->unique(),
-            'oid' => $this->string(45)->notNull(),
-            'title' => $this->string()->notNull(),
-            'register' => $this->string()->notNull(),
-            'deviceUuid' => $this->string(45),
-            'measureTypeUuid' => $this->string(45)->notNull(),
-            'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-            'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-        ], $tableOptions);
-
-        $this->createIndex(
-            'idx-deviceUuid',
-            self::SENSOR_CHANNEL,
-            'deviceUuid'
-        );
-
-        $this->addForeignKey(
-            'fk-sensor_channel-deviceUuid',
-            self::SENSOR_CHANNEL,
-            'deviceUuid',
-            self::DEVICE,
-            'uuid',
-            $delete = 'RESTRICT',
-            $update = 'CASCADE'
-        );
 
         $this->createTable(self::SENSOR_CONFIG, [
             '_id' => $this->primaryKey(),

@@ -3,7 +3,9 @@
 use common\components\MainFunctions;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Node;
 use common\models\Objects;
+use common\models\User;
 use common\models\Users;
 use kartik\date\DatePicker;
 use kartik\widgets\Select2;
@@ -75,37 +77,19 @@ use yii\widgets\ActiveForm;
 
     <?php echo $form->field($model, 'serial')->textInput(['maxlength' => true]) ?>
 
-    <?php echo $form->field($model, 'tag')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
-
-    <div class="pole-mg" style="margin: 0 -15px 20px -15px">
-        <p style="width: 300px; margin-bottom: 0;">Дата поверки</p>
-        <?php echo DatePicker::widget(
-            [
-                'model' => $model,
-                'attribute' => 'testDate',
-                'language' => 'ru',
-                'size' => 'ms',
-                'pluginOptions' => [
-                    'format' => 'yyyy-mm-dd',
-                    'todayHighlight' => true
-                ]
-            ]
-        );
-        ?>
-    </div>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <?php
-    $object = Objects::find()->all();
+    $nodes = Node::find()->all();
     $items = ArrayHelper::map($object, 'uuid', function ($model) {
-        return $model['house']['street']->title . ', ' . $model['house']->number . ', ' . $model['title'];
+        return $model['title'];
     });
-    echo $form->field($model, 'objectUuid')->widget(Select2::class,
+    echo $form->field($model, 'nodeUuid')->widget(Select2::class,
         [
             'data' => $items,
             'language' => 'ru',
             'options' => [
-                'placeholder' => 'Выберите объект..'
+                'placeholder' => 'Выберите контроллер..'
             ],
             'pluginOptions' => [
                 'allowClear' => true

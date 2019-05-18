@@ -67,7 +67,7 @@ class ObjectsSearch extends Objects
         ]);
 
         $query->andFilterWhere(['like', 'uuid', $this->uuid])
-            ->andFilterWhere(['like', 'number', $this->title]);
+            ->andFilterWhere(['like', 'title', $this->title]);
 
         return $dataProvider;
     }

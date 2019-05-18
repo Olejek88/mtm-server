@@ -18,7 +18,7 @@ class HouseSearch extends House
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'number', 'streetUuid', 'houseStatusUuid', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'number', 'streetUuid', 'houseTypeUuid', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 

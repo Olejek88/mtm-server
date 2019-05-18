@@ -32,7 +32,8 @@ $this->title = "";
                             'attributes' => [
                                 '_id',
                                 'uuid',
-                                'title',
+                                'config',
+                                'sensorChannelUuid',
                                 'createdAt',
                                 'changedAt',
                             ],

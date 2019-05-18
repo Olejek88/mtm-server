@@ -6,7 +6,7 @@ use yii\grid\GridView;
 
 /* @var $searchModel SensorChannelSearch */
 
-$this->title = Yii::t('app', 'Заявка');
+$this->title = Yii::t('app', 'Каналы измерения');
 ?>
 <div class="orders-index box-padding-index">
 
@@ -49,52 +49,28 @@ $this->title = Yii::t('app', 'Заявка');
                                     }
                                 ],
                                 [
-                                    'attribute'=>'equipment',
+                                    'attribute'=>'device',
                                     'contentOptions' =>[
                                         'class' => 'table_class'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'equipment.title',
+                                    'value'     => 'device.title',
                                 ],
                                 [
-                                    'attribute'=>'requestStatus',
+                                    'attribute'=>'measureType',
                                     'contentOptions' =>[
                                         'class' => 'table_class'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'requestStatus.title',
+                                    'value'     => 'measureType.title',
                                 ],
                                 [
-                                    'attribute'=>'user',
+                                    'attribute'=>'register',
                                     'contentOptions' =>[
                                         'class' => 'table_class'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'user.name',
-                                ],
-                                [
-                                    'attribute'=>'object',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class'
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'object.title',
-                                ],
-                                [
-                                    'attribute'=>'comment',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class'
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'comment',
-                                ],
-                                [
-                                    'attribute'=>'closeDate',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class'
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'closeDate',
+                                    'value'     => 'register',
                                 ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',

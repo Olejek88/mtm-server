@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\UserSearch;
 use backend\models\UsersSearch;
 use common\models\City;
 use common\models\Organisation;
@@ -10,6 +11,7 @@ use common\models\Objects;
 use common\models\LoginForm;
 use common\models\Measure;
 use common\models\Street;
+use common\models\User;
 use common\models\Users;
 use Yii;
 use yii\filters\AccessControl;
@@ -102,12 +104,12 @@ class SiteController extends Controller
      */
     public function actionDashboard()
     {
-        $searchModel = new UsersSearch();
+        $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
         $accountUser = Yii::$app->user->identity;
-        $currentUser = Users::find()
+        $currentUser = User::find()
             ->where(['user_id' => $accountUser['id']])
             ->asArray()
             ->one();
@@ -118,7 +120,7 @@ class SiteController extends Controller
         $equipmentCount = Device::find()->count();
         $contragentCount = Organisation::find()->count();
         $equipmentTypeCount = DeviceType::find()->count();
-        $usersCount = Users::find()->count();
+        $usersCount = User::find()->count();
 
         $last_measures = Measure::find()
             ->where('createdAt > (NOW()-(4*24*3600000));')
@@ -136,7 +138,7 @@ class SiteController extends Controller
             ->limit(20)
             ->all();
 
-        $users = Users::find()
+        $users = User::find()
             ->all();
 
         /**

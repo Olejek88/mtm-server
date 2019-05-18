@@ -1,6 +1,10 @@
 <?php
 
 use common\components\MainFunctions;
+use common\models\House;
+use common\models\SensorChannel;
+use kartik\widgets\Select2;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -20,8 +24,23 @@ use yii\widgets\ActiveForm;
         echo $form->field($model, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
     }
     ?>
+    <?php
+    $sensorChannel = SensorChannel::find()->all();
+    $items = ArrayHelper::map($sensorChannel, 'uuid', 'title');
+    echo $form->field($model, 'sensorChannelUuid')->widget(Select2::class,
+        [
+            'data' => $items,
+            'language' => 'ru',
+            'options' => [
+                'placeholder' => 'Выберите канал'
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+    ?>
 
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'config')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group text-center">
 

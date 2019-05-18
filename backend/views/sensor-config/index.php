@@ -4,7 +4,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 
-$this->title = Yii::t('app', 'Статусы заявок');
+$this->title = Yii::t('app', 'Конфигурация');
 ?>
 <div class="order-status-view box-padding" style="width: 95%; min-height: 782px">
     <?php
@@ -55,13 +55,23 @@ $this->title = Yii::t('app', 'Статусы заявок');
                                     }
                                 ],
                                 [
-                                    'attribute'=>'title',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class',
+                                    'attribute' => 'config',
+                                    'contentOptions' => [
+                                        'class' => 'table_class'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'content'=>function($data){
-                                        return $data->title;
+                                    'content' => function ($data) {
+                                        return $data->config;
+                                    }
+                                ],
+                                [
+                                    'attribute' => 'sensorChannelUuid',
+                                    'contentOptions' => [
+                                        'class' => 'table_class'
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'content' => function ($data) {
+                                        return $data['sensorChannel']['title'];
                                     }
                                 ],
                                 [

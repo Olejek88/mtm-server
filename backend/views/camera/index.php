@@ -43,54 +43,32 @@ $this->title = Yii::t('app', 'Камеры');
                                     }
                                 ],
                                 [
-                                    'attribute' => 'user',
+                                    'attribute' => 'title',
                                     'contentOptions' => [
                                         'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'user.name',
+                                    'value' => 'title',
                                 ],
                                 [
-                                    'attribute' => 'date',
+                                    'attribute' => 'deviceStatusUuid',
                                     'contentOptions' => [
                                         'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
                                     'content' => function ($data) {
-                                        return $data->date;
+                                        return $data['deviceStatus']['title'];
                                     }
                                 ],
                                 [
-                                    'attribute' => 'alarmType',
+                                    'attribute' => 'nodeUuid',
                                     'contentOptions' => [
                                         'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'alarmType.title',
-                                ],
-                                [
-                                    'attribute' => 'alarmStatus',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'alarmStatus.title',
-                                ],
-                                [
-                                    'attribute' => 'latitude',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'latitude',
-                                ],
-                                [
-                                    'attribute' => 'longitude',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'longitude',
+                                    'content' => function ($data) {
+                                        return $data['node']['title'];
+                                    }
                                 ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',

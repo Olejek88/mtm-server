@@ -21,8 +21,6 @@ use yii\db\Expression;
  * @property string $deviceStatusUuid
  * @property string $date
  * @property string $nodeUuid
- * @property double $latitude
- * @property double $longitude
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
@@ -143,6 +141,8 @@ class Device extends ActiveRecord
             'node' => Yii::t('app', 'Шкаф установки'),
             'port' => Yii::t('app', 'Порт'),
             'serial' => Yii::t('app', 'Серийный номер'),
+            'latitude' => Yii::t('app', 'Широта'),
+            'longitude' => Yii::t('app', 'Долгота'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

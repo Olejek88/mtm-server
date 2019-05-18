@@ -30,26 +30,16 @@ $this->title = "Камеры";
                             [
                                 'model' => $model,
                                 'attributes' => [
-                                    'latitude',
-                                    'longitude',
                                     'uuid',
-                                    [
-                                        'label' => 'Пользователь',
-                                        'value' => $model['user']->name
-                                    ],
-                                    [
-                                        'label' => 'Тип',
-                                        'value' => $model['alarmType']->title
-                                    ],
+                                    'title',
                                     [
                                         'label' => 'Статус',
-                                        'value' => $model['alarmStatus']->title
+                                        'value' => $model['deviceStatus']->title
                                     ],
                                     [
-                                        'label' => 'Объект',
-                                        'value' => $model['object']->title
+                                        'label' => 'Контроллер',
+                                        'value' => $model['node']->title
                                     ],
-                                    'date',
                                     'createdAt',
                                     'changedAt',
                                 ],

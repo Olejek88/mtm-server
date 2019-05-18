@@ -31,6 +31,9 @@ class ObjectTypeController extends Controller
         ];
     }
 
+    /**
+     * @throws UnauthorizedHttpException
+     */
     public function init()
     {
 

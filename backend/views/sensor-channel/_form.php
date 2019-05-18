@@ -1,10 +1,12 @@
 <?php
 
 use common\components\MainFunctions;
+use common\models\MeasureType;
 use common\models\Organisation;
 use common\models\Objects;
 use common\models\SensorChannel;
 use common\models\Task;
+use common\models\User;
 use common\models\Users;
 use kartik\widgets\Select2;
 use yii\helpers\Html;
@@ -14,7 +16,7 @@ use common\models\Device;
 use common\models\requestStatus;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Request */
+/* @var $model common\models\SensorChannel */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -38,10 +40,10 @@ use common\models\requestStatus;
     ?>
 
     <?php
-    $type = SensorChannel::find()->all();
+    $type = MeasureType::find()->all();
     $items = ArrayHelper::map($type, 'uuid', 'title');
-    echo $form->field($model, 'requestTypeUuid',
-        ['template' => MainFunctions::getAddButton("/request-type/create")])->widget(Select2::class,
+    echo $form->field($model, 'measureTypeUuid',
+        ['template' => MainFunctions::getAddButton("/measure-type/create")])->widget(Select2::class,
         [
             'data' => $items,
             'language' => 'ru',
@@ -55,43 +57,10 @@ use common\models\requestStatus;
     ?>
 
     <?php
-    $contragents = Organisation::find()->all();
-    $items = ArrayHelper::map($contragents, 'uuid', 'title');
-    echo $form->field($model, 'contragentUuid',
-        ['template' => MainFunctions::getAddButton("/contragent/create")])->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите тип..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
-
-    <?php
-    $users = Users::find()->all();
-    $items = ArrayHelper::map($users, 'uuid', 'name');
-    echo $form->field($model, 'userUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Исполнитель'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
-
-    <?php
-    $equipments = Device::find()->all();
-    $items = ArrayHelper::map($equipments, 'uuid', 'title');
-    echo $form->field($model, 'equipmentUuid',
-        ['template' => MainFunctions::getAddButton("/equipment/create")])->widget(Select2::class,
+    $device = Device::find()->all();
+    $items = ArrayHelper::map($device, 'uuid', 'title');
+    echo $form->field($model, 'deviceUuid',
+        ['template' => MainFunctions::getAddButton("/device/create")])->widget(Select2::class,
         [
             'data' => $items,
             'language' => 'ru',
@@ -104,37 +73,8 @@ use common\models\requestStatus;
         ]);
     ?>
 
-    <?php
-    $tasks = Task::find()->all();
-    $items = ArrayHelper::map($tasks, 'uuid', 'taskTemplate.title');
-    echo $form->field($model, 'taskUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Задача'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
-
-    <?php
-    $accountUser = Yii::$app->user->identity;
-    $currentUser = Users::findOne(['user_id' => $accountUser['id']]);
-    echo $form->field($model, 'authorUuid')->hiddenInput(['value' => $currentUser['uuid']])->label(false);
-    echo $form->field($model, 'requestStatusUuid')->hiddenInput(['value' => RequestStatus::NEW_REQUEST])->label(false);
-    ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
-
-    <?= $form->field($model, 'comment')->textInput() ?>
-
-    <?php
-    $objects  = Objects::find()->all();
-    $items = ArrayHelper::map($objects,'uuid','title');
-    echo $form->field($model, 'objectUuid')->dropDownList($items);
-    ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?= $form->field($model, 'register')->textInput() ?>
 
     <div class="form-group text-center">
 

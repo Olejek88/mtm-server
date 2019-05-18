@@ -4,6 +4,7 @@ namespace common\models;
 use common\components\IPhoto;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -13,14 +14,10 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $oid идентификатор организации
  * @property string $uuid
- * @property string $objectUuid
- * @property string $userUuid
- * @property double $latitude
- * @property double $longitude
+ * @property string $cameraUuid
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property Users $user
  * @property string $photoUrl
  */
 class Photo extends ActiveRecord implements IPhoto
@@ -73,9 +70,7 @@ class Photo extends ActiveRecord implements IPhoto
                 ],
                 'required'
             ],
-/*            [['photo'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg'],*/
-            [['latitude', 'longitude'], 'number'],
-            [['uuid', 'objectUuid', 'userUuid'], 'string', 'max' => 50],
+            [['uuid', 'cameraUuid'], 'string', 'max' => 50],
             [['createdAt', 'changedAt'], 'safe'],
         ];
     }
@@ -92,10 +87,7 @@ class Photo extends ActiveRecord implements IPhoto
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'objectUuid' => Yii::t('app', 'Объект'),
-            'userUuid' => Yii::t('app', 'Пользователь'),
-            'latitude' => Yii::t('app', 'Широта'),
-            'longitude' => Yii::t('app', 'Долгота'),
+            'cameraUuid' => Yii::t('app', 'Камера'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -109,16 +101,10 @@ class Photo extends ActiveRecord implements IPhoto
     public function fields()
     {
         return ['_id','uuid',
-            'objectUuid',
-            'object' => function ($model) {
-                return $model->object;
+            'cameraUuid',
+            'camera' => function ($model) {
+                return $model->camera;
             },
-            'userUuid',
-            'user' => function ($model) {
-                return $model->user;
-            },
-            'latitude',
-            'longitude',
             'createdAt',
             'changedAt',
         ];
@@ -141,21 +127,11 @@ class Photo extends ActiveRecord implements IPhoto
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getObject()
+    public function getCamera()
     {
-        return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
-    }
-
-    /**
-     * Объект связанного поля.
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(User::class, ['uuid' => 'userUuid']);
+        return $this->hasOne(Camera::class, ['uuid' => 'cameraUuid']);
     }
 
     /**

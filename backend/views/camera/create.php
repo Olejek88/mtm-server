@@ -44,31 +44,23 @@ $this->title = Yii::t('app', 'Создать камеру');
                                 }
                             ],
                             [
-                                'attribute' => 'user',
+                                'attribute' => 'title',
                                 'contentOptions' => [
                                     'class' => 'table_class',
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
-                                'value' => 'user.name',
+                                'value' => 'title',
                             ],
                             [
-                                'attribute' => 'date',
+                                'attribute' => 'node',
                                 'contentOptions' => [
                                     'class' => 'table_class',
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
                                 'content' => function ($data) {
-                                    return $data->date;
+                                    return $data['node']['title'];
                                 }
                             ],
-                            [
-                                'attribute' => 'alarmType',
-                                'contentOptions' => [
-                                    'class' => 'table_class',
-                                ],
-                                'headerOptions' => ['class' => 'text-center'],
-                                'value' => 'alarmType.title',
-                            ]
                         ],
                     ]); ?>
                 </div>

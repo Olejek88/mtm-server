@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\SensorChannel */
 
-$this->title = Yii::t('app', 'Создать заявку');
+$this->title = Yii::t('app', 'Создать канал');
 ?>
 <div class="task-request-create box-padding">
 

@@ -12,6 +12,9 @@ use yii\web\UnauthorizedHttpException;
  */
 class UserArmController extends Controller
 {
+    /**
+     * @throws UnauthorizedHttpException
+     */
     public function init()
     {
 

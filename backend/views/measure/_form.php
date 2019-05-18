@@ -69,23 +69,6 @@ use yii\widgets\ActiveForm;
             ],
         ]);
     ?>
-    <?php
-    $users = Users::find()->all();
-    $items = ArrayHelper::map($users, 'uuid', 'name');
-    echo $form->field($model, 'userUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите пользователя..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-
-    ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
 
     <div class="pole-mg" style="margin: 0 -15px 20px -15px;">
         <p style="width: 200px; margin-bottom: 0;">Дата измерения</p>

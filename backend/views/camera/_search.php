@@ -21,7 +21,7 @@ use yii\widgets\ActiveForm;
 
     <?php echo $form->field($model, 'uuid') ?>
 
-    <?php echo $form->field($model, 'objectUuid') ?>
+    <?php echo $form->field($model, 'nodeUuid') ?>
 
     <?php echo $form->field($model, 'date') ?>
 

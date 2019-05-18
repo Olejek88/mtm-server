@@ -69,8 +69,7 @@ class Measure extends ActiveRecord
             [
                 [
                     'uuid',
-                    'equipmentUuid',
-                    'userUuid',
+                    'sensorChannelUuid',
                     'measureTypeUuid',
                     'value',
                     'date'
@@ -78,7 +77,7 @@ class Measure extends ActiveRecord
                 'required'
             ],
             [['value'], 'number'],
-            [['uuid', 'equipmentUuid', 'userUuid', 'date', 'oid'], 'string', 'max' => 50],
+            [['uuid', 'sensorChannelUuid', 'measureTypeUuid', 'date', 'oid'], 'string', 'max' => 50],
             [['createdAt', 'changedAt'], 'safe'],
         ];
     }
@@ -95,11 +94,10 @@ class Measure extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'equipmentUuid' => Yii::t('app', 'Оборудование'),
+            'sensorChannel' => Yii::t('app', 'Канал измерения'),
+            'sensorChannelUuid' => Yii::t('app', 'Канал измерения'),
+            'measureType' => Yii::t('app', 'Тип измерения'),
             'measureTypeUuid' => Yii::t('app', 'Тип измерения'),
-            'userUuid' => Yii::t('app', 'Пользователь'),
-            'equipment' => Yii::t('app', 'Оборудование'),
-            'user' => Yii::t('app', 'Пользователь'),
             'value' => Yii::t('app', 'Значение'),
             'date' => Yii::t('app', 'Дата'),
             'createdAt' => Yii::t('app', 'Создан'),
@@ -115,13 +113,9 @@ class Measure extends ActiveRecord
     public function fields()
     {
         return ['_id', 'uuid',
-            'equipmentUuid',
-            'equipment' => function ($model) {
-                return $model->equipment;
-            },
-            'userUuid',
-            'user' => function ($model) {
-                return $model->user;
+            'sensorChannelUuid',
+            'sensorChannel' => function ($model) {
+                return $model->sensorChannel;
             },
             'measureTypeUuid',
             'measureType' => function ($model) {
@@ -153,19 +147,9 @@ class Measure extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getEquipment()
+    public function getSensorChannel()
     {
-        return $this->hasOne(Device::class, ['uuid' => 'equipmentUuid']);
-    }
-
-    /**
-     * Объект связанного поля.
-     *
-     * @return ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(Users::class, ['uuid' => 'userUuid']);
+        return $this->hasOne(SensorChannel::class, ['uuid' => 'sensorChannelUuid']);
     }
 
     /**
@@ -178,9 +162,9 @@ class Measure extends ActiveRecord
         return $this->hasOne(MeasureType::class, ['uuid' => 'measureTypeUuid']);
     }
 
-    public static function getLastMeasureBetweenDates($equipmentUuid, $startDate, $endDate)
+    public static function getLastMeasureBetweenDates($sensorChannelUuid, $startDate, $endDate)
     {
-        $model = Measure::find()->where(["equipmentUuid" => $equipmentUuid])
+        $model = Measure::find()->where(["sensorChannelUuid" => $sensorChannelUuid])
             ->andWhere('date >= "'.$startDate.'"')
             ->andWhere('date < "'.$endDate.'"')
             ->orderBy('date DESC')

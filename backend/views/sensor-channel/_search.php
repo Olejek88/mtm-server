@@ -19,16 +19,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'uuid') ?>
 
-    <?= $form->field($model, 'comment') ?>
+    <?= $form->field($model, 'register') ?>
 
-    <?= $form->field($model, 'userUuid') ?>
+    <?= $form->field($model, 'deviceUuid') ?>
 
-    <?= $form->field($model, 'equipmentUuid') ?>
-
-    <?= $form->field($model, 'requestStatusUuid') ?>
-
-    <?= $form->field($model, 'objectUuid') ?>
-
+    <?= $form->field($model, 'measureTypeUuid') ?>
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>

@@ -19,7 +19,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'uuid') ?>
 
-    <?= $form->field($model, 'title') ?>
+    <?= $form->field($model, 'sensorChannel') ?>
+
+    <?= $form->field($model, 'config') ?>
 
     <?= $form->field($model, 'createdAt') ?>
 

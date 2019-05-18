@@ -16,16 +16,14 @@ use yii\bootstrap\ActiveForm;
 ?>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Добавить заявку</h4>
+        <h4 class="modal-title">Добавить канал измерения</h4>
     </div>
     <div class="modal-body">
         <?php
             echo $form->field($model, 'uuid')->hiddenInput(['value' => MainFunctions::GUID()])->label(false);
-            if (isset($_GET["equipmentUuid"]))
-                echo $form->field($model, 'equipmentUuid')->hiddenInput(['value' => $_GET["equipmentUuid"]])->label(false);
-            if (isset($_GET["objectUuid"]))
-                echo $form->field($model, 'objectUuid')->hiddenInput(['value' => $_GET["objectUuid"]])->label(false);
-            echo $form->field($model, 'comment')->textArea();
+            if (isset($_GET["deviceUuid"]))
+                echo $form->field($model, 'deviceUuid')->hiddenInput(['value' => $_GET["deviceUuid"]])->label(false);
+            echo $form->field($model, 'register')->textArea();
         ?>
     </div>
     <div class="modal-footer">
@@ -35,7 +33,7 @@ use yii\bootstrap\ActiveForm;
 <script>
     $(document).on("beforeSubmit", "#form", function () {
         $.ajax({
-            url: "../request/new",
+            url: "../sensor-channel/new",
             type: "post",
             data: $('form').serialize(),
             success: function () {

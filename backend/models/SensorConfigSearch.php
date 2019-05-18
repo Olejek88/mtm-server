@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use common\models\Objects;
+use common\models\SensorChannel;
 use common\models\SensorConfig;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -41,7 +42,7 @@ class SensorConfigSearch extends SensorConfig
      */
     public function search($params)
     {
-        $query = Objects::find();
+        $query = SensorConfig::find();
 
         // add conditions that should always apply here
 

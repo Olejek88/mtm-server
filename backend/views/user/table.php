@@ -1,15 +1,12 @@
 <?php
-/* @var $searchModel backend\models\SensorChannelSearch */
+/* @var $searchModel backend\models\UsersSearch */
 
-use common\models\DeviceStatus;
-use common\models\MeasureType;
-use common\models\SensorChannel;
+use common\models\User;
+use common\models\Users;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Каналы измерения');
+$this->title = Yii::t('app', 'Управление пользователями');
 
 $gridColumns = [
     [
@@ -27,55 +24,55 @@ $gridColumns = [
         }
     ],
     [
-        'attribute' => 'deviceUuid',
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'name',
         'vAlign' => 'middle',
-        'hAlign' => 'center',
-        'header' => 'Устройство',
-        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
         'headerOptions' => ['class' => 'text-center'],
+        'editableOptions' => [
+            'size' => 'lg',
+        ],
         'content' => function ($data) {
-            return $data['device']->title;
+            return $data->name;
         }
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'measureTypeUuid',
+        'attribute' => 'type',
         'vAlign' => 'middle',
-        'width' => '150px',
-        'header' => 'Тип измерения',
+        'width' => '180px',
+        'header' => 'Тип пользователя',
+        'mergeHeader' => true,
         'format' => 'raw',
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
-        'value' => 'requestStatus.title',
-        'editableOptions' => function () {
-            $types = ArrayHelper::map(MeasureType::find()->orderBy('title')->all(), 'uuid', 'title');
+        'value' => function ($model, $key, $index, $widget) {
+            if ($model->type==User::ROLE_ADMIN)
+                return 'Администратор';
+            if ($model->type==User::ROLE_OPERATOR)
+                return 'Оператор';
+            return 'Пользователь';
+        },
+        'editableOptions'=> function ($model, $key, $index, $widget) {
             return [
-                'size' => 'md',
+                'header' => 'Тип',
+                'size' => 'lg',
                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'displayValueConfig' => $types,
-                'data' => $types
+                'data' => [
+                    User::ROLE_ADMIN =>'Администратор',
+                    User::ROLE_OPERATOR =>'Оператор'
+                ]
             ];
         },
-        'filterType' => GridView::FILTER_SELECT2,
-        'filter' => ArrayHelper::map(MeasureType::find()->orderBy('title')->all(),
-            'uuid', 'title'),
-        'filterWidgetOptions' => [
-            'pluginOptions' => ['allowClear' => true],
-        ],
-        'filterInputOptions' => ['placeholder' => 'Любой'],
     ],
     [
-        'attribute' => 'register',
+        'attribute' => 'whoIs',
         'hAlign' => 'center',
         'vAlign' => 'middle',
-        'header' => 'Регистр',
-        'format' => 'raw',
+        'header' => 'Должность',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
         'mergeHeader' => true,
+        'format' => 'raw',
         'contentOptions' => [
             'class' => 'table_class'
         ],
@@ -93,15 +90,32 @@ $gridColumns = [
         ],
     ],
     [
+        'class' => 'kartik\grid\BooleanColumn',
+        'attribute' => 'active',
+        'vAlign' => 'middle'
+    ],
+/*    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'active',
+        'header' => 'Статус',
+        'editableOptions'=> [
+            'asPopover' => false,
+        ],
+        'value' => function ($model, $key, $index, $widget) {
+            if ($model->active==1) return \yii\helpers\Html::'<span class="fas fa-check text-success"></span>';
+            else return '<span class="fas fa-times text-danger"></span>';
+        },
+        'headerOptions' => ['class' => 'kartik-sheet-style'],
+    ],*/
+    [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'template'=> '{delete}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];
 
 echo GridView::widget([
-    'id' => 'requests-table',
+    'id' => 'users-table',
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
@@ -112,20 +126,17 @@ echo GridView::widget([
         '{toggleData}'
     ],
     'toolbar' => [
-        ['content' =>
-            Html::a('Новая', ['/request/create'], ['class' => 'btn btn-success'])
-        ],
         '{export}',
     ],
     'export' => [
         'fontAwesome' => true,
         'target' => GridView::TARGET_BLANK,
-        'filename' => 'requests'
+        'filename' => 'users'
     ],
     'pjax' => true,
     'showPageSummary' => false,
     'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
-    'summary' => '',
+    'summary'=>'',
     'bordered' => true,
     'striped' => false,
     'condensed' => false,
@@ -134,7 +145,7 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Заявки',
+        'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Пользователи',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);

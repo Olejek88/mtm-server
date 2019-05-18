@@ -1,10 +1,9 @@
 <?php
 
-use app\commands\MainFunctions;
-use common\models\ObjectStatus;
+use common\components\MainFunctions;
 use common\models\ObjectType;
 use common\models\House;
-use common\models\Users;
+use common\models\User;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -29,7 +28,7 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <?php
     $houses = House::find()->all();
@@ -42,22 +41,6 @@ use yii\widgets\ActiveForm;
             'language' => 'ru',
             'options' => [
                 'placeholder' => 'Выберите объект..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
-
-    <?php
-    $statuses = ObjectStatus::find()->all();
-    $items = ArrayHelper::map($statuses, 'uuid', 'title');
-    echo $form->field($model, 'objectStatusUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите статус..'
             ],
             'pluginOptions' => [
                 'allowClear' => true
