@@ -48,7 +48,7 @@ class SensorConfig extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'sensor_channel';
+        return 'sensor_config';
     }
 
     /**
@@ -69,7 +69,7 @@ class SensorConfig extends ActiveRecord
                 ],
                 'required'
             ],
-            [['createdAt', 'changedAt'], 'safe'],
+            [['oid','createdAt', 'changedAt'], 'safe'],
             [
                 [
                     'uuid',

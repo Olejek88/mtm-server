@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\CameraSearch */
+/* @var $model backend\models\NodeSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="equipment-search box-padding">
+<div class="device-search box-padding">
 
     <?php $form = ActiveForm::begin(
         [
@@ -22,6 +22,10 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'uuid') ?>
 
     <?php echo $form->field($model, 'objectUuid') ?>
+
+    <?php echo $form->field($model, 'deviceStatusUuid') ?>
+
+    <?php echo $form->field($model, 'address') ?>
 
     <div class="form-group">
         <?php echo Html::submitButton(

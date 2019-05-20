@@ -228,6 +228,7 @@ class m190412_104112_init_new extends Migration
                 '_id' => $this->primaryKey()->comment("Id"),
                 'uuid' => $this->string(45)->unique()->notNull(),
                 'oid' => $this->string(45)->notNull(),
+                'address' => $this->string(45),
                 'deviceStatusUuid' => $this->string(45)->notNull(),
                 'objectUuid' => $this->string(45)->notNull(),
                 'deleted' => $this->smallInteger()->defaultValue(0),
@@ -275,8 +276,10 @@ class m190412_104112_init_new extends Migration
                 '_id' => $this->primaryKey()->comment("Id"),
                 'uuid' => $this->string(45)->unique()->notNull(),
                 'oid' => $this->string(45)->notNull(),
+                'title' => $this->string(150)->notNull(),
                 'deviceStatusUuid' => $this->string(45)->notNull(),
                 'nodeUuid' => $this->string(45)->notNull(),
+                'objectUuid' => $this->string(45)->notNull(),
                 'deleted' => $this->smallInteger()->defaultValue(0),
                 'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
                 'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -315,6 +318,21 @@ class m190412_104112_init_new extends Migration
             $update = 'CASCADE'
         );
 
+        $this->createIndex(
+            'idx-camera-objectUuid',
+            self::CAMERA,
+            'objectUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-camera-objectUuid',
+            self::CAMERA,
+            'objectUuid',
+            'object',
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
         //--------------------------------------------------------------------------------------------------------------
         $this->createTable(self::ORGANISATION, [
             '_id' => $this->primaryKey(),
@@ -332,6 +350,7 @@ class m190412_104112_init_new extends Migration
             'oid' => $this->string(45)->notNull(),
             'address' => $this->string(150)->notNull(),
             'nodeUuid' => $this->string(45)->notNull(),
+            'objectUuid' => $this->string(45)->notNull(),
             'deviceTypeUuid' => $this->string(45)->notNull(),
             'deviceStatusUuid' => $this->string(45)->notNull(),
             'port' => $this->string(),
@@ -386,6 +405,22 @@ class m190412_104112_init_new extends Migration
             self::DEVICE,
             'deviceStatusUuid',
             self::DEVICE_STATUS,
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
+
+        $this->createIndex(
+            'idx-device-objectUuid',
+            self::DEVICE,
+            'objectUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-device-objectUuid',
+            self::DEVICE,
+            'objectUuid',
+            'object',
             'uuid',
             $delete = 'RESTRICT',
             $update = 'CASCADE'
@@ -451,12 +486,11 @@ class m190412_104112_init_new extends Migration
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')
         ], $tableOptions);
 
-        $this->createTable('{{%measure}}', ['_id' => $this->primaryKey(),
+        $this->createTable(self::MEASURE, ['_id' => $this->primaryKey(),
             'uuid' => $this->string(45)->notNull()->unique(),
             'oid' => $this->string(45)->notNull(),
             'measureTypeUuid' => $this->string(45)->notNull(),
             'sensorChannelUuid' => $this->string(45)->notNull(),
-            'userUuid' => $this->string(45)->notNull(),
             'value' => $this->double(),
             'date' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
             'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),

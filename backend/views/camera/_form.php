@@ -1,11 +1,10 @@
 <?php
 
 use common\components\MainFunctions;
+use common\models\DeviceStatus;
 use common\models\Node;
 use common\models\Objects;
 use common\models\User;
-use common\models\Users;
-use kartik\date\DatePicker;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -38,10 +37,32 @@ use yii\widgets\ActiveForm;
     }
     ?>
 
+    <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+
+    <?php
+    $object = Objects::find()->all();
+    $items = ArrayHelper::map($object, 'uuid', function ($model) {
+        return $model->getAddress();
+    });
+    echo $form->field($model, 'objectUuid')->widget(Select2::class,
+        [
+            'data' => $items,
+            'language' => 'ru',
+            'options' => [
+                'placeholder' => 'Выберите объект..'
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+    ?>
+
     <?php
 
     $nodes = Node::find()->all();
-    $items = ArrayHelper::map($nodes, 'uuid', 'title');
+    $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
+        return $model['object']['address'].' ['.$model['address'].']';
+    });
     echo $form->field($model, 'nodeUuid')->widget(Select2::class,
         [
             'data' => $items,
@@ -55,8 +76,7 @@ use yii\widgets\ActiveForm;
         ]);
     ?>
 
-    <?php echo $form->field($model, 'longitude')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'latitude')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'deviceStatusUuid')->hiddenInput(['value' => DeviceStatus::WORK])->label(false); ?>
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <div class="form-group text-center">

@@ -49,6 +49,24 @@ class SensorChannelController extends Controller
     }
 
     /**
+     * Lists all models.
+     *
+     * @return mixed
+     */
+    public function actionTable()
+    {
+        $searchModel = new SensorChannelSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render(
+            'table', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]
+        );
+    }
+
+    /**
      * Displays a single StageOperation model.
      *
      * @param integer $id Id

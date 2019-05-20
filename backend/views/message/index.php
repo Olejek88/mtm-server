@@ -14,11 +14,6 @@ $this->title = Yii::t('app', 'Сообщения');
                 <?= Html::encode($this->title) ?>
             </h3>
 
-            <ul class="nav nav-tabs" style="width: 255px; margin: 0 auto;">
-                <li><a href="/users">Пользователи</a></li>
-                <li><a href="/message-type">Тип</a></li>
-                <li><a href="/message-channel">Канал</a></li>
-            </ul>
         </div>
         <div class="panel-body">
 
@@ -49,50 +44,12 @@ $this->title = Yii::t('app', 'Сообщения');
                                     }
                                 ],
                                 [
-                                    'attribute'=>'fromUserUuid',
+                                    'attribute'=>'link',
                                     'contentOptions' =>[
                                         'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'fromUser.name',
-                                ],
-                                [
-                                    'attribute'=>'toUserUuid',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'toUser.name',
-                                ],
-                                [
-                                    'attribute'=>'date',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'content'=>function($data){
-                                        return $data->date;
-                                    }
-                                ],
-                                [
-                                    'attribute'=>'text',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'content'=>function($data){
-                                        return $data->text;
-                                    }
-                                ],
-                                [
-                                    'attribute'=>'status',
-                                    'contentOptions' =>[
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'content'=>function($data){
-                                        return $data->status;
-                                    }
+                                    'value'     => 'link',
                                 ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',

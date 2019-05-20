@@ -5,9 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Message */
 
-$this->title = Yii::t('app', 'Обновить {modelClass}: ', [
-    'modelClass' => 'Message',
-]);
+$this->title = Yii::t('app', 'Обновить сообщение');
 ?>
 <div class="tool-type-update box-padding">
 

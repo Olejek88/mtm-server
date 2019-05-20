@@ -3,7 +3,7 @@
 
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Создать контрагента');
+$this->title = Yii::t('app', 'Создать');
 ?>
 <div class="task-create box-padding">
 

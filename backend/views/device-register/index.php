@@ -34,28 +34,14 @@ $this->title = Yii::t('app', 'Журнал оборудования');
                             'layout' => "{summary}\n{items}\n<div align='center'>{pager}</div>",
                             'columns' => [
                                 [
-                                    'attribute' => 'registerTypeUuid',
+                                    'attribute' => 'deviceUuid',
                                     'contentOptions' => [
                                         'class' => 'table_class',
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'registerType.title',
-                                ],
-                                [
-                                    'attribute' => 'userUuid',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'user.name',
-                                ],
-                                [
-                                    'attribute' => 'equipmentUuid',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'value' => 'equipment.title',
+                                    'content' => function ($data) {
+                                        return $data['device']->getFullTitle();
+                                    }
                                 ],
                                 [
                                     'attribute' => 'date',

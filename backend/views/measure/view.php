@@ -29,12 +29,8 @@ $this->title = 'Измеренное значение';
                 '_id',
                 'uuid',
                 [
-                    'label' => 'Оборудование',
-                    'value' => $model['equipment']['equipmentType']->title
-                ],
-                [
-                    'label' => 'Пользователь',
-                    'value' => $model['user']->name
+                    'label' => 'Канал',
+                    'value' => $model['sensorChannel']->title
                 ],
                 'date',
                 'value',

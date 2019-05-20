@@ -8,7 +8,7 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "equipment_status".
+ * This is the model class for table "device_status".
  *
  * @property integer $_id
  * @property string $uuid
@@ -39,7 +39,7 @@ class DeviceStatus extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'equipment_status';
+        return 'device_status';
     }
 
     /**

@@ -18,7 +18,7 @@ class NodeSearch extends Node
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'address', 'nodeUuid', 'objectUuid', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'address', 'deviceStatusUuid', 'objectUuid', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -59,7 +59,7 @@ class NodeSearch extends Node
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'nodeUuid' => $this->nodeUuid,
+            'deviceStatusUuid' => $this->deviceStatusUuid,
             'objectUuid' => $this->objectUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,

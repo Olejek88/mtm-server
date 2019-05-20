@@ -15,7 +15,8 @@ use yii\db\Expression;
  * @property string $oid идентификатор организации
  * @property string $title
  * @property string $deviceStatusUuid
- * @property string $nodesUuid
+ * @property string $objectUuid
+ * @property string $nodeUuid
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
@@ -51,7 +52,7 @@ class Camera extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'equipment';
+        return 'camera';
     }
 
     /**
@@ -65,6 +66,10 @@ class Camera extends ActiveRecord
             'nodeUuid',
             'node' => function ($model) {
                 return $model->node;
+            },
+            'objectUuid',
+            'object' => function ($model) {
+                return $model->object;
             },
             'deviceStatusUuid',
             'deviceStatus' => function ($model) {
@@ -87,6 +92,7 @@ class Camera extends ActiveRecord
                     'uuid',
                     'title',
                     'deviceStatusUuid',
+                    'objectUuid',
                 ],
                 'required'
             ],
@@ -97,7 +103,8 @@ class Camera extends ActiveRecord
                     'uuid',
                     'deviceStatusUuid',
                     'oid',
-                    'nodeUuid'
+                    'nodeUuid',
+                    'objectUuid'
                 ],
                 'string', 'max' => 50
             ],
@@ -125,6 +132,8 @@ class Camera extends ActiveRecord
             'deviceStatus' => Yii::t('app', 'Статус'),
             'nodeUuid' => Yii::t('app', 'Контроллер'),
             'node' => Yii::t('app', 'Контроллер'),
+            'objectUuid' => Yii::t('app', 'Объект'),
+            'object' => Yii::t('app', 'Объект'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -164,6 +173,11 @@ class Camera extends ActiveRecord
     public function getNode()
     {
         return $this->hasOne(Node::class, ['uuid' => 'nodeUuid']);
+    }
+
+    public function getObject()
+    {
+        return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
     }
 
     public function getPhoto() {

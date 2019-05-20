@@ -1,11 +1,11 @@
 <?php
-/* @var $model \common\models\Message */
+/* @var $model Message */
 /* @var $this yii\web\View */
 
+use common\models\Message;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Сообщения'), 'url' => ['index']];
 ?>
 <div class="task-status-view box-padding">
 
@@ -31,11 +31,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Сообщения')
                             'attributes' => [
                                 '_id',
                                 'uuid',
-                                'fromUser.name',
-                                'toUser.name',
-                                'text',
-                                'date',
-                                'status',
+                                'link',
                                 'createdAt',
                                 'changedAt',
                             ],

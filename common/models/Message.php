@@ -44,7 +44,7 @@ class Message extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'messages';
+        return 'message';
     }
 
     /**
@@ -54,7 +54,7 @@ class Message extends ActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'link', 'createdAt', 'changedAt'];
+        return ['_id', 'uuid', 'link', 'oid','createdAt', 'changedAt'];
     }
 
     /**
@@ -72,7 +72,7 @@ class Message extends ActiveRecord
                 ],
                 'required'
             ],
-            [['createdAt', 'changedAt'], 'safe'],
+            [['oid','createdAt', 'changedAt'], 'safe'],
             [
                 [ 'uuid' ], 'string', 'max' => 50
             ],

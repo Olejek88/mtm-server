@@ -3,6 +3,7 @@
 use common\components\MainFunctions;
 use common\models\House;
 use common\models\SensorChannel;
+use common\models\User;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -39,6 +40,7 @@ use yii\widgets\ActiveForm;
             ],
         ]);
     ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <?= $form->field($model, 'config')->textInput(['maxlength' => true]) ?>
 

@@ -41,7 +41,7 @@ class DeviceType extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'equipment_type';
+        return 'device_type';
     }
 
     /**
@@ -52,7 +52,7 @@ class DeviceType extends ActiveRecord
         return [
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['uuid', 'title', 'equipmentSystemUuid'], 'string', 'max' => 45],
+            [['uuid', 'title'], 'string', 'max' => 45],
         ];
     }
 
@@ -62,10 +62,6 @@ class DeviceType extends ActiveRecord
             '_id',
             'uuid',
             'title',
-            'equipmentSystemUuid',
-            'equipmentSystem' => function ($model) {
-                return $model->equipmentSystem;
-            },
             'createdAt',
             'changedAt',
         ];
@@ -80,8 +76,6 @@ class DeviceType extends ActiveRecord
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'title' => Yii::t('app', 'Название'),
-            'equipmentSystem' => Yii::t('app', 'Ин.Система'),
-            'equipmentSystemUuid' => Yii::t('app', 'Ин.Система'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

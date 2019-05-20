@@ -1,5 +1,5 @@
 <?php
-/* @var $searchModel backend\models\UsersSearch */
+/* @var $searchModel backend\models\UserSearch */
 
 use common\models\User;
 use common\models\Users;
@@ -77,36 +77,6 @@ $gridColumns = [
             'class' => 'table_class'
         ],
     ],
-    [
-        'attribute' => 'changedAt',
-        'hAlign' => 'center',
-        'vAlign' => 'middle',
-        'header' => 'Изменение',
-        'format' => 'raw',
-        'headerOptions' => ['class' => 'kartik-sheet-style'],
-        'mergeHeader' => true,
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
-    ],
-    [
-        'class' => 'kartik\grid\BooleanColumn',
-        'attribute' => 'active',
-        'vAlign' => 'middle'
-    ],
-/*    [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'active',
-        'header' => 'Статус',
-        'editableOptions'=> [
-            'asPopover' => false,
-        ],
-        'value' => function ($model, $key, $index, $widget) {
-            if ($model->active==1) return \yii\helpers\Html::'<span class="fas fa-check text-success"></span>';
-            else return '<span class="fas fa-times text-danger"></span>';
-        },
-        'headerOptions' => ['class' => 'kartik-sheet-style'],
-    ],*/
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',

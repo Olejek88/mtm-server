@@ -37,7 +37,7 @@ $gridColumns = [
         ],
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            return $data['device']->title;
+            return $data['device']->getFullTitle();
         }
     ],
     [
@@ -50,7 +50,6 @@ $gridColumns = [
         'contentOptions' => [
             'class' => 'table_class'
         ],
-        'value' => 'requestStatus.title',
         'editableOptions' => function () {
             $types = ArrayHelper::map(MeasureType::find()->orderBy('title')->all(), 'uuid', 'title');
             return [
@@ -134,7 +133,7 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Заявки',
+        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Каналы измерения',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);

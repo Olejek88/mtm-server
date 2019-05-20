@@ -9,7 +9,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
- * ShutdownSearch represents the model behind the search form about `common\models\Shutdown`.
+ * ShutdownSearch represents the model behind the search form about `common\models\SensorConfig`.
  */
 class SensorConfigSearch extends SensorConfig
 {
@@ -61,7 +61,6 @@ class SensorConfigSearch extends SensorConfig
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
-            'sensorChannelUuid' => $this->sensorChannelUuid,
             'config' => $this->config,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,

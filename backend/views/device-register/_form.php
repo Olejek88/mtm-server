@@ -2,6 +2,7 @@
 
 use common\components\MainFunctions;
 use common\models\Device;
+use common\models\User;
 use common\models\Users;
 use dosamigos\datetimepicker\DateTimePicker;
 use yii\helpers\ArrayHelper;
@@ -32,13 +33,9 @@ use yii\widgets\ActiveForm;
     }
     ?>
     <?php
-    $equipment = Device::find()->orderBy("title")->all();
-    $items = ArrayHelper::map($equipment, 'uuid', 'title');
-    echo $form->field($model, 'equipmentUuid')->dropDownList($items);
-
-    $user = Users::find()->all();
-    $items = ArrayHelper::map($user, 'uuid', 'name');
-    echo $form->field($model, 'userUuid')->dropDownList($items);
+    $equipment = Device::find()->orderBy("_id")->all();
+    $items = ArrayHelper::map($equipment, 'uuid', 'address');
+    echo $form->field($model, 'deviceUuid')->dropDownList($items);
     ?>
 
     <div class="pole-mg" style="margin: 0 -15px 20px -15px;">
@@ -62,7 +59,7 @@ use yii\widgets\ActiveForm;
         ['rows' => 4, 'style' => 'resize: none;']
     );
     ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <div class="form-group text-center">
 

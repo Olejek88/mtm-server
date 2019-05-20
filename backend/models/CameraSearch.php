@@ -18,7 +18,7 @@ class CameraSearch extends Camera
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'deviceStatus', 'node', 'deleted', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'deviceStatus', 'object', 'node', 'deleted', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 

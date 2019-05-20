@@ -20,7 +20,7 @@ use common\models\requestStatus;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="task-request-form" style="min-height: 880px">
+<div class="task-request-form" style="min-height: 680px">
 
     <?php $form = ActiveForm::begin([
         'id' => 'form-input-documentation',
@@ -38,6 +38,8 @@ use common\models\requestStatus;
         echo $form->field($model, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
     }
     ?>
+
+    <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?php
     $type = MeasureType::find()->all();
@@ -58,7 +60,9 @@ use common\models\requestStatus;
 
     <?php
     $device = Device::find()->all();
-    $items = ArrayHelper::map($device, 'uuid', 'title');
+    $items = ArrayHelper::map($device, 'uuid', function ($data) {
+        return $data->getFullTitle();
+    });
     echo $form->field($model, 'deviceUuid',
         ['template' => MainFunctions::getAddButton("/device/create")])->widget(Select2::class,
         [
@@ -72,7 +76,6 @@ use common\models\requestStatus;
             ],
         ]);
     ?>
-
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
     <?= $form->field($model, 'register')->textInput() ?>
 

@@ -57,14 +57,6 @@ $this->title = Yii::t('app', 'Дом');
                                         'class' => 'table_class'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'content' => function ($data) {
-                                        $userHouseId = UserHouse::find()
-                                            ->select('_id')
-                                            ->where(['houseUuid' => $data['uuid']])
-                                            ->one();
-                                        return Html::a($data->number,
-                                            '/user-house/update?id=' . $userHouseId['_id']);
-                                    }
                                 ],
                                 [
                                     'attribute' => 'street',

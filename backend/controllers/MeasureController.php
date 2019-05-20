@@ -80,13 +80,15 @@ class MeasureController extends Controller
     public function actionCreate()
     {
         $model = new Measure();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return self::actionIndex();
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model['sensorChannel'])
+                $model['measureTypeUuid'] = $model['sensorChannel']['measureTypeUuid'];
+            if ($model->save())
+                return self::actionIndex();
         }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**

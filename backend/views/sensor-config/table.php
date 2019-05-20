@@ -1,79 +1,86 @@
 <?php
-/* @var $searchModel backend\models\OrganisationSearch */
+/* @var $searchModel backend\models\SensorChannelSearch */
 
+use common\models\DeviceStatus;
+use common\models\MeasureType;
+use common\models\SensorChannel;
+use kartik\editable\Editable;
 use kartik\grid\GridView;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Таблица контрагентов');
+$this->title = Yii::t('app', 'Каналы измерения');
+
 $gridColumns = [
     [
         'attribute' => '_id',
+        'hAlign' => 'center',
         'vAlign' => 'middle',
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
         ],
         'headerOptions' => ['class' => 'text-center'],
+        'mergeHeader' => true,
         'content' => function ($data) {
             return $data->_id;
         }
     ],
     [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'title',
-        'hAlign' => 'center',
+        'attribute' => 'sensorChannelUuid',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
+        'header' => 'Устройство',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            return $data->title;
+            return $data['sensorChannel']['title'].' '.$data['sensorChannel']['device']->getFullTitle();
         }
     ],
     [
-        'attribute' => 'changedAt',
+        'attribute' => 'config',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'header' => 'Конфигурация',
+        'format' => 'raw',
+        'headerOptions' => ['class' => 'kartik-sheet-style'],
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
-        'headerOptions' => ['class' => 'text-center'],
-        'content' => function ($data) {
-            if (strtotime($data->changedAt) > 0)
-                return date("Y-m-d h:m", strtotime($data->changedAt));
-            else
-                return 'не открыт';
-        }
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
-        'headerOptions' => ['class' => 'kartik-sheet-style'],
         'header' => 'Действия',
+        'template'=> '{delete}',
+        'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];
 
 echo GridView::widget([
+    'id' => 'requests-table',
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
-    'headerRowOptions' => ['class' => 'kartik-sheet-style', 'style' => 'height: 20px'],
-    'filterRowOptions' => ['class' => 'kartik-sheet-style', 'style' => 'height: 20px important!'],
     'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
+    'headerRowOptions' => ['class' => 'kartik-sheet-style'],
+    'filterRowOptions' => ['class' => 'kartik-sheet-style'],
     'beforeHeader' => [
         '{toggleData}'
     ],
     'toolbar' => [
         ['content' =>
-            Html::a('Новый', ['/organisation/create'], ['class' => 'btn btn-success']) . ' ' .
-            Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['/organisation/table'], ['data-pjax' => 0,
-                'class' => 'btn btn-default', 'title' => Yii::t('app', 'Reset Grid')])
+            Html::a('Новая', ['/sensor-config/create'], ['class' => 'btn btn-success'])
         ],
-        '{export}'
+        '{export}',
     ],
     'export' => [
+        'fontAwesome' => true,
         'target' => GridView::TARGET_BLANK,
-        'filename' => 'residents'
+        'filename' => 'requests'
     ],
     'pjax' => true,
     'showPageSummary' => false,
@@ -81,13 +88,13 @@ echo GridView::widget([
     'summary' => '',
     'bordered' => true,
     'striped' => false,
-    'condensed' => true,
-    'responsive' => false,
+    'condensed' => false,
+    'responsive' => true,
+    'persistResize' => false,
     'hover' => true,
-    'floatHeader' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-user"></i>&nbsp; Организации',
+        'heading' => '<i class="glyphicon glyphicon-wrench"></i>&nbsp; Конфигурация каналов',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);

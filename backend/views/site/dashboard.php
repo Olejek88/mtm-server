@@ -4,8 +4,8 @@
  * @var $objectCount
  * @var $nodesCount
  * @var $channelsCount
- * @var $equipmentCount
- * @var $equipmentTypeCount
+ * @var $deviceCount
+ * @var $deviceTypeCount
  * @var $contragentCount
  * @var $measures
  * @var $equipments
@@ -15,7 +15,7 @@
  * @var $categories
  * @var $bar
  * @var $orders
- * @var $equipments \common\models\Device[]
+ * @var $equipments Device[]
  * @var $messagesChat
  * @var $usersCount
  * @var $currentUser
@@ -23,7 +23,7 @@
  * @var $objectsTypeCount
  * @var $events
  * @var $services
- * @var $users \common\models\Users[]
+ * @var $users User[]
  * @var $equipmentTypesCount
  * @var $modelsCount
  * @var $documentationCount
@@ -33,10 +33,11 @@
  * @var $usersList
  * @var $last_measures
  * @var $complete
- * @var $usersGroup
- * @var $defectsByType
+ * @var $equipmentsGroup
  */
 
+use common\models\Device;
+use common\models\User;
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Сводная');
@@ -61,12 +62,12 @@ $this->title = Yii::t('app', 'Сводная');
     <!-- /.col -->
     <div class="col-md-3 col-sm-6 col-xs-12">
         <div class="info-box">
-            <a href="/equipment"><span class="info-box-icon bg-red"><i class="fa fa-plug"></i></span></a>
+            <a href="/device"><span class="info-box-icon bg-red"><i class="fa fa-plug"></i></span></a>
 
             <div class="info-box-content">
-                <a href="/equipment"><span class="info-box-text">Оборудование</span></a>
-                <span><a href="/equipment-type">Типов <?= $equipmentTypeCount; ?></a></span><br/>
-                <span class="info-box-number"><?= $equipmentCount ?></span>
+                <a href="/device"><span class="info-box-text">Оборудование</span></a>
+                <span><a href="/device-type">Типов <?= $deviceTypeCount; ?></a></span><br/>
+                <span class="info-box-number"><?= $deviceCount ?></span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -135,59 +136,6 @@ $this->title = Yii::t('app', 'Сводная');
                     <div class="col-md-12">
                         <div class="chart">
                             <div id="container" style="height: 250px;"></div>
-                            <script src="/js/vendor/lib/HighCharts/highcharts.js"></script>
-                            <script src="/js/vendor/lib/HighCharts/modules/exporting.js"></script>
-                            <script type="text/javascript">
-                                Highcharts.chart('container', {
-                                    chart: {
-                                        type: 'column'
-                                    },
-                                    title: {
-                                        text: ''
-                                    },
-                                    xAxis: {
-                                        categories: [
-                                            <?php
-                                            echo $categories;
-                                            ?>
-                                        ]
-                                    },
-                                    legend: {
-                                        align: 'right',
-                                        x: -300,
-                                        verticalAlign: 'top',
-                                        y: 0,
-                                        floating: true,
-                                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
-                                        borderColor: '#CCC',
-                                        borderWidth: 1,
-                                        shadow: false
-                                    },
-                                    tooltip: {
-                                        headerFormat: '<b>{point.x}</b><br/>',
-                                        pointFormat: '{series.name}: {point.y}<br/>Всего: {point.stackTotal}'
-                                    },
-                                    plotOptions: {
-                                        column: {
-                                            dataLabels: {
-                                                enabled: true,
-                                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
-                                            }
-                                        }
-                                    },
-                                    yAxis: {
-                                        min: 0,
-                                        title: {
-                                            text: 'Количество измерений по пользователям'
-                                        }
-                                    },
-                                    series: [
-                                        <?php
-                                        echo $bar;
-                                        ?>
-                                    ]
-                                });
-                            </script>
                         </div>
                         <!-- /.chart-responsive -->
                     </div>
@@ -257,7 +205,7 @@ $this->title = Yii::t('app', 'Сводная');
                                 print '<li style="width:23%"><img src="' . Html::encode($path) . '" alt="User Image" width="145px">';
                                 echo Html::a(Html::encode($user['name']),
                                     ['/users/view', '_id' => Html::encode($user['_id'])], ['class' => 'users-list-name']);
-                                echo '<span class="users-list-date">' . $user['createdAt'] . '</span></li>';
+                                echo '<span class="users-list-date">' . $user['created_at'] . '</span></li>';
                             }
                             ?>
                         </ul>
@@ -387,23 +335,22 @@ $this->title = Yii::t('app', 'Сводная');
 </footer>
 
 <script>
-    var userIcon = L.icon({
-        iconUrl: '/images/worker_male1600.png',
+    var deviceIcon = L.icon({
+        iconUrl: '/images/house_marker2.png',
         iconSize: [35, 35],
         iconAnchor: [22, 94],
         popupAnchor: [-3, -76]
     });
 
     <?php
-    echo $usersList;
-    echo $usersGroup;
+    echo $equipmentsGroup;
     ?>
 
     var overlayMapsA = {};
     var overlayMapsB = {
-        "Пользователи": users
+        "Устройства":  devices
     };
-    var map = L.map('mapid', {zoomControl: false, layers: [users]}).setView([55.2969, 61.5157], 13);
+    var map = L.map('mapid', {zoomControl: false, layers: [devices]}).setView([55.2969, 61.5157], 13);
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         maxZoom: 18,
         id: 'mapbox.streets'

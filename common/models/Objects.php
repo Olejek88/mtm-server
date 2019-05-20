@@ -24,6 +24,7 @@ use yii\db\Expression;
  * @property boolean $deleted
  *
  * @property House $house
+ * @property string $address
  * @property ObjectType $objectType
  */
 class Objects extends ActiveRecord
@@ -58,7 +59,7 @@ class Objects extends ActiveRecord
             [['createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
             [['uuid', 'title', 'objectTypeUuid', 'houseUuid', 'oid'], 'string', 'max' => 50],
-            [['latitude', 'longitude'], 'float'],
+            [['latitude', 'longitude'], 'double'],
         ];
     }
 
@@ -118,4 +119,7 @@ class Objects extends ActiveRecord
         return 'ул.'.$this->house['street']['title'].', д.'.$this->house['number'];
     }
 
+    public function getAddress() {
+        return 'ул.'.$this->house['street']['title'].', д.'.$this->house['number'].' '.$this->title;
+    }
 }

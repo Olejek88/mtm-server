@@ -14,6 +14,8 @@ use yii\db\ActiveRecord;
  * @property string $deviceUuid
  * @property string $date
  * @property string $description
+ * @property string $createdAt
+ * @property string $changedAt
  *
  * @property Device $device
  */

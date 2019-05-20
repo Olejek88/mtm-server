@@ -38,7 +38,11 @@ $this->title = "Камеры";
                                     ],
                                     [
                                         'label' => 'Контроллер',
-                                        'value' => $model['node']->title
+                                        'value' => $model['node']->address
+                                    ],
+                                    [
+                                        'label' => 'Объект',
+                                        'value' => $model['node']['object']->getAddress()
                                     ],
                                     'createdAt',
                                     'changedAt',

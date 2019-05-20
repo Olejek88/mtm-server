@@ -5,12 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Measure */
 
-$this->title = Yii::t('app', 'Обновить {modelClass}: ', [
-        'modelClass' => 'Измеренные значения',
-    ]) . $model->_id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Измеренные значения'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->_id, 'url' => ['view', 'id' => $model->_id]];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Обновить');
+$this->title = Yii::t('app', 'Обновить Измеренные значения');
 ?>
 <div class="measured-value-update box-padding">
 

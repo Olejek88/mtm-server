@@ -18,7 +18,7 @@ class DeviceSearch extends Device
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'deviceTypeUuid', 'nodeUuid', 'date', 'deviceStatusUuid', 'serial', 'port',
+            [['uuid', 'deviceTypeUuid', 'nodeUuid', 'date', 'deviceStatusUuid', 'serial', 'port', 'object',
                 'latitude','longitude','createdAt', 'changedAt'], 'safe'],
         ];
     }

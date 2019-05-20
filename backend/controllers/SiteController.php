@@ -4,15 +4,16 @@ namespace backend\controllers;
 use backend\models\UserSearch;
 use backend\models\UsersSearch;
 use common\models\City;
+use common\models\Node;
 use common\models\Organisation;
 use common\models\Device;
 use common\models\DeviceType;
 use common\models\Objects;
 use common\models\LoginForm;
 use common\models\Measure;
+use common\models\SensorChannel;
 use common\models\Street;
 use common\models\User;
-use common\models\Users;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -110,24 +111,24 @@ class SiteController extends Controller
 
         $accountUser = Yii::$app->user->identity;
         $currentUser = User::find()
-            ->where(['user_id' => $accountUser['id']])
+            ->where(['_id' => $accountUser['id']])
             ->asArray()
             ->one();
 
         $cityCount = City::find()->count();
         $streetCount = Street::find()->count();
-        $flatCount = Objects::find()->count();
-        $equipmentCount = Device::find()->count();
+        $objectsCount = Objects::find()->count();
+        $deviceCount = Device::find()->count();
         $contragentCount = Organisation::find()->count();
-        $equipmentTypeCount = DeviceType::find()->count();
+        $nodesCount = Node::find()->count();
+        $sensorChannelsCount = SensorChannel::find()->count();
+        $deviceTypeCount = DeviceType::find()->count();
         $usersCount = User::find()->count();
 
         $last_measures = Measure::find()
             ->where('createdAt > (NOW()-(4*24*3600000));')
             ->count();
         $complete = 0;
-        if ($flatCount > 0)
-            $complete = number_format($last_measures * 100 / $flatCount, 2);
 
         $measures = Measure::find()
             ->orderBy('date')
@@ -144,29 +145,31 @@ class SiteController extends Controller
         /**
          * Работа с картой
          */
-        $userData = array();
-        $users = Users::find()->where('name != "sUser"')->select('*')->all();
-        $userList[] = $users;
-        $usersCount = count($users);
+        $deviceData = array();
+        $devices = Device::find()->select('*')->all();
+        $deviceList[] = $devices;
+        $deviceCount = count($devices);
+        $cnt = 0;
+        $equipmentsGroup = 'var equipments=L.layerGroup([';
+        $equipmentsList = '';
+        foreach ($devices as $device) {
+            if ($device["object"]["latitude"] > 0) {
+                $equipmentsList .= 'var equipment'
+                    . $device["_id"]
+                    . '= L.marker([' . $device["latitude"]
+                    . ',' . $device["longitude"]
+                    . '], {icon: equipmentIcon}).bindPopup("<b>'
+                    . $device["title"] . '</b><br/>'
+                    . $device["devieType"]["title"] . '").openPopup();';
+                if ($cnt > 0) {
+                    $equipmentsGroup .= ',';
+                }
 
-        $count = 0;
-        $categories = "";
-        $bar = "{ name: 'измерений',";
-        $bar .= "data: [";
-        foreach ($users as $current_user) {
-            if ($count > 0) {
-                $categories .= ',';
-                $bar .= ",";
+                $equipmentsGroup .= 'equipment' . $device["_id"];
+                $cnt++;
             }
-            $categories .= '"' . $current_user['name'] . '"';
-            $values[$count] = Measure::find()
-                ->where('createdAt > (NOW()-(5*24*3600000))')
-                ->andWhere(['userUuid' => $current_user['uuid']])
-                ->count();
-            $bar .= $values[$count];
-            $count++;
         }
-        $bar .= "]},";
+        $equipmentsGroup .= ']);' . PHP_EOL;
 
         return $this->render(
             'dashboard',
@@ -174,16 +177,17 @@ class SiteController extends Controller
                 'cityCount' => $cityCount,
                 'streetCount' => $streetCount,
                 'usersCount' => $usersCount,
-                'flatCount' => $flatCount,
+                'objectCount' => $objectsCount,
+                'nodesCount' => $nodesCount,
+                'channelsCount' => $sensorChannelsCount,
+                'deviceTypeCount' => $deviceTypeCount,
+                'deviceCount' => $deviceCount,
                 'measures' => $measures,
                 'equipments' => $equipments,
                 'users' => $users,
-                'categories' => $categories,
-                'bar' => $bar,
+                'equipmentsGroup' => $equipmentsGroup,
                 'last_measures' => $last_measures,
                 'complete' => $complete,
-                'equipmentCount' => $equipmentCount,
-                'equipmentTypeCount' => $equipmentTypeCount,
                 'contragentCount' => $contragentCount,
                 'currentUser' => $currentUser,
                 'searchModel' => $searchModel,
@@ -196,7 +200,6 @@ class SiteController extends Controller
      * Login action.
      *
      * @return string
-     * @throws \yii\web\HttpException
      */
     public function actionLogin()
     {

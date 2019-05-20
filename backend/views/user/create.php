@@ -4,7 +4,6 @@
 use yii\helpers\Html;
 
 $this->title = 'Новый пользователь';
-$this->params['breadcrumbs'][] = ['label' => 'Пользователи АРМ', 'url' => ['index']];
 ?>
 <div class="user-create box-padding">
 

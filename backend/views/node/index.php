@@ -1,15 +1,17 @@
 <?php
-/* @var $searchModel backend\models\DeviceSearch */
+/* @var $searchModel backend\models\NodeSearch */
 
+use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Operation;
 use kartik\datecontrol\DateControl;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Оборудование');
+$this->title = Yii::t('app', 'Контроллера');
 
 $gridColumns = [
     [
@@ -34,7 +36,7 @@ $gridColumns = [
             return GridView::ROW_COLLAPSED;
         },
         'detail' => function ($model, $key, $index, $column) {
-            return Yii::$app->controller->renderPartial('equipment-details', ['model' => $model]);
+            return Yii::$app->controller->renderPartial('node-details', ['model' => $model]);
         },
         'expandIcon' => '<span class="glyphicon glyphicon-expand"></span>',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
@@ -42,54 +44,24 @@ $gridColumns = [
     ],
     [
         'class' => 'kartik\grid\DataColumn',
-        'attribute' => 'nodeUuid',
+        'attribute' => 'objectUuid',
         'vAlign' => 'middle',
         'width' => '180px',
         'value' => function ($data) {
-            return $data['node']['object']->getAddress().' ['.$data['node']['address'].']';
+            return $data['object']['house']['street']->title . ', ' . $data['object']['house']->number . '-' . $data['object']->title;
         },
         'filterType' => GridView::FILTER_SELECT2,
-        'header' => 'Адрес',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
-        'format' => 'raw',
-    ],
-    [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'deviceTypeUuid',
-        'hAlign' => 'center',
-        'vAlign' => 'middle',
-        'width' => '180px',
-        'value' => 'deviceType.title',
-        'filterType' => GridView::FILTER_SELECT2,
-        'header' => 'Тип ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
-                '/device-type/create?from=device/index',
+        'header' => 'Объект ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
+                '/object/create?from=equipment/index',
                 ['title' => Yii::t('app', 'Добавить')]),
-        'filter' => ArrayHelper::map(DeviceType::find()->orderBy('title')->all(),
-            'uuid', 'title'),
-        'filterWidgetOptions' => [
-            'pluginOptions' => ['allowClear' => true],
-        ],
         'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
-        'editableOptions' => function ($model, $key, $index, $widget) {
-            $models = ArrayHelper::map(DeviceType::find()->orderBy('title')->all(), 'uuid', 'title');
-            return [
-                'header' => 'Тип оборудования',
-                'size' => 'lg',
-                'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'displayValueConfig' => $models,
-                'data' => $models
-            ];
-        },
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'deviceStatusUuid',
         'header' => 'Статус ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
-                '/device-status/create?from=device/index',
+                '/device-status/create?from=equipment/index',
                 ['title' => Yii::t('app', 'Добавить')]),
         'contentOptions' => [
             'class' => 'table_class'
@@ -126,7 +98,7 @@ $gridColumns = [
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'interface',
+        'attribute' => 'address',
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'contentOptions' => [
@@ -134,44 +106,27 @@ $gridColumns = [
         ],
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
-            $interfaces = [
-                '0' => 'не указан',
-                '1' => 'Последовательный порт',
-                '2' => 'Zigbee',
-                '3' => 'Ethernet'
-            ];
-            return $interfaces[$data["interface"]];
+            return $data->address;
         }
     ],
     [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'serial',
+        'hAlign' => 'center',
         'vAlign' => 'middle',
-        'width' => '180px',
-        'filterType' => GridView::FILTER_SELECT2,
-        'header' => 'Серийный',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
-        'format' => 'raw',
-    ],
-    [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'port',
-        'vAlign' => 'middle',
-        'width' => '180px',
-        'filterType' => GridView::FILTER_SELECT2,
-        'header' => 'Порт',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
-        'format' => 'raw',
-    ],
-    [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'address',
-        'vAlign' => 'middle',
-        'width' => '180px',
-        'filterType' => GridView::FILTER_SELECT2,
-        'header' => 'Адрес',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
-        'format' => 'raw',
+        'header' => 'Устройства',
+        'contentOptions' => [
+            'class' => 'table_class'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+        'content' => function ($data) {
+            $devices_list = "";
+            $count = 1;
+            $devices = Device::find()->where(['nodeUuid' => $data['uuid']])->all();
+            foreach ($devices as $device) {
+                $devices_list = $count.'. '.$device['title'].'</br>';
+                $count++;
+            }
+            return $devices_list;
+        }
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
@@ -193,8 +148,7 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-        /*            Html::a('Добавить недостающие', ['/equipment/new'], ['class'=>'btn btn-success']),*/
-            Html::a('Новое', ['/device/create'], ['class' => 'btn btn-success']),
+            Html::a('Новое', ['/node/create'], ['class' => 'btn btn-success']),
             Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['grid-demo'],
                 ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('app', 'Reset Grid')])
         ],
@@ -217,7 +171,7 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Устройства',
+        'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Контроллеры',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);

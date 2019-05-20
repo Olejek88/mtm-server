@@ -3,6 +3,8 @@
 use common\components\MainFunctions;
 use common\models\Device;
 use common\models\MeasureType;
+use common\models\SensorChannel;
+use common\models\User;
 use common\models\Users;
 use dosamigos\datetimepicker\DateTimePicker;
 use kartik\widgets\Select2;
@@ -37,39 +39,23 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php
-    $equipments = Device::find()->all();
-    $items = ArrayHelper::map($equipments, 'uuid', function ($model) {
-        return $model['equipmentType']['title'] . ' (' . $model['object']['house']['street']['title'] . ', ' .
-            $model['object']['house']['number'] . ', ' .
-            $model['object']['title'] . ')';
+    $sensorChannels = SensorChannel::find()->all();
+    $items = ArrayHelper::map($sensorChannels, 'uuid', function ($data) {
+        return $data['device']->getFullTitle().' ['.$data['title'].']';
     });
-    echo $form->field($model, 'equipmentUuid')->widget(Select2::class,
+    echo $form->field($model, 'sensorChannelUuid')->widget(Select2::class,
         [
             'data' => $items,
             'language' => 'ru',
             'options' => [
-                'placeholder' => 'Выберите оборудование..'
+                'placeholder' => 'Выберите канал измерения..'
             ],
             'pluginOptions' => [
                 'allowClear' => true
             ],
         ]);
 
-    $measureType = MeasureType::find()->all();
-    $items = ArrayHelper::map($measureType, 'uuid', 'title');
-    echo $form->field($model, 'measureTypeUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Тип измерения..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
     ?>
-
     <div class="pole-mg" style="margin: 0 -15px 20px -15px;">
         <p style="width: 200px; margin-bottom: 0;">Дата измерения</p>
         <?= DateTimePicker::widget([
@@ -87,6 +73,7 @@ use yii\widgets\ActiveForm;
     </div>
 
     <?= $form->field($model, 'value')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <div class="form-group text-center">
 

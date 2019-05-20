@@ -40,7 +40,7 @@ class MessageSearch extends Message
      */
     public function search($params)
     {
-        $query = Message::find()->orderBy('date DESC');
+        $query = Message::find()->orderBy('_id DESC');
 
         // add conditions that should always apply here
 

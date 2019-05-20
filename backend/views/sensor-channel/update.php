@@ -5,9 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\SensorChannel */
 
-$this->title = Yii::t('app', 'Обновить {modelClass}: ', [
-    'modelClass' => 'request',
-]) . $model->_id;
+$this->title = Yii::t('app', 'Обновить канал измерения');
 ?>
 <div class="task-request-update box-padding">
 

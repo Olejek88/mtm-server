@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -13,7 +14,7 @@ use yii\db\ActiveRecord;
  * @property string $description
  * @property string $date
  *
- * @property Users $user
+ * @property User $user
  */
 class Journal extends ActiveRecord
 {
@@ -54,12 +55,12 @@ class Journal extends ActiveRecord
     /**
      * Объект связанного поля.
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
         return $this->hasOne(
-            Users::class, ['uuid' => 'userUuid']
+            User::class, ['uuid' => 'userUuid']
         );
     }
 }

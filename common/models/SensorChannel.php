@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -35,7 +36,7 @@ class SensorChannel extends ActiveRecord
     {
         return [
             [['uuid', 'title', 'deviceUuid', 'measureTypeUuid'], 'required'],
-            [['createdAt', 'changedAt'], 'safe'],
+            [['oid','createdAt', 'changedAt'], 'safe'],
             [['uuid', 'deviceUuid', 'register', 'measureTypeUuid'], 'string', 'max' => 50],
             [['title'], 'string', 'max' => 100],
         ];
@@ -73,4 +74,19 @@ class SensorChannel extends ActiveRecord
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getMeasureType() {
+        return $this->hasOne(MeasureType::class, ['uuid' => 'measureTypeUuid']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDevice() {
+        return $this->hasOne(Device::class, ['uuid' => 'deviceUuid']);
+    }
+
 }

@@ -1,12 +1,13 @@
 <?php
 
 use common\models\Device;
+use common\models\Node;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/* @var $model Device */
+/* @var $model Node */
 
-$this->title = "Устройство";
+$this->title = 'Контроллер';
 ?>
 <div class="order-status-view box-padding">
 
@@ -30,8 +31,12 @@ $this->title = "Устройство";
                             [
                                 'model' => $model,
                                 'attributes' => [
-                                    'serial',
+                                    'address',
                                     'uuid',
+                                    [
+                                        'label' => 'Объект',
+                                        'value' => $model['object']->title
+                                    ],
                                     [
                                         'label' => 'Статус',
                                         'value' => $model['deviceStatus']->title

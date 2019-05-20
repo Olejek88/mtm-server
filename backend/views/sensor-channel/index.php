@@ -54,7 +54,9 @@ $this->title = Yii::t('app', 'Каналы измерения');
                                         'class' => 'table_class'
                                     ],
                                     'headerOptions' => ['class' => 'text-center'],
-                                    'value'     => 'device.title',
+                                    'value'     => function ($data) {
+                                        return $data['device']->getFullTitle();
+                                    },
                                 ],
                                 [
                                     'attribute'=>'measureType',

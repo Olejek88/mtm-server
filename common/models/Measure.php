@@ -78,7 +78,7 @@ class Measure extends ActiveRecord
             ],
             [['value'], 'number'],
             [['uuid', 'sensorChannelUuid', 'measureTypeUuid', 'date', 'oid'], 'string', 'max' => 50],
-            [['createdAt', 'changedAt'], 'safe'],
+            [['oid','createdAt', 'changedAt'], 'safe'],
         ];
     }
 

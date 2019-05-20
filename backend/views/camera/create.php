@@ -58,7 +58,17 @@ $this->title = Yii::t('app', 'Создать камеру');
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
                                 'content' => function ($data) {
-                                    return $data['node']['title'];
+                                    return $data['node']['address'];
+                                }
+                            ],
+                            [
+                                'attribute' => 'object',
+                                'contentOptions' => [
+                                    'class' => 'table_class',
+                                ],
+                                'headerOptions' => ['class' => 'text-center'],
+                                'content' => function ($data) {
+                                    return $data['object']->getFullTitle();
                                 }
                             ],
                         ],

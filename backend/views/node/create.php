@@ -1,16 +1,19 @@
 <?php
-/* @var $model common\models\House */
 
+use common\models\Device;
+use common\models\Node;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Обновить дом');
+/* @var $model Node */
+
+$this->title = Yii::t('app', 'Создать контроллер');
 ?>
-<div class="task-update box-padding">
+<div class="device-create box-padding">
 
     <div class="panel panel-default">
         <div class="panel-heading" style="background: #fff;">
             <h3 class="text-center" style="color: #333;">
-                <?= Html::encode($this->title) ?>
+                <?php echo Html::encode($this->title) ?>
             </h3>
         </div>
         <div class="panel-body">
@@ -18,9 +21,12 @@ $this->title = Yii::t('app', 'Обновить дом');
             <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="list">
                     <h6>
-                        <?= $this->render('_form', [
-                            'model' => $model,
-                        ]) ?>
+                        <?php echo $this->render(
+                            '_form',
+                            [
+                                'model' => $model,
+                            ]
+                        ) ?>
                     </h6>
                 </div>
             </div>

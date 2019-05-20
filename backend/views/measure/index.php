@@ -43,7 +43,7 @@ $this->title = Yii::t('app', 'Измеренные значения');
                                 }
                             ],
                             [
-                                'attribute' => 'equipmentUuid',
+                                'attribute' => 'sensorChannelUuid',
                                 'contentOptions' => [
                                     'class' => 'table_class',
                                     'hAlign' => 'center',
@@ -51,21 +51,9 @@ $this->title = Yii::t('app', 'Измеренные значения');
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
                                 'content' => function ($data) {
-                                    return $data['equipment']['equipmentType']->title . ' [' .
-                                        $data['equipment']['object']['house']['street']->title . ', ' .
-                                        $data['equipment']['object']['house']->number . ', ' .
-                                        $data['equipment']['object']['title'] . ']';
+                                    return $data['sensorChannel']['device']->getFullTitle();
 
                                 }
-                            ],
-                            [
-                                'attribute' => 'userUuid',
-                                'contentOptions' => [
-                                    'class' => 'table_class',
-                                    'style' => 'width: 200px'
-                                ],
-                                'headerOptions' => ['class' => 'text-center'],
-                                'value' => 'user.name'
                             ],
                             [
                                 'attribute' => 'value',

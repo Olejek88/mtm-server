@@ -15,11 +15,6 @@ $this->title = Yii::t('app', 'Пользователи');
             <h3 class="text-center" style="color: #333;">
                 <?= Html::encode($this->title) ?>
             </h3>
-
-            <ul class="nav nav-tabs" style="width: 200px; margin: 0 auto;">
-                <li class=""><a href="/users">Операторы</a></li>
-                <li class="active"><a href="/user">АРМ</a></li>
-            </ul>
         </div>
         <div class="panel-body">
 
@@ -67,6 +62,16 @@ $this->title = Yii::t('app', 'Пользователи');
                                     'headerOptions' => ['class' => 'text-center'],
                                     'content' => function ($data) {
                                         return $data->username;
+                                    }
+                                ],
+                                [
+                                    'attribute' => 'name',
+                                    'contentOptions' => [
+                                        'class' => 'table_class',
+                                    ],
+                                    'headerOptions' => ['class' => 'text-center'],
+                                    'content' => function ($data) {
+                                        return $data->name;
                                     }
                                 ],
                                 [

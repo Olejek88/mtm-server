@@ -2,19 +2,17 @@
 
 namespace backend\controllers;
 
-use app\commands\MainFunctions;
-use backend\models\DeviceSearch;
+use backend\models\NodeSearch;
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Node;
 use common\models\Objects;
 use common\models\House;
 use common\models\Measure;
 use common\models\Message;
 use common\models\Photo;
 use common\models\Street;
-use common\models\UserHouse;
-use common\models\Users;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
@@ -70,7 +68,7 @@ class NodeController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = Device::find()
+            $model = Node::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'address') {
@@ -86,7 +84,7 @@ class NodeController extends Controller
             return json_encode('');
         }
 
-        $searchModel = new DeviceSearch();
+        $searchModel = new NodeSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
@@ -125,7 +123,7 @@ class NodeController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Device();
+        $model = new Node();
 
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
@@ -210,7 +208,7 @@ class NodeController extends Controller
                 $type['title'],
                 ['equipment-type/view', 'id' => $type['_id']]
             );
-            $equipments = Device::find()
+            $equipments = Node::find()
                 ->select('*')
                 ->where(['equipmentTypeUuid' => $type['uuid']])
                 ->orderBy('serial')
@@ -314,7 +312,7 @@ class NodeController extends Controller
                 foreach ($flats as $flat) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Device::find()->where(['flatUuid' => $flat['uuid']])->all();
+                    $equipments = Node::find()->where(['flatUuid' => $flat['uuid']])->all();
                     foreach ($equipments as $equipment) {
                         $fullTree[$oCnt0][$c][$oCnt1]['title']
                             = Html::a(
@@ -328,11 +326,11 @@ class NodeController extends Controller
                                 ['user-house/delete', 'id' => $user_house['_id']], ['target' => '_blank']
                             );
 
-                        if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                        if ($equipment['equipmentStatusUuid'] == NodeStatus::NOT_MOUNTED) {
                             $class = 'critical1';
-                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
+                        } elseif ($equipment['equipmentStatusUuid'] == NodeStatus::NOT_WORK) {
                             $class = 'critical2';
-                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::UNKNOWN) {
+                        } elseif ($equipment['equipmentStatusUuid'] == NodeStatus::UNKNOWN) {
                             $class = 'critical4';
                         } else {
                             $class = 'critical3';
@@ -454,7 +452,7 @@ class NodeController extends Controller
                 foreach ($objects as $object) {
                     $house_count++;
                     $visited = 0;
-                    $equipments = Device::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $equipments = Node::find()->where(['objectUuid' => $object['uuid']])->all();
                     foreach ($equipments as $equipment) {
                         $fullTree[$oCnt0]['title']
                             = Html::a(
@@ -578,13 +576,13 @@ class NodeController extends Controller
      *
      * @param integer $id Id
      *
-     * @return Device the loaded model
+     * @return Node the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected
     function findModel($id)
     {
-        if (($model = Device::findOne($id)) !== null) {
+        if (($model = Node::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

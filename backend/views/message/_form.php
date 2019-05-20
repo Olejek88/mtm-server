@@ -1,11 +1,10 @@
 <?php
 
+use common\components\MainFunctions;
+use common\models\User;
+use common\models\Users;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\helpers\ArrayHelper;
-use app\commands\MainFunctions;
-use common\models\Users;
-use dosamigos\datetimepicker\DateTimePicker;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Message */
@@ -24,47 +23,18 @@ use dosamigos\datetimepicker\DateTimePicker;
 
     <?php
 
-        $model->load(Yii::$app->request->post());
+    $model->load(Yii::$app->request->post());
 
-        if (!$model->isNewRecord) {
-            echo $form->field($model, 'uuid')->textInput(['maxlength' => true, 'readonly' => true]);
-        } else {
-            echo $form->field($model, 'uuid')->textInput(['maxlength' => true, 'value' => (new MainFunctions)->GUID()]);
-        }
-    ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => Users::ORGANISATION_UUID])->label(false); ?>
-
-    <?php
-    $user  = Users::find()->all();
-    $items = ArrayHelper::map($user,'uuid','name');
-    echo $form->field($model, 'fromUserUuid')->dropDownList($items);
+    if (!$model->isNewRecord) {
+        echo $form->field($model, 'uuid')->hiddenInput()->label(false);
+    } else {
+        echo $form->field($model, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
+    }
     ?>
 
-    <?php
-    $user  = Users::find()->all();
-    $items = ArrayHelper::map($user,'uuid','name');
-    echo $form->field($model, 'toUserUuid')->dropDownList($items);
-    ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
-    <div class="pole-mg" style="margin: 0 -15px 20px -15px;">
-        <p style="width: 0; margin-bottom: 0;">Дата</p>
-        <?= DateTimePicker::widget([
-            'model' => $model,
-            'attribute' => 'date',
-            'language' => 'ru',
-            'size' => 'ms',
-            'clientOptions' => [
-                'autoclose' => true,
-                'linkFormat' => 'yyyy-mm-dd H:ii:ss',
-                'todayBtn' => true
-            ]
-        ]);
-        ?>
-    </div>
-
-    <?= $form->field($model, 'text')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'status')->checkbox() ?>
+    <?= $form->field($model, 'link')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group text-center">
 

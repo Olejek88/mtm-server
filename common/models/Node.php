@@ -14,7 +14,7 @@ use yii\db\Expression;
  * @property string $uuid
  * @property string $oid идентификатор организации
  * @property string $address
- * @property string $nodeUuid
+ * @property string $deviceStatusUuid
  * @property string $objectUuid
  * @property string $createdAt
  * @property string $changedAt
@@ -60,13 +60,13 @@ class Node extends ActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'title', 'oid',
+        return ['_id', 'uuid', 'oid',
             'objectUuid',
             'object' => function ($model) {
                 return $model->object;
             },
-            'nodeUuid',
-            'node' => function ($model) {
+            'deviceStatusUuid',
+            'deviceStatus' => function ($model) {
                 return $model->node;
             },
             'address', 'deleted', 'createdAt', 'changedAt'
@@ -84,30 +84,22 @@ class Node extends ActiveRecord
             [
                 [
                     'uuid',
-                    'title',
                     'objectUuid',
-                    'nodeUuid',
+                    'deviceStatusUuid',
                 ],
                 'required'
             ],
-            [['address', 'createdAt', 'changedAt'], 'safe'],
+            [['address', 'oid', 'createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
             [
                 [
                     'uuid',
                     'objectUuid',
-                    'nodeUuid',
+                    'deviceStatusUuid',
                     'address'
                 ],
                 'string', 'max' => 50
             ],
-            [
-                [
-                    'title'
-                ],
-                'string', 'max' => 150
-            ],
-
         ];
     }
 
@@ -121,9 +113,8 @@ class Node extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'title' => Yii::t('app', 'Название'),
-            'nodeUuid' => Yii::t('app', 'Контроллер'),
-            'node' => Yii::t('app', 'Контроллер'),
+            'deviceStatusUuid' => Yii::t('app', 'Статус'),
+            'deviceStatus' => Yii::t('app', 'Статус'),
             'objectUuid' => Yii::t('app', 'Объект'),
             'object' => Yii::t('app', 'Объект'),
             'address' => Yii::t('app', 'Адрес'),
@@ -151,10 +142,10 @@ class Node extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getNode()
+    public function getDeviceStatus()
     {
         return $this->hasOne(
-            Node::class, ['uuid' => 'nodeUuid']
+            DeviceStatus::class, ['uuid' => 'deviceStatusUuid']
         );
     }
 

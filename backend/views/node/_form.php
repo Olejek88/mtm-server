@@ -14,7 +14,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Device */
+/* @var $model common\models\Node */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -38,40 +38,8 @@ use yii\widgets\ActiveForm;
     }
     ?>
 
-    <?php
-    $deviceType = DeviceType::find()->all();
-    $items = ArrayHelper::map($deviceType, 'uuid', 'title');
-    echo $form->field($model, 'deviceTypeUuid',
-        ['template' => MainFunctions::getAddButton("/device-type/create")])->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите тип..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
+    <?php echo $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
 
-    <?php
-    $object = Objects::find()->all();
-    $items = ArrayHelper::map($object, 'uuid', function ($model) {
-        return $model['title'];
-    });
-    echo $form->field($model, 'objectUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите объект..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
 
     <?php
     $deviceStatus = DeviceStatus::find()->all();
@@ -90,45 +58,19 @@ use yii\widgets\ActiveForm;
         ]);
     ?>
 
-    <?php
-    $interfaces = [
-            '0' => 'не указан',
-            '1' => 'Последовательный порт',
-            '2' => 'Zigbee',
-            '3' => 'Ethernet'
-    ];
-    echo $form->field($model, 'interface')->widget(Select2::class,
-        [
-            'data' => $interfaces,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите интерфейс'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-    ?>
-
-    <?php echo $form->field($model, 'port')->textInput(['maxlength' => true]) ?>
-
-    <?php echo $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
-
-    <?php echo $form->field($model, 'serial')->textInput(['maxlength' => true]) ?>
-
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
 
     <?php
-    $nodes = Node::find()->all();
-    $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
-        return $model['object']['address'].' ['.$model['address'].']';
+    $object = Objects::find()->all();
+    $items = ArrayHelper::map($object, 'uuid', function ($model) {
+        return $model['title'];
     });
-    echo $form->field($model, 'nodeUuid')->widget(Select2::class,
+    echo $form->field($model, 'objectUuid')->widget(Select2::class,
         [
             'data' => $items,
             'language' => 'ru',
             'options' => [
-                'placeholder' => 'Выберите контроллер..'
+                'placeholder' => 'Выберите объект..'
             ],
             'pluginOptions' => [
                 'allowClear' => true

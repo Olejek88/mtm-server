@@ -4,7 +4,6 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\ToolSearchType */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -19,13 +18,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'uuid') ?>
 
-    <?= $form->field($model, 'fromUserUuid') ?>
-
-    <?= $form->field($model, 'toUserUuid') ?>
-
-    <?= $form->field($model, 'text') ?>
-
-    <?= $form->field($model, 'status') ?>
+    <?= $form->field($model, 'link') ?>
 
     <?= $form->field($model, 'createdAt') ?>
 

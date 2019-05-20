@@ -6,9 +6,6 @@ use yii\widgets\DetailView;
 /* @var $model DeviceRegister */
 
 $this->title = 'Запись в журнале событий';
-$this->params['breadcrumbs'][] = [
-    'label' => Yii::t('app', 'Журнал оборудования'), 'url' => ['index']
-];
 ?>
 <div class="order-status-view box-padding">
 
@@ -28,21 +25,12 @@ $this->params['breadcrumbs'][] = [
                                 'model' => $model,
                                 'attributes' => [
                                     'uuid',
-                                    [
-                                        'label' => 'Тип записи',
-                                        'value' => $model['registerType']->title
-                                    ],
-                                    [
-                                        'label' => 'Пользователь',
-                                        'value' => $model['user']->name
-                                    ],
                                     'date',
                                     [
                                         'label' => 'Оборудование',
-                                        'value' => $model['equipment']->title
+                                        'value' => $model['device']->getFullTitle()
                                     ],
-                                    'fromParameterUuid',
-                                    'toParameterUuid',
+                                    'description'
                                 ],
                             ]
                         ) ?>

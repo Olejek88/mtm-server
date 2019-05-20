@@ -5,7 +5,6 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 $this->title = $model->username;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Пользователи АРМ'), 'url' => ['index']];
 ?>
 
 <div class="order-status-view box-padding">

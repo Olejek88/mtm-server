@@ -3,11 +3,8 @@
 
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Обновить {modelClass}: ', [
-        'modelClass' => 'пользователя',
-    ]) . $model->username;
+$this->title = Yii::t('app', 'Обновить');
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Пользователи АРМ'), 'url' => ['index']];
 ?>
 
 <div class="users-update box-padding">
