@@ -8,7 +8,7 @@
  * @var $deviceTypeCount
  * @var $contragentCount
  * @var $measures
- * @var $equipments
+ * @var $devices
  * @var $sumStageStatusCompleteCount
  * @var $sumOperationStatusCount
  * @var $sumOperationStatusCompleteCount
@@ -256,10 +256,9 @@ $this->title = Yii::t('app', 'Сводная');
                         foreach ($measures as $measure) {
                             print '<tr><td><a href="/measure/view?id=' . $measure["_id"] . '">' . $measure["_id"] . '</a></td>
                                         <td>' . $measure["date"] . '</td>
-                                        <td>' . $measure["equipment"]["house"]["street"]->title . ',' . $measure["equipment"]["house"]->number . ', ' . $measure["equipment"]["flat"]->number . '</td>
-                                        <td>' . $measure["equipment"]["equipmentType"]->title . '</td>
-                                        <td>' . $measure["value"] . '</td>';
-                            print '<td><div class="sparkbar" data-color="#00a65a" data-height="20">' . $measure['user']->name . '</div></td></tr>';
+                                        <td>' . $measure["sensorChannel"]["device"]["object"]->getFullTitle().'</td>
+                                        <td>' . $measure["sensorChannel"]["device"]["deviceType"]->title . '</td>
+                                        <td>' . $measure["value"] . '</td></tr>';
                             $count++;
                             if ($count > 7) break;
                         }
@@ -296,16 +295,16 @@ $this->title = Yii::t('app', 'Сводная');
             <div class="box-body">
                 <ul class="products-list product-list-in-box">
                     <?php
-                    foreach ($equipments as $equipment) {
+                    foreach ($devices as $device) {
                         $path = '/images/no-image-icon-4.png';
                         print '<li class="item">
                                 <div class="product-img">
-                                    <img src="' . Html::encode($path) . '" alt="' . $equipment['equipmentType']->title . '">
+                                    <img src="' . Html::encode($path) . '" alt="' . $device['deviceType']->title . '">
                                 </div>
                                 <div class="product-info">
-                                    <a href="/equipment/view?id=' . $equipment["_id"] . '" class="product-title">' . $equipment["serial"] . '
-                                    <span class="label label-warning pull-right">' . $equipment['equipmentType']->title . '</span></a>
-                                    <span class="product-description">' . $equipment["equipmentType"]->title . '</span>
+                                    <a href="/device/view?id=' . $device["_id"] . '" class="product-title">' . $device["serial"] . '
+                                    <span class="label label-warning pull-right">' . $device['deviceType']->title . '</span></a>
+                                    <span class="product-description">' . $device["deviceType"]->title . '</span>
                                 </div></li>';
                     }
                     ?>
@@ -326,11 +325,11 @@ $this->title = Yii::t('app', 'Сводная');
 <!-- /.content-wrapper -->
 
 <footer class="main-footer" style="margin-left: 0 !important;">
-    <div class="pull-right hidden-xs">
-        <b>Version</b> 0.0.2
+    <div class="pull-right hidden-xs" style="vertical-align: middle; text-align: center;">
+        <b>Version</b> 0.0.3
     </div>
-    <?php echo Html::a('<img src="images/toir-logo_4x_m.png">', 'http://toirus.ru'); ?>
-    <strong>Copyright &copy; 2014-2018 <a href="http://toirus.ru">ТОиРУС</a>.</strong> Все права на
+    <?php echo Html::a('<img src="images/mtm.png">', 'http://www.mtm-smart.com'); ?>
+    <strong>Copyright &copy; 2019 <a href="http://www.mtm-smart.com">MTM Смарт</a>.</strong> Все права на
     программный продукт защищены.
 </footer>
 

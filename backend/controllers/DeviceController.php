@@ -168,8 +168,6 @@ class DeviceController extends Controller
                 $device->deviceStatusUuid = DeviceStatus::UNKNOWN;
                 $device->serial = '222222';
                 $device->interface = 1;
-                $device->latitude = 55;
-                $device->longitude = 55;
                 $device->date = date('Y-m-d H:i:s');
                 $device->changedAt = date('Y-m-d H:i:s');
                 $device->createdAt = date('Y-m-d H:i:s');

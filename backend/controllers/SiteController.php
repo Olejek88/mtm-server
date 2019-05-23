@@ -150,17 +150,17 @@ class SiteController extends Controller
         $deviceList[] = $devices;
         $deviceCount = count($devices);
         $cnt = 0;
-        $equipmentsGroup = 'var equipments=L.layerGroup([';
+        $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
-                $equipmentsList .= 'var equipment'
+                $equipmentsList .= 'var devices'
                     . $device["_id"]
                     . '= L.marker([' . $device["latitude"]
                     . ',' . $device["longitude"]
                     . '], {icon: equipmentIcon}).bindPopup("<b>'
                     . $device["title"] . '</b><br/>'
-                    . $device["devieType"]["title"] . '").openPopup();';
+                    . $device["deviceType"]["title"] . '").openPopup();';
                 if ($cnt > 0) {
                     $equipmentsGroup .= ',';
                 }
@@ -183,7 +183,7 @@ class SiteController extends Controller
                 'deviceTypeCount' => $deviceTypeCount,
                 'deviceCount' => $deviceCount,
                 'measures' => $measures,
-                'equipments' => $equipments,
+                'devices' => $devices,
                 'users' => $users,
                 'equipmentsGroup' => $equipmentsGroup,
                 'last_measures' => $last_measures,
