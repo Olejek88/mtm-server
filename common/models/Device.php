@@ -153,8 +153,6 @@ class Device extends ActiveRecord
             'port' => Yii::t('app', 'Порт'),
             'serial' => Yii::t('app', 'Серийный номер'),
             'address' => Yii::t('app', 'Адрес'),
-            'latitude' => Yii::t('app', 'Широта'),
-            'longitude' => Yii::t('app', 'Долгота'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

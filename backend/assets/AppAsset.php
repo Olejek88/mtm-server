@@ -25,8 +25,6 @@ class AppAsset extends AssetBundle
         'css/custom/modules/profile/profile.css',
         'css/custom/modules/profile/settings.css',
         'css/custom/modules/actions/app.css',
-        'css/custom/modules/list/ui.fancytree.css',
-        'css/custom/modules/list/jquery.contextMenu.min.css',
         'css/custom/modules/list/tree.css'
     ];
     public $js = [
@@ -39,9 +37,7 @@ class AppAsset extends AssetBundle
         'js/custom/modules/map/leaflet.js',
         'js/custom/modules/actions/result.js',
         'js/custom/modules/actions/entities.js',
-        'js/custom/modules/actions/app.js',
-        'js/custom/modules/list/jquery.contextMenu.min.js',
-        'js/custom/modules/list/jquery.fancytree.contextMenu.js'
+        'js/custom/modules/actions/app.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

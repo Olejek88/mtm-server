@@ -75,7 +75,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * Displays map.
      *
      * @return string
      */
@@ -83,17 +83,68 @@ class SiteController extends Controller
     {
         /**
          * Работа с картой
-         * [$online, $offline, $gpsOn, $gps description]
-         *
-         * @var $gpsOn - Список геоданных по онлайн пользователям
-         * @var $gps - Список геоданных по оффлайн пользователям
          */
-        $lats = array();
+        $objectSelect = Objects::find()
+            ->select('_id, title, latitude, longitude')
+            ->asArray()
+            ->all();
+
+        $cnt = 0;
+        $objectsGroup = 'var objects=L.layerGroup([';
+        $objectsList = '';
+        foreach ($objectSelect as $object) {
+            $objectsList .= 'var object' . $object["_id"]
+                . '= L.marker([' . $object["latitude"]
+                . ',' . $object["longitude"] . ']).bindPopup("<b>'
+                . $object["title"] . '</b>").openPopup();';
+            if ($cnt > 0) {
+                $objectsGroup .= ',';
+            }
+
+            $objectsGroup .= 'object' . $object["_id"];
+            $cnt++;
+        }
+
+        $objectsGroup .= ']);' . PHP_EOL;
+
+        $devices = Device::find()->all();
+
+        $cnt = 0;
+        $default_coordinates = "[55.54,61.36]";
+        $coordinates = $default_coordinates;
+        $equipmentsGroup = 'var devices=L.layerGroup([';
+        $equipmentsList = '';
+        foreach ($devices as $device) {
+            if ($device["object"]["latitude"] > 0) {
+                $equipmentsList .= 'var device'
+                    . $device["_id"]
+                    . '= L.marker([' . $device["object"]["latitude"]
+                    . ',' . $device["object"]["longitude"]
+                    . '], {icon: houseIcon}).bindPopup("<b>'
+                    . $device["deviceType"]["title"] . '</b><br/>'
+                    . $device["object"]->getAddress() . '").openPopup();';
+                $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
+                if ($coordinates==$default_coordinates && $device["object"]["latitude"]>0) {
+                    $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
+                }
+                if ($cnt > 0) {
+                    $equipmentsGroup .= ',';
+                }
+
+                $equipmentsGroup .= 'device' . $device["_id"];
+                $cnt++;
+            }
+        }
+        $equipmentsGroup .= ']);' . PHP_EOL;
 
         return $this->render(
             'index',
             [
-                'lats' => $lats,
+                'objectsGroup' => $objectsGroup,
+                'objectsList' => $objectsList,
+                'devicesGroup' => $equipmentsGroup,
+                'devicesList' => $equipmentsList,
+                'coordinates' => $coordinates
             ]
         );
     }
@@ -152,20 +203,26 @@ class SiteController extends Controller
         $cnt = 0;
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
+        $default_coordinates = "[55.54,61.36]";
+        $coordinates = $default_coordinates;
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
-                $equipmentsList .= 'var devices'
+                $equipmentsList .= 'var device'
                     . $device["_id"]
-                    . '= L.marker([' . $device["latitude"]
-                    . ',' . $device["longitude"]
-                    . '], {icon: equipmentIcon}).bindPopup("<b>'
-                    . $device["title"] . '</b><br/>'
-                    . $device["deviceType"]["title"] . '").openPopup();';
+                    . '= L.marker([' . $device["object"]["latitude"]
+                    . ',' . $device["object"]["longitude"]
+                    . '], {icon: houseIcon}).bindPopup("<b>'
+                    . $device["deviceType"]["title"] . '</b><br/>'
+                    . $device["object"]->getAddress() . '").openPopup();';
+                $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
+                if ($coordinates==$default_coordinates && $device["object"]["latitude"]>0) {
+                    $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
+                }
                 if ($cnt > 0) {
                     $equipmentsGroup .= ',';
                 }
 
-                $equipmentsGroup .= 'equipment' . $device["_id"];
+                $equipmentsGroup .= 'device' . $device["_id"];
                 $cnt++;
             }
         }
@@ -185,12 +242,14 @@ class SiteController extends Controller
                 'measures' => $measures,
                 'devices' => $devices,
                 'users' => $users,
-                'equipmentsGroup' => $equipmentsGroup,
+                'devicesList' => $equipmentsList,
+                'devicesGroup' => $equipmentsGroup,
                 'last_measures' => $last_measures,
                 'complete' => $complete,
                 'contragentCount' => $contragentCount,
                 'currentUser' => $currentUser,
                 'searchModel' => $searchModel,
+                'coordinates' => $coordinates,
                 'dataProvider' => $dataProvider
             ]
         );
