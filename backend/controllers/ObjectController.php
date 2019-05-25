@@ -181,12 +181,12 @@ class ObjectController extends Controller
                 'title' => $street['title'],
                 'folder' => true
             ];
-            $houses = House::find()->select('uuid, number')->where(['streetUuid' => $street['uuid']])->
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
             orderBy('number')->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $house['number'],
+                    'title' => $house->getFullTitle(),
                     'folder' => true
                 ];
                 $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();

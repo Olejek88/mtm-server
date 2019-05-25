@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Создать тип измерения');
 ?>
-<div class="order-status-view box-padding" style="width: 95%; min-height: 782px">
+<div class="order-status-view box-padding" style="width: 95%; min-height: 1024px">
     <?php
     echo $this->render('@backend/views/yii2-app/layouts/references-menu.php');
     ?>
@@ -23,6 +23,7 @@ $this->title = Yii::t('app', 'Создать тип измерения');
                     <?= $this->render('_form', [
                         'model' => $model,
                     ]) ?>
+                    <div style="min-height: 10px; clear: both;"></div>
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'tableOptions' => [
