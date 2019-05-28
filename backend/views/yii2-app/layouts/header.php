@@ -13,7 +13,7 @@ $userImage = Yii::$app->view->params['userImage'];
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini">С</span><span class="logo-lg">' . Yii::$app->name = 'СЕРВИС' . '</span>',
+    <?= Html::a('<span class="logo-mini">С</span><span class="logo-lg">' . Yii::$app->name = 'МТМ' . '</span>',
         Yii::$app->homeUrl, ['class' => 'logo']) ?>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -28,12 +28,6 @@ $userImage = Yii::$app->view->params['userImage'];
                     <a href="/site/timeline" class="dropdown-toggle">
                         <i class="fa fa-flag-o"></i>
                         <span class="label label-info">0</span>
-                    </a>
-                </li>
-                <!-- Messages: style can be found in dropdown.less-->
-                <li class="dropdown messages-menu">
-                    <a href="/message" class="dropdown-toggle">
-                        <i class="fa fa-envelope-o"></i>
                     </a>
                 </li>
                 <!-- Notifications: style can be found in dropdown.less -->

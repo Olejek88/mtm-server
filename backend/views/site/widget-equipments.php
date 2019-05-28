@@ -1,5 +1,6 @@
 <?php
 
+use common\models\DeviceType;
 use yii\helpers\Html;
 
 /* @var $devices */
@@ -22,9 +23,13 @@ use yii\helpers\Html;
             <?php
             foreach ($devices as $device) {
                 $path = '/images/no-image-icon-4.png';
+                if ($device['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO)
+                    $path = '/images/elektro.jpg';
+                if ($device['deviceTypeUuid']==DeviceType::DEVICE_LIGHT)
+                    $path = '/images/light.jpg';
                 print '<li class="item">
                                 <div class="product-img">
-                                    <img src="' . Html::encode($path) . '" alt="' . $device['deviceType']->title . '">
+                                    <img class="img-circle" src="' . Html::encode($path) . '" alt="' . $device['deviceType']->title . '">
                                 </div>
                                 <div class="product-info">
                                     <a href="/device/view?id=' . $device["_id"] . '" class="product-title">' . $device["serial"] . '

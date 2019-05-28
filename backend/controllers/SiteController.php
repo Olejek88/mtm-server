@@ -3,8 +3,15 @@ namespace backend\controllers;
 
 use backend\models\UserSearch;
 use backend\models\UsersSearch;
+use common\components\MainFunctions;
 use common\models\City;
+use common\models\Defect;
+use common\models\EquipmentRegister;
+use common\models\ExternalEvent;
+use common\models\Journal;
 use common\models\Node;
+use common\models\Orders;
+use common\models\OrderStatus;
 use common\models\Organisation;
 use common\models\Device;
 use common\models\DeviceType;
@@ -14,6 +21,7 @@ use common\models\Measure;
 use common\models\SensorChannel;
 use common\models\Street;
 use common\models\User;
+use common\models\UsersAttribute;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -355,4 +363,35 @@ class SiteController extends Controller
         $event .= '</div></li>';
         return $event;
     }
+
+    /**
+     * Displays a timeline
+     *
+     * @return mixed
+     */
+    public function actionTimeline()
+    {
+        $events = [];
+        $journals = Journal::find()
+            ->orderBy('date DESC')
+            ->limit(10)
+            ->all();
+        foreach ($journals as $journal) {
+            $text = '<i class="fa fa-calendar"></i>&nbsp;' . $journal['description'];
+            $events[] = ['date' => $journal['date'], 'event' => self::formEvent($journal['date'], 'journal', 0,
+                $journal['description'], $text, $journal['user']->name)];
+        }
+
+        $sort_events = MainFunctions::array_msort($events, ['date' => SORT_DESC]);
+        $today = date("j-m-Y h:m");
+
+        return $this->render(
+            'timeline',
+            [
+                'events' => $sort_events,
+                'today_date' => $today
+            ]
+        );
+    }
+
 }

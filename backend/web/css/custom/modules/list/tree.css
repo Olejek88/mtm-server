@@ -73,3 +73,7 @@ span.fancytree-expander {
     padding: 5px;
     line-height: 1.2;
 }
+
+span.fancytree-checkbox, span.fancytree-expander, span.fancytree-custom-icon {
+    margin-top: 6px !important;
+}

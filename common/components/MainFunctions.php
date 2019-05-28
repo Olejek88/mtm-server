@@ -5,6 +5,7 @@ namespace common\components;
 use common\models\DeviceStatus;
 use common\models\Journal;
 use common\models\TaskVerdict;
+use common\models\User;
 use common\models\Users;
 use common\models\WorkStatus;
 use Yii;
@@ -69,8 +70,8 @@ class MainFunctions
     public static function register($description)
     {
         $accountUser = Yii::$app->user->identity;
-        $currentUser = Users::find()
-            ->where(['user_id' => $accountUser['id']])
+        $currentUser = User::find()
+            ->where(['_id' => $accountUser['id']])
             ->asArray()
             ->one();
         $journal = new Journal();

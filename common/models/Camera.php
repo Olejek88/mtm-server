@@ -17,6 +17,8 @@ use yii\db\Expression;
  * @property string $deviceStatusUuid
  * @property string $objectUuid
  * @property string $nodeUuid
+ * @property string $address
+ * @property integer $port
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
@@ -75,7 +77,7 @@ class Camera extends ActiveRecord
             'deviceStatus' => function ($model) {
                 return $model->deviceStatus;
             },
-            'deleted', 'createdAt', 'changedAt'
+            'deleted', 'address','createdAt', 'changedAt'
         ];
     }
 
@@ -93,6 +95,7 @@ class Camera extends ActiveRecord
                     'title',
                     'deviceStatusUuid',
                     'objectUuid',
+                    'address'
                 ],
                 'required'
             ],
@@ -134,6 +137,7 @@ class Camera extends ActiveRecord
             'node' => Yii::t('app', 'Контроллер'),
             'objectUuid' => Yii::t('app', 'Объект'),
             'object' => Yii::t('app', 'Объект'),
+            'address' => Yii::t('app', 'Адрес'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
