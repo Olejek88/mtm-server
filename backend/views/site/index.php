@@ -12,6 +12,10 @@ use yii\widgets\Pjax;
 /* @var $objectsGroup */
 /* @var $devicesList */
 /* @var $devicesGroup */
+/* @var  $nodesList */
+/* @var  $nodesGroup */
+/* @var  $camerasList */
+/* @var  $camerasGroup */
 
 $this->title = Yii::t('app', 'Карта объектов и светильников');
 
@@ -38,18 +42,36 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             iconAnchor: [22, 94],
             popupAnchor: [-3, -76]
         });
+        var nodeIcon = L.icon({
+            iconUrl: '/images/marker_house.png',
+            iconSize: [32, 51],
+            iconAnchor: [22, 94],
+            popupAnchor: [-3, -76]
+        });
+        var cameraIcon = L.icon({
+            iconUrl: '/images/marker_house.png',
+            iconSize: [32, 51],
+            iconAnchor: [22, 94],
+            popupAnchor: [-3, -76]
+        });
 
         <?php
         echo $devicesList;
         echo $devicesGroup;
+        echo $nodesList;
+        echo $nodesGroup;
+        echo $camerasList;
+        echo $camerasGroup;
         ?>
 
         var overlayMapsA = {};
         var overlayMapsB = {
-            "Объекты": devices
+            "Светильники": devices,
+            "Камеры": cameras,
+            "Шкафы:": nodes
         };
 
-        var map = L.map('mapid', {zoomControl: false, layers: [devices]}).setView(<?= $coordinates ?>, 13);
+        var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(<?= $coordinates ?>, 13);
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
             id: 'mapbox.streets'

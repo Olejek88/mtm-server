@@ -4,6 +4,7 @@ namespace backend\controllers;
 use backend\models\UserSearch;
 use backend\models\UsersSearch;
 use common\components\MainFunctions;
+use common\models\Camera;
 use common\models\City;
 use common\models\Defect;
 use common\models\EquipmentRegister;
@@ -145,16 +146,76 @@ class SiteController extends Controller
         }
         $equipmentsGroup .= ']);' . PHP_EOL;
 
-        return $this->render(
-            'index',
-            [
-                'objectsGroup' => $objectsGroup,
-                'objectsList' => $objectsList,
-                'devicesGroup' => $equipmentsGroup,
-                'devicesList' => $equipmentsList,
-                'coordinates' => $coordinates
-            ]
-        );
+        $cameras = Camera::find()->all();
+        $cnt = 0;
+        $camerasGroup = 'var cameras=L.layerGroup([';
+        $camerasList = '';
+        foreach ($cameras as $camera) {
+            if ($camera["object"]["latitude"] > 0) {
+                $camerasList .= 'var camera'
+                    . $camera["_id"]
+                    . '= L.marker([' . $camera["object"]["latitude"]
+                    . ',' . $camera["object"]["longitude"]
+                    . '], {icon: cameraIcon}).bindPopup("<b>'
+                    . $camera["title"] . '</b><br/>'
+                    . $camera["object"]->getAddress() . '").openPopup();';
+                $coordinates = "[".$camera["object"]["latitude"].",".$camera["object"]["longitude"]."]";
+                if ($coordinates==$default_coordinates && $camera["object"]["latitude"]>0) {
+                    $coordinates = "[".$camera["object"]["latitude"].",".$camera["object"]["longitude"]."]";
+                }
+                if ($cnt > 0) {
+                    $camerasGroup .= ',';
+                }
+
+                $camerasGroup .= 'camera' . $camera["_id"];
+                $cnt++;
+            }
+        }
+        $camerasGroup .= ']);' . PHP_EOL;
+
+        $nodes = Node::find()->all();
+        $cnt = 0;
+        $nodesGroup = 'var nodes=L.layerGroup([';
+        $nodesList = '';
+        foreach ($nodes as $node) {
+            if ($node["object"]["latitude"] > 0) {
+                $nodesList .= 'var node'
+                    . $node["_id"]
+                    . '= L.marker([' . $node["object"]["latitude"]
+                    . ',' . $node["object"]["longitude"]
+                    . '], {icon: nodeIcon}).bindPopup("<b>'
+                    . $node["uuid"] . '</b><br/>'
+                    . $node["object"]->getAddress() . '").openPopup();';
+                $coordinates = "[".$node["object"]["latitude"].",".$node["object"]["longitude"]."]";
+                if ($coordinates==$default_coordinates && $node["object"]["latitude"]>0) {
+                    $coordinates = "[".$node["object"]["latitude"].",".$node["object"]["longitude"]."]";
+                }
+                if ($cnt > 0) {
+                    $nodesGroup .= ',';
+                }
+                $nodesGroup .= 'node' . $node["_id"];
+                $cnt++;
+            }
+        }
+        $nodesGroup .= ']);' . PHP_EOL;
+
+        //echo json_encode($nodesGroup);
+        //echo json_encode($camerasGroup);
+
+                return $this->render(
+                    'index',
+                    [
+                        'objectsGroup' => $objectsGroup,
+                        'objectsList' => $objectsList,
+                        'devicesGroup' => $equipmentsGroup,
+                        'devicesList' => $equipmentsList,
+                        'camerasGroup' => $camerasGroup,
+                        'camerasList' => $camerasList,
+                        'nodesGroup' => $nodesGroup,
+                        'nodesList' => $nodesList,
+                        'coordinates' => $coordinates
+                    ]
+                );
     }
 
     /**

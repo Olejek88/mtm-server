@@ -26,6 +26,7 @@ use yii\db\Expression;
  * @property DeviceStatus $deviceStatus
  * @property Node $node
  */
+
 class Camera extends ActiveRecord
 {
 

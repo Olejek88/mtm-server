@@ -13,6 +13,7 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $uuid
  * @property string $oid идентификатор организации
+ * @property string $name
  * @property string $address
  * @property string $deviceTypeUuid
  * @property string $serial
@@ -31,6 +32,7 @@ use yii\db\Expression;
  * @property DeviceType $deviceType
  * @property Node $node
  */
+
 class Device extends ActiveRecord
 {
 
@@ -68,7 +70,7 @@ class Device extends ActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'address',
+        return ['_id', 'uuid', 'address', 'name',
             'nodeUuid',
             'node' => function ($model) {
                 return $model->node;
@@ -116,6 +118,7 @@ class Device extends ActiveRecord
             [
                 [
                     'uuid',
+                    'name',
                     'deviceTypeUuid',
                     'deviceStatusUuid',
                     'objectUuid',
@@ -140,6 +143,7 @@ class Device extends ActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
+            'name' => Yii::t('app', 'Название'),
             'interface' => Yii::t('app', 'Интерфейс'),
             'deviceTypeUuid' => Yii::t('app', 'Тип оборудования'),
             'deviceType' => Yii::t('app', 'Тип'),

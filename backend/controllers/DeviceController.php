@@ -75,10 +75,13 @@ class DeviceController extends Controller
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'port') {
-                $model['tag'] = $_POST['Device'][$_POST['editableIndex']]['port'];
+                $model['port'] = $_POST['Device'][$_POST['editableIndex']]['port'];
             }
             if ($_POST['editableAttribute'] == 'deviceTypeUuid') {
                 $model['deviceTypeUuid'] = $_POST['Device'][$_POST['editableIndex']]['deviceTypeUuid'];
+            }
+            if ($_POST['editableAttribute'] == 'interface') {
+                $model['interface'] = $_POST['Device'][$_POST['editableIndex']]['interface'];
             }
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
                 $model['deviceStatusUuid'] = $_POST['Device'][$_POST['editableIndex']]['deviceStatusUuid'];
