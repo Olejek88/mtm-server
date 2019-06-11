@@ -7,6 +7,10 @@ use yii\db\Migration;
  */
 class m190610_172132_sync_with_controller extends Migration
 {
+    const DEVICE = '{{%device}}';
+    const THREADS = '{{%threads}}';
+    const DEVICE_TYPE = '{{%device_type}}';
+
     /**
      * {@inheritdoc}
      */
@@ -18,9 +22,7 @@ class m190610_172132_sync_with_controller extends Migration
         }
 
         $this->addColumn('device', 'name', $this->string(45));
-        $this->addColumn('node', 'address', $this->string(45));
-
-        $this->createTable('thread', [
+        $this->createTable('{{%threads}}', [
             '_id' => $this->primaryKey(),
             'uuid' => $this->string(45)->notNull()->unique(),
             'oid' => $this->string(45)->notNull(),
@@ -31,12 +33,43 @@ class m190610_172132_sync_with_controller extends Migration
             'status' => $this->integer()->notNull()->defaultValue(0),
             'work' => $this->integer()->notNull()->defaultValue(0),
             'deviceTypeUuid' => $this->string(45),
-            'c_time' => $this->timestamp()->notNull()->defaultValue('0000-00-00 00:00:00'),
+            'c_time' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'message' => $this->string(250)->notNull(),
-            'createdAt' => $this->timestamp()->notNull()->defaultValue('0000-00-00 00:00:00'),
+            'createdAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
+        $this->createIndex(
+            'idx-deviceUuid',
+            self::THREADS,
+            'deviceUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-threads-deviceUuid',
+            self::THREADS,
+            'deviceUuid',
+            self::DEVICE,
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
+
+        $this->createIndex(
+            'idx-deviceTypeUuid',
+            self::THREADS,
+            'deviceTypeUuid'
+        );
+
+        $this->addForeignKey(
+            'fk-threads-deviceTypeUuid',
+            self::THREADS,
+            'deviceTypeUuid',
+            self::DEVICE_TYPE,
+            'uuid',
+            $delete = 'RESTRICT',
+            $update = 'CASCADE'
+        );
     }
 
     /**

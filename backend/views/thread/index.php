@@ -26,6 +26,18 @@ $gridColumns = [
         }
     ],
     [
+        'vAlign' => 'middle',
+        'width' => '160px',
+        'mergeHeader' => true,
+        'filterType' => GridView::FILTER_SELECT2,
+        'header' => 'Контроллер',
+        'filterInputOptions' => ['placeholder' => 'Любой'],
+        'format' => 'raw',
+        'content' => function ($model) {
+            return $model['node']['object']['address'].' ['.$model['node']['address'].']';
+        }
+    ],
+    [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'title',
         'vAlign' => 'middle',
@@ -98,7 +110,7 @@ $gridColumns = [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'port',
         'vAlign' => 'middle',
-        'width' => '180px',
+        'width' => '100px',
         'mergeHeader' => true,
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Порт',
@@ -109,7 +121,7 @@ $gridColumns = [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'speed',
         'vAlign' => 'middle',
-        'width' => '180px',
+        'width' => '100px',
         'mergeHeader' => true,
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Скорость',

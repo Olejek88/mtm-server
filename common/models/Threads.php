@@ -12,6 +12,7 @@ use yii\db\Expression;
  *
  * @property integer $_id
  * @property string $uuid
+ * @property string $oid идентификатор организации
  * @property string $title
  * @property string $deviceUuid
  * @property string $port
@@ -21,9 +22,11 @@ use yii\db\Expression;
  * @property string $deviceTypeUuid
  * @property string $c_time
  * @property string $message
+ * @property string $nodeUuid
  * @property string $createdAt
  * @property string $changedAt
  *
+ * @property Node $node
  * @property Device $device
  * @property DeviceType $deviceType
  */
@@ -58,7 +61,7 @@ class Threads extends ActiveRecord
             [['uuid', 'title', 'deviceTypeUuid'], 'required'],
             [['c_time', 'message', 'createdAt', 'changedAt'], 'safe'],
             [['speed', 'status', 'work'], 'integer'],
-            [['uuid', 'title', 'deviceTypeUuid', 'deviceUuid', 'port'], 'string', 'max' => 50],
+            [['uuid', 'title', 'deviceTypeUuid', 'nodeUuid', 'deviceUuid', 'port', 'oid'], 'string', 'max' => 50],
         ];
     }
 
@@ -67,9 +70,14 @@ class Threads extends ActiveRecord
         return [
             '_id',
             'uuid',
+            'oid',
             'deviceUuid',
             'device' => function ($model) {
                 return $model->device;
+            },
+            'nodeUuid',
+            'node' => function ($model) {
+                return $model->node;
             },
             'title',
             'port',
@@ -97,6 +105,11 @@ class Threads extends ActiveRecord
         return $this->hasOne(DeviceType::class, ['uuid' => 'deviceTypeUuid']);
     }
 
+    public function getNode()
+    {
+        return $this->hasOne(Node::class, ['uuid' => 'nodeUuid']);
+    }
+
     /**
      * @inheritdoc
      */
@@ -108,6 +121,10 @@ class Threads extends ActiveRecord
             'title' => Yii::t('app', 'Название потока'),
             'device' => Yii::t('app', 'Устройство'),
             'deviceUuid' => Yii::t('app', 'Устройство'),
+            'deviceType' => Yii::t('app', 'Тип устройства'),
+            'deviceTypeUuid' => Yii::t('app', 'Тип устройства'),
+            'node' => Yii::t('app', 'Контроллер'),
+            'nodeUuid' => Yii::t('app', 'Контроллер'),
             'port'  => Yii::t('app', 'Порт'),
             'speed' => Yii::t('app', 'Скорость'),
             'status' => Yii::t('app', 'Статус'),
