@@ -12,10 +12,17 @@ class MtmPktHeader extends Model
 
     public static $MTM_CMD_PROTO_VERSION_0 = 0;
 
+    // индекс устройства(датчика) типа "светильник"
     public static $MTM_DEVICE_LIGHT = 0;
 
     public $type;
     public $protoVersion;
+
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+        $this->protoVersion = self::$MTM_CMD_PROTO_VERSION_0;
+    }
 
     /**
      * @inheritdoc
