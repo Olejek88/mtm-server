@@ -4,22 +4,19 @@ namespace backend\controllers;
 
 use backend\models\CameraSearch;
 use common\models\Camera;
-use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\House;
-use common\models\Measure;
 use common\models\Node;
 use common\models\Objects;
-use common\models\SensorChannel;
-use common\models\SensorConfig;
 use common\models\Street;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
+use yii\base\InvalidConfigException;
+use Throwable;
 
 class CameraController extends Controller
 {
@@ -29,6 +26,15 @@ class CameraController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -36,18 +42,6 @@ class CameraController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * @throws UnauthorizedHttpException
-     */
-    public function init()
-    {
-
-        if (Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**
@@ -126,7 +120,7 @@ class CameraController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)
@@ -155,6 +149,7 @@ class CameraController extends Controller
      * Build tree of device
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionTree()
     {

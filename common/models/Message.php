@@ -1,10 +1,9 @@
 <?php
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -17,8 +16,7 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  */
-
-class Message extends ActiveRecord
+class Message extends MtmActiveRecord
 {
     /**
      * Behaviors.
@@ -77,6 +75,7 @@ class Message extends ActiveRecord
                 [ 'uuid' ], 'string', 'max' => 50
             ],
             [['link'], 'string'],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

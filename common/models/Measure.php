@@ -2,10 +2,10 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -24,7 +24,7 @@ use yii\db\Expression;
  * @property SensorChannel $sensorChannel
  * @property MeasureType $measureType
  */
-class Measure extends ActiveRecord
+class Measure extends MtmActiveRecord
 {
 
     /**
@@ -79,6 +79,7 @@ class Measure extends ActiveRecord
             [['value'], 'number'],
             [['uuid', 'sensorChannelUuid', 'measureTypeUuid', 'date', 'oid'], 'string', 'max' => 50],
             [['oid','createdAt', 'changedAt'], 'safe'],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

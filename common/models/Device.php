@@ -1,10 +1,10 @@
 <?php
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -29,9 +29,10 @@ use yii\db\Expression;
  * @property Objects $object
  * @property DeviceStatus $deviceStatus
  * @property DeviceType $deviceType
+ * @property string $fullTitle
  * @property Node $node
  */
-class Device extends ActiveRecord
+class Device extends MtmActiveRecord
 {
 
     /**
@@ -127,6 +128,8 @@ class Device extends ActiveRecord
                 'string', 'max' => 50
             ],
             [['interface'], 'integer'],
+            [['oid'], 'checkOrganizationOwn'],
+
         ];
     }
 
@@ -215,6 +218,7 @@ class Device extends ActiveRecord
     {
         return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
     }
+
     /**
      * Объект связанного поля.
      *

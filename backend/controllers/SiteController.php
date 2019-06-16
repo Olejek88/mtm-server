@@ -1,17 +1,12 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\SignupForm;
 use backend\models\UserSearch;
-use backend\models\UsersSearch;
 use common\components\MainFunctions;
 use common\models\City;
-use common\models\Defect;
-use common\models\EquipmentRegister;
-use common\models\ExternalEvent;
 use common\models\Journal;
 use common\models\Node;
-use common\models\Orders;
-use common\models\OrderStatus;
 use common\models\Organisation;
 use common\models\Device;
 use common\models\DeviceType;
@@ -21,12 +16,12 @@ use common\models\Measure;
 use common\models\SensorChannel;
 use common\models\Street;
 use common\models\User;
-use common\models\UsersAttribute;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
+use Throwable;
 
 /**
  * Site controller
@@ -185,7 +180,7 @@ class SiteController extends Controller
         $usersCount = User::find()->count();
 
         $last_measures = Measure::find()
-            ->where('createdAt > (NOW()-(4*24*3600000));')
+            ->where('createdAt > (NOW()-(4*24*3600000))')
             ->count();
         $complete = 0;
 
@@ -199,6 +194,7 @@ class SiteController extends Controller
             ->all();
 
         $users = User::find()
+            ->where(['oid' => User::getOid(Yii::$app->user->identity)])
             ->all();
 
         /**
@@ -394,4 +390,27 @@ class SiteController extends Controller
         );
     }
 
+    /**
+     * Signup action.
+     *
+     * @return string
+     * @throws Throwable
+     */
+    public function actionSignup()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new SignupForm();
+        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
+            Yii::$app->user->login(User::findByUsername($model->username), true ? 3600 * 24 * 30 : 0);
+            return $this->goBack();
+        } else {
+            $model->password = '';
+            return $this->render('signup', [
+                'model' => $model,
+            ]);
+        }
+    }
 }

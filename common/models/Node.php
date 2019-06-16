@@ -1,10 +1,10 @@
 <?php
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -23,7 +23,7 @@ use yii\db\Expression;
  * @property Node $node
  * @property Object $object
  */
-class Node extends ActiveRecord
+class Node extends MtmActiveRecord
 {
 
     /**
@@ -100,6 +100,7 @@ class Node extends ActiveRecord
                 ],
                 'string', 'max' => 50
             ],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 
