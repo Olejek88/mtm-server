@@ -34,7 +34,9 @@ use yii\helpers\Html;
                                 <div class="product-info">
                                     <a href="/device/view?id=' . $device["_id"] . '" class="product-title">' . $device["serial"] . '
                                     <span class="label label-warning pull-right">' . $device['deviceType']->title . '</span></a>
-                                    <span class="product-description">' . $device["deviceType"]->title . '</span>
+                                    <span class="product-description">' . $device["node"]['address'] . ' / ' .
+                                    $device["node"]['object']->getAddress().'
+                                    </span>
                                 </div></li>';
             }
             ?>

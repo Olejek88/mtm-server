@@ -130,7 +130,7 @@ class Threads extends ActiveRecord
             'status' => Yii::t('app', 'Статус'),
             'work' => Yii::t('app', 'Работа'),
             'c_time' => Yii::t('app', 'Время'),
-            'message' => Yii::t('app', 'Статус'),
+            'message' => Yii::t('app', 'Сообщение'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

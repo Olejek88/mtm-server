@@ -3,7 +3,7 @@ use wbraganca\fancytree\FancytreeWidget;
 use yii\helpers\Html;
 use yii\web\JsExpression;
 
-/* @var $device */
+/* @var $devices */
 ?>
 
 <div class="box box-primary">
@@ -26,7 +26,7 @@ use yii\web\JsExpression;
     </div>
     <!-- /.box-header -->
     <div class="box-body">
-        <table id="tree" cellspacing="1">
+        <table id="tree" cellspacing="1" style="width: 100%">
             <colgroup>
                 <col width="*">
                 <col width="*">
@@ -54,7 +54,7 @@ use yii\web\JsExpression;
             echo FancytreeWidget::widget([
             'options' => [
                 'id' => 'tree',
-                'source' => $device,
+                'source' => $devices,
                 'extensions' => ["glyph", "table"],
                 'glyph' => 'glyph_opts',
                 'table' => [
