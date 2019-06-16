@@ -4,6 +4,7 @@ use common\components\MainFunctions;
 use common\models\Device;
 use common\models\Measure;
 use common\models\Photo;
+use common\models\SensorChannel;
 use yii\helpers\Html;
 
 /* @var $model Device */
@@ -11,16 +12,18 @@ use yii\helpers\Html;
 $equipment = Device::find()
     ->where(['uuid' => $model['uuid']])
     ->one();
-$models = Device::findOne($model['_id']);
+$measures=[];
 
-$measures = Measure::find()
-    ->where(['equipmentUuid' => $equipment['uuid']])
-    ->all();
-$photo = Photo::find()
-    ->where(['objectUuid' => $equipment['uuid']])
-    ->orderBy('createdAt DESC')
-    ->one();
-
+if($equipment) {
+    $sensorChannel = SensorChannel::find()
+        ->where(['uuid' => $equipment['uuid']])
+        ->one();
+    if ($sensorChannel) {
+        $measures = Measure::find()
+            ->where(['sensorChannelUuid' => $sensorChannel['uuid']])
+            ->all();
+    }
+}
 $categories = "[";
 $values = "name: 'Значения', data: [";
 $zero = 0;
@@ -42,7 +45,7 @@ $categories .= "]";
     <div class="kv-expand-detail skip-export kv-grid-demo">
         <div class="skip-export kv-expanded-row kv-grid-demo" data-index="0" data-key="1">
             <div class="kv-detail-content">
-                <h3><?php echo $equipment['equipmentType']->title ?></h3>
+                <h3><?php echo $equipment['deviceType']->title ?></h3>
                 <div class="row">
                     <div class="col-sm-2">
                         <table class="table table-bordered table-condensed table-hover small kv-table">

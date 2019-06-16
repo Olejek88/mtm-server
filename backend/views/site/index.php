@@ -37,19 +37,19 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
 
     <script>
         var houseIcon = L.icon({
-            iconUrl: '/images/marker_house.png',
+            iconUrl: '/images/house_marker_green.png',
             iconSize: [32, 51],
             iconAnchor: [22, 94],
             popupAnchor: [-3, -76]
         });
         var nodeIcon = L.icon({
-            iconUrl: '/images/marker_house.png',
+            iconUrl: '/images/router_marker_green.png',
             iconSize: [32, 51],
             iconAnchor: [22, 94],
             popupAnchor: [-3, -76]
         });
         var cameraIcon = L.icon({
-            iconUrl: '/images/marker_house.png',
+            iconUrl: '/images/camera_marker_green.png',
             iconSize: [32, 51],
             iconAnchor: [22, 94],
             popupAnchor: [-3, -76]

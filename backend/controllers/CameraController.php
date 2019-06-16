@@ -4,19 +4,14 @@ namespace backend\controllers;
 
 use backend\models\CameraSearch;
 use common\models\Camera;
-use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\House;
-use common\models\Measure;
 use common\models\Node;
 use common\models\Objects;
-use common\models\SensorChannel;
-use common\models\SensorConfig;
 use common\models\Street;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
-use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
@@ -56,6 +51,23 @@ class CameraController extends Controller
      */
     public function actionIndex()
     {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Camera::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'port') {
+                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
+            }
+            if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
+                $model['deviceStatusUuid'] = $_POST['Camera'][$_POST['editableIndex']]['deviceStatusUuid'];
+            }
+            if ($_POST['editableAttribute'] == 'date') {
+                $model['date'] = date("Y-m-d H:i:s", $_POST['Camera'][$_POST['editableIndex']]['date']);
+            }
+            $model->save();
+            return json_encode('');
+        }
+
         $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;

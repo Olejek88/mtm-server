@@ -22,6 +22,9 @@ class MeasureType extends ActiveRecord
     const PRESSURE = "69A71072-7EDD-4FF9-B095-0EF145286D79";
     const PHOTO = "8EB1CC6A-FBD5-4A4E-91EE-CA762B94473C";
 
+    const POWER = "7BDB38C7-EF93-49D4-8FE3-89F2A2AEDB48";
+    const TEMPERATURE = "54051538-38F7-44A3-A9B5-C8B5CD4A2936";
+
     /**
      * @inheritdoc
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace backend\controllers;
 
 use backend\models\UserSearch;
@@ -7,18 +8,18 @@ use common\components\MainFunctions;
 use common\models\Camera;
 use common\models\City;
 use common\models\Defect;
+use common\models\Device;
+use common\models\DeviceType;
 use common\models\EquipmentRegister;
 use common\models\ExternalEvent;
 use common\models\Journal;
+use common\models\LoginForm;
+use common\models\Measure;
 use common\models\Node;
+use common\models\Objects;
 use common\models\Orders;
 use common\models\OrderStatus;
 use common\models\Organisation;
-use common\models\Device;
-use common\models\DeviceType;
-use common\models\Objects;
-use common\models\LoginForm;
-use common\models\Measure;
 use common\models\SensorChannel;
 use common\models\Street;
 use common\models\User;
@@ -129,12 +130,14 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: houseIcon}).bindPopup("<b>'
-                    . $device["deviceType"]["title"] . '</b><br/>'
-                    . $device["object"]->getAddress() . '").openPopup();';
-                $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
-                if ($coordinates==$default_coordinates && $device["object"]["latitude"]>0) {
-                    $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
+                    . '], {icon: houseIcon}).bindPopup(\'<b>'
+                    . Html::a($device["deviceType"]["title"],
+                        ['/node/dashboard', 'uuid' => $device['node']['uuid'],'type' => 'device']). '</span>'
+                    . '</b><br/>'
+                    . $device["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 }
                 if ($cnt > 0) {
                     $equipmentsGroup .= ',';
@@ -156,12 +159,14 @@ class SiteController extends Controller
                     . $camera["_id"]
                     . '= L.marker([' . $camera["object"]["latitude"]
                     . ',' . $camera["object"]["longitude"]
-                    . '], {icon: cameraIcon}).bindPopup("<b>'
-                    . $camera["title"] . '</b><br/>'
-                    . $camera["object"]->getAddress() . '").openPopup();';
-                $coordinates = "[".$camera["object"]["latitude"].",".$camera["object"]["longitude"]."]";
-                if ($coordinates==$default_coordinates && $camera["object"]["latitude"]>0) {
-                    $coordinates = "[".$camera["object"]["latitude"].",".$camera["object"]["longitude"]."]";
+                    . '], {icon: cameraIcon}).bindPopup(\'<b>'
+                    . Html::a($camera["title"],
+                        ['/node/dashboard', 'uuid' => $camera['node']['uuid'],'type' => 'camera']). '</span>'
+                    . '</b><br/>'
+                    . $camera["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $camera["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
                 }
                 if ($cnt > 0) {
                     $camerasGroup .= ',';
@@ -183,12 +188,14 @@ class SiteController extends Controller
                     . $node["_id"]
                     . '= L.marker([' . $node["object"]["latitude"]
                     . ',' . $node["object"]["longitude"]
-                    . '], {icon: nodeIcon}).bindPopup("<b>'
-                    . $node["uuid"] . '</b><br/>'
-                    . $node["object"]->getAddress() . '").openPopup();';
-                $coordinates = "[".$node["object"]["latitude"].",".$node["object"]["longitude"]."]";
-                if ($coordinates==$default_coordinates && $node["object"]["latitude"]>0) {
-                    $coordinates = "[".$node["object"]["latitude"].",".$node["object"]["longitude"]."]";
+                    . '], {icon: nodeIcon}).bindPopup(\'<b>'
+                    . Html::a($node["address"],
+                        ['/node/dashboard', 'uuid' => $node['uuid'],'type' => 'node']). '</span>'
+                    . '</b><br/>'
+                    . $node["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
                 }
                 if ($cnt > 0) {
                     $nodesGroup .= ',';
@@ -199,23 +206,20 @@ class SiteController extends Controller
         }
         $nodesGroup .= ']);' . PHP_EOL;
 
-        //echo json_encode($nodesGroup);
-        //echo json_encode($camerasGroup);
-
-                return $this->render(
-                    'index',
-                    [
-                        'objectsGroup' => $objectsGroup,
-                        'objectsList' => $objectsList,
-                        'devicesGroup' => $equipmentsGroup,
-                        'devicesList' => $equipmentsList,
-                        'camerasGroup' => $camerasGroup,
-                        'camerasList' => $camerasList,
-                        'nodesGroup' => $nodesGroup,
-                        'nodesList' => $nodesList,
-                        'coordinates' => $coordinates
-                    ]
-                );
+        return $this->render(
+            'index',
+            [
+                'objectsGroup' => $objectsGroup,
+                'objectsList' => $objectsList,
+                'devicesGroup' => $equipmentsGroup,
+                'devicesList' => $equipmentsList,
+                'camerasGroup' => $camerasGroup,
+                'camerasList' => $camerasList,
+                'nodesGroup' => $nodesGroup,
+                'nodesList' => $nodesList,
+                'coordinates' => $coordinates
+            ]
+        );
     }
 
     /**
@@ -281,11 +285,13 @@ class SiteController extends Controller
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
                     . '], {icon: houseIcon}).bindPopup("<b>'
-                    . $device["deviceType"]["title"] . '</b><br/>'
+                    . Html::a($device["deviceType"]["title"],
+                        ['/node/dashboard', 'uuid' => $device['node']['uuid']]). '</span>'
+                    . '</b><br/>'
                     . $device["object"]->getAddress() . '").openPopup();';
-                $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
-                if ($coordinates==$default_coordinates && $device["object"]["latitude"]>0) {
-                    $coordinates = "[".$device["object"]["latitude"].",".$device["object"]["longitude"]."]";
+                $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 }
                 if ($cnt > 0) {
                     $equipmentsGroup .= ',';
