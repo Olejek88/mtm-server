@@ -58,7 +58,7 @@ use yii\widgets\ActiveForm;
         ]);
     ?>
 
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
     $object = Objects::find()->all();
