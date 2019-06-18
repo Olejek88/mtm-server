@@ -10,6 +10,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\base\InvalidConfigException;
+use Throwable;
 
 /**
  * SensorConfigController implements the CRUD actions for SensorConfig model.
@@ -48,7 +50,7 @@ class SensorConfigController extends Controller
      * Lists all SensorConfig models.
      *
      * @return mixed
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -162,7 +164,7 @@ class SensorConfigController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

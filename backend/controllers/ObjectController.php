@@ -12,6 +12,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use Throwable;
+use yii\base\InvalidConfigException;
 
 /**
  * ObjectController implements the CRUD actions for Object model.
@@ -134,7 +136,7 @@ class ObjectController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)
@@ -164,6 +166,7 @@ class ObjectController extends Controller
      * Build tree of equipment by user
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionTree()
     {

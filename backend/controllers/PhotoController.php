@@ -9,6 +9,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use Throwable;
 
 /**
  * Photo implements the CRUD actions for Photo model.
@@ -109,6 +110,9 @@ class PhotoController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws Throwable
+     * @throws yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {

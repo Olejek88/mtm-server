@@ -7,9 +7,10 @@ use backend\models\UserSearch;
 use common\components\MainFunctions;
 use common\models\Camera;
 use common\models\City;
+use common\models\DeviceStatus;
+use common\models\House;
 use common\models\Journal;
 use common\models\Node;
-use common\models\Organisation;
 use common\models\Device;
 use common\models\DeviceType;
 use common\models\Objects;
@@ -25,9 +26,12 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
 use Throwable;
+use yii\base\InvalidConfigException;
 
 /**
  * Site controller
+ *
+ * @property mixed $layers
  */
 class SiteController extends Controller
 {
@@ -84,6 +88,7 @@ class SiteController extends Controller
      * Displays map.
      *
      * @return string
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -222,6 +227,7 @@ class SiteController extends Controller
      * Dashboard
      *
      * @return string
+     * @throws InvalidConfigException
      */
     public function actionDashboard()
     {
@@ -415,7 +421,7 @@ class SiteController extends Controller
      */
     public function actionError()
     {
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             Yii::$app->getResponse()->redirect("/")->send();
         } else {
             $exception = Yii::$app->errorHandler->exception;
@@ -517,6 +523,10 @@ class SiteController extends Controller
         );
     }
 
+    /**
+     * @return mixed
+     * @throws InvalidConfigException
+     */
     public function getLayers()
     {
         $devices = Device::find()->all();

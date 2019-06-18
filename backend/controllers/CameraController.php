@@ -47,6 +47,7 @@ class CameraController extends Controller
     /**
      * Lists all Camera models.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {

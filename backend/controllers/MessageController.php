@@ -12,6 +12,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use common\models\Message;
 use backend\models\MessageSearch;
+use Throwable;
 
 /**
  * MessageController implements the CRUD actions for Message model.
@@ -146,7 +147,7 @@ class MessageController extends Controller
      * @return mixed
      * @throws NotFoundHttpException
      * @throws Exception
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

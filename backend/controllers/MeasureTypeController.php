@@ -10,6 +10,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use Throwable;
 
 /**
  * MeasureTypeController implements the CRUD actions for MeasureType model.
@@ -116,7 +117,7 @@ class MeasureTypeController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectExceptionAlias
      */
     public function actionDelete($id)

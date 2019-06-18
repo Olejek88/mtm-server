@@ -10,6 +10,8 @@ use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use Exception;
+use Throwable;
 
 /**
  * StageOperationController implements the CRUD actions for StageOperation model.
@@ -178,8 +180,8 @@ class SensorChannelController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

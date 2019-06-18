@@ -4,25 +4,14 @@ namespace backend\controllers;
 
 use backend\models\ThreadSearch;
 use common\components\MainFunctions;
-use common\models\Thread;
-use common\models\ThreadStatus;
-use common\models\ThreadType;
-use common\models\Stat;
-use common\models\Measure;
-use common\models\Node;
-use common\models\Protocols;
-use common\models\Info;
-use common\models\SensorChannel;
-use common\models\SensorConfig;
 use common\models\Threads;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
+use Throwable;
 
 /**
  * ThreadController implements the CRUD actions for Thread model.
@@ -207,7 +196,7 @@ class ThreadController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public
