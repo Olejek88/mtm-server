@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "82647d10fb5b916e1cbdb4e050141a9e",
+    "content-hash": "80c840cf4f8c3b046fc9667cc27d4dcb",
     "packages": [
         {
             "name": "2amigos/yii2-date-time-picker-widget",
@@ -313,12 +313,12 @@
             "version": "v2.4.10",
             "source": {
                 "type": "git",
-                "url": "https://github.com/almasaeed2010/AdminLTE.git",
+                "url": "https://github.com/ColorlibHQ/AdminLTE.git",
                 "reference": "4672183ea06a28d540a1d87900a7b5f84b1a1495"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/almasaeed2010/AdminLTE/zipball/4672183ea06a28d540a1d87900a7b5f84b1a1495",
+                "url": "https://api.github.com/repos/ColorlibHQ/AdminLTE/zipball/4672183ea06a28d540a1d87900a7b5f84b1a1495",
                 "reference": "4672183ea06a28d540a1d87900a7b5f84b1a1495",
                 "shasum": ""
             },
@@ -627,7 +627,8 @@
                 "event",
                 "full-sized",
                 "jquery-plugin"
-            ]
+            ],
+            "time": "2018-03-05T03:08:31+00:00"
         },
         {
             "name": "bower-asset/fullcalendar-scheduler",
@@ -667,7 +668,8 @@
             "license": [
                 "SEE LICENSE IN LICENSE.md"
             ],
-            "description": "A premium add-on to FullCalendar for displaying events and resources"
+            "description": "A premium add-on to FullCalendar for displaying events and resources",
+            "time": "2018-03-28T18:43:55+00:00"
         },
         {
             "name": "bower-asset/inputmask",
@@ -726,7 +728,8 @@
                 "jquery",
                 "mask",
                 "plugins"
-            ]
+            ],
+            "time": "2017-11-21T11:46:23+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -786,7 +789,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "bower-asset/leaflet",
@@ -916,7 +920,8 @@
                     "node_modules",
                     "package.json"
                 ]
-            }
+            },
+            "time": "2014-10-22T12:02:42+00:00"
         },
         {
             "name": "bower-asset/smalot-bootstrap-datetimepicker",
@@ -949,7 +954,8 @@
                     ".travis.yml",
                     "minify.sh"
                 ]
-            }
+            },
+            "time": "2017-03-03T10:00:24+00:00"
         },
         {
             "name": "bower-asset/yii2-pjax",
@@ -983,7 +989,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2017-10-12T10:11:14+00:00"
         },
         {
             "name": "c006/yii2-migration-utility",
@@ -1369,6 +1376,46 @@
                 "icon"
             ],
             "time": "2016-10-24T15:52:54+00:00"
+        },
+        {
+            "name": "inpassor/yii2-daemon",
+            "version": "0.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Inpassor/yii2-daemon.git",
+                "reference": "a8efd68efa48e74295ff359938120ac12e1fb1bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Inpassor/yii2-daemon/zipball/a8efd68efa48e74295ff359938120ac12e1fb1bf",
+                "reference": "a8efd68efa48e74295ff359938120ac12e1fb1bf",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "inpassor\\daemon\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Inpassor",
+                    "email": "inpassor@yandex.com"
+                }
+            ],
+            "description": "The simple daemon extension for the Yii 2 framework",
+            "keywords": [
+                "daemon",
+                "yii2"
+            ],
+            "time": "2018-11-19T12:10:19+00:00"
         },
         {
             "name": "kartik-v/bootstrap-fileinput",
@@ -3780,6 +3827,80 @@
             "time": "2018-05-04T09:06:24+00:00"
         },
         {
+            "name": "php-amqplib/php-amqplib",
+            "version": "v2.9.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-amqplib/php-amqplib.git",
+                "reference": "76faddcd668dabb8d4f7c00e86b8a9decd781a59"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/76faddcd668dabb8d4f7c00e86b8a9decd781a59",
+                "reference": "76faddcd668dabb8d4f7c00e86b8a9decd781a59",
+                "shasum": ""
+            },
+            "require": {
+                "ext-bcmath": "*",
+                "ext-sockets": "*",
+                "php": ">=5.4.0"
+            },
+            "replace": {
+                "videlalvaro/php-amqplib": "self.version"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "nategood/httpful": "^0.2.20",
+                "phpdocumentor/phpdocumentor": "^2.9",
+                "phpunit/phpunit": "^4.8",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PhpAmqpLib\\": "PhpAmqpLib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Alvaro Videla",
+                    "role": "Original Maintainer"
+                },
+                {
+                    "name": "John Kelly",
+                    "email": "johnmkelly86@gmail.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Raúl Araya",
+                    "email": "nubeiro@gmail.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Luke Bakken",
+                    "email": "luke@bakken.io",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Formerly videlalvaro/php-amqplib.  This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
+            "homepage": "https://github.com/php-amqplib/php-amqplib/",
+            "keywords": [
+                "message",
+                "queue",
+                "rabbitmq"
+            ],
+            "time": "2019-04-24T15:36:21+00:00"
+        },
+        {
             "name": "phpoffice/phpspreadsheet",
             "version": "1.6.0",
             "source": {
@@ -4748,15 +4869,11 @@
             "require": {
                 "bower-asset/jquery": ">=1.7"
             },
-            "require-dev": {
-                "bower-asset/jasmine-ajax": "~1.3.1",
-                "bower-asset/jasmine-jquery": "~1.5.2",
-                "bower-asset/jquery": "~1.7"
-            },
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "dist/typeahead.bundle.js"
-            }
+            },
+            "time": "2015-04-27T04:02:14+00:00"
         },
         {
             "name": "codeception/base",
@@ -7035,7 +7152,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "backendtea@gmail.com"
+                    "email": "BackEndTea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
@@ -7408,7 +7525,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.1",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-pcntl": "*"
     },
     "platform-dev": []
 }

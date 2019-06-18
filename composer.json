@@ -48,7 +48,10 @@
     "kartik-v/yii2-builder": "~1.6.6",
     "2amigos/yii2-leaflet-extension": "~1.0",
     "2amigos/yii2-leaflet-geocoder-plugin": "~1.0",
-    "ext-json": "*"
+    "ext-json": "*",
+    "inpassor/yii2-daemon": "0.3.4",
+    "php-amqplib/php-amqplib": "^2.7",
+    "ext-pcntl": "*"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.0.0",
