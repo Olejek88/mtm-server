@@ -9,6 +9,7 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "device_register".
  *
+ * @property int $_id
  * @property string $uuid
  * @property string $oid идентификатор организации
  * @property string $deviceUuid

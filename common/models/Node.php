@@ -20,7 +20,7 @@ use yii\db\Expression;
  * @property string $changedAt
  * @property boolean $deleted
  *
- * @property Node $node
+ * @property ActiveQuery $deviceStatus
  * @property Object $object
  */
 class Node extends MtmActiveRecord

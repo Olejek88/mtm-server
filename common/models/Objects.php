@@ -25,6 +25,7 @@ use yii\db\Expression;
  *
  * @property House $house
  * @property string $address
+ * @property string $fullTitle
  * @property ObjectType $objectType
  */
 class Objects extends MtmActiveRecord
@@ -55,7 +56,7 @@ class Objects extends MtmActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'objectTypeUuid', 'houseUuid'], 'required'],
+            [['uuid', 'objectTypeUuid', 'houseUuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
             [['uuid', 'title', 'objectTypeUuid', 'houseUuid', 'oid'], 'string', 'max' => 50],
