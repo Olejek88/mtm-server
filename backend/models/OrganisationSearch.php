@@ -2,10 +2,11 @@
 
 namespace backend\models;
 
-use common\models\City;
 use common\models\Organisation;
+use common\models\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use Yii;
 
 /**
  * ContragentSearch represents the model behind the search form about `common\models\Organisation`.
@@ -41,7 +42,7 @@ class OrganisationSearch extends Organisation
      */
     public function search($params)
     {
-        $query = Organisation::find();
+        $query = Organisation::find()->where(['uuid' => User::getOid(Yii::$app->user->identity)]);
 
         // add conditions that should always apply here
 

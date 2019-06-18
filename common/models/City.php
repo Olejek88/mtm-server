@@ -2,9 +2,9 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -17,7 +17,7 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  */
-class City extends ActiveRecord
+class City extends MtmActiveRecord
 {
     public function behaviors()
     {
@@ -48,6 +48,7 @@ class City extends ActiveRecord
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['uuid', 'title', 'oid'], 'string', 'max' => 50],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

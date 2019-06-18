@@ -2,9 +2,9 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "device_register".
@@ -19,8 +19,7 @@ use yii\db\ActiveRecord;
  *
  * @property Device $device
  */
-
-class DeviceRegister extends ActiveRecord
+class DeviceRegister extends MtmActiveRecord
 {
     /**
      * @inheritdoc
@@ -40,6 +39,7 @@ class DeviceRegister extends ActiveRecord
             [['data'], 'safe'],
             [['uuid', 'deviceUuid', 'oid'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 250],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

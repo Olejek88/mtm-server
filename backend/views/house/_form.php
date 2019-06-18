@@ -28,7 +28,7 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php echo $form->field($model, 'number')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
     $streets = Street::find()->orderBy('cityUuid')->all();

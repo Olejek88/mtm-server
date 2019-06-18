@@ -2,10 +2,10 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -24,7 +24,7 @@ use yii\db\Expression;
  * @property Street $street
  * @property HouseType $houseType
  */
-class House extends ActiveRecord
+class House extends MtmActiveRecord
 {
     public function behaviors()
     {
@@ -55,6 +55,7 @@ class House extends ActiveRecord
             [['uuid', 'streetUuid'], 'required'],
             [['createdAt', 'changedAt', 'deleted'], 'safe'],
             [['uuid', 'number', 'houseTypeUuid', 'streetUuid', 'oid'], 'string', 'max' => 50],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

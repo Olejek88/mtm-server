@@ -1,10 +1,10 @@
 <?php
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -26,8 +26,7 @@ use yii\db\Expression;
  * @property DeviceStatus $deviceStatus
  * @property Node $node
  */
-
-class Camera extends ActiveRecord
+class Camera extends MtmActiveRecord
 {
 
     /**
@@ -118,6 +117,7 @@ class Camera extends ActiveRecord
                 ],
                 'string', 'max' => 150
             ],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

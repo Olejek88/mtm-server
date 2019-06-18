@@ -3,10 +3,6 @@
 namespace backend\controllers;
 
 use backend\models\NodeSearch;
-use backend\models\UserSearch;
-use common\models\Camera;
-use common\models\City;
-use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\Node;
@@ -22,11 +18,11 @@ use common\models\Threads;
 use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
 
 /**
  * NodeController implements the CRUD actions for Node model.
@@ -43,6 +39,15 @@ class NodeController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -50,21 +55,6 @@ class NodeController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * Init
-     *
-     * @return void
-     * @throws UnauthorizedHttpException
-     */
-    public function init()
-    {
-
-        if (\Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**

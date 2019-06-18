@@ -23,7 +23,6 @@ use yii\web\IdentityInterface;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
- * @property int $id
  * @property string $authKey
  * @property string $password write-only password
  * @property string $type
@@ -33,8 +32,9 @@ use yii\web\IdentityInterface;
  * @property string $image
  * @property boolean $deleted
  *
+ * @property int $id
  * @property string $photoUrl
- * @property null|string $imageDir
+ * @property string $imageDir
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -77,7 +77,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function behaviors()
     {
         return [
-            TimestampBehavior::class,
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'created_at',
+                    ActiveRecord::EVENT_BEFORE_UPDATE => 'updated_at',
+                ],
+                'value' => function () {
+                    return date('Y-m-d H-i-s');
+                },
+            ],
         ];
     }
 
@@ -107,6 +116,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['deleted'], 'boolean'],
             [['uuid', 'whoIs'], 'string', 'max' => 45],
             [['name', 'contact'], 'string', 'max' => 100],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 
@@ -337,5 +347,15 @@ class User extends ActiveRecord implements IdentityInterface
         throw new NotSupportedException(
             '"findIdentityByAccessToken" is not implemented.'
         );
+    }
+
+    /**
+     * @param $identity IdentityInterface
+     * @return string
+     */
+    public static function getOid($identity)
+    {
+        /** @var $identity User */
+        return $identity->oid;
     }
 }
