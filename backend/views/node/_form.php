@@ -6,7 +6,6 @@ use common\models\DeviceType;
 use common\models\Node;
 use common\models\Objects;
 use common\models\User;
-use common\models\Users;
 use kartik\date\DatePicker;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
@@ -58,7 +57,7 @@ use yii\widgets\ActiveForm;
         ]);
     ?>
 
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
     $object = Objects::find()->all();

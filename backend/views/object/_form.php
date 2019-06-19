@@ -37,7 +37,7 @@ $lngDefault = 61.402738;
     ?>
 
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
     $houses = House::find()->all();

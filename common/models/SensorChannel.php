@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -18,8 +19,11 @@ use yii\db\ActiveRecord;
  * @property string $measureTypeUuid
  * @property string $createdAt
  * @property string $changedAt
+ *
+ * @property \yii\db\ActiveQuery $measureType
+ * @property \yii\db\ActiveQuery $device
  */
-class SensorChannel extends ActiveRecord
+class SensorChannel extends MtmActiveRecord
 {
     /**
      * @inheritdoc
@@ -39,6 +43,7 @@ class SensorChannel extends ActiveRecord
             [['oid','createdAt', 'changedAt'], 'safe'],
             [['uuid', 'deviceUuid', 'register', 'measureTypeUuid'], 'string', 'max' => 50],
             [['title'], 'string', 'max' => 100],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

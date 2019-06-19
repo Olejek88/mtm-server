@@ -5,6 +5,7 @@ namespace backend\models;
 use common\models\User;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use Yii;
 
 /**
  * UserSearch represents the model behind the search form about `backend\models\User`.
@@ -41,6 +42,7 @@ class UserSearch extends User
     public function search($params)
     {
         $query = User::find();
+        $query->where(['oid' => User::getOid(Yii::$app->user->identity)]);
 
         // add conditions that should always apply here
 

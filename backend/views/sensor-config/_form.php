@@ -40,7 +40,7 @@ use yii\widgets\ActiveForm;
             ],
         ]);
     ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?= $form->field($model, 'config')->textInput(['maxlength' => true]) ?>
 
