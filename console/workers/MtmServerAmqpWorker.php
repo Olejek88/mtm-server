@@ -5,6 +5,7 @@ namespace console\workers;
 use common\models\Device;
 use common\models\LightStatus;
 use common\models\mtm\MtmDevLightStatus;
+use common\models\Node;
 use common\models\Organisation;
 use inpassor\daemon\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -82,13 +83,13 @@ class MtmServerAmqpWorker extends Worker
     {
         $this->log('run...');
         while ($this->run) {
-            $this->log('tick...');
+//            $this->log('tick...');
             // TODO: придумать механизм который позволит выбирать все сообщения в очереди, а не по одному с задержкой в секунду
             try {
                 if (count($this->channel->callbacks)) {
-                    $this->log('wait for message...');
+//                    $this->log('wait for message...');
                     $this->channel->wait(null, true);
-                    $this->log('end wait...');
+//                    $this->log('end wait...');
                 }
             } catch (ErrorException $e) {
                 $this->log($e->getMessage());
@@ -111,23 +112,43 @@ class MtmServerAmqpWorker extends Worker
      */
     public function callback($msg)
     {
-        $this->log('get msg');
+//        $this->log('get msg');
         $content = json_decode($msg->body);
         $type = $content->type;
         $oid = $content->oid;
-        $address = $content->address;
+        $nid = $content->nid;
+        $address = strtoupper($content->address);
         $data = $content->data;
         switch ($type) {
             case 'lightstatus' :
                 $status = new MtmDevLightStatus();
                 if ($status->loadBase64Data($data)) {
-                    $this->log('Не удалось разобрать данные статуса светильника!!!');
+                    $this->log('Parse error light data.');
                 } else {
-                    $this->log('Успешно разобрали данные статуса светильника!!!');
-                    $orgUuid = Organisation::findOne($oid)->uuid;
-                    $this->log('org uuid' . $orgUuid);
-                    $deviceUuid = Device::find()->where(['oid' => $orgUuid, 'address' => $address])->one()->uuid;
-                    $this->log('dev uuid' . $deviceUuid);
+//                    $this->log('Успешно разобрали данные статуса светильника!!!');
+
+                    $orgUuid = null;
+                    $nodeUuid = null;
+                    $deviceUuid = null;
+
+                    $organisation = Organisation::findOne($oid);
+                    if ($organisation != null) {
+                        $orgUuid = $organisation->uuid;
+                    }
+
+                    $node = Node::findOne($nid);
+                    if ($node != null) {
+                        $nodeUuid = $node->uuid;
+                    }
+
+                    $device = Device::find()->where(['oid' => $orgUuid, 'nodeUuid' => $nodeUuid, 'address' => $address])->one();
+                    if ($device != null) {
+                        $deviceUuid = $device->uuid;
+                    } else {
+                        $this->log('Not found device: oid=' . $oid . ', $bid=' . $nid . ', address=' . $address);
+                        return;
+                    }
+
                     $lightStatus = LightStatus::find()->where(['oid' => $orgUuid, 'deviceUuid' => $deviceUuid])->one();
                     if ($lightStatus == null) {
                         $lightStatus = new LightStatus();
@@ -136,7 +157,7 @@ class MtmServerAmqpWorker extends Worker
                     $lightStatus->oid = $orgUuid;
                     $lightStatus->deviceUuid = $deviceUuid;
                     $lightStatus->date = date('Y-m-d H:i:s');
-                    $lightStatus->address = strtoupper($address);
+                    $lightStatus->address = $address;
                     $lightStatus->setAlerts($status->alert);
                     $lightStatus->setStatus($status->data);
                     if ($lightStatus->save()) {
@@ -144,7 +165,7 @@ class MtmServerAmqpWorker extends Worker
                         $channel = $msg->delivery_info['channel'];
                         $channel->basic_ack($msg->delivery_info['delivery_tag']);
                     } else {
-                        $this->log('Не удалось записать статус...');
+                        $this->log('Не удалось записать статус светильника...');
                         foreach ($lightStatus->getErrors() as $error) {
                             $this->log($error);
                         }
