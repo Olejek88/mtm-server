@@ -2,7 +2,10 @@
 
 namespace console\workers;
 
+use common\models\Device;
+use common\models\LightStatus;
 use common\models\mtm\MtmDevLightStatus;
+use common\models\Organisation;
 use inpassor\daemon\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -11,6 +14,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use ErrorException;
 use Exception;
+use yii\base\InvalidConfigException;
 
 class MtmServerAmqpWorker extends Worker
 {
@@ -103,25 +107,52 @@ class MtmServerAmqpWorker extends Worker
 
     /**
      * @param AMQPMessage $msg
+     * @throws InvalidConfigException
      */
     public function callback($msg)
     {
         $this->log('get msg');
         $content = json_decode($msg->body);
-        // TODO: реализовать работу с полученными данными
+        $type = $content->type;
         $oid = $content->oid;
-        $bid = $content->bid;
         $address = $content->address;
         $data = $content->data;
-        $status = new MtmDevLightStatus();
-        if ($status->loadBase64Data($data)) {
-            $this->log('Не удалось разобрать данные статуса светильника!!!');
-        } else {
-            // TODO: реализовать сохранение полученных данных в базу
-            $this->log('Успешно разобрали данные статуса светильника!!!');
-            /** @var AMQPChannel $channel */
-            $channel = $msg->delivery_info['channel'];
-            $channel->basic_ack($msg->delivery_info['delivery_tag']);
+        switch ($type) {
+            case 'lightstatus' :
+                $status = new MtmDevLightStatus();
+                if ($status->loadBase64Data($data)) {
+                    $this->log('Не удалось разобрать данные статуса светильника!!!');
+                } else {
+                    $this->log('Успешно разобрали данные статуса светильника!!!');
+                    $orgUuid = Organisation::findOne($oid)->uuid;
+                    $this->log('org uuid' . $orgUuid);
+                    $deviceUuid = Device::find()->where(['oid' => $orgUuid, 'address' => $address])->one()->uuid;
+                    $this->log('dev uuid' . $deviceUuid);
+                    $lightStatus = LightStatus::find()->where(['oid' => $orgUuid, 'deviceUuid' => $deviceUuid])->one();
+                    if ($lightStatus == null) {
+                        $lightStatus = new LightStatus();
+                    }
+
+                    $lightStatus->oid = $orgUuid;
+                    $lightStatus->deviceUuid = $deviceUuid;
+                    $lightStatus->date = date('Y-m-d H:i:s');
+                    $lightStatus->address = strtoupper($address);
+                    $lightStatus->setAlerts($status->alert);
+                    $lightStatus->setStatus($status->data);
+                    if ($lightStatus->save()) {
+                        /** @var AMQPChannel $channel */
+                        $channel = $msg->delivery_info['channel'];
+                        $channel->basic_ack($msg->delivery_info['delivery_tag']);
+                    } else {
+                        $this->log('Не удалось записать статус...');
+                        foreach ($lightStatus->getErrors() as $error) {
+                            $this->log($error);
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
