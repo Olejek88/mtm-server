@@ -3,6 +3,9 @@
 namespace backend\controllers;
 
 use backend\models\NodeSearch;
+use backend\models\UserSearch;
+use common\models\Camera;
+use common\models\City;
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -11,8 +14,12 @@ use common\models\Objects;
 use common\models\House;
 use common\models\Measure;
 use common\models\Message;
+use common\models\Organisation;
 use common\models\Photo;
+use common\models\SensorChannel;
 use common\models\Street;
+use common\models\Threads;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
@@ -155,6 +162,26 @@ class NodeController extends Controller
         return $this->render('new', ['equipments' => $equipments]);
     }
 
+    /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @param $type
+     * @return string
+     */
+    public function actionDashboard($uuid, $type)
+    {
+        $node = Node::find()
+            ->where(['uuid' => $uuid])
+            ->one();
+        return $this->render(
+            'dashboard',
+            [
+                'node' => $node,
+                'type' => $type
+            ]
+        );
+    }
 
     /**
      * Updates an existing Node model.
@@ -326,11 +353,11 @@ class NodeController extends Controller
                                 ['user-house/delete', 'id' => $user_house['_id']], ['target' => '_blank']
                             );
 
-                        if ($equipment['equipmentStatusUuid'] == NodeStatus::NOT_MOUNTED) {
+                        if ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
                             $class = 'critical1';
-                        } elseif ($equipment['equipmentStatusUuid'] == NodeStatus::NOT_WORK) {
+                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::NOT_WORK) {
                             $class = 'critical2';
-                        } elseif ($equipment['equipmentStatusUuid'] == NodeStatus::UNKNOWN) {
+                        } elseif ($equipment['equipmentStatusUuid'] == DeviceStatus::UNKNOWN) {
                             $class = 'critical4';
                         } else {
                             $class = 'critical3';

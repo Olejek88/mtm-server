@@ -4,6 +4,10 @@ namespace backend\controllers;
 
 use backend\models\UserSearch;
 use common\components\MainFunctions;
+use common\models\Journal;
+use common\models\Measure;
+use common\models\Message;
+use common\models\Photo;
 use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
@@ -59,21 +63,6 @@ class UserController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Users model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-
-        $model = User::find()->where(['_id' => $id])->one();
-
-        return $this->render('view', [
-            'model' => $model,
         ]);
     }
 
@@ -297,6 +286,66 @@ class UserController extends Controller
         $event .= '<div class="timeline-body">' . $text . '</div>';
         $event .= '</div></li>';
         return $event;
+    }
+
+    /**
+     * Displays a single Users model.
+     *
+     * @param integer $id Id.
+     *
+     * @return mixed
+     * @throws NotFoundHttpException
+     */
+    public function actionView($id)
+    {
+        $model = $this->findModel($id);
+        $oldImage = $model->image;
+        // сохраняем старое значение image
+        if ($model->load(Yii::$app->request->post())) {
+            // получаем изображение для последующего сохранения
+            $file = UploadedFile::getInstance($model, 'image');
+            if ($file && $file->tempName) {
+                $fileName = self::_saveFile($model, $file);
+                if ($fileName) {
+                    $model->image = $fileName;
+                } else {
+                    $model->image = $oldImage;
+                    // уведомить пользователя, админа о невозможности сохранить файл
+                }
+            } else {
+                $model->image = $oldImage;
+            }
+
+            // FIXME: !!!! почему обновление записи происходит в методе view вместо update?!
+            if ($model->save()) {
+                MainFunctions::register('Обновлен профиль пользователя ' . $model->name);
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else
+                return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        $user = $this->findModel($id);
+        if ($user) {
+            $events = [];
+            $journals = Journal::find()
+                ->where(['=', 'userUuid', $user['uuid']])
+                ->limit(5)
+                ->all();
+            foreach ($journals as $journal) {
+                $text = $journal['description'];
+                $events[] = ['date' => $journal['date'], 'event' => self::formEvent($journal['date'], 'journal', 0,
+                    $journal['description'], $text)];
+            }
+
+            $sort_events = MainFunctions::array_msort($events, ['date' => SORT_DESC]);
+            return $this->render(
+                'view',
+                [
+                    'model' => $user,
+                    'events' => $sort_events
+                ]
+            );
+        }
     }
 
 }

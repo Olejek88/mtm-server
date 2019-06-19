@@ -30,8 +30,7 @@ $lngDefault = 61.402738;
 
     <?php
     if (!$model->isNewRecord) {
-        echo $form->field($model, 'uuid')
-            ->textInput(['maxlength' => true, 'readonly' => true]);
+        echo $form->field($model, 'uuid')->hiddenInput()->label(false);
     } else {
         echo $form->field($model, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
     }
@@ -74,8 +73,8 @@ $lngDefault = 61.402738;
         ]);
     ?>
 
-    <?php echo $form->field($model, 'latitude')->hiddenInput(['maxlength' => true, 'value' => $latDefault])->label(false) ?>
-    <?php echo $form->field($model, 'longitude')->hiddenInput(['maxlength' => true, 'value' => $lngDefault])->label(false) ?>
+    <?php echo $form->field($model, 'latitude')->textInput(['maxlength' => true, 'value' => $latDefault]) ?>
+    <?php echo $form->field($model, 'longitude')->textInput(['maxlength' => true, 'value' => $lngDefault]) ?>
 
     <?php
     // lets use nominating service
@@ -151,7 +150,6 @@ $lngDefault = 61.402738;
         echo '<div id="map"/>';
     }
 
-    // echo $leaflet->widget();
     ?>
 
     <div class="form-group text-center">

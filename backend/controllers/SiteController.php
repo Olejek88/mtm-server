@@ -1,19 +1,32 @@
 <?php
+
 namespace backend\controllers;
 
 use backend\models\UserSearch;
 use backend\models\UsersSearch;
+use common\components\MainFunctions;
+use common\models\Camera;
 use common\models\City;
-use common\models\Node;
-use common\models\Organisation;
+use common\models\Defect;
 use common\models\Device;
+use common\models\DeviceStatus;
 use common\models\DeviceType;
-use common\models\Objects;
+use common\models\EquipmentRegister;
+use common\models\ExternalEvent;
+use common\models\House;
+use common\models\Journal;
 use common\models\LoginForm;
 use common\models\Measure;
+use common\models\Node;
+use common\models\Objects;
+use common\models\Orders;
+use common\models\OrderStatus;
+use common\models\Organisation;
 use common\models\SensorChannel;
+use common\models\SensorConfig;
 use common\models\Street;
 use common\models\User;
+use common\models\UsersAttribute;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -75,7 +88,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * Displays map.
      *
      * @return string
      */
@@ -83,17 +96,131 @@ class SiteController extends Controller
     {
         /**
          * Работа с картой
-         * [$online, $offline, $gpsOn, $gps description]
-         *
-         * @var $gpsOn - Список геоданных по онлайн пользователям
-         * @var $gps - Список геоданных по оффлайн пользователям
          */
-        $lats = array();
+        $objectSelect = Objects::find()
+            ->select('_id, title, latitude, longitude')
+            ->asArray()
+            ->all();
+
+        $cnt = 0;
+        $objectsGroup = 'var objects=L.layerGroup([';
+        $objectsList = '';
+        foreach ($objectSelect as $object) {
+            $objectsList .= 'var object' . $object["_id"]
+                . '= L.marker([' . $object["latitude"]
+                . ',' . $object["longitude"] . ']).bindPopup("<b>'
+                . $object["title"] . '</b>").openPopup();';
+            if ($cnt > 0) {
+                $objectsGroup .= ',';
+            }
+
+            $objectsGroup .= 'object' . $object["_id"];
+            $cnt++;
+        }
+
+        $objectsGroup .= ']);' . PHP_EOL;
+
+        $devices = Device::find()->all();
+
+        $cnt = 0;
+        $default_coordinates = "[55.54,61.36]";
+        $coordinates = $default_coordinates;
+        $equipmentsGroup = 'var devices=L.layerGroup([';
+        $equipmentsList = '';
+        foreach ($devices as $device) {
+            if ($device["object"]["latitude"] > 0) {
+                $equipmentsList .= 'var device'
+                    . $device["_id"]
+                    . '= L.marker([' . $device["object"]["latitude"]
+                    . ',' . $device["object"]["longitude"]
+                    . '], {icon: houseIcon}).bindPopup(\'<b>'
+                    . Html::a($device["deviceType"]["title"],
+                        ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
+                    . '</b><br/>'
+                    . $device["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
+                }
+                if ($cnt > 0) {
+                    $equipmentsGroup .= ',';
+                }
+
+                $equipmentsGroup .= 'device' . $device["_id"];
+                $cnt++;
+            }
+        }
+        $equipmentsGroup .= ']);' . PHP_EOL;
+
+        $cameras = Camera::find()->all();
+        $cnt = 0;
+        $camerasGroup = 'var cameras=L.layerGroup([';
+        $camerasList = '';
+        foreach ($cameras as $camera) {
+            if ($camera["object"]["latitude"] > 0) {
+                $camerasList .= 'var camera'
+                    . $camera["_id"]
+                    . '= L.marker([' . $camera["object"]["latitude"]
+                    . ',' . $camera["object"]["longitude"]
+                    . '], {icon: cameraIcon}).bindPopup(\'<b>'
+                    . Html::a($camera["title"],
+                        ['/node/dashboard', 'uuid' => $camera['node']['uuid'], 'type' => 'camera']) . '</span>'
+                    . '</b><br/>'
+                    . $camera["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $camera["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
+                }
+                if ($cnt > 0) {
+                    $camerasGroup .= ',';
+                }
+
+                $camerasGroup .= 'camera' . $camera["_id"];
+                $cnt++;
+            }
+        }
+        $camerasGroup .= ']);' . PHP_EOL;
+
+        $nodes = Node::find()->all();
+        $cnt = 0;
+        $nodesGroup = 'var nodes=L.layerGroup([';
+        $nodesList = '';
+        foreach ($nodes as $node) {
+            if ($node["object"]["latitude"] > 0) {
+                $nodesList .= 'var node'
+                    . $node["_id"]
+                    . '= L.marker([' . $node["object"]["latitude"]
+                    . ',' . $node["object"]["longitude"]
+                    . '], {icon: nodeIcon}).bindPopup(\'<b>'
+                    . Html::a($node["address"],
+                        ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
+                    . '</b><br/>'
+                    . $node["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
+                }
+                if ($cnt > 0) {
+                    $nodesGroup .= ',';
+                }
+                $nodesGroup .= 'node' . $node["_id"];
+                $cnt++;
+            }
+        }
+        $nodesGroup .= ']);' . PHP_EOL;
 
         return $this->render(
             'index',
             [
-                'lats' => $lats,
+                'objectsGroup' => $objectsGroup,
+                'objectsList' => $objectsList,
+                'devicesGroup' => $equipmentsGroup,
+                'devicesList' => $equipmentsList,
+                'camerasGroup' => $camerasGroup,
+                'camerasList' => $camerasList,
+                'nodesGroup' => $nodesGroup,
+                'nodesList' => $nodesList,
+                'coordinates' => $coordinates
             ]
         );
     }
@@ -115,15 +242,15 @@ class SiteController extends Controller
             ->asArray()
             ->one();
 
-        $cityCount = City::find()->count();
-        $streetCount = Street::find()->count();
-        $objectsCount = Objects::find()->count();
-        $deviceCount = Device::find()->count();
-        $contragentCount = Organisation::find()->count();
-        $nodesCount = Node::find()->count();
-        $sensorChannelsCount = SensorChannel::find()->count();
-        $deviceTypeCount = DeviceType::find()->count();
-        $usersCount = User::find()->count();
+        $counts['city'] = City::find()->count();
+        $counts['street'] = Street::find()->count();
+        $counts['objects'] = Objects::find()->count();
+        $counts['device'] = Device::find()->count();
+        $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])->count();
+        $counts['light'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])->count();
+        $counts['channel'] = SensorChannel::find()->count();
+        $counts['node'] = Node::find()->count();
+        $counts['deviceType'] = DeviceType::find()->count();
 
         $last_measures = Measure::find()
             ->where('createdAt > (NOW()-(4*24*3600000));')
@@ -134,63 +261,133 @@ class SiteController extends Controller
             ->orderBy('date')
             ->all();
 
-        $equipments = Device::find()
-            ->orderBy('_id DESC')
-            ->limit(20)
-            ->all();
-
         $users = User::find()
             ->all();
 
         /**
          * Работа с картой
          */
-        $deviceData = array();
-        $devices = Device::find()->select('*')->all();
-        $deviceList[] = $devices;
-        $deviceCount = count($devices);
-        $cnt = 0;
-        $equipmentsGroup = 'var equipments=L.layerGroup([';
-        $equipmentsList = '';
-        foreach ($devices as $device) {
-            if ($device["object"]["latitude"] > 0) {
-                $equipmentsList .= 'var equipment'
-                    . $device["_id"]
-                    . '= L.marker([' . $device["latitude"]
-                    . ',' . $device["longitude"]
-                    . '], {icon: equipmentIcon}).bindPopup("<b>'
-                    . $device["title"] . '</b><br/>'
-                    . $device["devieType"]["title"] . '").openPopup();';
-                if ($cnt > 0) {
-                    $equipmentsGroup .= ',';
-                }
+        $layers = self::getLayers();
 
-                $equipmentsGroup .= 'equipment' . $device["_id"];
-                $cnt++;
+        ini_set('memory_limit', '-1');
+        $fullTree = array();
+        $streets = Street::find()
+            ->select('*')
+            ->orderBy('title')
+            ->all();
+        foreach ($streets as $street) {
+            $fullTree['children'][] = [
+                'title' => $street['title'],
+                'folder' => true,
+                'expanded' => true
+            ];
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
+            orderBy('number')->all();
+            foreach ($houses as $house) {
+                $childIdx = count($fullTree['children']) - 1;
+                $fullTree['children'][$childIdx]['children'][] = [
+                    'title' => $house->getFullTitle(),
+                    'folder' => true,
+                    'expanded' => true
+                ];
+                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                foreach ($objects as $object) {
+                    $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
+                    $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
+                        'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'folder' => true,
+                        'expanded' => true
+                    ];
+                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    foreach ($nodes as $node) {
+                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
+                        if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                            $class = 'critical1';
+                        } elseif ($node['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                            $class = 'critical2';
+                        } else {
+                            $class = 'critical3';
+                        }
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
+                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
+                            'title' => 'Контроллер [' . $node['address'] . ']',
+                            'register' => $node['address'],
+                            'expanded' => true,
+                            'folder' => true
+                        ];
+                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        if (isset($_GET['type']))
+                            $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                                ->andWhere(['deviceTypeUuid' => $_GET['type']])
+                                ->all();
+                        foreach ($devices as $device) {
+                            $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                                $class = 'critical1';
+                            } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                                $class = 'critical2';
+                            } else {
+                                $class = 'critical3';
+                            }
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
+                                'title' => $device['deviceType']['title'],
+                                'status' => '<div class="progress"><div class="'
+                                    . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                                'register' => $device['port'].' ['.$device['address'].']',
+                                'measure' => '',
+                                'date' => $device['date'],
+                                'folder' => true
+                            ];
+                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                            foreach ($channels as $channel) {
+                                $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
+                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                $date = '-';
+                                if (!$measure) {
+                                    $config = null;
+                                    $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                    if ($config) {
+                                        $measure = Html::a('конфигурация', ['sensor-config/view', 'id' => $config['_id']]);
+                                        $date = $config['changedAt'];
+                                    }
+                                } else {
+                                    $date = $measure['date'];
+                                    $measure = $measure['value'];
+                                }
+                                $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
+                                    'title' => $channel['title'],
+                                    'register' => $channel['register'],
+                                    'value' => $measure,
+                                    'date' => $date,
+                                    'folder' => false
+                                ];
+                            }
+                        }
+                    }
+                }
             }
         }
-        $equipmentsGroup .= ']);' . PHP_EOL;
+        $devices = Device::find()->all();
 
         return $this->render(
             'dashboard',
             [
-                'cityCount' => $cityCount,
-                'streetCount' => $streetCount,
-                'usersCount' => $usersCount,
-                'objectCount' => $objectsCount,
-                'nodesCount' => $nodesCount,
-                'channelsCount' => $sensorChannelsCount,
-                'deviceTypeCount' => $deviceTypeCount,
-                'deviceCount' => $deviceCount,
+                'counts' => $counts,
                 'measures' => $measures,
-                'equipments' => $equipments,
+                'devices' => $devices,
                 'users' => $users,
-                'equipmentsGroup' => $equipmentsGroup,
+                'tree' => $fullTree,
+                'devicesList' => $layers['devicesList'],
+                'devicesGroup' => $layers['devicesGroup'],
+                'camerasList' => $layers['camerasList'],
+                'camerasGroup' => $layers['camerasGroup'],
+                'nodesList' => $layers['nodesList'],
+                'nodesGroup' => $layers['nodesGroup'],
                 'last_measures' => $last_measures,
                 'complete' => $complete,
-                'contragentCount' => $contragentCount,
                 'currentUser' => $currentUser,
                 'searchModel' => $searchModel,
+                'coordinates' => $layers['coordinates'],
                 'dataProvider' => $dataProvider
             ]
         );
@@ -295,5 +492,137 @@ class SiteController extends Controller
         $event .= '<div class="timeline-body">' . $text . '</div>';
         $event .= '</div></li>';
         return $event;
+    }
+
+    /**
+     * Displays a timeline
+     *
+     * @return mixed
+     */
+    public function actionTimeline()
+    {
+        $events = [];
+        $journals = Journal::find()
+            ->orderBy('date DESC')
+            ->limit(10)
+            ->all();
+        foreach ($journals as $journal) {
+            $text = '<i class="fa fa-calendar"></i>&nbsp;' . $journal['description'];
+            $events[] = ['date' => $journal['date'], 'event' => self::formEvent($journal['date'], 'journal', 0,
+                $journal['description'], $text, $journal['user']->name)];
+        }
+
+        $sort_events = MainFunctions::array_msort($events, ['date' => SORT_DESC]);
+        $today = date("j-m-Y h:m");
+
+        return $this->render(
+            'timeline',
+            [
+                'events' => $sort_events,
+                'today_date' => $today
+            ]
+        );
+    }
+
+    public function getLayers()
+    {
+        $devices = Device::find()->all();
+
+        $cnt = 0;
+        $default_coordinates = "[55.54,61.36]";
+        $coordinates = $default_coordinates;
+        $equipmentsGroup = 'var devices=L.layerGroup([';
+        $equipmentsList = '';
+        foreach ($devices as $device) {
+            if ($device["object"]["latitude"] > 0) {
+                $equipmentsList .= 'var device'
+                    . $device["_id"]
+                    . '= L.marker([' . $device["object"]["latitude"]
+                    . ',' . $device["object"]["longitude"]
+                    . '], {icon: houseIcon}).bindPopup(\'<b>'
+                    . Html::a($device["deviceType"]["title"],
+                        ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
+                    . '</b><br/>'
+                    . $device["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
+                }
+                if ($cnt > 0) {
+                    $equipmentsGroup .= ',';
+                }
+
+                $equipmentsGroup .= 'device' . $device["_id"];
+                $cnt++;
+            }
+        }
+        $equipmentsGroup .= ']);' . PHP_EOL;
+
+        $cameras = Camera::find()->all();
+        $cnt = 0;
+        $camerasGroup = 'var cameras=L.layerGroup([';
+        $camerasList = '';
+        foreach ($cameras as $camera) {
+            if ($camera["object"]["latitude"] > 0) {
+                $camerasList .= 'var camera'
+                    . $camera["_id"]
+                    . '= L.marker([' . $camera["object"]["latitude"]
+                    . ',' . $camera["object"]["longitude"]
+                    . '], {icon: cameraIcon}).bindPopup(\'<b>'
+                    . Html::a($camera["title"],
+                        ['/node/dashboard', 'uuid' => $camera['node']['uuid'], 'type' => 'camera']) . '</span>'
+                    . '</b><br/>'
+                    . $camera["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $camera["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
+                }
+                if ($cnt > 0) {
+                    $camerasGroup .= ',';
+                }
+
+                $camerasGroup .= 'camera' . $camera["_id"];
+                $cnt++;
+            }
+        }
+        $camerasGroup .= ']);' . PHP_EOL;
+
+        $nodes = Node::find()->all();
+        $cnt = 0;
+        $nodesGroup = 'var nodes=L.layerGroup([';
+        $nodesList = '';
+        foreach ($nodes as $node) {
+            if ($node["object"]["latitude"] > 0) {
+                $nodesList .= 'var node'
+                    . $node["_id"]
+                    . '= L.marker([' . $node["object"]["latitude"]
+                    . ',' . $node["object"]["longitude"]
+                    . '], {icon: nodeIcon}).bindPopup(\'<b>'
+                    . Html::a($node["address"],
+                        ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
+                    . '</b><br/>'
+                    . $node["object"]->getAddress() . '\').openPopup();';
+                $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
+                if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
+                    $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
+                }
+                if ($cnt > 0) {
+                    $nodesGroup .= ',';
+                }
+                $nodesGroup .= 'node' . $node["_id"];
+                $cnt++;
+            }
+        }
+        $nodesGroup .= ']);' . PHP_EOL;
+
+        $layer['coordinates'] = $coordinates;
+        $layer['nodesList'] = $nodesList;
+        $layer['nodesGroup'] = $nodesGroup;
+        $layer['devicesList'] = $equipmentsList;
+        $layer['devicesGroup'] = $equipmentsGroup;
+        $layer['camerasList'] = $camerasList;
+        $layer['camerasGroup'] = $camerasGroup;
+
+        return $layer;
     }
 }

@@ -77,12 +77,6 @@ class House extends ActiveRecord
         ];
     }
 
-
-    public function getStreet()
-    {
-        return $this->hasOne(Street::class, ['uuid' => 'streetUuid']);
-    }
-
     /**
      * @inheritdoc
      */
@@ -109,15 +103,18 @@ class House extends ActiveRecord
         return $this->hasMany(Photo::class, ['houseUuid' => 'uuid']);
     }
 
-    /**
-     * @return ActiveQuery
-     */
+    public function getStreet()
+    {
+        return $this->hasOne(Street::class, ['uuid' => 'streetUuid']);
+    }
+
     public function getHouseType()
     {
         return $this->hasOne(HouseType::class, ['uuid' => 'houseTypeUuid']);
     }
 
     public function getFullTitle() {
+//        echo json_encode($this->houseType);
         return 'ул.'.$this->street['title'].', д.'.$this->number;
     }
 }

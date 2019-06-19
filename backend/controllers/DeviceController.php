@@ -7,15 +7,18 @@ use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
-use common\models\Objects;
 use common\models\House;
 use common\models\Measure;
-use common\models\Message;
+use common\models\Node;
+use common\models\Objects;
 use common\models\Photo;
+use common\models\SensorChannel;
+use common\models\SensorConfig;
 use common\models\Street;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -72,10 +75,13 @@ class DeviceController extends Controller
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'port') {
-                $model['tag'] = $_POST['Device'][$_POST['editableIndex']]['port'];
+                $model['port'] = $_POST['Device'][$_POST['editableIndex']]['port'];
             }
             if ($_POST['editableAttribute'] == 'deviceTypeUuid') {
                 $model['deviceTypeUuid'] = $_POST['Device'][$_POST['editableIndex']]['deviceTypeUuid'];
+            }
+            if ($_POST['editableAttribute'] == 'interface') {
+                $model['interface'] = $_POST['Device'][$_POST['editableIndex']]['interface'];
             }
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
                 $model['deviceStatusUuid'] = $_POST['Device'][$_POST['editableIndex']]['deviceStatusUuid'];
@@ -136,6 +142,8 @@ class DeviceController extends Controller
             }
             // сохраняем запись
             if ($model->save(false)) {
+                MainFunctions::register("Добавлено новое оборудование ".$model['deviceType']['title'].' '.
+                    $model['node']['object']->getAddress().' ['.$model['node']['address'].']');
                 return $this->redirect(['view', 'id' => $model->_id]);
             }
             echo json_encode($model->errors);
@@ -168,8 +176,6 @@ class DeviceController extends Controller
                 $device->deviceStatusUuid = DeviceStatus::UNKNOWN;
                 $device->serial = '222222';
                 $device->interface = 1;
-                $device->latitude = 55;
-                $device->longitude = 55;
                 $device->date = date('Y-m-d H:i:s');
                 $device->changedAt = date('Y-m-d H:i:s');
                 $device->createdAt = date('Y-m-d H:i:s');
@@ -229,81 +235,106 @@ class DeviceController extends Controller
      */
     public function actionTree()
     {
-        $c = 'children';
+        ini_set('memory_limit', '-1');
         $fullTree = array();
-        $types = DeviceType::find()
+        $streets = Street::find()
             ->select('*')
             ->orderBy('title')
             ->all();
-        $oCnt0 = 0;
-        foreach ($types as $type) {
-            $fullTree[$oCnt0]['title'] = Html::a(
-                $type['title'],
-                ['device-type/view', 'id' => $type['_id']]
-            );
-            $devices = Device::find()
-                ->select('*')
-                ->where(['deviceTypeUuid' => $type['uuid']])
-                ->orderBy('serial')
-                ->all();
-            $oCnt1 = 0;
-            foreach ($devices as $device) {
-                $fullTree[$oCnt0][$c][$oCnt1]['title']
-                    = Html::a(
-                    'ул.' . $device['house']['street']['title'] . ', д.' . $device['house']['number'] . ', кв.' . $device['flat']['number'],
-                    ['device/view', 'id' => $device['_id']]
-                );
-                if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
-                    $class = 'critical1';
-                } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
-                    $class = 'critical2';
-                } else {
-                    $class = 'critical3';
+        foreach ($streets as $street) {
+            $fullTree['children'][] = [
+                'title' => $street['title'],
+                'folder' => true
+            ];
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
+            orderBy('number')->all();
+            foreach ($houses as $house) {
+                $childIdx = count($fullTree['children']) - 1;
+                $fullTree['children'][$childIdx]['children'][] = [
+                    'title' => $house->getFullTitle(),
+                    'folder' => true
+                ];
+                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                foreach ($objects as $object) {
+                    $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
+                    $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
+                        'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'folder' => true
+                    ];
+                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    foreach ($nodes as $node) {
+                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
+                        if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                            $class = 'critical1';
+                        } elseif ($node['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                            $class = 'critical2';
+                        } else {
+                            $class = 'critical3';
+                        }
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
+                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
+                            'title' => 'Контроллер [' . $node['address'] . ']',
+                            'register' => $node['address'],
+                            'folder' => true
+                        ];
+                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        if (isset($_GET['type']))
+                            $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                                ->andWhere(['deviceTypeUuid' => $_GET['type']])
+                                ->all();
+                        foreach ($devices as $device) {
+                            $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                                $class = 'critical1';
+                            } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                                $class = 'critical2';
+                            } else {
+                                $class = 'critical3';
+                            }
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
+                                'title' => $device['deviceType']['title'],
+                                'status' => '<div class="progress"><div class="'
+                                    . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                                'register' => $device['port'].' ['.$device['address'].']',
+                                'measure' => '',
+                                'date' => $device['date'],
+                                'folder' => true
+                            ];
+                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                            foreach ($channels as $channel) {
+                                $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
+                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                $date = '-';
+                                if (!$measure) {
+                                    $config = null;
+                                    $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                    if ($config) {
+                                        $measure = Html::a('конфигурация', ['sensor-config/view', 'id' => $config['_id']]);
+                                        $date = $config['changedAt'];
+                                    }
+                                } else {
+                                    $date = $measure['date'];
+                                    $measure = $measure['value'];
+                                }
+                                $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
+                                    'title' => $channel['title'],
+                                    'register' => $channel['register'],
+                                    'measure' => $measure,
+                                    'date' => $date,
+                                    'folder' => false
+                                ];
+                            }
+                        }
+                    }
                 }
-                $fullTree[$oCnt0][$c][$oCnt1]['status'] = '<div class="progress"><div class="'
-                    . $class . '">' . $device['deviceStatus']->title . '</div></div>';
-                $fullTree[$oCnt0][$c][$oCnt1]['date'] = $device['testDate'];
-                $fullTree[$oCnt0][$c][$oCnt1]['serial'] = $device['serial'];
-
-                $measure = Measure::find()
-                    ->select('*')
-                    ->where(['deviceUuid' => $device['uuid']])
-                    ->orderBy('date DESC')
-                    ->one();
-                if ($measure) {
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $measure['date'];
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = $measure['value'];
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = $measure['user']->name;
-                } else {
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $device['changedAt'];
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = "не снимались";
-                    $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = "-";
-                }
-
-                $photo = Photo::find()
-                    ->select('*')
-                    ->where(['objectUuid' => $device['uuid']])
-                    ->orderBy('createdAt DESC')
-                    ->one();
-                if ($photo) {
-                    $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = $photo['createdAt'];
-                    $fullTree[$oCnt0][$c][$oCnt1]['photo'] = Html::a(
-                        '<img width="100px" src="/storage/device/' . $photo['uuid'] . '.jpg" />',
-                        ['storage/device/' . $photo['uuid'] . '.jpg']
-                    );
-                    $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = $photo['user']->name;
-                } else {
-                    $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = 'нет фото';
-                    $fullTree[$oCnt0][$c][$oCnt1]['photo'] = '-';
-                    $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = '-';
-                }
-                $oCnt1++;
             }
-            $oCnt0++;
         }
+        $deviceTypes = DeviceType::find()->all();
+        $items = ArrayHelper::map($deviceTypes, 'uuid', 'title');
+
         return $this->render(
             'tree',
-            ['device' => $fullTree]
+            ['device' => $fullTree, 'deviceTypes' => $items]
         );
     }
 
@@ -320,149 +351,6 @@ class DeviceController extends Controller
         ini_set('memory_limit', '-1');
         return $this->render(
             'tree-user'
-        );
-    }
-
-    /**
-     * Build tree of device by user
-     *
-     * @return mixed
-     */
-    public function actionTreeStreet()
-    {
-        ini_set('memory_limit', '-1');
-        $c = 'children';
-        $fullTree = array();
-        $streets = Street::find()
-            ->select('*')
-            ->orderBy('title')
-            ->all();
-        $oCnt0 = 0;
-        foreach ($streets as $street) {
-            $last_user = '';
-            $last_date = '';
-            $house_count = 0;
-            $house_visited = 0;
-            $photo_count = 0;
-            $fullTree[$oCnt0]['title'] = Html::a(
-                $street['title'],
-                ['street/view', 'id' => $street['_id']]
-            );
-            $oCnt1 = 0;
-            $houses = House::find()->select('uuid,number')->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
-            foreach ($houses as $house) {
-                $flats = Objects::find()->select('uuid,number')->where(['houseUuid' => $house['uuid']])->all();
-                foreach ($flats as $flat) {
-                    $house_count++;
-                    $visited = 0;
-                    $devices = Device::find()->where(['flatUuid' => $flat['uuid']])->all();
-                    foreach ($devices as $device) {
-                        $fullTree[$oCnt0][$c][$oCnt1]['title']
-                            = Html::a(
-                            'ул.' . $device['house']['street']['title'] . ', д.' . $device['house']['number'] . ', кв.' . $device['flat']['number'],
-                            ['device/view', 'id' => $device['_id']]
-                        );
-
-                        if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
-                            $class = 'critical1';
-                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
-                            $class = 'critical2';
-                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::UNKNOWN) {
-                            $class = 'critical4';
-                        } else {
-                            $class = 'critical3';
-                        }
-                        $fullTree[$oCnt0][$c][$oCnt1]['status'] = '<div class="progress"><div class="'
-                            . $class . '">' . $device['deviceStatus']->title . '</div></div>';
-                        $fullTree[$oCnt0][$c][$oCnt1]['date'] = $device['testDate'];
-                        //$fullTree[$oCnt0][$c][$oCnt1]['serial'] = $device['serial'];
-
-                        $measure = Measure::find()
-                            ->select('*')
-                            ->where(['deviceUuid' => $device['uuid']])
-                            ->orderBy('date DESC')
-                            ->one();
-                        if ($measure) {
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $measure['date'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = $measure['value'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = $measure['user']->name;
-                            $last_user = $measure['user']->name;
-                            $last_date = $measure['date'];
-                            $house_visited++;
-                            $visited++;
-                        } else {
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $device['changedAt'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_value'] = "не снимались";
-                            $fullTree[$oCnt0][$c][$oCnt1]['measure_user'] = "-";
-                        }
-
-                        $message = Message::find()
-                            ->select('*')
-                            ->orderBy('date DESC')
-                            ->where(['flatUuid' => $device['flat']['uuid']])
-                            ->one();
-                        if ($message != null) {
-                            $fullTree[$oCnt0][$c][$oCnt1]['message'] =
-                                mb_convert_encoding(substr($message['message'], 0, 150), 'UTF-8', 'UTF-8');
-                            if ($visited == 0)
-                                $visited = 1;
-                            $house_visited++;
-                        }
-
-                        $photo = Photo::find()
-                            ->select('*')
-                            ->where(['objectuid' => $device['uuid']])
-                            ->orderBy('createdAt DESC')
-                            ->one();
-                        if ($photo) {
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = $photo['createdAt'];
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo'] = Html::a('фото',
-                                ['storage/device/' . $photo['uuid'] . '.jpg']
-                            );
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = $photo['user']->name;
-                            $last_user = $photo['user']->name;
-                            $photo_count++;
-                            if ($visited == 0) {
-                                $visited = 1;
-                                $house_visited++;
-                            }
-                        } else {
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = 'нет фото';
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo'] = '-';
-                            $fullTree[$oCnt0][$c][$oCnt1]['photo_user'] = '-';
-                        }
-                        $oCnt1++;
-                    }
-                }
-            }
-            $fullTree[$oCnt0]['measure_user'] = $last_user;
-            $fullTree[$oCnt0]['measure_date'] = $last_date;
-            $fullTree[$oCnt0]['photo_user'] = $last_user;
-            $fullTree[$oCnt0]['photo_date'] = $last_date;
-            $fullTree[$oCnt0]['photo'] = $photo_count;
-            $ok = 0;
-            if ($house_count > 0)
-                $ok = $house_visited * 100 / $house_count;
-            if ($ok > 100) $ok = 100;
-            if ($ok < 20) {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical1">' .
-                    number_format($ok, 2) . '%</div></div>';
-            } elseif ($ok < 45) {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical2">' .
-                    number_format($ok, 2) . '%</div></div>';
-            } elseif ($ok < 70) {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical4">' .
-                    number_format($ok, 2) . '%</div></div>';
-            } else {
-                $fullTree[$oCnt0]['status'] = '<div class="progress"><div class="critical3">' .
-                    number_format($ok, 2) . '%</div></div>';
-            }
-            $oCnt0++;
-        }
-        return $this->render(
-            'tree-street',
-            ['device' => $fullTree]
         );
     }
 

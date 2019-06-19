@@ -3,7 +3,7 @@
 /* @var $events */
 /* @var $today_date */
 
-$this->title = Yii::t('app', 'ТОИРУС::Новости');
+$this->title = Yii::t('app', 'МТМ::События системы');
 
 ?>
 

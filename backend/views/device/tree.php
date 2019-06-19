@@ -1,73 +1,84 @@
 <?php
 
+use kartik\select2\Select2;
 use wbraganca\fancytree\FancytreeWidget;
 use yii\web\JsExpression;
 
-$this->title = 'Дерево моделей оборудования';
+/* @var $deviceTypes */
 
-/* @var $registers common\models\DeviceRegister */
+$this->title = 'Дерево оборудования';
 
 ?>
-<script type="text/javascript">
-    $("modalDefects").on("click", function (e) {
-        //var detailId;
 
-        e.preventDefault();
+    <table id="tree" style="width: 100%">
+        <colgroup>
+            <col width="*">
+            <col width="120px">
+            <col width="140px">
+            <col width="120px">
+            <col width="150px">
+        </colgroup>
+        <thead style="background-color: #337ab7; color: white">
+        <tr>
+            <th colspan="1">
+                <?php
+                try {
+                    echo Select2::widget([
+                        'id' => 'type_select',
+                        'name' => 'type_select',
+                        'language' => 'ru',
+                        'data' => $deviceTypes,
+                        'options' => ['placeholder' => 'Выберите тип устройств...'],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                    ]);
+                } catch (Exception $e) {
 
-        // we can use jQuery's built in .data() method to retrieve the detail-id
-        //detailId = $(this).data("data-id");
-        $('#modalDefects').load('index.php?id=1', function () {
-            // call some kind of overlay code that displays the popup?
-            // this way the popup will show then the content from popup.php has
-            // finished loading.
-        });
-    });
-</script>
+                }
+                ?>
+            </th>
+            <th align="center" colspan="1" style="background-color: #3c8dbc; color: whitesmoke">
+                <button class="btn btn-success" type="button" id="addButton" style="padding: 5px 10px">
+                    Выбрать
+                </button>
+            </th>
+            <th align="center" colspan="4" style="background-color: #3c8dbc; color: whitesmoke">Оборудование системы
+            </th>
+        </tr>
+        <tr style="background-color: #3c8dbc; color: whitesmoke">
+            <th align="center">Оборудование</th>
+            <th>Статус</th>
+            <th>Дата</th>
+            <th>Показания</th>
+            <th>Регистр</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td></td>
+            <td class="alt"></td>
+            <td class="center"></td>
+            <td class="alt"></td>
+            <td class="center"></td>
+        </tr>
+        </tbody>
+    </table>
+<?php
+$this->registerJsFile('/js/custom/modules/list/jquery.fancytree.contextMenu.js',
+    ['depends' => ['wbraganca\fancytree\FancytreeAsset']]);
+$this->registerJsFile('/js/custom/modules/list/jquery.contextMenu.min.js',
+    ['depends' => ['yii\jui\JuiAsset']]);
+$this->registerCssFile('/css/custom/modules/list/ui.fancytree.css');
+$this->registerCssFile('/css/custom/modules/list/jquery.contextMenu.min.css');
 
-<table id="tree">
-    <colgroup>
-        <col width="*">
-        <col width="100px">
-        <col width="120px">
-        <col width="130px">
-        <col width="80px">
-        <col width="120px">
-        <col width="130px">
-        <col width="120px">
-    </colgroup>
-    <thead style="background-color: #337ab7; color: white">
-    <tr>
-        <th align="center" colspan="11" style="background-color: #3c8dbc; color: whitesmoke">Оборудование</th>
-    </tr>
-    <tr style="background-color: #3c8dbc; color: whitesmoke">
-        <th align="center">Оборудование</th>
-        <th>Серийный</th>
-        <th>Статус</th>
-        <th>Дата обхода</th>
-        <th>Показания</th>
-        <th>Пользователь</th>
-        <th>Дата фото</th>
-        <th>Фото</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td></td>
-        <td class="alt"></td>
-        <td class="center"></td>
-        <td class="alt"></td>
-        <td class="center"></td>
-        <td class="alt"></td>
-        <td class="center"></td>
-        <td class="alt"></td>
-    </tr>
-    </tbody>
-</table>
-<?php echo FancytreeWidget::widget([
+echo FancytreeWidget::widget([
     'options' => [
         'id' => 'tree',
-        'source' => $equipment,
-        'extensions' => ['dnd', "glyph", "table"],
+        'source' => $device,
+        'checkbox' => true,
+        'selectMode' => 3,
+        'extensions' => ['dnd', "glyph", "table", "contextMenu"],
         'glyph' => 'glyph_opts',
         'dnd' => [
             'preventVoidMoves' => true,
@@ -83,125 +94,123 @@ $this->title = 'Дерево моделей оборудования';
 				data.otherNode.moveTo(node, data.hitMode);
 			}'),
         ],
+        'contextMenu' => [
+            'menu' => [
+                'new' => [
+                    'name' => 'Добавить новое',
+                    'icon' => 'add',
+                    'callback' => new JsExpression('function(key, opt) {
+                        var node = $.ui.fancytree.getNode(opt.$trigger);
+                        if (node.folder==true) {
+                            $.ajax({
+                                url: "new",
+                                type: "post",
+                                data: {
+                                    selected_node: node.key,
+                                    folder: node.folder,
+                                    uuid: node.data.uuid,
+                                    type: node.type,
+                                    model_uuid: node.data.model_uuid,
+                                    type_uuid: node.data.type_uuid                                                                        
+                                },
+                                success: function (data) { 
+                                    $(\'#modalAddEquipment\').modal(\'show\');
+                                    $(\'#modalContentEquipment\').html(data);
+                                }
+                           }); 
+                        }                        
+                    }')
+                ],
+                'edit' => [
+                    'name' => 'Редактировать',
+                    'icon' => 'edit',
+                    'callback' => new JsExpression('function(key, opt) {
+                        var node = $.ui.fancytree.getNode(opt.$trigger);
+                            $.ajax({
+                                url: "edit",
+                                type: "post",
+                                data: {
+                                    selected_node: node.key,
+                                    folder: node.folder,
+                                    uuid: node.data.uuid,
+                                    type: node.type,
+                                    model_uuid: node.data.model_uuid,
+                                    type_uuid: node.data.type_uuid,
+                                    reference: "equipment"                                                                        
+                                },
+                                success: function (data) { 
+                                    $(\'#modalAddEquipment\').modal(\'show\');
+                                    $(\'#modalContentEquipment\').html(data);
+                                }
+                           }); 
+                    }')
+                ],
+                'doc' => [
+                    'name' => 'Добавить документацию',
+                    'icon' => 'add',
+                    'callback' => new JsExpression('function(key, opt) {
+                            var node = $.ui.fancytree.getNode(opt.$trigger);
+                            $.ajax({
+                                url: "../documentation/add",
+                                type: "post",
+                                data: {
+                                    selected_node: node.key,
+                                    folder: node.folder,
+                                    uuid: node.data.uuid,
+                                    model_uuid: node.data.model_uuid                                    
+                                },
+                                success: function (data) { 
+                                    $(\'#modalAddDocumentation\').modal(\'show\');
+                                    $(\'#modalContent\').html(data);
+                                }
+                            });
+                    }')
+                ],
+                'defect' => [
+                    'name' => 'Добавить дефект',
+                    'icon' => 'add',
+                    'callback' => new JsExpression('function(key, opt) {
+                            var node = $.ui.fancytree.getNode(opt.$trigger);
+                            $.ajax({
+                                url: "../defect/add",
+                                type: "post",
+                                data: {
+                                    selected_node: node.key,
+                                    folder: node.folder,
+                                    uuid: node.data.uuid,
+                                    model_uuid: node.data.model_uuid                                    
+                                },
+                                success: function (data) { 
+                                    $(\'#modalAddDefect\').modal(\'show\');
+                                    $(\'#modalContentDefect\').html(data);
+                                }
+                            });
+                    }')
+                ]
+            ]
+        ],
         'table' => [
             'indentation' => 20,
             "titleColumnIdx" => "1",
-            "serialColumnIdx" => "2",
-            "statusColumnIdx" => "3",
-            "dateMeasureColumnIdx" => "4",
-            "valueColumnIdx" => "5",
-            "userColumnIdx" => "6",
-            "datePhotoColumnIdx" => "7",
-            "photoColumnIdx" => "8"
+            "statusColumnIdx" => "2",
+            "dateColumnIdx" => "3",
+            "measureColumnIdx" => "4",
+            "registerColumnIdx" => "5"
         ],
         'renderColumns' => new JsExpression('function(event, data) {
             var node = data.node;
             $tdList = $(node.tr).find(">td");
-            $tdList.eq(1).text(node.data.serial);
-            $tdList.eq(2).html(node.data.status);
-            $tdList.eq(3).html(node.data.measure_date);
-            $tdList.eq(4).text(node.data.measure_value);
-            $tdList.eq(5).html(node.data.measure_user);
-            $tdList.eq(6).html(node.data.photo_date);
-            $tdList.eq(7).html(node.data.photo);
+            $tdList.eq(1).html(node.data.status);
+            $tdList.eq(2).html(node.data.date);
+            $tdList.eq(3).html(node.data.measure);
+            $tdList.eq(4).html(node.data.register);
         }')
     ]
 ]);
+
+$this->registerJs('$("#addButton").on("click",function() {
+        var e = document.getElementById("type_select");
+        var strType = e.options[e.selectedIndex].value;
+        window.location.replace("tree?type="+strType);             
+    })');
 ?>
-
-<div class="modal remote fade" id="modalDefects">
-    <div class="modal-dialog">
-        <div class="modal-content loader-lg">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-center">Зафиксированные дефекты</h4>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped table-hover text-left">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Дефект</th>
-                        <th>Тип</th>
-                        <th>Время</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--                    <?php /*foreach ($defects as $defect): */ ?>
-                        <tr>
-                        </tr>
-                    --><?php /*endforeach; */ ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal remote fade" id="modalTasks">
-    <div class="modal-dialog">
-        <div class="modal-content loader-lg">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-center">Последние операции над оборудованием</h4>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped table-hover text-left">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Операция</th>
-                        <th>Время</th>
-                        <th>Вердикт</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--                    <?php /*foreach ($operations as $operation): */ ?>
-                        <tr>
-                            <td><? /*= $operation['id'] */ ?></td>
-                            <td><? /*= $operation['user'] */ ?></td>
-                            <td><? /*= $operation['title'] */ ?></td>
-                            <td><? /*= $operation['date'] */ ?></td>
-                            <td><? /*= $operation['verdict'] */ ?></td>
-                        </tr>
-                    --><?php /*endforeach; */ ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal remote fade" id="modalRegister">
-    <div class="modal-dialog">
-        <div class="modal-content loader-lg">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-center">Журнал оборудования</h4>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped table-hover text-left">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Тип события</th>
-                        <th>Время</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--                    <?php /*foreach ($registers as $register): */ ?>
-                        <tr>
-                            <td><? /*= $register['uuid'] */ ?></td>
-                            <td><? /*= $register['user'] */ ?></td>
-                            <td><? /*= $register['type'] */ ?></td>
-                            <td><? /*= $register['date'] */ ?></td>
-                        </tr>
-                    --><?php /*endforeach; */ ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>

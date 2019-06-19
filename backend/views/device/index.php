@@ -3,7 +3,6 @@
 
 use common\models\DeviceStatus;
 use common\models\DeviceType;
-use kartik\datecontrol\DateControl;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -34,7 +33,7 @@ $gridColumns = [
             return GridView::ROW_COLLAPSED;
         },
         'detail' => function ($model, $key, $index, $column) {
-            return Yii::$app->controller->renderPartial('equipment-details', ['model' => $model]);
+            return Yii::$app->controller->renderPartial('device-details', ['model' => $model]);
         },
         'expandIcon' => '<span class="glyphicon glyphicon-expand"></span>',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
@@ -141,7 +140,22 @@ $gridColumns = [
                 '3' => 'Ethernet'
             ];
             return $interfaces[$data["interface"]];
-        }
+        },
+        'editableOptions' => function () {
+            $interfaces = [
+                '0' => 'не указан',
+                '1' => 'Последовательный порт',
+                '2' => 'Zigbee',
+                '3' => 'Ethernet'
+            ];
+            return [
+                'header' => 'Статус',
+                'size' => 'md',
+                'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                'displayValueConfig' => $interfaces,
+                'data' => $interfaces
+            ];
+        },
     ],
     [
         'class' => 'kartik\grid\EditableColumn',

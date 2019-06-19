@@ -16,6 +16,7 @@ class AdminLteAsset extends AssetBundle
         'css/vendor/lib/bootstrap.theme.min.css',
     ];
     public $js = [
+
     ];
     public $depends = [
         'yii\web\YiiAsset',

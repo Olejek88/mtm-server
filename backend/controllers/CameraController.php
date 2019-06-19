@@ -4,6 +4,11 @@ namespace backend\controllers;
 
 use backend\models\CameraSearch;
 use common\models\Camera;
+use common\models\DeviceStatus;
+use common\models\House;
+use common\models\Node;
+use common\models\Objects;
+use common\models\Street;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
@@ -46,6 +51,23 @@ class CameraController extends Controller
      */
     public function actionIndex()
     {
+        if (isset($_POST['editableAttribute'])) {
+            $model = Camera::find()
+                ->where(['_id' => $_POST['editableKey']])
+                ->one();
+            if ($_POST['editableAttribute'] == 'port') {
+                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
+            }
+            if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
+                $model['deviceStatusUuid'] = $_POST['Camera'][$_POST['editableIndex']]['deviceStatusUuid'];
+            }
+            if ($_POST['editableAttribute'] == 'date') {
+                $model['date'] = date("Y-m-d H:i:s", $_POST['Camera'][$_POST['editableIndex']]['date']);
+            }
+            $model->save();
+            return json_encode('');
+        }
+
         $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
@@ -139,5 +161,87 @@ class CameraController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * Build tree of device
+     *
+     * @return mixed
+     */
+    public function actionTree()
+    {
+        ini_set('memory_limit', '-1');
+        $fullTree = array();
+        $streets = Street::find()
+            ->select('*')
+            ->orderBy('title')
+            ->all();
+        foreach ($streets as $street) {
+            $fullTree['children'][] = [
+                'title' => $street['title'],
+                'expanded' => true,
+                'folder' => true
+            ];
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
+            orderBy('number')->all();
+            foreach ($houses as $house) {
+                $childIdx = count($fullTree['children']) - 1;
+                $fullTree['children'][$childIdx]['children'][] = [
+                    'title' => $house->getFullTitle(),
+                    'expanded' => true,
+                    'folder' => true
+                ];
+                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                foreach ($objects as $object) {
+                    $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
+                    $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
+                        'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'expanded' => true,
+                        'folder' => true
+                    ];
+                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    foreach ($nodes as $node) {
+                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
+                        if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                            $class = 'critical1';
+                        } elseif ($node['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                            $class = 'critical2';
+                        } else {
+                            $class = 'critical3';
+                        }
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
+                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
+                            'title' => 'Контроллер [' . $node['address'] . ']',
+                            'register' => $node['address'],
+                            'expanded' => true,
+                            'folder' => true
+                        ];
+                        $cameras = Camera::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        foreach ($cameras as $camera) {
+                            $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            if ($camera['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                                $class = 'critical1';
+                            } elseif ($camera['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                                $class = 'critical2';
+                            } else {
+                                $class = 'critical3';
+                            }
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
+                                'title' => $camera['title'],
+                                'status' => '<div class="progress"><div class="'
+                                    . $class . '">' . $camera['deviceStatus']->title . '</div></div>',
+                                'register' => '['.$camera['address'].':'.$camera['port'].']',
+                                'date' => $camera['changedAt'],
+                                'folder' => false
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        return $this->render(
+            'tree',
+            ['device' => $fullTree]
+        );
     }
 }
