@@ -139,6 +139,7 @@ class Camera extends ActiveRecord
             'objectUuid' => Yii::t('app', 'Объект'),
             'object' => Yii::t('app', 'Объект'),
             'address' => Yii::t('app', 'Адрес'),
+            'port' => Yii::t('app', 'Порт'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

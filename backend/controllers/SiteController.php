@@ -312,6 +312,7 @@ class SiteController extends Controller
                             'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
                             'title' => 'Контроллер [' . $node['address'] . ']',
                             'register' => $node['address'],
+                            'expanded' => true,
                             'folder' => true
                         ];
                         $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
@@ -356,7 +357,7 @@ class SiteController extends Controller
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel['title'],
                                     'register' => $channel['register'],
-                                    'measure' => $measure,
+                                    'value' => $measure,
                                     'date' => $date,
                                     'folder' => false
                                 ];

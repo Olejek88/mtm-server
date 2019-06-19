@@ -179,6 +179,7 @@ class CameraController extends Controller
         foreach ($streets as $street) {
             $fullTree['children'][] = [
                 'title' => $street['title'],
+                'expanded' => true,
                 'folder' => true
             ];
             $houses = House::find()->where(['streetUuid' => $street['uuid']])->
@@ -187,6 +188,7 @@ class CameraController extends Controller
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
                     'title' => $house->getFullTitle(),
+                    'expanded' => true,
                     'folder' => true
                 ];
                 $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
@@ -194,6 +196,7 @@ class CameraController extends Controller
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
                         'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'expanded' => true,
                         'folder' => true
                     ];
                     $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
@@ -210,6 +213,7 @@ class CameraController extends Controller
                             'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
                             'title' => 'Контроллер [' . $node['address'] . ']',
                             'register' => $node['address'],
+                            'expanded' => true,
                             'folder' => true
                         ];
                         $cameras = Camera::find()->where(['nodeUuid' => $node['uuid']])->all();
@@ -226,7 +230,7 @@ class CameraController extends Controller
                                 'title' => $camera['title'],
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $camera['deviceStatus']->title . '</div></div>',
-                                'register' => $camera['port'].' ['.$camera['address'].':'.$camera['port'].']',
+                                'register' => '['.$camera['address'].':'.$camera['port'].']',
                                 'date' => $camera['changedAt'],
                                 'folder' => false
                             ];

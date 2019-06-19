@@ -46,7 +46,6 @@ $gridColumns = [
         'class' => 'kartik\grid\DataColumn',
         'attribute' => 'objectUuid',
         'vAlign' => 'middle',
-        'width' => '180px',
         'value' => function ($data) {
             return $data['object']['house']['street']->title . ', ' . $data['object']['house']->number . '-' . $data['object']->title;
         },
@@ -75,7 +74,7 @@ $gridColumns = [
             $list = [];
             $statuses = DeviceStatus::find()->orderBy('title')->all();
             foreach ($statuses as $stat) {
-                $color = 'background-color: white';
+                $color = 'background-color: gray';
                 if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
                     $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
                     $color = 'background-color: gray';
@@ -99,6 +98,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'address',
+        'width' => '180px',
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'contentOptions' => [
@@ -107,25 +107,6 @@ $gridColumns = [
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
             return $data->address;
-        }
-    ],
-    [
-        'hAlign' => 'center',
-        'vAlign' => 'middle',
-        'header' => 'Устройства',
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
-        'headerOptions' => ['class' => 'text-center'],
-        'content' => function ($data) {
-            $devices_list = "";
-            $count = 1;
-            $devices = Device::find()->where(['nodeUuid' => $data['uuid']])->all();
-            foreach ($devices as $device) {
-                $devices_list = $count.'. '.$device['title'].'</br>';
-                $count++;
-            }
-            return $devices_list;
         }
     ],
     [
