@@ -29,16 +29,20 @@ use yii\web\JsExpression;
         <table id="tree" cellspacing="1" style="width: 100%">
             <colgroup>
                 <col width="*">
-                <col width="*">
-                <col width="100px">
                 <col width="140px">
+                <col width="150px">
+                <col width="140px">
+                <col width="100px">
+                <col width="100px">
             </colgroup>
             <thead style="background-color: #337ab7; color: white">
             <tr style="background-color: #3c8dbc; color: whitesmoke">
                 <th align="center">Оборудование</th>
-                <th>Расположение</th>
                 <th>Статус</th>
                 <th>Дата</th>
+                <th>Интерфейс</th>
+                <th>Порт</th>
+                <th>Значение</th>
             </tr>
             </thead>
             <tbody>
@@ -47,6 +51,9 @@ use yii\web\JsExpression;
                 <td class="alt"></td>
                 <td class="center"></td>
                 <td class="alt"></td>
+                <td class="center"></td>
+                <td class="alt"></td>
+                <td class="center"></td>
             </tr>
             </tbody>
         </table>
@@ -60,16 +67,20 @@ use yii\web\JsExpression;
                 'table' => [
                     'indentation' => 20,
                     "titleColumnIdx" => "1",
-                    "locationColumnIdx" => "2",
-                    "statusColumnIdx" => "3",
-                    "userColumnIdx" => "4"
+                    "statusColumnIdx" => "2",
+                    "dateColumnIdx" => "3",
+                    "interfaceColumnIdx" => "4",
+                    "portColumnIdx" => "5",
+                    "valueColumnIdx" => "6"
                 ],
                 'renderColumns' => new JsExpression('function(event, data) {
                         var node = data.node;
                         $tdList = $(node.tr).find(">td");
-                        $tdList.eq(1).text(node.data.location);
-                        $tdList.eq(2).html(node.data.status);
-                        $tdList.eq(3).html(node.data.date); 
+                        $tdList.eq(1).html(node.data.status);
+                        $tdList.eq(2).html(node.data.date);
+                        $tdList.eq(3).text(node.data.interface);
+                        $tdList.eq(4).text(node.data.port);                                                  
+                        $tdList.eq(5).text(node.data.value);                                                  
                    }')
             ]
         ]);

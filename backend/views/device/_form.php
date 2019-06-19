@@ -58,7 +58,7 @@ use yii\widgets\ActiveForm;
     <?php
     $object = Objects::find()->all();
     $items = ArrayHelper::map($object, 'uuid', function ($model) {
-        return $model['title'];
+        return $model->getAddress();
     });
     echo $form->field($model, 'objectUuid')->widget(Select2::class,
         [

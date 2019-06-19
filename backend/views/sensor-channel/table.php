@@ -112,7 +112,7 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-            Html::a('Новая', ['/request/create'], ['class' => 'btn btn-success'])
+            Html::a('Новая', ['/sensor-channel/create'], ['class' => 'btn btn-success'])
         ],
         '{export}',
     ],

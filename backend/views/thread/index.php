@@ -1,14 +1,13 @@
 <?php
 /* @var $searchModel backend\models\DeviceSearch */
 
-use common\models\DeviceStatus;
 use common\models\DeviceType;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Оборудование');
+$this->title = Yii::t('app', 'Потоки');
 
 $gridColumns = [
     [

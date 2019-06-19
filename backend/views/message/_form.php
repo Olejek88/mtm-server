@@ -1,8 +1,12 @@
 <?php
 
 use common\components\MainFunctions;
+use common\models\Node;
 use common\models\User;
 use common\models\Users;
+use kartik\file\FileInput;
+use kartik\widgets\Select2;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -34,7 +38,29 @@ use yii\widgets\ActiveForm;
 
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
-    <?= $form->field($model, 'link')->textInput(['maxlength' => true]) ?>
+    <?php
+    echo $form->field($model, 'link')
+        ->widget(FileInput::class, ['options' => ['accept' => '*'],]);
+    ?>
+
+    <?php
+    $nodes = Node::find()->all();
+    $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
+        return $model['object']['address'].' ['.$model['address'].']';
+    });
+    echo $form->field($model, 'nodeUuid')->widget(Select2::class,
+        [
+            'data' => $items,
+            'language' => 'ru',
+            'options' => [
+                'placeholder' => 'Выберите контроллер..'
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+
+    ?>
 
     <div class="form-group text-center">
 

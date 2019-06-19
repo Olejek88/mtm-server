@@ -13,8 +13,11 @@ use yii\db\Expression;
  * @property string $oid идентификатор организации
  * @property string $uuid
  * @property string $link
+ * @property string $nodeUuid
  * @property string $createdAt
  * @property string $changedAt
+ *
+ * @property Node $nodes
  */
 class Message extends MtmActiveRecord
 {
@@ -52,7 +55,7 @@ class Message extends MtmActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'link', 'oid','createdAt', 'changedAt'];
+        return ['_id', 'uuid', 'link', 'nodeUuid', 'oid','createdAt', 'changedAt'];
     }
 
     /**
@@ -72,7 +75,7 @@ class Message extends MtmActiveRecord
             ],
             [['oid','createdAt', 'changedAt'], 'safe'],
             [
-                [ 'uuid' ], 'string', 'max' => 50
+                [ 'uuid','nodeUuid' ], 'string', 'max' => 50
             ],
             [['link'], 'string'],
             [['oid'], 'checkOrganizationOwn'],
@@ -90,6 +93,8 @@ class Message extends MtmActiveRecord
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
             'link' => Yii::t('app', 'Ссылка'),
+            'nodeUuid' => Yii::t('app', 'Шкаф установки'),
+            'node' => Yii::t('app', 'Шкаф установки'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -107,5 +112,15 @@ class Message extends MtmActiveRecord
         } else {
             return false;
         }
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getNode()
+    {
+        return $this->hasOne(Node::class, ['uuid' => 'nodeUuid']);
     }
 }
