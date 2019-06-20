@@ -46,6 +46,21 @@ class MtmDevLightStatus extends MtmPktHeader
 
     public function loadBinaryData($data)
     {
+        $dataLen = strlen($data);
+        // таким нехитрым способом определяем сколько на самом деле двух байтовых значений статусов датчиков
+        // пришло в пакете со светильника (12 = 1 тип + 1 версия + 8 mac + 2 alert)
+        $sensorsCount = $dataLen - 12;
+        if ($sensorsCount % 2 != 0) {
+            $this->addError('sensors_count', 'Не чётное значение байт статусов датчиков.');
+            return false;
+        } else {
+            $sensorsCount = $sensorsCount / 2;
+            if ($sensorsCount >= self::MAX_SENSORS) {
+                $this->addError('sensors_count', 'Количество статусов датчиков больше ' . self::MAX_SENSORS);
+                return false;
+            }
+        }
+
         $this->type = ord($data[0]);
         $this->protoVersion = ord($data[1]);
         $this->mac =
@@ -58,11 +73,11 @@ class MtmDevLightStatus extends MtmPktHeader
             self::i2h(ord($data[3])) .
             self::i2h(ord($data[2]));
         $this->alert = ord($data[10]) | (ord($data[11]) << 8);
-        // TODO: в пакете на самом деле сейчас будет приходить всего два байта
-        // TODO: реализовать механизм проверки сколько на самом деле данных приехало!!!
-        for ($i = 0; $i < self::MAX_SENSORS; $i++) {
+
+        for ($i = 0; $i < $sensorsCount; $i++) {
             $this->data[$i] = ord($data[$i * 2 + 12]) | (ord($data[$i * 2 + 13]) << 8);
         }
+
         return $this->validate();
     }
 

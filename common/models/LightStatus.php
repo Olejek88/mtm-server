@@ -177,5 +177,11 @@ class LightStatus extends MtmActiveRecord
             $sensorName = 'sensor' . $idx++;
             $this->$sensorName = $value;
         }
+
+        for ($i = $idx; $i < 16; $i++) {
+            $sensorName = 'sensor' . $i;
+            // принудительно затираем значения датчиков которые по какой-то причине перестали приходить
+            $this->$sensorName = 0;
+        }
     }
 }
