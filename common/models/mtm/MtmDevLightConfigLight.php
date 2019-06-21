@@ -33,7 +33,7 @@ class MtmDevLightConfigLight extends MtmPktHeader
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['device'], 'integer', 'min' => 0x00, 'max' => 0x0f],
+            [['device'], 'integer', 'min' => 0x01, 'max' => 0x01],
 //            [['config'], 'each', 'rule' => ['checkConfigElement']],
             [['time', 'value'], 'required'],
             [['time'], 'integer', 'min' => 0, 'max' => 1440],

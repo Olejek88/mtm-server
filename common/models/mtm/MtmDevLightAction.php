@@ -28,7 +28,7 @@ class MtmDevLightAction extends MtmPktHeader
     public function rules()
     {
         return array_merge(parent::rules(), [
-            [['device'], 'integer', 'min' => 0x00, 'max' => 0x0f],
+            [['device'], 'integer', 'min' => 0x01, 'max' => 0x01],
         ]);
     }
 }
