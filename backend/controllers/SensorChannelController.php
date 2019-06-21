@@ -2,20 +2,46 @@
 namespace backend\controllers;
 
 use backend\models\SensorChannelSearch;
-use common\components\Errors;
-use common\components\FancyTreeHelper;
 use Yii;
 use common\models\SensorChannel;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use Exception;
+use Throwable;
 
 /**
  * StageOperationController implements the CRUD actions for StageOperation model.
  */
 class SensorChannelController extends Controller
 {
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
     // отключаем проверку для внешних запросов
     /**
      * @param $action
@@ -154,8 +180,8 @@ class SensorChannelController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

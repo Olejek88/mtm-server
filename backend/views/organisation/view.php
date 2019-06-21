@@ -20,12 +20,6 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Карточка'), 
 
             <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="list">
-                    <p class="text-center">
-                        <?php
-                        echo $this->render('@backend/views/yii2-app/layouts/buttons.php',
-                            ['model' => $model]);
-                        ?>
-                    </p>
                     <h6>
                         <?php echo DetailView::widget([
                             'model' => $model,

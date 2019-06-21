@@ -2,9 +2,7 @@
 
 namespace backend\controllers;
 
-use common\models\OrderStatus;
 use common\models\User;
-use common\models\Users;
 use Yii;
 
 $accountUser = Yii::$app->user->identity;

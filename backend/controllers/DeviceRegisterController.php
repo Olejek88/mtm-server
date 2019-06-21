@@ -6,10 +6,11 @@ use backend\models\DeviceRegisterSearch;
 use common\models\DeviceRegister;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
+use Throwable;
 
 /**
  * DeviceRegisterController implements the CRUD actions for DeviceRegister model.
@@ -22,6 +23,15 @@ class DeviceRegisterController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -29,18 +39,6 @@ class DeviceRegisterController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * @throws UnauthorizedHttpException
-     */
-    public function init()
-    {
-
-        if (Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**
@@ -115,7 +113,7 @@ class DeviceRegisterController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

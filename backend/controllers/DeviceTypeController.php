@@ -6,10 +6,11 @@ use backend\models\DeviceSearchType;
 use common\models\DeviceType;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
+use Throwable;
 
 /**
  * DeviceTypeController implements the CRUD actions for DeviceType model.
@@ -26,6 +27,15 @@ class DeviceTypeController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -33,21 +43,6 @@ class DeviceTypeController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * Init
-     *
-     * @return void
-     * @throws UnauthorizedHttpException
-     */
-    public function init()
-    {
-
-        if (\Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**
@@ -151,7 +146,7 @@ class DeviceTypeController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

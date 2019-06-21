@@ -2,19 +2,35 @@
 
 namespace backend\controllers;
 
-use Yii;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
-use yii\web\UnauthorizedHttpException;
 
 class JournalController extends Controller
 {
-    public function init()
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
     {
-
-        if (Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
 
     public function actionIndex()

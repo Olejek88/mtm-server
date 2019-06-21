@@ -58,6 +58,11 @@ $fieldOptions2 = [
 
                 </div>
 
+                <div class="row">
+                    <div class="col-lg-5">
+                        <a href="/signup">Регистрация</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

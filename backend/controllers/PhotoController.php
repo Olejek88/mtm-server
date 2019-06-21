@@ -5,10 +5,11 @@ namespace backend\controllers;
 use backend\models\PhotoSearch;
 use common\models\Photo;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
+use Throwable;
 
 /**
  * Photo implements the CRUD actions for Photo model.
@@ -21,6 +22,15 @@ class PhotoController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -28,15 +38,6 @@ class PhotoController extends Controller
                 ],
             ],
         ];
-    }
-
-    public function init()
-    {
-
-        if (Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**
@@ -109,6 +110,9 @@ class PhotoController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws Throwable
+     * @throws yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {

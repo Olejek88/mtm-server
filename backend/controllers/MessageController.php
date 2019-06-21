@@ -2,16 +2,17 @@
 
 namespace backend\controllers;
 
-use common\components\MainFunctions;
-use common\models\Users;
 use Exception;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use common\models\Message;
 use backend\models\MessageSearch;
+use Throwable;
 
 /**
  * MessageController implements the CRUD actions for Message model.
@@ -19,6 +20,30 @@ use backend\models\MessageSearch;
 class MessageController extends Controller
 {
     protected $modelClass = Message::class;
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
 
     /**
      * Lists all Message models.
@@ -122,7 +147,7 @@ class MessageController extends Controller
      * @return mixed
      * @throws NotFoundHttpException
      * @throws Exception
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

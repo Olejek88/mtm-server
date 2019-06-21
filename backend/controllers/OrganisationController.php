@@ -4,12 +4,12 @@ namespace backend\controllers;
 
 use backend\models\OrganisationSearch;
 use common\models\Organisation;
+use common\models\User;
 use Yii;
-use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller as ControllerAlias;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
 
 /**
  * OrganisationController implements the CRUD actions for Organisation model.
@@ -26,6 +26,15 @@ class OrganisationController extends ControllerAlias
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -33,21 +42,6 @@ class OrganisationController extends ControllerAlias
                 ],
             ],
         ];
-    }
-
-    /**
-     * Init
-     *
-     * @return void
-     * @throws UnauthorizedHttpException
-     */
-    public function init()
-    {
-
-        if (\Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     public function actionIndex()
@@ -105,31 +99,6 @@ class OrganisationController extends ControllerAlias
     }
 
     /**
-     * Creates a new Organisation model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     *
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Organisation();
-
-        if ($model->load(Yii::$app->request->post())) {
-            // проверяем все поля, если что-то не так показываем форму с ошибками
-            if (!$model->validate()) {
-                echo json_encode($model->errors);
-                return $this->render('create', ['model' => $model]);
-            }
-            // сохраняем запись
-            if ($model->save(false)) {
-                return $this->redirect(['view', 'id' => $model->_id]);
-            }
-            echo json_encode($model->errors);
-        }
-        return $this->render('create', ['model' => $model]);
-    }
-
-    /**
      * Updates an existing Organisation model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
@@ -163,24 +132,6 @@ class OrganisationController extends ControllerAlias
     }
 
     /**
-     * Deletes an existing Organisation model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     *
-     * @param integer $id Id
-     *
-     * @return mixed
-     * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws StaleObjectException
-     */
-    public
-    function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-        return $this->redirect(['index']);
-    }
-
-    /**
      * Finds the Organisation model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      *
@@ -189,10 +140,12 @@ class OrganisationController extends ControllerAlias
      * @return Organisation the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected
-    function findModel($id)
+    protected function findModel($id)
     {
-        if (($model = Organisation::findOne($id)) !== null) {
+        /** @var User $identity */
+        $identity = Yii::$app->user->identity;
+
+        if (($model = Organisation::findOne(['_id' => $id, 'uuid' => $identity->oid])) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

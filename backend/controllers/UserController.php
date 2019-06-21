@@ -5,18 +5,17 @@ namespace backend\controllers;
 use backend\models\UserSearch;
 use common\components\MainFunctions;
 use common\models\Journal;
-use common\models\Measure;
-use common\models\Message;
-use common\models\Photo;
 use common\models\User;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
 use yii\web\UploadedFile;
+use Throwable;
 
 /**
  * UsersController implements the CRUD actions for Users model.
@@ -29,6 +28,15 @@ class UserController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -36,18 +44,6 @@ class UserController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * @throws UnauthorizedHttpException
-     */
-    public function init()
-    {
-
-        if (Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**
@@ -163,7 +159,7 @@ class UserController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)
@@ -219,12 +215,12 @@ class UserController extends Controller
      *
      * @param integer $id Id.
      *
-     * @return User the loaded model
+     * @return ActiveQuery the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = User::findOne($id)) !== null) {
+        if (($model = User::find()->where(['_id' => $id, 'oid' => User::getOid(Yii::$app->user->identity)])) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

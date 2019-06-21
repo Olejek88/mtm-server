@@ -2,39 +2,36 @@
 
 namespace backend\controllers;
 
+use backend\models\SignupForm;
 use backend\models\UserSearch;
-use backend\models\UsersSearch;
 use common\components\MainFunctions;
 use common\models\Camera;
 use common\models\City;
-use common\models\Defect;
-use common\models\Device;
 use common\models\DeviceStatus;
-use common\models\DeviceType;
-use common\models\EquipmentRegister;
-use common\models\ExternalEvent;
 use common\models\House;
 use common\models\Journal;
+use common\models\Node;
+use common\models\Device;
+use common\models\DeviceType;
+use common\models\Objects;
 use common\models\LoginForm;
 use common\models\Measure;
-use common\models\Node;
-use common\models\Objects;
-use common\models\Orders;
-use common\models\OrderStatus;
-use common\models\Organisation;
 use common\models\SensorChannel;
 use common\models\SensorConfig;
 use common\models\Street;
 use common\models\User;
-use common\models\UsersAttribute;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
+use Throwable;
+use yii\base\InvalidConfigException;
 
 /**
  * Site controller
+ *
+ * @property mixed $layers
  */
 class SiteController extends Controller
 {
@@ -91,6 +88,7 @@ class SiteController extends Controller
      * Displays map.
      *
      * @return string
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -229,6 +227,7 @@ class SiteController extends Controller
      * Dashboard
      *
      * @return string
+     * @throws InvalidConfigException
      */
     public function actionDashboard()
     {
@@ -253,7 +252,7 @@ class SiteController extends Controller
         $counts['deviceType'] = DeviceType::find()->count();
 
         $last_measures = Measure::find()
-            ->where('createdAt > (NOW()-(4*24*3600000));')
+            ->where('createdAt > (NOW()-(4*24*3600000))')
             ->count();
         $complete = 0;
 
@@ -262,6 +261,7 @@ class SiteController extends Controller
             ->all();
 
         $users = User::find()
+            ->where(['oid' => User::getOid(Yii::$app->user->identity)])
             ->all();
 
         /**
@@ -422,7 +422,7 @@ class SiteController extends Controller
      */
     public function actionError()
     {
-        if (\Yii::$app->getUser()->isGuest) {
+        if (Yii::$app->getUser()->isGuest) {
             Yii::$app->getResponse()->redirect("/")->send();
         } else {
             $exception = Yii::$app->errorHandler->exception;
@@ -524,6 +524,10 @@ class SiteController extends Controller
         );
     }
 
+    /**
+     * @return mixed
+     * @throws InvalidConfigException
+     */
     public function getLayers()
     {
         $devices = Device::find()->all();
@@ -624,5 +628,29 @@ class SiteController extends Controller
         $layer['camerasGroup'] = $camerasGroup;
 
         return $layer;
+    }
+
+    /**
+     * Signup action.
+     *
+     * @return string
+     * @throws Throwable
+     */
+    public function actionSignup()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new SignupForm();
+        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
+            Yii::$app->user->login(User::findByUsername($model->username), true ? 3600 * 24 * 30 : 0);
+            return $this->goBack();
+        } else {
+            $model->password = '';
+            return $this->render('signup', [
+                'model' => $model,
+            ]);
+        }
     }
 }

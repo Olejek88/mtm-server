@@ -6,10 +6,11 @@ use backend\models\StreetSearch;
 use common\models\Street;
 use Yii;
 use yii\db\StaleObjectException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
+use Throwable;
 
 /**
  * StreetController implements the CRUD actions for Street model.
@@ -22,6 +23,15 @@ class StreetController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -29,15 +39,6 @@ class StreetController extends Controller
                 ],
             ],
         ];
-    }
-
-    public function init()
-    {
-
-        if (Yii::$app->getUser()->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-
     }
 
     /**
@@ -60,6 +61,7 @@ class StreetController extends Controller
      * Displays a single Street model.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionView($id)
     {
@@ -122,7 +124,7 @@ class StreetController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public function actionDelete($id)

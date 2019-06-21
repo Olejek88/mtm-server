@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
+use Throwable;
 
 /**
  * ThreadController implements the CRUD actions for Thread model.
@@ -195,7 +196,7 @@ class ThreadController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws StaleObjectException
      */
     public
