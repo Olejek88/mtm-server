@@ -37,6 +37,7 @@ use yii\widgets\ActiveForm;
         echo $form->field($model, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
     }
     ?>
+    <?php echo $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?php
     $deviceType = DeviceType::find()->all();

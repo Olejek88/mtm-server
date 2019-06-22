@@ -9,6 +9,9 @@ use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
 use common\models\Measure;
+use common\models\mtm\MtmDevLightActionSetLight;
+use common\models\mtm\MtmDevLightConfig;
+use common\models\mtm\MtmDevLightConfigLight;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Photo;
@@ -227,6 +230,26 @@ class DeviceController extends Controller
     }
 
     /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionDashboard($uuid)
+    {
+        $device = Device::find()
+            ->where(['uuid' => $uuid])
+            ->one();
+        return $this->render(
+            'dashboard',
+            [
+                'device' => $device
+            ]
+        );
+    }
+
+    /**
      * Build tree of device
      *
      * @return mixed
@@ -405,5 +428,73 @@ class DeviceController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionLightConfig()
+    {
+        $lightConfig = new MtmDevLightConfigLight();
+        if (isset($_POST['time0'])) {
+            $lightConfig->time[0] = $_POST['time0'];
+            $lightConfig->value[0] = $_POST['level0'];
+            $lightConfig->time[1] = $_POST['time1'];
+            $lightConfig->value[1] = $_POST['level1'];
+            $lightConfig->time[2] = $_POST['time2'];
+            $lightConfig->value[2] = $_POST['level2'];
+            $lightConfig->time[3] = $_POST['time3'];
+            $lightConfig->value[3] = $_POST['level3'];
+
+            $lightConfig->type = 3;
+            $lightConfig->protoVersion = 0;
+            $lightConfig->device = 1;
+        }
+
+        $device =Device::find()->where(['uuid' => $_POST['device']])->one();
+        return $this->render('dashboard', ['device' => $device]);
+    }
+
+    /**
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionSet()
+    {
+        $lightConfig = new MtmDevLightActionSetLight();
+        $device =Device::find()->where(['uuid' => $_POST['device']])->one();
+        if ($device && isset($_POST['value'])) {
+            $lightConfig->value = $_POST['value'];
+            $lightConfig->type = 5;
+            $lightConfig->protoVersion = 0;
+            $lightConfig->device = 1;
+            $lightConfig->action = 2;
+            //send to $device['address'];
+        }
+        return $this->render('dashboard', ['device' => $device]);
+    }
+
+    /**
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionConfig()
+    {
+        $lightConfig = new MtmDevLightConfig();
+        if (isset($_POST['power'])) {
+            $lightConfig->power = $_POST['power'];
+            $lightConfig->group = $_POST['group'];
+            $lightConfig->frequency = $_POST['frequency'];
+
+            $lightConfig->type = 2;
+            $lightConfig->protoVersion = 0;
+            $lightConfig->device = 1;
+        }
+        $device =Device::find()->where(['uuid' => $_POST['device']])->one();
+        return $this->render('dashboard', ['device' => $device]);
     }
 }
