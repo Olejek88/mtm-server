@@ -6,18 +6,15 @@ use common\models\Device;
 use common\models\User;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Устройство');
+$this->title = Yii::t('app', 'Конфигурация устройства');
 ?>
 
 <br/>
-<!-- Info boxes -->
-<div class="row">
-    <div class="col-md-12">
-    <?= $this->render('widget-light-info', ['device' => $device]); ?>
-    </div>
+<script>$.fn.slider = null</script>
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
 </div>
-<!-- /.row -->
-
+<div class="modal-body">
 <div class="row">
     <!-- Left col -->
     <div class="col-md-3">
@@ -31,16 +28,5 @@ $this->title = Yii::t('app', 'Устройство');
     <div class="col-md-5">
         <?= $this->render('widget-light-config', ['device' => $device]); ?>
     </div>
-
-
 </div>
-<div class="row">
-    <div class="col-md-7">
-        <?= $this->render('widget-light-register', ['device' => $device]); ?>
-    </div>
-
-    <div class="col-md-5">
-        <?= $this->render('widget-light-list', ['device' => $device]); ?>
-    </div>
 </div>
-

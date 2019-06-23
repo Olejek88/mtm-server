@@ -122,7 +122,7 @@ use yii\helpers\Html;
                 'toolbar' => [
                     []
                 ],
-                'pjax' => true,
+                'pjax' => false,
                 'showPageSummary' => false,
                 'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
                 'summary' => '',

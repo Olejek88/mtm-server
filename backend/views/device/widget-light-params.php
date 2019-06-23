@@ -9,7 +9,7 @@ use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 ?>
-<div class="info-box">
+<div class="box box-success">
     <div class="box-header with-border">
         <h3 class="box-title">Конфигурация светильника</h3>
         <div class="box-tools pull-right">
@@ -19,13 +19,15 @@ use yii\widgets\Pjax;
     </div>
     <div class="box-body">
         <?php Pjax::begin(['id' => 'options']); ?>
-        <?= Html::beginForm(['device/light-config'], 'post',
+        <?= Html::beginForm(['device/dashboard'], 'post',
             ['data-pjax' => '', 'class' => 'form-inline']);
         ?>
         <div class="row">
             <div class="col-md-12" style="margin: 3px">
                 <?php
                 echo Html::hiddenInput('device', $device['uuid']);
+                echo Html::hiddenInput('type', 'params');
+
                 echo '<label class="control-label">Режим работы светильника</label>';
                 $modes = [
                     MtmDevLightConfig::$MTM_DEV_LIGHT_CONFIG_MODE_AUTO => "Автономный режим",

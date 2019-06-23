@@ -8,7 +8,7 @@ use yii\widgets\Pjax;
  */
 
 ?>
-<div class="info-box">
+<div class="box box-info">
     <div class="box-header with-border">
         <h3 class="box-title">Задать уровень освещения</h3>
         <div class="box-tools pull-right">
@@ -18,12 +18,13 @@ use yii\widgets\Pjax;
     </div>
     <div class="box-body">
         <?php
-        Pjax::begin(['id' => 'options']); ?>
+        Pjax::begin(['id' => 'options','enablePushState' => false]); ?>
         <div class="row">
             <div class="col-md-7" style="margin: 10px">
-                <?= Html::beginForm(['device/set'], 'post',
+                <?= Html::beginForm(['device/dashboard'], 'post',
                     ['data-pjax' => '', 'class' => 'form-inline']);
                 echo Html::hiddenInput('device', $device['uuid']);
+                echo Html::hiddenInput('type', 'set');
 
                 echo Slider::widget([
                     'name' => 'value',
