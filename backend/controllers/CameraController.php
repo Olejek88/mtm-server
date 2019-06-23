@@ -9,6 +9,9 @@ use common\models\House;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Street;
+use Exception;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -55,9 +58,9 @@ class CameraController extends Controller
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-            if ($_POST['editableAttribute'] == 'port') {
-                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
-            }
+//            if ($_POST['editableAttribute'] == 'port') {
+//                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
+//            }
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
                 $model['deviceStatusUuid'] = $_POST['Camera'][$_POST['editableIndex']]['deviceStatusUuid'];
             }
@@ -86,6 +89,35 @@ class CameraController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if ($model != null) {
+            $params = Yii::$app->params;
+            if (isset($params['amqpServer']['host']) &&
+                isset($params['amqpServer']['port']) &&
+                isset($params['amqpServer']['user']) &&
+                isset($params['amqpServer']['password'])) {
+                try {
+                    $connection = new AMQPStreamConnection($params['amqpServer']['host'],
+                        $params['amqpServer']['port'],
+                        $params['amqpServer']['user'],
+                        $params['amqpServer']['password']);
+
+                    $channel = $connection->channel();
+                    $channel->exchange_declare('light', 'direct', false, true, false);
+                    $pkt = [
+                        'type' => 'camera',
+                        'action' => 'publish',
+                        'uuid' => $model->uuid,
+                    ];
+                    $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
+                    $route = 'routeNode-' . $model->organisation->_id . '-' . $model->node->_id;
+                    $channel->basic_publish($msq, 'light', $route);
+                } catch (Exception $e) {
+
+                }
+            }
+        }
+
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -231,7 +263,8 @@ class CameraController extends Controller
                                 'title' => $camera['title'],
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $camera['deviceStatus']->title . '</div></div>',
-                                'register' => '['.$camera['address'].':'.$camera['port'].']',
+                                'register' => '[' ./*$camera['address'].':'.$camera['port'].*/
+                                    ']',
                                 'date' => $camera['changedAt'],
                                 'folder' => false
                             ];

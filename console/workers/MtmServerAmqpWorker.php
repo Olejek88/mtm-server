@@ -55,19 +55,28 @@ class MtmServerAmqpWorker extends Worker
             !isset($params['amqpServer']['port']) ||
             !isset($params['amqpServer']['user']) ||
             !isset($params['amqpServer']['password'])) {
-            exit(-1);
+            $this->log('Не задана конфигурация сервера сообщений и шкафа.');
+            $this->run = false;
+            return;
         }
 
-        $this->connection = new AMQPStreamConnection($params['amqpServer']['host'],
-            $params['amqpServer']['port'],
-            $params['amqpServer']['user'],
-            $params['amqpServer']['password']);
+        try {
+            $this->connection = new AMQPStreamConnection($params['amqpServer']['host'],
+                $params['amqpServer']['port'],
+                $params['amqpServer']['user'],
+                $params['amqpServer']['password']);
 
-        $this->channel = $this->connection->channel();
-        $this->channel->exchange_declare(self::EXCHANGE, 'direct', false, true, false);
-        $this->channel->queue_declare(self::QUERY_LSERVER, false, true, false, false);
-        $this->channel->queue_bind(self::QUERY_LSERVER, self::EXCHANGE, self::ROUTE_TO_LSERVER);
-        $this->channel->basic_consume(self::QUERY_LSERVER, '', false, false, false, false, [&$this, 'callback']);
+            $this->channel = $this->connection->channel();
+            $this->channel->exchange_declare(self::EXCHANGE, 'direct', false, true, false);
+            $this->channel->queue_declare(self::QUERY_LSERVER, false, true, false, false);
+            $this->channel->queue_bind(self::QUERY_LSERVER, self::EXCHANGE, self::ROUTE_TO_LSERVER);
+            $this->channel->basic_consume(self::QUERY_LSERVER, '', false, false, false, false, [&$this, 'callback']);
+        } catch (Exception $e) {
+            $this->log($e->getMessage());
+            $this->log('init not complete');
+            $this->run = false;
+            return;
+        }
 
         pcntl_signal(SIGTERM, [&$this, 'handler']);
         pcntl_signal(SIGINT, [&$this, 'handler']);
@@ -95,14 +104,20 @@ class MtmServerAmqpWorker extends Worker
                 $this->log($e->getMessage());
             } catch (AMQPTimeoutException $e) {
                 $this->log($e->getMessage());
+            } catch (Exception $e) {
+                $this->log($e->getMessage());
+                return;
             }
 
             pcntl_signal_dispatch();
             sleep(1);
         }
 
-        $this->channel->close();
-        $this->connection->close();
+        if ($this->connection != null) {
+            $this->channel->close();
+            $this->connection->close();
+        }
+
         $this->log('finish...');
     }
 
