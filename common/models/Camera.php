@@ -17,13 +17,13 @@ use yii\db\Expression;
  * @property string $deviceStatusUuid
  * @property string $objectUuid
  * @property string $nodeUuid
- * @property string $address
- * @property integer $port
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
  *
  * @property DeviceStatus $deviceStatus
+ * @property Objects $object
+ * @property Photo $photo
  * @property Node $node
  */
 class Camera extends MtmActiveRecord
@@ -139,7 +139,6 @@ class Camera extends MtmActiveRecord
             'objectUuid' => Yii::t('app', 'Объект'),
             'object' => Yii::t('app', 'Объект'),
             'address' => Yii::t('app', 'Адрес'),
-            'port' => Yii::t('app', 'Порт'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -181,11 +180,17 @@ class Camera extends MtmActiveRecord
         return $this->hasOne(Node::class, ['uuid' => 'nodeUuid']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getObject()
     {
         return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getPhoto() {
         return $this->hasMany(Photo::class, ['equipmentUuid' => 'uuid']);
     }

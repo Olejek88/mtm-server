@@ -55,9 +55,9 @@ class CameraController extends Controller
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-            if ($_POST['editableAttribute'] == 'port') {
-                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
-            }
+//            if ($_POST['editableAttribute'] == 'port') {
+//                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
+//            }
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
                 $model['deviceStatusUuid'] = $_POST['Camera'][$_POST['editableIndex']]['deviceStatusUuid'];
             }
@@ -231,7 +231,8 @@ class CameraController extends Controller
                                 'title' => $camera['title'],
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $camera['deviceStatus']->title . '</div></div>',
-                                'register' => '['.$camera['address'].':'.$camera['port'].']',
+                                'register' => '[' ./*$camera['address'].':'.$camera['port'].*/
+                                    ']',
                                 'date' => $camera['changedAt'],
                                 'folder' => false
                             ];
