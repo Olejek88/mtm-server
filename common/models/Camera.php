@@ -24,6 +24,7 @@ use yii\db\Expression;
  * @property DeviceStatus $deviceStatus
  * @property Objects $object
  * @property Photo $photo
+ * @property Organisation $organisation
  * @property Node $node
  */
 class Camera extends MtmActiveRecord
@@ -193,5 +194,13 @@ class Camera extends MtmActiveRecord
      */
     public function getPhoto() {
         return $this->hasMany(Photo::class, ['equipmentUuid' => 'uuid']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getOrganisation()
+    {
+        return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
     }
 }
