@@ -126,15 +126,21 @@ class SiteController extends Controller
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
         foreach ($devices as $device) {
+            if ($device['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
+                $link = '<b>'.Html::a($device["deviceType"]["title"],
+                    ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
+                . '</b>';
+            } else {
+                $link = '<b>' . Html::a($device["deviceType"]["title"],
+                        ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
+                    . '</b>';
+            }
             if ($device["object"]["latitude"] > 0) {
                 $equipmentsList .= 'var device'
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: houseIcon}).bindPopup(\'<b>'
-                    . Html::a($device["deviceType"]["title"],
-                        ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
-                    . '</b><br/>'
+                    . '], {icon: houseIcon}).bindPopup(\''.$link.'<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -539,14 +545,20 @@ class SiteController extends Controller
         $equipmentsList = '';
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
+                if ($device['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
+                    $link = '<b>'.Html::a($device["deviceType"]["title"],
+                            ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
+                        . '</b>';
+                } else {
+                    $link = '<b>' . Html::a($device["deviceType"]["title"],
+                            ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
+                        . '</b>';
+                }
                 $equipmentsList .= 'var device'
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: houseIcon}).bindPopup(\'<b>'
-                    . Html::a($device["deviceType"]["title"],
-                        ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
-                    . '</b><br/>'
+                    . '], {icon: houseIcon}).bindPopup(\''.$link.'<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
