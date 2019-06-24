@@ -29,6 +29,9 @@ use yii\helpers\Html;
 </div>
 <div class="modal-body">
     <?php
+    $latDefault = 55.160374;
+    $lngDefault = 61.402738;
+
     if ($object['uuid']) {
         echo Html::hiddenInput("objectUuid", $object['uuid']);
         echo $form->field($object, 'uuid')
@@ -60,8 +63,8 @@ use yii\helpers\Html;
             ],
         ]);
 
-    echo $form->field($model, 'latitude')->textInput(['maxlength' => true, 'value' => $latDefault]);
-    echo $form->field($model, 'longitude')->textInput(['maxlength' => true, 'value' => $lngDefault]);
+    echo $form->field($object, 'latitude')->textInput(['maxlength' => true, 'value' => $latDefault]);
+    echo $form->field($object, 'longitude')->textInput(['maxlength' => true, 'value' => $lngDefault]);
 
     // lets use nominating service
     $nominatim = new ServiceNominatim();

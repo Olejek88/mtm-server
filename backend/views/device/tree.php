@@ -97,7 +97,7 @@ echo FancytreeWidget::widget([
         'contextMenu' => [
             'menu' => [
                 'new' => [
-                    'name' => 'Добавить новое',
+                    'name' => 'Добавить',
                     'icon' => 'add',
                     'callback' => new JsExpression('function(key, opt) {
                         var node = $.ui.fancytree.getNode(opt.$trigger);
@@ -107,11 +107,11 @@ echo FancytreeWidget::widget([
                                 type: "post",
                                 data: {
                                     selected_node: node.key,
-                                    folder: node.folder,
                                     uuid: node.data.uuid,
-                                    type: node.type,
-                                    model_uuid: node.data.model_uuid,
-                                    type_uuid: node.data.type_uuid                                                                        
+                                    nodeUuid: node.data.nodeUuid,
+                                    objectUuid: node.data.objectUuid,
+                                    type: node.type,                                                                        
+                                    source: node.data.source                                                                   
                                 },
                                 success: function (data) { 
                                     $(\'#modalAddEquipment\').modal(\'show\');
@@ -131,12 +131,11 @@ echo FancytreeWidget::widget([
                                 type: "post",
                                 data: {
                                     selected_node: node.key,
-                                    folder: node.folder,
                                     uuid: node.data.uuid,
-                                    type: node.type,
-                                    model_uuid: node.data.model_uuid,
-                                    type_uuid: node.data.type_uuid,
-                                    reference: "equipment"                                                                        
+                                    nodeUuid: node.data.nodeUuid,
+                                    objectUuid: node.data.objectUuid,
+                                    type: node.type,                                                                        
+                                    source: node.data.source                                                                   
                                 },
                                 success: function (data) { 
                                     $(\'#modalAddEquipment\').modal(\'show\');
@@ -145,48 +144,6 @@ echo FancytreeWidget::widget([
                            }); 
                     }')
                 ],
-                'doc' => [
-                    'name' => 'Добавить документацию',
-                    'icon' => 'add',
-                    'callback' => new JsExpression('function(key, opt) {
-                            var node = $.ui.fancytree.getNode(opt.$trigger);
-                            $.ajax({
-                                url: "../documentation/add",
-                                type: "post",
-                                data: {
-                                    selected_node: node.key,
-                                    folder: node.folder,
-                                    uuid: node.data.uuid,
-                                    model_uuid: node.data.model_uuid                                    
-                                },
-                                success: function (data) { 
-                                    $(\'#modalAddDocumentation\').modal(\'show\');
-                                    $(\'#modalContent\').html(data);
-                                }
-                            });
-                    }')
-                ],
-                'defect' => [
-                    'name' => 'Добавить дефект',
-                    'icon' => 'add',
-                    'callback' => new JsExpression('function(key, opt) {
-                            var node = $.ui.fancytree.getNode(opt.$trigger);
-                            $.ajax({
-                                url: "../defect/add",
-                                type: "post",
-                                data: {
-                                    selected_node: node.key,
-                                    folder: node.folder,
-                                    uuid: node.data.uuid,
-                                    model_uuid: node.data.model_uuid                                    
-                                },
-                                success: function (data) { 
-                                    $(\'#modalAddDefect\').modal(\'show\');
-                                    $(\'#modalContentDefect\').html(data);
-                                }
-                            });
-                    }')
-                ]
             ]
         ],
         'table' => [
@@ -213,4 +170,16 @@ $this->registerJs('$("#addButton").on("click",function() {
         var strType = e.options[e.selectedIndex].value;
         window.location.replace("tree?type="+strType);             
     })');
+
+$this->registerJs('$("#modalAddEquipment").on("hidden.bs.modal",
+function () {
+     window.location.replace("tree");
+})');
 ?>
+
+<div class="modal remote fade" id="modalAddEquipment">
+    <div class="modal-dialog">
+        <div class="modal-content loader-lg" id="modalContentEquipment">
+        </div>
+    </div>
+</div>

@@ -89,22 +89,25 @@ use yii\helpers\Html;
             ]);
     }
 
-    $nodes = Node::find()->all();
-    $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
-        return $model['object']['address'].' ['.$model['address'].']';
-    });
-    echo $form->field($device, 'nodeUuid')->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите контроллер..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
-
+    if (isset($nodeUuid)) {
+        echo $form->field($device, 'nodeUuid')->hiddenInput(['value' => $nodeUuid])->label(false);
+    } else {
+        $nodes = Node::find()->all();
+        $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
+            return $model['object']['address'] . ' [' . $model['address'] . ']';
+        });
+        echo $form->field($device, 'nodeUuid')->widget(Select2::class,
+            [
+                'data' => $items,
+                'language' => 'ru',
+                'options' => [
+                    'placeholder' => 'Выберите контроллер..'
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
+    }
     echo $form->field($device, 'port')->textInput(['maxlength' => true]);
 
     $interfaces = [
