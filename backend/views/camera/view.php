@@ -3,13 +3,16 @@
 use common\models\Camera;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\web\View;
 
 /* @var $model Camera */
+/* @var $this View */
 
+
+$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerCssFile('/css/vendor/video-js.min.css');
 $this->title = "Камеры";
 ?>
-<link href="/css/video-js.min.css" rel="stylesheet">
-<script src="/js/video.min.js"></script>
 
 <div class="order-status-view box-padding">
 

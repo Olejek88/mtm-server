@@ -58,15 +58,19 @@ class CameraController extends Controller
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
-//            if ($_POST['editableAttribute'] == 'port') {
-//                $model['port'] = $_POST['Camera'][$_POST['editableIndex']]['port'];
-//            }
+
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
                 $model['deviceStatusUuid'] = $_POST['Camera'][$_POST['editableIndex']]['deviceStatusUuid'];
             }
+
             if ($_POST['editableAttribute'] == 'date') {
                 $model['date'] = date("Y-m-d H:i:s", $_POST['Camera'][$_POST['editableIndex']]['date']);
             }
+
+            if ($_POST['editableAttribute'] == 'address') {
+                $model['address'] = $_POST['Camera'][$_POST['editableIndex']]['address'];
+            }
+
             $model->save();
             return json_encode('');
         }
@@ -263,8 +267,7 @@ class CameraController extends Controller
                                 'title' => $camera['title'],
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $camera['deviceStatus']->title . '</div></div>',
-                                'register' => '[' ./*$camera['address'].':'.$camera['port'].*/
-                                    ']',
+                                'register' => '[' . $camera['address'] . ']',
                                 'date' => $camera['changedAt'],
                                 'folder' => false
                             ];

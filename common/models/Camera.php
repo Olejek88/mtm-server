@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property string $deviceStatusUuid
  * @property string $objectUuid
  * @property string $nodeUuid
+ * @property string $address
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
@@ -95,6 +96,7 @@ class Camera extends MtmActiveRecord
                     'uuid',
                     'title',
                     'deviceStatusUuid',
+                    'nodeUuid',
                     'objectUuid',
                     'address'
                 ],
@@ -112,13 +114,9 @@ class Camera extends MtmActiveRecord
                 ],
                 'string', 'max' => 50
             ],
-            [
-                [
-                    'title'
-                ],
-                'string', 'max' => 150
-            ],
+            [['title'], 'string', 'max' => 150],
             [['oid'], 'checkOrganizationOwn'],
+            [['address'], 'string', 'max' => 1024],
         ];
     }
 
@@ -139,7 +137,7 @@ class Camera extends MtmActiveRecord
             'node' => Yii::t('app', 'Контроллер'),
             'objectUuid' => Yii::t('app', 'Объект'),
             'object' => Yii::t('app', 'Объект'),
-            'address' => Yii::t('app', 'Адрес'),
+            'address' => Yii::t('app', 'URL'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
