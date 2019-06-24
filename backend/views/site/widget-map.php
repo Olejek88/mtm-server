@@ -60,6 +60,13 @@
         iconAnchor: [22, 94],
         popupAnchor: [-3, -76]
     });
+    var lightIcon = L.icon({
+        iconUrl: '/images/light_marker_green.png',
+        iconSize: [32, 51],
+        iconAnchor: [22, 94],
+        popupAnchor: [-3, -76]
+    });
+
     <?php
     echo $devicesList;
     echo $devicesGroup;

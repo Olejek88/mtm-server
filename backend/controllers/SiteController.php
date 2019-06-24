@@ -140,7 +140,7 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: houseIcon}).bindPopup(\''.$link.'<br/>'
+                    . '], {icon: lightIcon}).bindPopup(\''.$link.'<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -558,7 +558,7 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: houseIcon}).bindPopup(\''.$link.'<br/>'
+                    . '], {icon: lightIcon}).bindPopup(\''.$link.'<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
