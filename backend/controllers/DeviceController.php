@@ -297,6 +297,10 @@ class DeviceController extends Controller
         foreach ($streets as $street) {
             $fullTree['children'][] = [
                 'title' => $street['title'],
+                'source' => '../device/tree',
+                'uuid' => $street['uuid'],
+                'expanded' => true,
+                'type' => 'street',
                 'folder' => true
             ];
             $houses = House::find()->where(['streetUuid' => $street['uuid']])->
@@ -304,6 +308,9 @@ class DeviceController extends Controller
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
+                    'uuid' => $house['uuid'],
+                    'type' => 'house',
+                    'expanded' => true,
                     'title' => $house->getFullTitle(),
                     'folder' => true
                 ];
@@ -312,6 +319,10 @@ class DeviceController extends Controller
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
                         'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'source' => '../device/tree',
+                        'uuid' => $object['uuid'],
+                        'expanded' => true,
+                        'type' => 'object',
                         'folder' => true
                     ];
                     $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
@@ -327,6 +338,11 @@ class DeviceController extends Controller
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
                             'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
                             'title' => 'Контроллер [' . $node['address'] . ']',
+                            'source' => '../device/tree',
+                            'objectUuid' => $object['uuid'],
+                            'uuid' => $node['uuid'],
+                            'type' => 'node',
+                            'expanded' => true,
                             'register' => $node['address'],
                             'folder' => true
                         ];
@@ -349,7 +365,13 @@ class DeviceController extends Controller
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                                 'register' => $device['port'] . ' [' . $device['address'] . ']',
+                                'uuid' => $device['uuid'],
+                                'expanded' => true,
+                                'objectUuid' => $object['uuid'],
+                                'nodeUuid' => $node['uuid'],
                                 'measure' => '',
+                                'source' => '../device/tree',
+                                'type' => 'device',
                                 'date' => $device['date'],
                                 'folder' => true
                             ];
@@ -372,6 +394,9 @@ class DeviceController extends Controller
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel['title'],
                                     'register' => $channel['register'],
+                                    'uuid' => $channel['uuid'],
+                                    'source' => '../device/tree',
+                                    'type' => 'channel',
                                     'measure' => $measure,
                                     'date' => $date,
                                     'folder' => false
@@ -585,6 +610,10 @@ class DeviceController extends Controller
             if (isset($_POST["deviceTypeUuid"]))
                 $deviceTypeUuid = $_POST["deviceTypeUuid"];
             else $deviceTypeUuid = DeviceType::DEVICE_LIGHT;
+            if (isset($_POST["objectUuid"]))
+                $objectUuid = $_POST["objectUuid"];
+            else $objectUuid = '';
+
             if (isset($_POST["source"]))
                 $source = $_POST["source"];
             else $source = '../device/tree';
@@ -607,11 +636,28 @@ class DeviceController extends Controller
                     ]);
                 }
                 if ($type == 'object') {
+                    $node = new Node();
+                    return $this->renderAjax('../node/_add_form', [
+                        'node' => $node,
+                        'objectUuid' => $uuid,
+                        'source' => $source
+                    ]);
+                }
+                if ($type == 'node') {
                     $device = new Device();
                     return $this->renderAjax('_add_form', [
                         'device' => $device,
-                        'objectUuid' => $uuid,
+                        'objectUuid' => $objectUuid,
+                        'nodeUuid' => $uuid,
                         'deviceTypeUuid' => $deviceTypeUuid,
+                        'source' => $source
+                    ]);
+                }
+                if ($type == 'device') {
+                    $sensorChannel = new SensorChannel();
+                    return $this->renderAjax('../sensor-channel/_add_sensor_channel', [
+                        'model' => $sensorChannel,
+                        'deviceUuid' => $uuid,
                         'source' => $source
                     ]);
                 }
@@ -670,12 +716,28 @@ class DeviceController extends Controller
                     ]);
                 }
             }
+            if ($type == 'node') {
+                $node = Node::find()->where(['uuid' => $uuid])->one();
+                if ($node) {
+                    return $this->renderAjax('../node/_add_form', [
+                        'nodeUuid' => $uuid,
+                        'node' => $node,
+                        'source' => $source
+                    ]);
+                }
+            }
             if ($type == 'device') {
                 $device = Device::find()->where(['uuid' => $uuid])->one();
                 return $this->renderAjax('../device/_add_form', [
-                    'contragentUuid' => $uuid,
                     'deviceTypeUuid' => $device['deviceTypeUuid'],
                     'device' => $device,
+                    'source' => $source
+                ]);
+            }
+            if ($type == 'sensor-channel') {
+                $sensorChannel = SensorChannel::find()->where(['uuid' => $uuid])->one();
+                return $this->renderAjax('../sensor-channel/_add_sensor_channel', [
+                    'model' => $sensorChannel,
                     'source' => $source
                 ]);
             }
@@ -728,6 +790,17 @@ class DeviceController extends Controller
                     $model = new Objects();
                 if ($model->load(Yii::$app->request->post())) {
                     if ($model->save(false)) {
+                        return $this->redirect($source);
+                    }
+                }
+            }
+            if ($type == 'node') {
+                if (isset($_POST['nodeUuid']))
+                    $model = Node::find()->where(['uuid' => $_POST['nodeUuid']])->one();
+                else
+                    $model = new Node();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false) && isset($_POST['nodeUuid'])) {
                         return $this->redirect($source);
                     }
                 }
