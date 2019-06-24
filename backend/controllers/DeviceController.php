@@ -14,6 +14,7 @@ use common\models\mtm\MtmDevLightConfig;
 use common\models\mtm\MtmDevLightConfigLight;
 use common\models\Node;
 use common\models\Objects;
+use common\models\Organisation;
 use common\models\Photo;
 use common\models\SensorChannel;
 use common\models\SensorConfig;
@@ -232,9 +233,9 @@ class DeviceController extends Controller
                     'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
                 ];
                 $org_id = User::getOid(Yii::$app->user->identity);
-                // TODO uuid  или _id?
+                $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
                 $node_id = $device['node']['_id'];
-                //self::sendConfig($pkt, $org_id, $node_id);
+                self::sendConfig($pkt, $org_id, $node_id);
             }
         }
 
@@ -264,9 +265,9 @@ class DeviceController extends Controller
                             'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
                         ];
                         $org_id = User::getOid(Yii::$app->user->identity);
-                        // TODO uuid  или _id?
+                        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
                         $node_id = $device['node']['_id'];
-                        //self::sendConfig($pkt, $org_id, $node_id);
+                        self::sendConfig($pkt, $org_id, $node_id);
                     }
                 }
             }
@@ -587,9 +588,9 @@ class DeviceController extends Controller
             'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
         ];
         $org_id = User::getOid(Yii::$app->user->identity);
-        // TODO uuid  или _id?
+        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
         $node_id = $device['node']['_id'];
-        //self::sendConfig($pkt, $org_id, $node_id);
+        self::sendConfig($pkt, $org_id, $node_id);
     }
 
     /**
@@ -874,7 +875,7 @@ class DeviceController extends Controller
             !isset($params['amqpServer']['port']) ||
             !isset($params['amqpServer']['user']) ||
             !isset($params['amqpServer']['password'])) {
-            exit(-1);
+            return;
         }
 
         $connection = new AMQPStreamConnection($params['amqpServer']['host'],
@@ -889,6 +890,6 @@ class DeviceController extends Controller
 
         // отправка сообщения на шкаф с _id=1, принадлежащий организации с _id=1
         $message = new AMQPMessage(json_encode($packet), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-        $channel->basic_publish($message, 'light', 'queryNode-' . $org_id . '-' . $node_id); // queryNode-1-1
+        $channel->basic_publish($message, 'light', 'routeNode-' . $org_id . '-' . $node_id); // queryNode-1-1
     }
 }

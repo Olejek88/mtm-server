@@ -8,6 +8,9 @@ use yii\widgets\DetailView;
 
 $this->title = "Камеры";
 ?>
+<link href="/css/video-js.min.css" rel="stylesheet">
+<script src="/js/video.min.js"></script>
+
 <div class="order-status-view box-padding">
 
     <div class="panel panel-default">
@@ -50,6 +53,41 @@ $this->title = "Камеры";
                             ]
                         ) ?>
                     </h6>
+                </div>
+                <div>
+                    <video
+                            id="my-player"
+                            class="video-js"
+                            controls
+                            preload="auto"
+                            poster="//vjs.zencdn.net/v/oceans.png"
+                            data-setup="{}">
+                        <source src="/lightcams/<?= $model->uuid . '.m3u8' ?>" type="application/x-mpegURL"/>
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a
+                            web browser that
+                            <a href="https://videojs.com/html5-video-support/" target="_blank">
+                                supports HTML5 video
+                            </a>
+                        </p>
+                    </video>
+                    <script>
+                        v = videojs('my-player');
+                        v.on('error', function () {
+                            console.log('XXX');
+                            console.log(this.error());
+                        });
+                        v.reloadSourceOnError({
+                            getSource: function (reload) {
+                                console.log('Reloading because of an error');
+                                reload({
+                                    src: "/lightcams/<?= $model->uuid . '.m3u8' ?>",
+                                    type: 'application/x-mpegURL'
+                                });
+                            },
+                            errorInterval: 5
+                        });
+                    </script>
                 </div>
             </div>
         </div>
