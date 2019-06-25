@@ -9,6 +9,7 @@
  * @var $contragentCount
  * @var $measures
  * @var $devices
+ * @var $cameras
  * @var $tree
  * @var $coordinates
  * @var $categories
@@ -60,12 +61,13 @@ $this->title = Yii::t('app', 'Сводная');
 
     <div class="col-md-5">
         <div class="row">
-            <div class="col-md-12">
-                <?= $this->render('widget-camera'); ?>
-            </div>
-            <div class="col-md-12">
-                <?= $this->render('widget-camera'); ?>
-            </div>
+            <?php
+            foreach ($cameras as $camera) {
+                echo '<div class="col-md-12">';
+                echo $this->render('widget-camera',['camera' => $camera]);
+                echo '</div>';
+            }
+            ?>
         </div>
     </div>
 </div>

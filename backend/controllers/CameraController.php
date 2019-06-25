@@ -12,14 +12,14 @@ use common\models\Street;
 use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\base\InvalidConfigException;
-use Throwable;
 
 class CameraController extends Controller
 {
@@ -162,6 +162,22 @@ class CameraController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionDashboard()
+    {
+        if (isset($_GET['uuid'])) {
+            $model = Camera::find()->where(['uuid' => $_GET['uuid']])->one();
+            if ($model)
+                return $this->render('dashboard', [
+                    'model' => $model
+                ]);
+        }
+        return self::actionIndex();
     }
 
     /**

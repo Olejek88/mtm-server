@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\NodeSearch;
+use common\models\Camera;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\Node;
@@ -12,6 +13,9 @@ use common\models\Measure;
 use common\models\Message;
 use common\models\Photo;
 use common\models\Street;
+use Exception;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -164,10 +168,42 @@ class NodeController extends Controller
         $node = Node::find()
             ->where(['uuid' => $uuid])
             ->one();
+        $camera=null;
+        if ($node) {
+            $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
+            if ($camera) {
+                $params = Yii::$app->params;
+                if (isset($params['amqpServer']['host']) &&
+                    isset($params['amqpServer']['port']) &&
+                    isset($params['amqpServer']['user']) &&
+                    isset($params['amqpServer']['password'])) {
+                    try {
+                        $connection = new AMQPStreamConnection($params['amqpServer']['host'],
+                            $params['amqpServer']['port'],
+                            $params['amqpServer']['user'],
+                            $params['amqpServer']['password']);
+
+                        $channel = $connection->channel();
+                        $channel->exchange_declare('light', 'direct', false, true, false);
+                        $pkt = [
+                            'type' => 'camera',
+                            'action' => 'publish',
+                            'uuid' => $camera->uuid,
+                        ];
+                        $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
+                        $route = 'routeNode-' . $camera->organisation->_id . '-' . $camera->node->_id;
+                        $channel->basic_publish($msq, 'light', $route);
+                    } catch (Exception $e) {
+                    }
+                }
+            }
+        }
+
         return $this->render(
             'dashboard',
             [
                 'node' => $node,
+                'camera' => $camera,
                 'type' => $type
             ]
         );

@@ -1,5 +1,6 @@
 <?php
 /* @var $node
+ * @var $camera
  */
 
 use common\models\Device;
@@ -35,7 +36,7 @@ $this->title = Yii::t('app', 'Контроллер');
     </div>
 
     <div class="col-md-5">
-        <?= $this->render('widget-camera', ['node' => $node]); ?>
+        <?= $this->render('widget-camera', ['camera' => $camera]); ?>
     </div>
 </div>
 
