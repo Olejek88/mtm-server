@@ -1,10 +1,8 @@
 <?php
+/* @var $camera */
 
-use common\models\Camera;
 use common\models\DeviceStatus;
-use yii\helpers\Html;
 
-$camera = Camera::find()->one();
 ?>
 
 <div class="box box-success">
@@ -21,12 +19,45 @@ $camera = Camera::find()->one();
     <div class="box-body no-padding">
         <div class="col-sm-7 invoice-col">
             <div class="product-img">
-                <?php echo Html::img('@web/images/camera_view.jpg') ?>
+                <div>
+                    <video
+                            id="my-player"
+                            class="video-js"
+                            controls
+                            preload="auto"
+                            poster="/images/camera_view.jpg"
+                            data-setup="{}">
+                        <source src="/lightcams/<?= $camera['uuid'] . '.m3u8' ?>" type="application/x-mpegURL"/>
+                        <p class="vjs-no-js">
+                            Для просмотра видео включите JavaScript и обновите браузер для поддержки
+                            <a href="https://videojs.com/html5-video-support/" target="_blank">
+                                HTML5 видео
+                            </a>
+                        </p>
+                    </video>
+                    <script>
+                        v = videojs('my-player');
+                        v.on('error', function () {
+                            console.log('XXX');
+                            console.log(this.error());
+                        });
+                        v.reloadSourceOnError({
+                            getSource: function (reload) {
+                                console.log('Reloading because of an error');
+                                reload({
+                                    src: "/lightcams/<?= $camera['uuid'] . '.m3u8' ?>",
+                                    type: 'application/x-mpegURL'
+                                });
+                            },
+                            errorInterval: 5
+                        });
+                    </script>
+                </div>
+                <?php /*echo Html::img('@web/images/camera_view.jpg')*/ ?>
             </div>
         </div>
         <!-- /.col -->
-        <div class="col-sm-5 invoice-col">
-            <address>
+        <div class="col-sm-5">
                 <?php
                 if ($camera) {
                     $color = 'background-color: white';
@@ -45,7 +76,6 @@ $camera = Camera::find()->one();
                     echo '<strong>Адрес</strong>&nbsp;&nbsp;' . $camera['address'] . '<br>';
                 }
                 ?>
-            </address>
         </div>
     </div>
 </div>

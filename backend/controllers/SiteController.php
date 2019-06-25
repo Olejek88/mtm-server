@@ -7,26 +7,29 @@ use backend\models\UserSearch;
 use common\components\MainFunctions;
 use common\models\Camera;
 use common\models\City;
+use common\models\Device;
 use common\models\DeviceStatus;
+use common\models\DeviceType;
 use common\models\House;
 use common\models\Journal;
-use common\models\Node;
-use common\models\Device;
-use common\models\DeviceType;
-use common\models\Objects;
 use common\models\LoginForm;
 use common\models\Measure;
+use common\models\Node;
+use common\models\Objects;
 use common\models\SensorChannel;
 use common\models\SensorConfig;
 use common\models\Street;
 use common\models\User;
+use Exception;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
-use Throwable;
-use yii\base\InvalidConfigException;
 
 /**
  * Site controller
@@ -116,115 +119,19 @@ class SiteController extends Controller
             $cnt++;
         }
 
-        $objectsGroup .= ']);' . PHP_EOL;
+        $layers = self::getLayers();
 
-        $devices = Device::find()->all();
-
-        $cnt = 0;
-        $default_coordinates = "[55.54,61.36]";
-        $coordinates = $default_coordinates;
-        $equipmentsGroup = 'var devices=L.layerGroup([';
-        $equipmentsList = '';
-        foreach ($devices as $device) {
-            if ($device['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
-                $link = '<b>'.Html::a($device["deviceType"]["title"],
-                    ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
-                . '</b>';
-            } else {
-                $link = '<b>' . Html::a($device["deviceType"]["title"],
-                        ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
-                    . '</b>';
-            }
-            if ($device["object"]["latitude"] > 0) {
-                $equipmentsList .= 'var device'
-                    . $device["_id"]
-                    . '= L.marker([' . $device["object"]["latitude"]
-                    . ',' . $device["object"]["longitude"]
-                    . '], {icon: lightIcon}).bindPopup(\''.$link.'<br/>'
-                    . $device["object"]->getAddress() . '\').openPopup();';
-                $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
-                if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
-                    $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
-                }
-                if ($cnt > 0) {
-                    $equipmentsGroup .= ',';
-                }
-
-                $equipmentsGroup .= 'device' . $device["_id"];
-                $cnt++;
-            }
-        }
-        $equipmentsGroup .= ']);' . PHP_EOL;
-
-        $cameras = Camera::find()->all();
-        $cnt = 0;
-        $camerasGroup = 'var cameras=L.layerGroup([';
-        $camerasList = '';
-        foreach ($cameras as $camera) {
-            if ($camera["object"]["latitude"] > 0) {
-                $camerasList .= 'var camera'
-                    . $camera["_id"]
-                    . '= L.marker([' . $camera["object"]["latitude"]
-                    . ',' . $camera["object"]["longitude"]
-                    . '], {icon: cameraIcon}).bindPopup(\'<b>'
-                    . Html::a($camera["title"],
-                        ['/node/dashboard', 'uuid' => $camera['node']['uuid'], 'type' => 'camera']) . '</span>'
-                    . '</b><br/>'
-                    . $camera["object"]->getAddress() . '\').openPopup();';
-                $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
-                if ($coordinates == $default_coordinates && $camera["object"]["latitude"] > 0) {
-                    $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
-                }
-                if ($cnt > 0) {
-                    $camerasGroup .= ',';
-                }
-
-                $camerasGroup .= 'camera' . $camera["_id"];
-                $cnt++;
-            }
-        }
-        $camerasGroup .= ']);' . PHP_EOL;
-
-        $nodes = Node::find()->all();
-        $cnt = 0;
-        $nodesGroup = 'var nodes=L.layerGroup([';
-        $nodesList = '';
-        foreach ($nodes as $node) {
-            if ($node["object"]["latitude"] > 0) {
-                $nodesList .= 'var node'
-                    . $node["_id"]
-                    . '= L.marker([' . $node["object"]["latitude"]
-                    . ',' . $node["object"]["longitude"]
-                    . '], {icon: nodeIcon}).bindPopup(\'<b>'
-                    . Html::a($node["address"],
-                        ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
-                    . '</b><br/>'
-                    . $node["object"]->getAddress() . '\').openPopup();';
-                $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
-                if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
-                    $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
-                }
-                if ($cnt > 0) {
-                    $nodesGroup .= ',';
-                }
-                $nodesGroup .= 'node' . $node["_id"];
-                $cnt++;
-            }
-        }
-        $nodesGroup .= ']);' . PHP_EOL;
 
         return $this->render(
             'index',
             [
-                'objectsGroup' => $objectsGroup,
-                'objectsList' => $objectsList,
-                'devicesGroup' => $equipmentsGroup,
-                'devicesList' => $equipmentsList,
-                'camerasGroup' => $camerasGroup,
-                'camerasList' => $camerasList,
-                'nodesGroup' => $nodesGroup,
-                'nodesList' => $nodesList,
-                'coordinates' => $coordinates
+                'devicesList' => $layers['devicesList'],
+                'devicesGroup' => $layers['devicesGroup'],
+                'camerasList' => $layers['camerasList'],
+                'camerasGroup' => $layers['camerasGroup'],
+                'nodesList' => $layers['nodesList'],
+                'nodesGroup' => $layers['nodesGroup'],
+                'coordinates' => $layers['coordinates']
             ]
         );
     }
@@ -339,7 +246,7 @@ class SiteController extends Controller
                                 'title' => $device['deviceType']['title'],
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $device['deviceStatus']->title . '</div></div>',
-                                'register' => $device['port'].' ['.$device['address'].']',
+                                'register' => $device['port'] . ' [' . $device['address'] . ']',
                                 'measure' => '',
                                 'date' => $device['date'],
                                 'folder' => true
@@ -374,6 +281,35 @@ class SiteController extends Controller
             }
         }
         $devices = Device::find()->all();
+        $cameras = Camera::find()->all();
+
+        foreach ($cameras as $camera) {
+            $params = Yii::$app->params;
+            if (isset($params['amqpServer']['host']) &&
+                isset($params['amqpServer']['port']) &&
+                isset($params['amqpServer']['user']) &&
+                isset($params['amqpServer']['password'])) {
+                try {
+                    $connection = new AMQPStreamConnection($params['amqpServer']['host'],
+                        $params['amqpServer']['port'],
+                        $params['amqpServer']['user'],
+                        $params['amqpServer']['password']);
+
+                    $channel = $connection->channel();
+                    $channel->exchange_declare('light', 'direct', false, true, false);
+                    $pkt = [
+                        'type' => 'camera',
+                        'action' => 'publish',
+                        'uuid' => $camera->uuid,
+                    ];
+                    $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
+                    $route = 'routeNode-' . $camera->organisation->_id . '-' . $camera->node->_id;
+                    $channel->basic_publish($msq, 'light', $route);
+                } catch (Exception $e) {
+
+                }
+            }
+        }
 
         return $this->render(
             'dashboard',
@@ -381,6 +317,7 @@ class SiteController extends Controller
                 'counts' => $counts,
                 'measures' => $measures,
                 'devices' => $devices,
+                'cameras' => $cameras,
                 'users' => $users,
                 'tree' => $fullTree,
                 'devicesList' => $layers['devicesList'],
@@ -545,8 +482,8 @@ class SiteController extends Controller
         $equipmentsList = '';
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
-                if ($device['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
-                    $link = '<b>'.Html::a($device["deviceType"]["title"],
+                if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
+                    $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
                 } else {
@@ -558,7 +495,7 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: lightIcon}).bindPopup(\''.$link.'<br/>'
+                    . '], {icon: lightIcon}).bindPopup(\'' . $link . '<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -586,7 +523,7 @@ class SiteController extends Controller
                     . ',' . $camera["object"]["longitude"]
                     . '], {icon: cameraIcon}).bindPopup(\'<b>'
                     . Html::a($camera["title"],
-                        ['/node/dashboard', 'uuid' => $camera['node']['uuid'], 'type' => 'camera']) . '</span>'
+                        ['/camera/dashboard', 'uuid' => $camera['uuid']]) . '</span>'
                     . '</b><br/>'
                     . $camera["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
