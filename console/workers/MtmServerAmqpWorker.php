@@ -2,11 +2,6 @@
 
 namespace console\workers;
 
-use common\models\Device;
-use common\models\LightStatus;
-use common\models\mtm\MtmDevLightStatus;
-use common\models\Node;
-use common\models\Organisation;
 use inpassor\daemon\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -15,7 +10,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use ErrorException;
 use Exception;
-use yii\base\InvalidConfigException;
 
 class MtmServerAmqpWorker extends Worker
 {
@@ -123,70 +117,17 @@ class MtmServerAmqpWorker extends Worker
 
     /**
      * @param AMQPMessage $msg
-     * @throws InvalidConfigException
      */
     public function callback($msg)
     {
 //        $this->log('get msg');
         $content = json_decode($msg->body);
         $type = $content->type;
-        $oid = $content->oid;
-        $nid = $content->nid;
-        $address = strtoupper($content->address);
-        $data = $content->data;
+//        $oid = $content->oid;
+//        $nid = $content->nid;
+//        $address = strtoupper($content->address);
+//        $data = $content->data;
         switch ($type) {
-            case 'lightstatus' :
-                $status = new MtmDevLightStatus();
-                if ($status->loadBase64Data($data)) {
-                    $this->log('Parse error light data.');
-                } else {
-//                    $this->log('Успешно разобрали данные статуса светильника!!!');
-
-                    $orgUuid = null;
-                    $nodeUuid = null;
-                    $deviceUuid = null;
-
-                    $organisation = Organisation::findOne($oid);
-                    if ($organisation != null) {
-                        $orgUuid = $organisation->uuid;
-                    }
-
-                    $node = Node::findOne($nid);
-                    if ($node != null) {
-                        $nodeUuid = $node->uuid;
-                    }
-
-                    $device = Device::find()->where(['oid' => $orgUuid, 'nodeUuid' => $nodeUuid, 'address' => $address])->one();
-                    if ($device != null) {
-                        $deviceUuid = $device->uuid;
-                    } else {
-                        $this->log('Not found device: oid=' . $oid . ', $bid=' . $nid . ', address=' . $address);
-                        return;
-                    }
-
-                    $lightStatus = LightStatus::find()->where(['oid' => $orgUuid, 'deviceUuid' => $deviceUuid])->one();
-                    if ($lightStatus == null) {
-                        $lightStatus = new LightStatus();
-                    }
-
-                    $lightStatus->oid = $orgUuid;
-                    $lightStatus->deviceUuid = $deviceUuid;
-                    $lightStatus->date = date('Y-m-d H:i:s');
-                    $lightStatus->address = $address;
-                    $lightStatus->setAlerts($status->alert);
-                    $lightStatus->setStatus($status->data);
-                    if ($lightStatus->save()) {
-                        /** @var AMQPChannel $channel */
-                        $channel = $msg->delivery_info['channel'];
-                        $channel->basic_ack($msg->delivery_info['delivery_tag']);
-                    } else {
-                        $this->log('Не удалось записать статус светильника...');
-                        foreach ($lightStatus->getErrors() as $error) {
-                            $this->log($error);
-                        }
-                    }
-                }
-                break;
             default:
                 break;
         }
