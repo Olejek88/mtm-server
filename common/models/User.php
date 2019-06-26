@@ -34,6 +34,7 @@ use yii\web\IdentityInterface;
  *
  * @property int $id
  * @property string $photoUrl
+ * @property Organisation $organisation
  * @property string $imageDir
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -335,7 +336,7 @@ class User extends ActiveRecord implements IdentityInterface
      * Поиск пользователя по accessToken.
      *
      * @param string $token Токен.
-     * @param string $type  Тип.
+     * @param string $type Тип.
      *
      * @inheritdoc
      *
@@ -357,5 +358,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         /** @var $identity User */
         return $identity->oid;
+    }
+
+    public function getOrganisation()
+    {
+        return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
     }
 }

@@ -7,6 +7,8 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
+use yii\db\ActiveRecord;
+use yii\base\InvalidConfigException;
 
 /**
  * This is the model class for table "measure".
@@ -15,14 +17,12 @@ use yii\db\Expression;
  * @property string $oid идентификатор организации
  * @property string $uuid
  * @property string $sensorChannelUuid
- * @property string $measureTypeUuid
  * @property double $value
  * @property string $date
  * @property string $createdAt
  * @property string $changedAt
  *
  * @property SensorChannel $sensorChannel
- * @property MeasureType $measureType
  */
 class Measure extends MtmActiveRecord
 {
@@ -70,15 +70,14 @@ class Measure extends MtmActiveRecord
                 [
                     'uuid',
                     'sensorChannelUuid',
-                    'measureTypeUuid',
                     'value',
                     'date'
                 ],
                 'required'
             ],
             [['value'], 'number'],
-            [['uuid', 'sensorChannelUuid', 'measureTypeUuid', 'date', 'oid'], 'string', 'max' => 50],
-            [['oid','createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'sensorChannelUuid', 'date', 'oid'], 'string', 'max' => 50],
+            [['oid', 'createdAt', 'changedAt'], 'safe'],
             [['oid'], 'checkOrganizationOwn'],
         ];
     }
@@ -97,8 +96,6 @@ class Measure extends MtmActiveRecord
             'uuid' => Yii::t('app', 'Uuid'),
             'sensorChannel' => Yii::t('app', 'Канал измерения'),
             'sensorChannelUuid' => Yii::t('app', 'Канал измерения'),
-            'measureType' => Yii::t('app', 'Тип измерения'),
-            'measureTypeUuid' => Yii::t('app', 'Тип измерения'),
             'value' => Yii::t('app', 'Значение'),
             'date' => Yii::t('app', 'Дата'),
             'createdAt' => Yii::t('app', 'Создан'),
@@ -117,10 +114,6 @@ class Measure extends MtmActiveRecord
             'sensorChannelUuid',
             'sensorChannel' => function ($model) {
                 return $model->sensorChannel;
-            },
-            'measureTypeUuid',
-            'measureType' => function ($model) {
-                return $model->measureType;
             },
             'value',
             'date',
@@ -154,20 +147,17 @@ class Measure extends MtmActiveRecord
     }
 
     /**
-     * Объект связанного поля.
-     *
-     * @return ActiveQuery
+     * @param $sensorChannelUuid
+     * @param $startDate
+     * @param $endDate
+     * @return ActiveRecord
+     * @throws InvalidConfigException
      */
-    public function getMeasureType()
-    {
-        return $this->hasOne(MeasureType::class, ['uuid' => 'measureTypeUuid']);
-    }
-
     public static function getLastMeasureBetweenDates($sensorChannelUuid, $startDate, $endDate)
     {
         $model = Measure::find()->where(["sensorChannelUuid" => $sensorChannelUuid])
-            ->andWhere('date >= "'.$startDate.'"')
-            ->andWhere('date < "'.$endDate.'"')
+            ->andWhere('date >= "' . $startDate . '"')
+            ->andWhere('date < "' . $endDate . '"')
             ->orderBy('date DESC')
             ->one();
         return $model;
