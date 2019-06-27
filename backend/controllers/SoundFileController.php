@@ -2,6 +2,10 @@
 
 namespace backend\controllers;
 
+use common\models\Organisation;
+use common\models\User;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use common\models\SoundFile;
 use backend\models\SoundFileSearch;
@@ -167,5 +171,98 @@ class SoundFileController extends Controller
         $model->save();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление нового оборудования
+     *
+     * @return mixed
+     */
+    public
+    function actionNew()
+    {
+        $message = new SoundFile();
+        return $this->renderAjax('_add_form', [
+            'model' => $message
+        ]);
+    }
+
+    /**
+     * Creates a new Message model.
+     * @return mixed
+     */
+    public
+    function actionSave()
+    {
+        $model = new SoundFile();
+        if ($model->load(Yii::$app->request->post())) {
+            // получаем изображение для последующего сохранения
+            $uFile = $model->uploadSoundFile();
+
+            if ($uFile !== false) {
+                $filePath = $model->getSoundFile();
+                if (!file_exists($model->uploadPath)) {
+                    mkdir($model->uploadPath, 0777, true);
+                }
+                $uFile->saveAs($filePath);
+            }
+            if ($model->save(false)) {
+                return $this->redirect('index');
+            }
+        }
+        echo json_encode($model->errors);
+        //return $this->redirect('index');
+    }
+
+    /**
+     * @return mixed
+     */
+    public
+    function actionSend()
+    {
+        if ($_GET['messageUuid'] && $_GET['nodeId']) {
+            $pkt = [
+                'type' => 'sound',
+                'action' => 'play',
+                'uuid' => $_GET['messageUuid'],
+            ];
+            $org_id = User::getOid(Yii::$app->user->identity);
+            $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+            $node_id = $_GET['nodeId'];
+            self::sendConfig($pkt, $org_id, $node_id);
+        }
+        return $this->redirect('index');
+    }
+
+    /**
+     * функция отправляет конфигурацию на светильник
+     *
+     * @param $packet
+     * @param $org_id
+     * @param $node_id
+     */
+    function sendConfig($packet, $org_id, $node_id)
+    {
+        $params = Yii::$app->params;
+        if (!isset($params['amqpServer']['host']) ||
+            !isset($params['amqpServer']['port']) ||
+            !isset($params['amqpServer']['user']) ||
+            !isset($params['amqpServer']['password'])) {
+            return;
+        }
+
+        $connection = new AMQPStreamConnection($params['amqpServer']['host'],
+            $params['amqpServer']['port'],
+            $params['amqpServer']['user'],
+            $params['amqpServer']['password']);
+
+        $channel = $connection->channel();
+
+        // инициализация exhange
+        $channel->exchange_declare('light', 'direct', false, true, false);
+
+        // отправка сообщения на шкаф с _id=1, принадлежащий организации с _id=1
+        $message = new AMQPMessage(json_encode($packet), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
+        $channel->basic_publish($message, 'light', 'routeNode-' . $org_id . '-' . $node_id); // queryNode-1-1
     }
 }

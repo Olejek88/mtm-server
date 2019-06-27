@@ -31,14 +31,6 @@ use kartik\widgets\FileInput;
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?php
-    echo $form->field($model, 'sFile')->widget(FileInput::class,
-        [
-            'options' => ['accept' => 'audio/*', 'allowEmpty' => true],
-            'pluginOptions' => ['allowedFileExtensions' => ['ogg', 'mp3']],
-        ]
-    ); ?>
-
-    <?php
     $nodes = Node::find()->all();
     $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
         return $model['object']['address'] . ' [' . $model['address'] . ']';
@@ -55,6 +47,14 @@ use kartik\widgets\FileInput;
             ],
         ]);
     ?>
+
+    <?php
+    echo $form->field($model, 'sFile')->widget(FileInput::class,
+        [
+            'options' => ['accept' => 'audio/*', 'allowEmpty' => true],
+            'pluginOptions' => ['allowedFileExtensions' => ['ogg', 'mp3']],
+        ]
+    ); ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
