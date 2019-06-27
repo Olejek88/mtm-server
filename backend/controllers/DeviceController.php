@@ -12,6 +12,7 @@ use common\models\Measure;
 use common\models\mtm\MtmDevLightActionSetLight;
 use common\models\mtm\MtmDevLightConfig;
 use common\models\mtm\MtmDevLightConfigLight;
+use common\models\mtm\MtmPktHeader;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Organisation;
@@ -225,7 +226,7 @@ class DeviceController extends Controller
 
                 $lightConfig->type = 2;
                 $lightConfig->protoVersion = 0;
-                $lightConfig->device = 1;
+                $lightConfig->device = MtmPktHeader::$MTM_DEVICE_LIGHT;
 
                 $pkt = [
                     'type' => 'light',
@@ -257,7 +258,7 @@ class DeviceController extends Controller
 
                         $lightConfig->type = 3;
                         $lightConfig->protoVersion = 0;
-                        $lightConfig->device = 1;
+                        $lightConfig->device = MtmPktHeader::$MTM_DEVICE_LIGHT;
 
                         $pkt = [
                             'type' => 'light',
@@ -579,7 +580,7 @@ class DeviceController extends Controller
         $lightConfig->value = $value;
         $lightConfig->type = 5;
         $lightConfig->protoVersion = 0;
-        $lightConfig->device = 1;
+        $lightConfig->device = MtmPktHeader::$MTM_DEVICE_LIGHT;
         $lightConfig->action = 2;
         //send to $device['address'];
         $pkt = [
