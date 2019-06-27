@@ -19,6 +19,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin([
         'id' => 'form-input-documentation',
+        'action' => 'save',
         'options' => [
             'class' => 'form-horizontal col-lg-12 col-sm-12 col-xs-12',
             'enctype' => 'multipart/form-data'
@@ -39,11 +40,6 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
-    echo $form->field($model, 'link')
-        ->widget(FileInput::class, ['options' => ['accept' => '*'],]);
-    ?>
-
-    <?php
     $nodes = Node::find()->all();
     $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
         return $model['object']['address'].' ['.$model['address'].']';
@@ -60,6 +56,8 @@ use yii\widgets\ActiveForm;
             ],
         ]);
 
+    echo $form->field($model, 'link')
+        ->widget(FileInput::class, ['options' => ['accept' => '*']]);
     ?>
 
     <div class="form-group text-center">

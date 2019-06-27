@@ -1,8 +1,6 @@
 <?php
 
-use common\models\Device;
 use common\models\Measure;
-use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 
