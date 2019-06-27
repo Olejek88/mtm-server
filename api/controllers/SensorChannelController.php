@@ -2,9 +2,9 @@
 
 namespace api\controllers;
 
-use common\models\Measure;
 use common\models\Node;
 use common\models\Organisation;
+use common\models\SensorChannel;
 use common\models\User;
 use Yii;
 use yii\db\ActiveRecord;
@@ -15,9 +15,9 @@ use yii\rest\Controller;
 use yii\web\Response;
 use yii\base\InvalidConfigException;
 
-class MeasureController extends Controller
+class SensorChannelController extends Controller
 {
-    public $modelClass = Measure::class;
+    public $modelClass = SensorChannel::class;
 
     /**
      * @inheritdoc
@@ -87,18 +87,19 @@ class MeasureController extends Controller
 
         $items = $req->getBodyParam('items');
         foreach ($items as $item) {
-            $model = Measure::find()->where(['uuid' => $item['uuid']])->one();
+            $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new Measure();
+                $model = new SensorChannel();
             }
 
             $model->uuid = $item['uuid'];
             $model->oid = $organisation->uuid;
-            $model->sensorChannelUuid = $item['sensorChannelUuid'];
-            $model->value = $item['value'];
-            $model->date = $item['date'];
+            $model->title = $item['title'];
+            $model->register = $item['register'];
+            $model->deviceUuid = $item['deviceUuid'];
+            $model->measureTypeUuid = $item['measureTypeUuid'];
             if (!$model->save()) {
-                throw new HttpException(401, 'measure not saved.');
+                throw new HttpException(401, 'sensor channel not saved.');
             }
         }
 
