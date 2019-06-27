@@ -3,9 +3,13 @@
 namespace backend\controllers;
 
 use backend\models\ObjectsSearch;
+use common\components\MainFunctions;
+use common\models\Contragent;
 use common\models\House;
+use common\models\ObjectContragent;
 use common\models\Objects;
 use common\models\Street;
+use common\models\Users;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -204,4 +208,201 @@ class ObjectController extends Controller
             ['contragents' => $fullTree]
         );
     }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление нового оборудования или объекта
+     *
+     * @return mixed
+     */
+    public
+    function actionNew()
+    {
+        if (isset($_POST["selected_node"])) {
+            $folder = $_POST["folder"];
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+            if (isset($_POST["type"]))
+                $type = $_POST["type"];
+            else $type = 0;
+
+            if ($folder == "true" && $uuid && $type) {
+                if ($type == 'street') {
+                    $house = new House();
+                    return $this->renderAjax('_add_house_form', [
+                        'streetUuid' => $uuid,
+                        'house' => $house
+                    ]);
+                }
+                if ($type == 'house') {
+                    $object = new Objects();
+                    return $this->renderAjax('_add_object_form', [
+                        'houseUuid' => $uuid,
+                        'object' => $object
+                    ]);
+                }
+            }
+        }
+        return 'Нельзя добавить объект в этом месте';
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет редактирование оборудования
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionEdit()
+    {
+        if (isset($_POST["selected_node"])) {
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+            if (isset($_POST["type"]))
+                $type = $_POST["type"];
+            else $type = 0;
+
+            if ($uuid && $type) {
+                if ($type == 'street') {
+                    $street = Street::find()->where(['uuid' => $uuid])->one();
+                    if ($street) {
+                        return $this->renderAjax('_add_street_form', [
+                            'street' => $street,
+                            'streetUuid' => $uuid
+                        ]);
+                    }
+                }
+                if ($type == 'house') {
+                    $house = House::find()->where(['uuid' => $uuid])->one();
+                    if ($house) {
+                        return $this->renderAjax('_add_house_form', [
+                            'houseUuid' => $uuid,
+                            'house' => $house
+                        ]);
+                    }
+                }
+
+                if ($type == 'object') {
+                    $object = Objects::find()->where(['uuid' => $uuid])->one();
+                    if ($object) {
+                        return $this->renderAjax('_add_object_form', [
+                            'objectUuid' => $uuid,
+                            'object' => $object
+                        ]);
+                    }
+                }
+            }
+        }
+        return 'Нельзя отредактировать этот объект';
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет удаление
+     *
+     * @return mixed
+     * @throws StaleObjectException
+     * @throws \Throwable
+     */
+    public function actionRemove()
+    {
+        if (isset($_POST["selected_node"])) {
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+            if (isset($_POST["type"]))
+                $type = $_POST["type"];
+            else $type = 0;
+
+            if ($uuid && $type) {
+                if ($type == 'street') {
+                    $street = Street::find()->where(['uuid' => $uuid])->one();
+                    if ($street) {
+                        $house = House::find()->where(['streetUuid' => $street['uuid']])->one();
+                        if (!$house) {
+                            $street->delete();
+                        }
+                    }
+                }
+                if ($type == 'house') {
+                    $house = House::find()->where(['uuid' => $uuid])->one();
+                    if ($house) {
+                        $object = Objects::find()->where(['houseUuid' => $house['uuid']])->one();
+                        if (!$object) {
+                            $house->delete();
+                        }
+                    }
+                }
+                if ($type == 'object') {
+                    $object = Objects::find()->where(['uuid' => $uuid])->one();
+                    if ($object) {
+                        $object['deleted'] = true;
+                        $object->save();
+                    }
+
+                }
+            }
+        }
+        return 'Нельзя удалить этот объект';
+    }
+
+    /**
+     * Creates a new Object model.
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSave()
+    {
+        if (isset($_POST["type"]))
+            $type = $_POST["type"];
+        else $type = 0;
+        if (isset($_POST["source"]))
+            $source = $_POST["source"];
+        else $source = 0;
+
+        if ($type) {
+            if ($type == 'street') {
+                if (isset($_POST['streetUuid'])) {
+                    $model = Street::find()->where(['uuid' => $_POST['streetUuid']])->one();
+                    if ($model->load(Yii::$app->request->post())) {
+                        if ($model->save(false)) {
+                            if ($source)
+                                return $this->redirect([$source]);
+                            return $this->redirect(['/object/tree']);
+                        }
+                    }
+                }
+            }
+            if ($type == 'house') {
+                if (isset($_POST['houseUuid']))
+                    $model = House::find()->where(['uuid' => $_POST['houseUuid']])->one();
+                else
+                    $model = new House();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false)) {
+                        if ($source)
+                            return $this->redirect([$source]);
+                        return $this->redirect(['/object/tree']);
+                    }
+                }
+            }
+            if ($type == 'object') {
+                if (isset($_POST['objectUuid']))
+                    $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->one();
+                else
+                    $model = new Objects();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false)) {
+                        if ($source)
+                            return $this->redirect([$source]);
+                        return $this->redirect(['/object/tree']);
+                    }
+                }
+            }
+        }
+        if ($source)
+            return $this->redirect([$source]);
+        return $this->redirect(['/device/tree']);
+    }
+
 }

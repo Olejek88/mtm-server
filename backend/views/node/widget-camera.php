@@ -1,18 +1,7 @@
 <?php
-/* @var $node */
+/* @var $camera */
 
-use common\models\Camera;
-use common\models\DeviceStatus;
-use yii\helpers\Html;
-
-$camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
-/*if ($camera) {
-    $cameraPhoto = Photo::find()
-        ->where(['cameraUuid' => $camera['uuid']])
-        ->all();
-}*/
-
-?>
+use common\models\DeviceStatus; ?>
 
 <div class="box box-success">
     <div class="box-header with-border">
@@ -28,7 +17,40 @@ $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
     <div class="box-body no-padding">
         <div class="col-sm-7 invoice-col">
             <div class="product-img">
-                <?php echo Html::img('@web/images/camera_view.jpg') ?>
+                <div>
+                    <video
+                            id="my-player"
+                            class="video-js"
+                            controls
+                            preload="auto"
+                            poster="/images/camera_view.jpg"
+                            data-setup="{}">
+                        <source src="/lightcams/<?= $camera['uuid'] . '.m3u8' ?>" type="application/x-mpegURL"/>
+                        <p class="vjs-no-js">
+                            Для просмотра видео включите JavaScript и обновите браузер для поддержки
+                            <a href="https://videojs.com/html5-video-support/" target="_blank">
+                                HTML5 видео
+                            </a>
+                        </p>
+                    </video>
+                    <script>
+                        v = videojs('my-player');
+                        v.on('error', function () {
+                            console.log('XXX');
+                            console.log(this.error());
+                        });
+                        v.reloadSourceOnError({
+                            getSource: function (reload) {
+                                console.log('Reloading because of an error');
+                                reload({
+                                    src: "/lightcams/<?= $camera['uuid'] . '.m3u8' ?>",
+                                    type: 'application/x-mpegURL'
+                                });
+                            },
+                            errorInterval: 5
+                        });
+                    </script>
+                </div>
             </div>
         </div>
         <!-- /.col -->
@@ -45,7 +67,7 @@ $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
                     if ($camera['deviceStatusUuid'] == DeviceStatus::WORK)
                         $color = 'background-color: green';
                     $status = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;"
-                        .$camera['deviceStatus']['title'];
+                        . $camera['deviceStatus']['title'];
 
                     echo '<strong>&nbsp;&nbsp;' . $camera['object']->getAddress() . '</strong> <br>';
                     echo '<strong>Статус</strong>&nbsp;&nbsp;' . $status . '<br>';

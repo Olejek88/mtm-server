@@ -9,13 +9,22 @@ use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
 use common\models\Measure;
+use common\models\mtm\MtmDevLightActionSetLight;
+use common\models\mtm\MtmDevLightConfig;
+use common\models\mtm\MtmDevLightConfigLight;
 use common\models\Node;
 use common\models\Objects;
+use common\models\Organisation;
 use common\models\Photo;
 use common\models\SensorChannel;
 use common\models\SensorConfig;
 use common\models\Street;
+use common\models\User;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -23,8 +32,6 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\base\InvalidConfigException;
-use Throwable;
 
 /**
  * DeviceController implements the CRUD actions for Device model.
@@ -139,59 +146,14 @@ class DeviceController extends Controller
             }
             // сохраняем запись
             if ($model->save(false)) {
-                MainFunctions::register("Добавлено новое оборудование ".$model['deviceType']['title'].' '.
-                    $model['node']['object']->getAddress().' ['.$model['node']['address'].']');
+                MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
+                    $model['node']['object']->getAddress() . ' [' . $model['node']['address'] . ']');
                 return $this->redirect(['view', 'id' => $model->_id]);
             }
             echo json_encode($model->errors);
         }
         return $this->render('create', ['model' => $model]);
     }
-
-    /**
-     * Creates a new Device models.
-     *
-     * @return mixed
-     * @throws InvalidConfigException
-     */
-    public function actionNew()
-    {
-        $devices = array();
-        $device_count = 0;
-        $objects = Objects::find()
-            ->select('*')
-            ->all();
-        foreach ($objects as $object) {
-            $device = Device::find()
-                ->select('*')
-                ->where(['objectUuid' => $object['uuid']])
-                ->one();
-            if ($device == null) {
-                $device = new Device();
-                $device->uuid = MainFunctions::GUID();
-                $device->nodeUuid = $object['uuid'];
-                $device->deviceTypeUuid = DeviceType::EQUIPMENT_HVS;
-                $device->deviceStatusUuid = DeviceStatus::UNKNOWN;
-                $device->serial = '222222';
-                $device->interface = 1;
-                $device->date = date('Y-m-d H:i:s');
-                $device->changedAt = date('Y-m-d H:i:s');
-                $device->createdAt = date('Y-m-d H:i:s');
-                $device->save();
-                $devices[$device_count] = $device;
-                $device_count++;
-            } else {
-                if ($device['deviceTypeUuid'] != DeviceType::EQUIPMENT_HVS) {
-                    $device['deviceTypeUuid'] = DeviceType::EQUIPMENT_HVS;
-                    $device['changedAt'] = date('Y-m-d H:i:s');
-                    $device->save();
-                    echo $device['uuid'] . '<br/>';
-                }
-            }
-        }
-        return $this->render('new', ['devices' => $devices]);
-    }
-
 
     /**
      * Updates an existing Device model.
@@ -227,6 +189,99 @@ class DeviceController extends Controller
     }
 
     /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionDashboard()
+    {
+        if (isset($_GET['uuid'])) {
+            $device = Device::find()
+                ->where(['uuid' => $_GET['uuid']])
+                ->one();
+        } else {
+            $device = Device::find()
+                ->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+                ->one();
+        }
+
+        if (isset($_POST['type']) && $_POST['type'] == 'set') {
+            if (isset($_POST['device'])) {
+                $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                if (isset($_POST['value'])) {
+                    $this->set($device, $_POST['value']);
+                }
+            }
+        }
+        if (isset($_POST['type']) && $_POST['type'] == 'params') {
+            if (isset($_POST['device'])) {
+                $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                $lightConfig = new MtmDevLightConfig();
+                $lightConfig->power = $_POST['power'];
+                $lightConfig->group = $_POST['group'];
+                $lightConfig->frequency = $_POST['frequency'];
+
+                $lightConfig->type = 2;
+                $lightConfig->protoVersion = 0;
+                $lightConfig->device = 1;
+
+                $pkt = [
+                    'type' => 'light',
+                    'address' => $device['address'], // 16 байт мак адрес в шестнадцатиричном представлении
+                    'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
+                ];
+                $org_id = User::getOid(Yii::$app->user->identity);
+                $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                $node_id = $device['node']['_id'];
+                self::sendConfig($pkt, $org_id, $node_id);
+            }
+        }
+
+        if (isset($_POST['type']) && $_POST['type'] == 'config') {
+            if (isset($_POST['device'])) {
+                $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                $lightConfig = new MtmDevLightConfigLight();
+                if (isset($_POST['device'])) {
+                    $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                    if ($device && isset($_POST['time0'])) {
+                        $lightConfig->time[0] = $_POST['time0'];
+                        $lightConfig->value[0] = $_POST['level0'];
+                        $lightConfig->time[1] = $_POST['time1'];
+                        $lightConfig->value[1] = $_POST['level1'];
+                        $lightConfig->time[2] = $_POST['time2'];
+                        $lightConfig->value[2] = $_POST['level2'];
+                        $lightConfig->time[3] = $_POST['time3'];
+                        $lightConfig->value[3] = $_POST['level3'];
+
+                        $lightConfig->type = 3;
+                        $lightConfig->protoVersion = 0;
+                        $lightConfig->device = 1;
+
+                        $pkt = [
+                            'type' => 'light',
+                            'address' => $device['address'], // 16 байт мак адрес в шестнадцатиричном представлении
+                            'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
+                        ];
+                        $org_id = User::getOid(Yii::$app->user->identity);
+                        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                        $node_id = $device['node']['_id'];
+                        self::sendConfig($pkt, $org_id, $node_id);
+                    }
+                }
+            }
+        }
+
+        return $this->render(
+            'dashboard',
+            [
+                'device' => $device
+            ]
+        );
+    }
+
+    /**
      * Build tree of device
      *
      * @return mixed
@@ -243,6 +298,10 @@ class DeviceController extends Controller
         foreach ($streets as $street) {
             $fullTree['children'][] = [
                 'title' => $street['title'],
+                'source' => '../device/tree',
+                'uuid' => $street['uuid'],
+                'expanded' => true,
+                'type' => 'street',
                 'folder' => true
             ];
             $houses = House::find()->where(['streetUuid' => $street['uuid']])->
@@ -250,6 +309,9 @@ class DeviceController extends Controller
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
+                    'uuid' => $house['uuid'],
+                    'type' => 'house',
+                    'expanded' => true,
                     'title' => $house->getFullTitle(),
                     'folder' => true
                 ];
@@ -258,6 +320,10 @@ class DeviceController extends Controller
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
                         'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'source' => '../device/tree',
+                        'uuid' => $object['uuid'],
+                        'expanded' => true,
+                        'type' => 'object',
                         'folder' => true
                     ];
                     $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
@@ -273,6 +339,11 @@ class DeviceController extends Controller
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
                             'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
                             'title' => 'Контроллер [' . $node['address'] . ']',
+                            'source' => '../device/tree',
+                            'objectUuid' => $object['uuid'],
+                            'uuid' => $node['uuid'],
+                            'type' => 'node',
+                            'expanded' => true,
                             'register' => $node['address'],
                             'folder' => true
                         ];
@@ -294,8 +365,14 @@ class DeviceController extends Controller
                                 'title' => $device['deviceType']['title'],
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $device['deviceStatus']->title . '</div></div>',
-                                'register' => $device['port'].' ['.$device['address'].']',
+                                'register' => $device['port'] . ' [' . $device['address'] . ']',
+                                'uuid' => $device['uuid'],
+                                'expanded' => true,
+                                'objectUuid' => $object['uuid'],
+                                'nodeUuid' => $node['uuid'],
                                 'measure' => '',
+                                'source' => '../device/tree',
+                                'type' => 'device',
                                 'date' => $device['date'],
                                 'folder' => true
                             ];
@@ -318,6 +395,9 @@ class DeviceController extends Controller
                                 $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
                                     'title' => $channel['title'],
                                     'register' => $channel['register'],
+                                    'uuid' => $channel['uuid'],
+                                    'source' => '../device/tree',
+                                    'type' => 'channel',
                                     'measure' => $measure,
                                     'date' => $date,
                                     'folder' => false
@@ -333,6 +413,87 @@ class DeviceController extends Controller
 
         return $this->render(
             'tree',
+            ['device' => $fullTree, 'deviceTypes' => $items]
+        );
+    }
+
+    /**
+     * Build tree of device
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionTreeLight()
+    {
+        ini_set('memory_limit', '-1');
+        $fullTree = array();
+        $streets = Street::find()
+            ->select('*')
+            ->orderBy('title')
+            ->all();
+        foreach ($streets as $street) {
+            $fullTree['children'][] = [
+                'title' => $street['title'],
+                'expanded' => true,
+                'source' => '../device/tree-light',
+                'uuid' => $street['uuid'],
+                'type' => 'street',
+                'folder' => true
+            ];
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
+            orderBy('number')->all();
+            foreach ($houses as $house) {
+                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                foreach ($objects as $object) {
+                    $childIdx = count($fullTree['children']) - 1;
+                    $fullTree['children'][$childIdx]['children'][] = [
+                        'title' => $house->getFullTitle() . ', ' . $object['title'],
+                        'expanded' => true,
+                        'source' => '../device/tree-light',
+                        'uuid' => $object['uuid'],
+                        'type' => 'object',
+                        'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
+                        'folder' => true
+                    ];
+                    $devices = Device::find()->where(['objectUuid' => $object['uuid']])
+                        ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+                        ->all();
+                    foreach ($devices as $device) {
+                        $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
+                        if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                            $class = 'critical1';
+                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                            $class = 'critical2';
+                        } else {
+                            $class = 'critical3';
+                        }
+                        $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
+                        //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
+                        $config = 'конфигурация';
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
+                            'title' => $device['deviceType']['title'],
+                            'status' => '<div class="progress"><div class="'
+                                . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                            'register' => $device['port'] . ' [' . $device['address'] . ']',
+                            'address' => $device['address'],
+                            'uuid' => $device['uuid'],
+                            'source' => '../device/tree-light',
+                            'type' => 'device',
+                            'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
+                            'channels' => $channels,
+                            'config' => $config,
+                            'date' => $device['date'],
+                            'folder' => false
+                        ];
+                    }
+                }
+            }
+        }
+        $deviceTypes = DeviceType::find()->all();
+        $items = ArrayHelper::map($deviceTypes, 'uuid', 'title');
+
+        return $this->render(
+            'tree-light',
             ['device' => $fullTree, 'deviceTypes' => $items]
         );
     }
@@ -405,5 +566,330 @@ class DeviceController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     *
+     * @param $device
+     * @param $value
+     */
+    function set($device, $value)
+    {
+        $lightConfig = new MtmDevLightActionSetLight();
+        $lightConfig->value = $value;
+        $lightConfig->type = 5;
+        $lightConfig->protoVersion = 0;
+        $lightConfig->device = 1;
+        $lightConfig->action = 2;
+        //send to $device['address'];
+        $pkt = [
+            'type' => 'light',
+            'address' => $device['address'], // 16 байт мак адрес в шестнадцатиричном представлении
+            'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
+        ];
+        $org_id = User::getOid(Yii::$app->user->identity);
+        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+        $node_id = $device['node']['_id'];
+        self::sendConfig($pkt, $org_id, $node_id);
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление нового оборудования
+     *
+     * @return mixed
+     */
+    public
+    function actionNew()
+    {
+        if (isset($_POST["selected_node"])) {
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+            if (isset($_POST["type"]))
+                $type = $_POST["type"];
+            else $type = 0;
+            if (isset($_POST["deviceTypeUuid"]))
+                $deviceTypeUuid = $_POST["deviceTypeUuid"];
+            else $deviceTypeUuid = DeviceType::DEVICE_LIGHT;
+            if (isset($_POST["objectUuid"]))
+                $objectUuid = $_POST["objectUuid"];
+            else $objectUuid = '';
+
+            if (isset($_POST["source"]))
+                $source = $_POST["source"];
+            else $source = '../device/tree';
+
+            if ($uuid && $type) {
+                if ($type == 'street') {
+                    $house = new House();
+                    return $this->renderAjax('../object/_add_house_form', [
+                        'streetUuid' => $uuid,
+                        'house' => $house,
+                        'source' => $source
+                    ]);
+                }
+                if ($type == 'house') {
+                    $object = new Objects();
+                    return $this->renderAjax('../object/_add_object_form', [
+                        'houseUuid' => $uuid,
+                        'object' => $object,
+                        'source' => $source
+                    ]);
+                }
+                if ($type == 'object') {
+                    $node = new Node();
+                    return $this->renderAjax('../node/_add_form', [
+                        'node' => $node,
+                        'objectUuid' => $uuid,
+                        'source' => $source
+                    ]);
+                }
+                if ($type == 'node') {
+                    $device = new Device();
+                    return $this->renderAjax('_add_form', [
+                        'device' => $device,
+                        'objectUuid' => $objectUuid,
+                        'nodeUuid' => $uuid,
+                        'deviceTypeUuid' => $deviceTypeUuid,
+                        'source' => $source
+                    ]);
+                }
+                if ($type == 'device') {
+                    $sensorChannel = new SensorChannel();
+                    return $this->renderAjax('../sensor-channel/_add_sensor_channel', [
+                        'model' => $sensorChannel,
+                        'deviceUuid' => $uuid,
+                        'source' => $source
+                    ]);
+                }
+            }
+        }
+        return 'Нельзя добавить объект в этом месте';
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет редактирование оборудования
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionEdit()
+    {
+        if (isset($_POST["source"]))
+            $source = $_POST["source"];
+        else $source = '../device/tree';
+
+        if (isset($_POST["uuid"]))
+            $uuid = $_POST["uuid"];
+        else $uuid = 0;
+        if (isset($_POST["type"]))
+            $type = $_POST["type"];
+        else $type = 0;
+
+        if ($uuid && $type) {
+            if ($type == 'street') {
+                $street = Street::find()->where(['uuid' => $uuid])->one();
+                if ($street) {
+                    return $this->renderAjax('../object/_add_street_form', [
+                        'street' => $street,
+                        'streetUuid' => $uuid,
+                        'source' => $source
+                    ]);
+                }
+            }
+            if ($type == 'house') {
+                $house = House::find()->where(['uuid' => $uuid])->one();
+                if ($house) {
+                    return $this->renderAjax('../object/_add_house_form', [
+                        'houseUuid' => $uuid,
+                        'house' => $house,
+                        'source' => $source
+                    ]);
+                }
+            }
+            if ($type == 'object') {
+                $object = Objects::find()->where(['uuid' => $uuid])->one();
+                if ($object) {
+                    return $this->renderAjax('../object/_add_object_form', [
+                        'objectUuid' => $uuid,
+                        'object' => $object,
+                        'source' => $source
+                    ]);
+                }
+            }
+            if ($type == 'node') {
+                $node = Node::find()->where(['uuid' => $uuid])->one();
+                if ($node) {
+                    return $this->renderAjax('../node/_add_form', [
+                        'nodeUuid' => $uuid,
+                        'node' => $node,
+                        'source' => $source
+                    ]);
+                }
+            }
+            if ($type == 'device') {
+                $device = Device::find()->where(['uuid' => $uuid])->one();
+                return $this->renderAjax('../device/_add_form', [
+                    'deviceTypeUuid' => $device['deviceTypeUuid'],
+                    'device' => $device,
+                    'source' => $source
+                ]);
+            }
+            if ($type == 'sensor-channel') {
+                $sensorChannel = SensorChannel::find()->where(['uuid' => $uuid])->one();
+                return $this->renderAjax('../sensor-channel/_add_sensor_channel', [
+                    'model' => $sensorChannel,
+                    'source' => $source
+                ]);
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Creates a new Device model.
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSave()
+    {
+        if (isset($_POST["type"]))
+            $type = $_POST["type"];
+        else $type = 0;
+        if (isset($_POST["source"]))
+            $source = $_POST["source"];
+        else $source = '../device/tree';
+
+
+        if ($type) {
+            if ($type == 'street') {
+                if (isset($_POST['streetUuid'])) {
+                    $model = Street::find()->where(['uuid' => $_POST['streetUuid']])->one();
+                    if ($model->load(Yii::$app->request->post())) {
+                        if ($model->save(false)) {
+                            return $this->redirect($source);
+                        }
+                    }
+                }
+            }
+            if ($type == 'house') {
+                if (isset($_POST['houseUuid']))
+                    $model = House::find()->where(['uuid' => $_POST['houseUuid']])->one();
+                else
+                    $model = new House();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false)) {
+                        return $this->redirect($source);
+                    }
+                }
+            }
+            if ($type == 'object') {
+                if (isset($_POST['objectUuid']))
+                    $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->one();
+                else
+                    $model = new Objects();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false)) {
+                        return $this->redirect($source);
+                    }
+                }
+            }
+            if ($type == 'node') {
+                if (isset($_POST['nodeUuid']))
+                    $model = Node::find()->where(['uuid' => $_POST['nodeUuid']])->one();
+                else
+                    $model = new Node();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false) && isset($_POST['nodeUuid'])) {
+                        return $this->redirect($source);
+                    }
+                }
+            }
+            if ($type == 'device') {
+                if (isset($_POST['deviceUuid']))
+                    $model = Device::find()->where(['uuid' => $_POST['deviceUuid']])->one();
+                else
+                    $model = new Device();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false) && isset($_POST['deviceUuid'])) {
+                        return $this->redirect($source);
+                    }
+                }
+            }
+        }
+        return $this->redirect($source);
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет отвязывание выбранного оборудования от пользователя
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionRemove()
+    {
+        if (isset($_POST["uuid"])) {
+            $model = Device::find()->where(['uuid' => $_POST['uuid']])->one();
+            $model["deleted"] = true;
+            $model->save();
+        }
+        $this->enableCsrfValidation = false;
+        return 0;
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление нового оборудования
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSetConfig()
+    {
+        if (isset($_POST["selected_node"])) {
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+
+            if ($uuid) {
+                $model = Device::find()->where(['uuid' => $_POST['uuid']])->one();
+                return $this->renderAjax('_edit_light_config', [
+                    'device' => $model
+                ]);
+            }
+        }
+        return 'Нельзя сконфигурировать устройство';
+    }
+
+    /**
+     * функция отправляет конфигурацию на светильник
+     *
+     * @param $packet
+     * @param $org_id
+     * @param $node_id
+     */
+    function sendConfig($packet, $org_id, $node_id)
+    {
+        $params = Yii::$app->params;
+        if (!isset($params['amqpServer']['host']) ||
+            !isset($params['amqpServer']['port']) ||
+            !isset($params['amqpServer']['user']) ||
+            !isset($params['amqpServer']['password'])) {
+            return;
+        }
+
+        $connection = new AMQPStreamConnection($params['amqpServer']['host'],
+            $params['amqpServer']['port'],
+            $params['amqpServer']['user'],
+            $params['amqpServer']['password']);
+
+        $channel = $connection->channel();
+
+        // инициализация exhange
+        $channel->exchange_declare('light', 'direct', false, true, false);
+
+        // отправка сообщения на шкаф с _id=1, принадлежащий организации с _id=1
+        $message = new AMQPMessage(json_encode($packet), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
+        $channel->basic_publish($message, 'light', 'routeNode-' . $org_id . '-' . $node_id); // queryNode-1-1
     }
 }
