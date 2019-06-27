@@ -117,7 +117,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['deleted'], 'boolean'],
             [['uuid', 'whoIs'], 'string', 'max' => 45],
             [['name', 'contact'], 'string', 'max' => 100],
-            [['oid'], 'checkOrganizationOwn'],
+//            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 
