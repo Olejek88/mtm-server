@@ -1,5 +1,6 @@
 <?php
 /* @var $device
+ * @var $parameters
  */
 
 use kartik\slider\Slider;
@@ -18,7 +19,7 @@ use yii\widgets\Pjax;
     <div class="box-body">
         <div class="row">
             <?php Pjax::begin(['id' => 'options']); ?>
-            <?= Html::beginForm(['device/dashboard'], 'post',
+            <?= Html::beginForm(['device/dashboard','uuid' => $device['uuid']], 'post',
                 ['data-pjax' => '', 'class' => 'form-inline']); ?>
             <div class="col-md-12">
                 <?php

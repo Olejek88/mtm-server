@@ -1,5 +1,6 @@
 <?php
 /* @var $device
+ * @var $parameters
  */
 
 use common\models\mtm\MtmDevLightConfig;
@@ -19,7 +20,7 @@ use yii\widgets\Pjax;
     </div>
     <div class="box-body">
         <?php Pjax::begin(['id' => 'options']); ?>
-        <?= Html::beginForm(['device/dashboard'], 'post',
+        <?= Html::beginForm(['device/dashboard','uuid' => $device['uuid']], 'post',
             ['data-pjax' => '', 'class' => 'form-inline']);
         ?>
         <div class="row">
@@ -27,6 +28,25 @@ use yii\widgets\Pjax;
                 <?php
                 echo Html::hiddenInput('device', $device['uuid']);
                 echo Html::hiddenInput('type', 'params');
+
+                echo '<label class="control-label">Частота выдачи датчиком своего статуса (сек.)</label>';
+                echo '<span></br></br></span>';
+                echo '<div style="margin-left: 10px; width: 100%">';
+                echo Slider::widget([
+                    'name' => 'frequency',
+                    'value' => $parameters['frequency'],
+                    'sliderColor' => Slider::TYPE_SUCCESS,
+                    'handleColor' => Slider::TYPE_SUCCESS,
+                    'pluginOptions' => [
+                        'orientation' => 'horizontal',
+                        'handle' => 'square',
+                        'min' => 5,
+                        'max' => 60,
+                        'step' => 5,
+                        'tooltip' => 'always'
+                    ],
+                ]);
+                echo '</div>';
 
                 echo '<label class="control-label">Режим работы светильника</label>';
                 $modes = [
@@ -38,6 +58,7 @@ use yii\widgets\Pjax;
                     [
                         'name' => 'mode',
                         'data' => $modes,
+                        'value' => $parameters['mode'],
                         'options' => [
                             'placeholder' => 'Режим работы светильника'
                         ]
@@ -45,16 +66,17 @@ use yii\widgets\Pjax;
 
                 echo '<label class="control-label">Мощность светильника</label>';
                 $levels = [
-                    MtmDevLightConfig::$LIGHT_POWER_12 => '12%',
-                    MtmDevLightConfig::$LIGHT_POWER_40 => '40%',
-                    MtmDevLightConfig::$LIGHT_POWER_60 => '60%',
-                    MtmDevLightConfig::$LIGHT_POWER_80 => '80%',
-                    MtmDevLightConfig::$LIGHT_POWER_100 => '100%',
-                    MtmDevLightConfig::$LIGHT_POWER_120 => '120%'
+                    MtmDevLightConfig::$LIGHT_POWER_12 => '12Вт',
+                    MtmDevLightConfig::$LIGHT_POWER_40 => '40Вт',
+                    MtmDevLightConfig::$LIGHT_POWER_60 => '60Вт',
+                    MtmDevLightConfig::$LIGHT_POWER_80 => '80Вт',
+                    MtmDevLightConfig::$LIGHT_POWER_100 => '100Вт',
+                    MtmDevLightConfig::$LIGHT_POWER_120 => '120Вт'
                 ];
                 echo Select2::widget(
                 [
                     'data' => $levels,
+                    'value' => $parameters['power'],
                     'name' => 'power',
                     'language' => 'ru',
                     'options' => [
@@ -76,6 +98,7 @@ use yii\widgets\Pjax;
                 echo Select2::widget(
                 [
                     'data' => $groups,
+                    'value' => $parameters['group'],
                     'name' => 'group',
                     'language' => 'ru',
                     'options' => [
@@ -86,23 +109,7 @@ use yii\widgets\Pjax;
                     ],
                 ]);
 
-                echo '<label class="control-label">Частота выдачи датчиком своего статуса (сек.)</label>';
-                echo '<span></br></br></span>';
-                echo '<div style="margin: 10px; width: 100%">';
-                echo Slider::widget([
-                    'name' => 'frequency',
-                    'sliderColor' => Slider::TYPE_SUCCESS,
-                    'handleColor' => Slider::TYPE_SUCCESS,
-                    'pluginOptions' => [
-                        'orientation' => 'horizontal',
-                        'handle' => 'square',
-                        'min' => 5,
-                        'max' => 60,
-                        'step' => 5,
-                        'tooltip' => 'always'
-                    ],
-                ]);
-                echo '</div><div class="modal-footer">';
+                echo '<div class="modal-footer">';
                 echo Html::submitButton('Задать', ['class' => 'btn btn-success', 'name' => 'button']);
                 echo '</div>';
                 ?>

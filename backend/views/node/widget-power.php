@@ -6,15 +6,16 @@
 
 use common\models\Measure;
 use common\models\MeasureType;
+use common\models\SensorChannel;
 use yii\helpers\Html;
 
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
 $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 
 $last_measures = Measure::find()
-    ->where(['measureTypeUuid' => MeasureType::POWER])
-    ->orderBy('date')
-    ->all();
+    ->where(['sensorChannelUuid' => (SensorChannel::find()->select('uuid')
+        ->where(['measureTypeUuid' => MeasureType::POWER]))])
+    ->orderBy('date')->all();
 $cnt=0;
 $categories='';
 $values='';

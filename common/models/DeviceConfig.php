@@ -13,15 +13,31 @@ use yii\db\Expression;
  * @property integer $_id
  * @property string $oid идентификатор организации
  * @property string $uuid
- * @property string $sensorChannelUuid
- * @property string $config
+ * @property string $deviceUuid
+ * @property string $parameter
+ * @property string $value
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property SensorChannel $sensorChannel
+ * @property Device $device
  */
-class SensorConfig extends MtmActiveRecord
+class DeviceConfig extends MtmActiveRecord
 {
+    const PARAM_SET_VALUE = 'Уровень освещения';
+    const PARAM_FREQUENCY = 'Частота выдачи датчиком статуса';
+    const PARAM_REGIME = 'Режим работы светильника';
+    const PARAM_POWER = 'Мощность светильника';
+    const PARAM_GROUP = 'Группа';
+
+    const PARAM_TIME0 = 'Время с начала суток #1';
+    const PARAM_LEVEL0 = 'Уровень освещения #1';
+    const PARAM_TIME1 = 'Время с начала суток #2';
+    const PARAM_LEVEL1 = 'Уровень освещения #2';
+    const PARAM_TIME2 = 'Время с начала суток #3';
+    const PARAM_LEVEL2 = 'Уровень освещения #3';
+    const PARAM_TIME3 = 'Время с начала суток #4';
+    const PARAM_LEVEL3 = 'Уровень освещения #4';
+
     /**
      * Behaviors
      *
@@ -48,7 +64,7 @@ class SensorConfig extends MtmActiveRecord
      */
     public static function tableName()
     {
-        return 'sensor_config';
+        return 'device_config';
     }
 
     /**
@@ -64,8 +80,9 @@ class SensorConfig extends MtmActiveRecord
             [
                 [
                     'uuid',
-                    'sensorChannelUuid',
-                    'config',
+                    'deviceUuid',
+                    'parameter',
+                    'value'
                 ],
                 'required'
             ],
@@ -73,7 +90,7 @@ class SensorConfig extends MtmActiveRecord
             [
                 [
                     'uuid',
-                    'sensorChannelUuid'
+                    'deviceUuid'
                 ],
                 'string', 'max' => 45
             ],
@@ -88,10 +105,10 @@ class SensorConfig extends MtmActiveRecord
      */
     public function fields()
     {
-        return ['_id', 'uuid', 'config',
-            'sensorChannelUuid',
-            'sensorChannel' => function ($model) {
-                return $model->sensorChannel;
+        return ['_id', 'uuid', 'parameter', 'value',
+            'deviceUuid',
+            'device' => function ($model) {
+                return $model->device;
             },
             'createdAt', 'changedAt'
         ];
@@ -109,8 +126,10 @@ class SensorConfig extends MtmActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'sensorChannelUuid' => Yii::t('app', 'Канал/устройство'),
-            'config' => Yii::t('app', 'Конфигурация'),
+            'device' => Yii::t('app', 'Устройство'),
+            'deviceUuid' => Yii::t('app', 'Устройство'),
+            'parameter' => Yii::t('app', 'Параметр'),
+            'value' => Yii::t('app', 'Конфигурация'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
@@ -121,10 +140,10 @@ class SensorConfig extends MtmActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getSensorChannel()
+    public function getDevice()
     {
         return $this->hasOne(
-            SensorChannel::class, ['uuid' => 'sensorChannelUuid']
+            Device::class, ['uuid' => 'deviceUuid']
         );
     }
 

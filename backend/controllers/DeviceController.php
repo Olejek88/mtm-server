@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\DeviceSearch;
 use common\components\MainFunctions;
 use common\models\Device;
+use common\models\DeviceConfig;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
@@ -213,6 +214,7 @@ class DeviceController extends Controller
                 $device = Device::find()->where(['uuid' => $_POST['device']])->one();
                 if (isset($_POST['value'])) {
                     $this->set($device, $_POST['value']);
+                    self::updateConfig($device['uuid'], DeviceConfig::PARAM_SET_VALUE, $_POST['value']);
                 }
             }
         }
@@ -220,6 +222,7 @@ class DeviceController extends Controller
             if (isset($_POST['device'])) {
                 $device = Device::find()->where(['uuid' => $_POST['device']])->one();
                 $lightConfig = new MtmDevLightConfig();
+                $lightConfig->mode = $_POST['mode'];
                 $lightConfig->power = $_POST['power'];
                 $lightConfig->group = $_POST['group'];
                 $lightConfig->frequency = $_POST['frequency'];
@@ -237,6 +240,11 @@ class DeviceController extends Controller
                 $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
                 $node_id = $device['node']['_id'];
                 self::sendConfig($pkt, $org_id, $node_id);
+
+                self::updateConfig($device['uuid'], DeviceConfig::PARAM_FREQUENCY, $_POST['frequency']);
+                self::updateConfig($device['uuid'], DeviceConfig::PARAM_POWER, $_POST['power']);
+                self::updateConfig($device['uuid'], DeviceConfig::PARAM_GROUP, $_POST['group']);
+                self::updateConfig($device['uuid'], DeviceConfig::PARAM_REGIME, $_POST['mode']);
             }
         }
 
@@ -269,15 +277,39 @@ class DeviceController extends Controller
                         $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
                         $node_id = $device['node']['_id'];
                         self::sendConfig($pkt, $org_id, $node_id);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_TIME0, $_POST['time0']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_LEVEL0, $_POST['level0']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_TIME1, $_POST['time1']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_LEVEL1, $_POST['level1']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_TIME2, $_POST['time2']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_LEVEL2, $_POST['level2']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_TIME3, $_POST['time3']);
+                        self::updateConfig($device['uuid'], DeviceConfig::PARAM_LEVEL3, $_POST['level3']);
                     }
                 }
             }
         }
 
+        $parameters['mode'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_REGIME);
+        $parameters['group'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_GROUP);
+        $parameters['power'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+        $parameters['frequency'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_FREQUENCY);
+        $parameters['value'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
+
+        $parameters['time0'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME0);
+        $parameters['level0'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL0);
+        $parameters['time1'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME1);
+        $parameters['level1'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL1);
+        $parameters['time2'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME2);
+        $parameters['level2'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL2);
+        $parameters['time3'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME3);
+        $parameters['level3'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL3);
+
         return $this->render(
             'dashboard',
             [
-                'device' => $device
+                'device' => $device,
+                'parameters' => $parameters
             ]
         );
     }
@@ -892,5 +924,46 @@ class DeviceController extends Controller
         // отправка сообщения на шкаф с _id=1, принадлежащий организации с _id=1
         $message = new AMQPMessage(json_encode($packet), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
         $channel->basic_publish($message, 'light', 'routeNode-' . $org_id . '-' . $node_id); // queryNode-1-1
+    }
+
+    /**
+     * @param $deviceUuid
+     * @param $parameter
+     * @param $value
+     * @throws InvalidConfigException
+     */
+    function updateConfig($deviceUuid, $parameter, $value)
+    {
+        $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->one();
+        if ($deviceConfig) {
+            $deviceConfig['value'] = $value;
+            $deviceConfig->save();
+        } else {
+            $deviceConfig = new DeviceConfig();
+            $deviceConfig->uuid = MainFunctions::GUID();
+            $deviceConfig->deviceUuid = $deviceUuid;
+            $deviceConfig->value = $value;
+            $deviceConfig->parameter = $parameter;
+            $deviceConfig->oid = User::getOid(Yii::$app->user->identity);
+            $deviceConfig->save();
+            //echo json_encode($deviceConfig->errors);
+            //exit(0);
+        }
+    }
+
+    /**
+     * @param $deviceUuid
+     * @param $parameter
+     * @return mixed|null
+     * @throws InvalidConfigException
+     */
+    function getParameter($deviceUuid, $parameter)
+    {
+        $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->one();
+        if ($deviceConfig) {
+            return $deviceConfig['value'];
+        } else {
+            return null;
+        }
     }
 }
