@@ -67,7 +67,7 @@ class Node extends MtmActiveRecord
             },
             'deviceStatusUuid',
             'deviceStatus' => function ($model) {
-                return $model->node;
+                return $model->deviceStatus;
             },
             'address', 'deleted', 'createdAt', 'changedAt'
         ];

@@ -71,9 +71,9 @@ class Objects extends MtmActiveRecord
             '_id',
             'uuid',
             'title',
-            'objectStatusUuid',
-            'objectStatus' => function ($model) {
-                return $model->objectStatus;
+            'objectTypeUuid',
+            'objectType' => function ($model) {
+                return $model->objectType;
             },
             'houseUuid',
             'house' => function ($model) {

@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use yii\widgets\Pjax;
 
 /* @var $device
+ * @var $parameters
  */
 
 ?>
@@ -17,17 +18,19 @@ use yii\widgets\Pjax;
         </div>
     </div>
     <div class="box-body">
-        <?php
-        Pjax::begin(['id' => 'options','enablePushState' => false]); ?>
+        <?php Pjax::begin(['id' => 'options']); ?>
+        <?= Html::beginForm(['device/dashboard','uuid' => $device['uuid']], 'post',
+            ['data-pjax' => '', 'class' => 'form-inline']);
+        ?>
         <div class="row">
             <div class="col-md-7" style="margin: 10px">
-                <?= Html::beginForm(['device/dashboard'], 'post',
-                    ['data-pjax' => '', 'class' => 'form-inline']);
+                <?php
                 echo Html::hiddenInput('device', $device['uuid']);
                 echo Html::hiddenInput('type', 'set');
 
                 echo Slider::widget([
                     'name' => 'value',
+                    'value' => $parameters['value'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'pluginOptions' => [

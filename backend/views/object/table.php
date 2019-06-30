@@ -1,7 +1,6 @@
 <?php
 /* @var $searchModel backend\models\ObjectsSearch */
 
-use common\models\ObjectStatus;
 use common\models\ObjectType;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
