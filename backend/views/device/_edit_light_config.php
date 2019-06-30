@@ -1,5 +1,6 @@
 <?php
 /* @var $device
+ * @var $parameters
  */
 
 use common\models\Device;
@@ -18,15 +19,15 @@ $this->title = Yii::t('app', 'Конфигурация устройства');
 <div class="row">
     <!-- Left col -->
     <div class="col-md-3">
-        <?= $this->render('widget-light-set', ['device' => $device]); ?>
+        <?= $this->render('widget-light-set', ['device' => $device, 'parameters' => $parameters]); ?>
     </div>
 
     <div class="col-md-4">
-        <?= $this->render('widget-light-params', ['device' => $device]); ?>
+        <?= $this->render('widget-light-params', ['device' => $device, 'parameters' => $parameters]); ?>
     </div>
 
     <div class="col-md-5">
-        <?= $this->render('widget-light-config', ['device' => $device]); ?>
+        <?= $this->render('widget-light-config', ['device' => $device, 'parameters' => $parameters]); ?>
     </div>
 </div>
 </div>

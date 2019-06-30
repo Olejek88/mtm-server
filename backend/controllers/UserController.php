@@ -294,33 +294,8 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
-        $model = $this->findModel($id);
-        $oldImage = $model->image;
-        // сохраняем старое значение image
-        if ($model->load(Yii::$app->request->post())) {
-            // получаем изображение для последующего сохранения
-            $file = UploadedFile::getInstance($model, 'image');
-            if ($file && $file->tempName) {
-                $fileName = self::_saveFile($model, $file);
-                if ($fileName) {
-                    $model->image = $fileName;
-                } else {
-                    $model->image = $oldImage;
-                    // уведомить пользователя, админа о невозможности сохранить файл
-                }
-            } else {
-                $model->image = $oldImage;
-            }
-
-            // FIXME: !!!! почему обновление записи происходит в методе view вместо update?!
-            if ($model->save()) {
-                MainFunctions::register('Обновлен профиль пользователя ' . $model->name);
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else
-                return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        $user = $this->findModel($id);
+        $userImage = Yii::$app->request->baseUrl . '/images/unknown2.png';
+        $user = $this->findModel($id)->one();
         if ($user) {
             $events = [];
             $journals = Journal::find()
@@ -338,7 +313,8 @@ class UserController extends Controller
                 'view',
                 [
                     'model' => $user,
-                    'events' => $sort_events
+                    'events' => $sort_events,
+                    'image' => $userImage
                 ]
             );
         }

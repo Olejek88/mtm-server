@@ -22,7 +22,7 @@ $this->title = Yii::t('app', 'Пользователи');
                 <div class="tab-pane fade active in" id="list">
 
                     <p class="text-center">
-                        <?= Html::a(Yii::t('app', 'Создать'), ['/user-arm/create'], ['class' => 'btn btn-success']) ?>
+                        <?= Html::a(Yii::t('app', 'Создать'), ['/user/create'], ['class' => 'btn btn-success']) ?>
                     </p>
 
                     <h6 class="text-center">

@@ -23,8 +23,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'houseUuid') ?>
 
-    <?= $form->field($model, 'objectStatusUuid') ?>
-
     <?= $form->field($model, 'objectTypeUuid') ?>
 
     <div class="form-group">

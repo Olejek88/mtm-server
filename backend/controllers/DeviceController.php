@@ -885,9 +885,26 @@ class DeviceController extends Controller
             else $uuid = 0;
 
             if ($uuid) {
-                $model = Device::find()->where(['uuid' => $_POST['uuid']])->one();
+                $device = Device::find()->where(['uuid' => $_POST['uuid']])->one();
+
+                $parameters['mode'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_REGIME);
+                $parameters['group'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_GROUP);
+                $parameters['power'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                $parameters['frequency'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_FREQUENCY);
+                $parameters['value'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
+
+                $parameters['time0'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME0);
+                $parameters['level0'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL0);
+                $parameters['time1'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME1);
+                $parameters['level1'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL1);
+                $parameters['time2'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME2);
+                $parameters['level2'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL2);
+                $parameters['time3'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME3);
+                $parameters['level3'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL3);
+
                 return $this->renderAjax('_edit_light_config', [
-                    'device' => $model
+                    'device' => $device,
+                    'parameters' => $parameters
                 ]);
             }
         }
