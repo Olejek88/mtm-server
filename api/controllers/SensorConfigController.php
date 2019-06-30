@@ -78,8 +78,6 @@ class SensorConfigController extends Controller
             $node = Node::findOne($nid);
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
-            } else {
-                $query->andWhere(['nodeUuid' => $node->uuid]);
             }
         }
 
@@ -138,19 +136,21 @@ class SensorConfigController extends Controller
             $model = SensorConfig::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new SensorConfig();
-                $model->_id = $items['_id'];
+//                $model->_id = $items['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
-                $model->createdAt = $items['createdAt'];
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->config = $item['config'];
             $model->sensorChannelUuid = $item['sensorChannelUuid'];
-            $model->changedAt = $items['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'sensor config not saved.');
+            } else {
+                $model->createdAt = $items['createdAt'];
+                $model->changedAt = $items['changedAt'];
+                $model->save();
             }
         }
 

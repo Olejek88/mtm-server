@@ -97,7 +97,8 @@ class NodeController extends Controller
                 '_id' => $result->_id,
                 'uuid' => $result->uuid,
                 'oid' => $result->organisation->_id,
-                'deviceStatus' => $result->deviceStatusUuid,
+                'deviceStatusUuid' => $result->deviceStatusUuid,
+                'address' => $result->address,
                 'createdAt' => $result['createdAt'],
                 'changedAt' => $result['changedAt'],
             ];

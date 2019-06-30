@@ -91,20 +91,21 @@ class DeviceRegisterController extends Controller
             $model = DeviceRegister::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new DeviceRegister();
-                $model->_id = $items['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
-                $model->createdAt = $items['createdAt'];
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->deviceUuid = $item['deviceUuid'];
             $model->date = $item['date'];
             $model->description = $item['description'];
-            $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'device register not saved.');
+            } else {
+                $model->createdAt = $items['createdAt'];
+                $model->changedAt = $item['changedAt'];
+                $model->save();
             }
         }
 

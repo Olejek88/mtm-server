@@ -78,8 +78,6 @@ class SensorChannelController extends Controller
             $node = Node::findOne($nid);
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
-            } else {
-                $query->andWhere(['nodeUuid' => $node->uuid]);
             }
         }
 
@@ -138,10 +136,9 @@ class SensorChannelController extends Controller
             $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new SensorChannel();
-                $model->_id = $items['_id'];
+//                $model->_id = $items['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
-                $model->createdAt = $items['createdAt'];
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
@@ -149,10 +146,13 @@ class SensorChannelController extends Controller
             $model->register = $item['register'];
             $model->deviceUuid = $item['deviceUuid'];
             $model->measureTypeUuid = $item['measureTypeUuid'];
-            $model->changedAt = $items['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'sensor channel not saved.');
+            } else {
+                $model->createdAt = $items['createdAt'];
+                $model->changedAt = $items['changedAt'];
+                $model->save();
             }
         }
 

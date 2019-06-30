@@ -138,10 +138,9 @@ class ThreadController extends Controller
             $model = Threads::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new Threads();
-                $model->_id = $items['_id'];
+//                $model->_id = $items['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
-                $model->createdAt = $items['createdAt'];
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
@@ -155,10 +154,13 @@ class ThreadController extends Controller
             $model->c_time = $item['c_time'];
             $model->message = $item['message'];
             $model->nodeUuid = $item['nodeUuid'];
-            $model->changedAt = $items['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'thread not saved.');
+            } else {
+                $model->createdAt = $items['createdAt'];
+                $model->changedAt = $items['changedAt'];
+                $model->save();
             }
         }
 
