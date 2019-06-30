@@ -44,11 +44,58 @@ class SensorConfigController extends Controller
 
     /**
      * @return array|ActiveRecord[]
+     * @throws HttpException
      */
     public function actionIndex()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return [];
+        $req = Yii::$app->request;
+
+        // проверяем параметры запроса
+        $oid = $req->getQueryParam('oid');
+        if ($oid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $organisation = Organisation::findOne($oid);
+            if ($organisation == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+        }
+
+        $user = new User();
+        $user->oid = $organisation->uuid;
+        Yii::$app->user->identity = $user;
+
+        /** @var ActiveRecord $class */
+        $class = $this->modelClass;
+        $query = $class::find();
+
+        // проверяем параметры запроса
+        $nid = $req->getQueryParam('nid');
+        if ($nid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $node = Node::findOne($nid);
+            if ($node == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            } else {
+                $query->andWhere(['nodeUuid' => $node->uuid]);
+            }
+        }
+
+        // проверяем параметры запроса
+        $changedAfter = $req->getQueryParam('changedAfter');
+        if ($changedAfter != null) {
+            $query->andWhere(['>=', 'changedAt', $changedAfter]);
+        }
+
+        // проверяем что хоть какие-то условия были заданы
+        if ($query->where == null) {
+            return [];
+        }
+
+        $result = $query->all();
+        return $result;
     }
 
     /**
