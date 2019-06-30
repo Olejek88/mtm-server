@@ -2,6 +2,7 @@
 
 namespace api\controllers;
 
+use common\components\MtmActiveRecord;
 use common\models\DeviceRegister;
 use common\models\Node;
 use common\models\Organisation;
@@ -90,14 +91,18 @@ class DeviceRegisterController extends Controller
             $model = DeviceRegister::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new DeviceRegister();
+                $model->_id = $items['_id'];
+                $model->uuid = $item['uuid'];
+                $model->oid = $organisation->uuid;
+                $model->createdAt = $items['createdAt'];
             }
 
-            $model->uuid = $item['uuid'];
-            $model->oid = $organisation->uuid;
+            $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->deviceUuid = $item['deviceUuid'];
             $model->date = $item['date'];
             $model->description = $item['description'];
-            $model->date = $item['date'];
+            $model->changedAt = $item['changedAt'];
+
             if (!$model->save()) {
                 throw new HttpException(401, 'device register not saved.');
             }

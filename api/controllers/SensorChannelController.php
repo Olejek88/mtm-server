@@ -2,6 +2,7 @@
 
 namespace api\controllers;
 
+use common\components\MtmActiveRecord;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\SensorChannel;
@@ -90,14 +91,19 @@ class SensorChannelController extends Controller
             $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new SensorChannel();
+                $model->_id = $items['_id'];
+                $model->uuid = $item['uuid'];
+                $model->oid = $organisation->uuid;
+                $model->createdAt = $items['createdAt'];
             }
 
-            $model->uuid = $item['uuid'];
-            $model->oid = $organisation->uuid;
+            $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->title = $item['title'];
             $model->register = $item['register'];
             $model->deviceUuid = $item['deviceUuid'];
             $model->measureTypeUuid = $item['measureTypeUuid'];
+            $model->changedAt = $items['changedAt'];
+
             if (!$model->save()) {
                 throw new HttpException(401, 'sensor channel not saved.');
             }

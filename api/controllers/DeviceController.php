@@ -2,11 +2,13 @@
 
 namespace api\controllers;
 
+use common\components\MtmActiveRecord;
 use common\models\Device;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\User;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 //use yii\filters\auth\HttpBearerAuth;
 use yii\web\BadRequestHttpException;
@@ -26,6 +28,7 @@ class DeviceController extends Controller
         $verbs = parent::verbs();
 //        $verbs['create'] = ['POST'];
         $verbs['index'] = ['GET'];
+        $verbs['send'] = ['POST'];
         return $verbs;
     }
 
@@ -93,6 +96,69 @@ class DeviceController extends Controller
 
         $result = $query->all();
         return $result;
+    }
+
+    /**
+     * @throws HttpException
+     * @throws InvalidConfigException
+     */
+    public function actionSend()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $req = Yii::$app->request;
+
+        // проверяем параметры запроса
+        $oid = $req->getBodyParam('oid');
+        if ($oid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $organisation = Organisation::findOne($oid);
+            if ($organisation == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+        }
+
+        $user = new User();
+        $user->oid = $organisation->uuid;
+        Yii::$app->user->identity = $user;
+
+        // проверяем параметры запроса
+        $nid = $req->getBodyParam('nid');
+        if ($nid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $node = Node::findOne($nid);
+            if ($node == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+        }
+
+        $items = $req->getBodyParam('items');
+        foreach ($items as $item) {
+            $model = Device::find()->where(['uuid' => $item['uuid']])->one();
+            if ($model == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+
+            $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
+//            $model->uuid = $item['uuid'];
+//            $model->oid = $organisation->uuid;
+            $model->address = $item['address'];
+            $model->name = $item['name'];
+            $model->serial = $item['serial'];
+            $model->port = $item['port'];
+            $model->interface = $item['interface'];
+            $model->deviceStatusUuid = $item['deviceStatusUuid'];
+            $model->date = $item['last_date'];
+            $model->changedAt = $item['changedAt'];
+
+            if (!$model->save()) {
+                throw new HttpException(401, 'device not saved.');
+            }
+        }
+
+//        throw new HttpException(401, 'Oops...');
+        return [];
     }
 
     /**
