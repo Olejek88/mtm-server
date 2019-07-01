@@ -4,8 +4,9 @@ namespace common\models;
 
 use common\components\MtmActiveRecord;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "sensor_channel".
@@ -20,11 +21,30 @@ use yii\db\ActiveRecord;
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property \yii\db\ActiveQuery $measureType
- * @property \yii\db\ActiveQuery $device
+ * @property ActiveQuery $measureType
+ * @property ActiveQuery $device
  */
 class SensorChannel extends MtmActiveRecord
 {
+    /**
+     * Behaviors.
+     *
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'createdAt',
+                'updatedAtAttribute' => 'changedAt',
+                'value' => function () {
+                    return $this->scenario == self::SCENARIO_CUSTOM_UPDATE ? $this->changedAt : new Expression('NOW()');
+                },
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -40,7 +60,8 @@ class SensorChannel extends MtmActiveRecord
     {
         return [
             [['uuid', 'title', 'deviceUuid', 'measureTypeUuid'], 'required'],
-            [['oid','createdAt', 'changedAt'], 'safe'],
+            [['oid', 'createdAt', 'changedAt'], 'safe'],
+            [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['uuid', 'deviceUuid', 'register', 'measureTypeUuid'], 'string', 'max' => 50],
             [['title'], 'string', 'max' => 100],
             [['oid'], 'checkOrganizationOwn'],

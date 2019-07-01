@@ -3,9 +3,9 @@
 namespace api\controllers;
 
 use common\components\MtmActiveRecord;
-use common\models\Measure;
 use common\models\Node;
 use common\models\Organisation;
+use common\models\Threads;
 use common\models\User;
 use Yii;
 use yii\db\ActiveRecord;
@@ -16,9 +16,9 @@ use yii\rest\Controller;
 use yii\web\Response;
 use yii\base\InvalidConfigException;
 
-class MeasureController extends Controller
+class ThreadController extends Controller
 {
-    public $modelClass = Measure::class;
+    public $modelClass = Threads::class;
 
     /**
      * @inheritdoc
@@ -44,11 +44,58 @@ class MeasureController extends Controller
 
     /**
      * @return array|ActiveRecord[]
+     * @throws HttpException
      */
     public function actionIndex()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return [];
+        $req = Yii::$app->request;
+
+        // проверяем параметры запроса
+        $oid = $req->getQueryParam('oid');
+        if ($oid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $organisation = Organisation::findOne($oid);
+            if ($organisation == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+        }
+
+        $user = new User();
+        $user->oid = $organisation->uuid;
+        Yii::$app->user->identity = $user;
+
+        /** @var ActiveRecord $class */
+        $class = $this->modelClass;
+        $query = $class::find();
+
+        // проверяем параметры запроса
+        $nid = $req->getQueryParam('nid');
+        if ($nid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $node = Node::findOne($nid);
+            if ($node == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            } else {
+                $query->andWhere(['nodeUuid' => $node->uuid]);
+            }
+        }
+
+        // проверяем параметры запроса
+        $changedAfter = $req->getQueryParam('changedAfter');
+        if ($changedAfter != null) {
+            $query->andWhere(['>=', 'changedAt', $changedAfter]);
+        }
+
+        // проверяем что хоть какие-то условия были заданы
+        if ($query->where == null) {
+            return [];
+        }
+
+        $result = $query->all();
+        return $result;
     }
 
     /**
@@ -88,23 +135,30 @@ class MeasureController extends Controller
 
         $items = $req->getBodyParam('items');
         foreach ($items as $item) {
-            $model = Measure::find()->where(['uuid' => $item['uuid']])->one();
+            $model = Threads::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new Measure();
+                $model = new Threads();
 //                $model->_id = $item['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-            $model->sensorChannelUuid = $item['sensorChannelUuid'];
-            $model->value = $item['value'];
-            $model->date = $item['date'];
+            $model->deviceUuid = $item['deviceUuid'];
+            $model->port = $item['port'];
+            $model->speed = $item['speed'];
+            $model->title = $item['title'];
+            $model->status = $item['status'];
+            $model->work = $item['work'];
+            $model->deviceTypeUuid = $item['deviceTypeUuid'];
+            $model->c_time = $item['c_time'];
+            $model->message = $item['message'];
+            $model->nodeUuid = $item['nodeUuid'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
-                throw new HttpException(401, 'measure not saved.');
+                throw new HttpException(401, 'thread not saved.');
             }
         }
 

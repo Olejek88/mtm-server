@@ -2,6 +2,7 @@
 
 namespace api\controllers;
 
+use common\components\MtmActiveRecord;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\SensorChannel;
@@ -43,11 +44,56 @@ class SensorChannelController extends Controller
 
     /**
      * @return array|ActiveRecord[]
+     * @throws HttpException
      */
     public function actionIndex()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return [];
+        $req = Yii::$app->request;
+
+        // проверяем параметры запроса
+        $oid = $req->getQueryParam('oid');
+        if ($oid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $organisation = Organisation::findOne($oid);
+            if ($organisation == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+        }
+
+        $user = new User();
+        $user->oid = $organisation->uuid;
+        Yii::$app->user->identity = $user;
+
+        /** @var ActiveRecord $class */
+        $class = $this->modelClass;
+        $query = $class::find();
+
+        // проверяем параметры запроса
+        $nid = $req->getQueryParam('nid');
+        if ($nid == null) {
+            throw new HttpException(404, 'The specified post cannot be found.');
+        } else {
+            $node = Node::findOne($nid);
+            if ($node == null) {
+                throw new HttpException(404, 'The specified post cannot be found.');
+            }
+        }
+
+        // проверяем параметры запроса
+        $changedAfter = $req->getQueryParam('changedAfter');
+        if ($changedAfter != null) {
+            $query->andWhere(['>=', 'changedAt', $changedAfter]);
+        }
+
+        // проверяем что хоть какие-то условия были заданы
+        if ($query->where == null) {
+            return [];
+        }
+
+        $result = $query->all();
+        return $result;
     }
 
     /**
@@ -90,14 +136,19 @@ class SensorChannelController extends Controller
             $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new SensorChannel();
+//                $model->_id = $item['_id'];
+                $model->uuid = $item['uuid'];
+                $model->oid = $organisation->uuid;
             }
 
-            $model->uuid = $item['uuid'];
-            $model->oid = $organisation->uuid;
+            $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->title = $item['title'];
             $model->register = $item['register'];
             $model->deviceUuid = $item['deviceUuid'];
             $model->measureTypeUuid = $item['measureTypeUuid'];
+            $model->createdAt = $item['createdAt'];
+            $model->changedAt = $item['changedAt'];
+
             if (!$model->save()) {
                 throw new HttpException(401, 'sensor channel not saved.');
             }

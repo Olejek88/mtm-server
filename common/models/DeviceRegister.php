@@ -4,7 +4,9 @@ namespace common\models;
 
 use common\components\MtmActiveRecord;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "device_register".
@@ -23,6 +25,25 @@ use yii\db\ActiveQuery;
 class DeviceRegister extends MtmActiveRecord
 {
     /**
+     * Behaviors.
+     *
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'createdAt',
+                'updatedAtAttribute' => 'changedAt',
+                'value' => function () {
+                    return $this->scenario == self::SCENARIO_CUSTOM_UPDATE ? $this->changedAt : new Expression('NOW()');
+                },
+            ],
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -40,6 +61,8 @@ class DeviceRegister extends MtmActiveRecord
             [['data'], 'safe'],
             [['uuid', 'deviceUuid', 'oid'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 250],
+            [['createdAt', 'changedAt'], 'safe'],
+            [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['oid'], 'checkOrganizationOwn'],
         ];
     }

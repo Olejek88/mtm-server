@@ -2,8 +2,6 @@
 
 namespace api\controllers;
 
-use common\components\MtmActiveRecord;
-use common\models\Measure;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\User;
@@ -11,14 +9,13 @@ use Yii;
 use yii\db\ActiveRecord;
 //use yii\filters\auth\HttpBearerAuth;
 use yii\web\BadRequestHttpException;
-use yii\web\HttpException;
 use yii\rest\Controller;
+use yii\web\HttpException;
 use yii\web\Response;
-use yii\base\InvalidConfigException;
 
-class MeasureController extends Controller
+class NodeController extends Controller
 {
-    public $modelClass = Measure::class;
+    public $modelClass = Node::class;
 
     /**
      * @inheritdoc
@@ -27,8 +24,7 @@ class MeasureController extends Controller
     {
         $verbs = parent::verbs();
 //        $verbs['create'] = ['POST'];
-//        $verbs['index'] = ['GET'];
-        $verbs['send'] = ['POST'];
+        $verbs['index'] = ['GET'];
         return $verbs;
     }
 
@@ -44,24 +40,15 @@ class MeasureController extends Controller
 
     /**
      * @return array|ActiveRecord[]
+     * @throws HttpException
      */
     public function actionIndex()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        return [];
-    }
-
-    /**
-     * @throws HttpException
-     * @throws InvalidConfigException
-     */
-    public function actionSend()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $req = Yii::$app->request;
 
         // проверяем параметры запроса
-        $oid = $req->getBodyParam('oid');
+        $oid = $req->getQueryParam('oid');
         if ($oid == null) {
             throw new HttpException(404, 'The specified post cannot be found.');
         } else {
@@ -75,41 +62,49 @@ class MeasureController extends Controller
         $user->oid = $organisation->uuid;
         Yii::$app->user->identity = $user;
 
+        /** @var ActiveRecord $class */
+        $class = $this->modelClass;
+        $query = $class::find();
+
         // проверяем параметры запроса
-        $nid = $req->getBodyParam('nid');
+        $nid = $req->getQueryParam('nid');
         if ($nid == null) {
             throw new HttpException(404, 'The specified post cannot be found.');
         } else {
             $node = Node::findOne($nid);
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
+            } else {
+                $query->andWhere(['uuid' => $node->uuid]);
             }
         }
 
-        $items = $req->getBodyParam('items');
-        foreach ($items as $item) {
-            $model = Measure::find()->where(['uuid' => $item['uuid']])->one();
-            if ($model == null) {
-                $model = new Measure();
-//                $model->_id = $item['_id'];
-                $model->uuid = $item['uuid'];
-                $model->oid = $organisation->uuid;
-            }
-
-            $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-            $model->sensorChannelUuid = $item['sensorChannelUuid'];
-            $model->value = $item['value'];
-            $model->date = $item['date'];
-            $model->createdAt = $item['createdAt'];
-            $model->changedAt = $item['changedAt'];
-
-            if (!$model->save()) {
-                throw new HttpException(401, 'measure not saved.');
-            }
+        // проверяем параметры запроса
+        $changedAfter = $req->getQueryParam('changedAfter');
+        if ($changedAfter != null) {
+            $query->andWhere(['>=', 'changedAt', $changedAfter]);
         }
 
-//        throw new HttpException(401, 'Oops...');
-        return [];
+        // проверяем что хоть какие-то условия были заданы
+        if ($query->where == null) {
+            return [];
+        }
+
+        /** @var Node $result */
+        $result = $query->one();
+        if ($result != null) {
+            return [
+                '_id' => $result->_id,
+                'uuid' => $result->uuid,
+                'oid' => $result->organisation->_id,
+                'deviceStatusUuid' => $result->deviceStatusUuid,
+                'address' => $result->address,
+                'createdAt' => $result['createdAt'],
+                'changedAt' => $result['changedAt'],
+            ];
+        } else {
+            return null;
+        }
     }
 
     /**

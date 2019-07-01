@@ -3,7 +3,7 @@
 namespace api\controllers;
 
 use common\components\MtmActiveRecord;
-use common\models\Measure;
+use common\models\DeviceRegister;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\User;
@@ -16,9 +16,9 @@ use yii\rest\Controller;
 use yii\web\Response;
 use yii\base\InvalidConfigException;
 
-class MeasureController extends Controller
+class DeviceRegisterController extends Controller
 {
-    public $modelClass = Measure::class;
+    public $modelClass = DeviceRegister::class;
 
     /**
      * @inheritdoc
@@ -88,23 +88,23 @@ class MeasureController extends Controller
 
         $items = $req->getBodyParam('items');
         foreach ($items as $item) {
-            $model = Measure::find()->where(['uuid' => $item['uuid']])->one();
+            $model = DeviceRegister::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new Measure();
+                $model = new DeviceRegister();
 //                $model->_id = $item['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-            $model->sensorChannelUuid = $item['sensorChannelUuid'];
-            $model->value = $item['value'];
+            $model->deviceUuid = $item['deviceUuid'];
             $model->date = $item['date'];
+            $model->description = $item['description'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
-                throw new HttpException(401, 'measure not saved.');
+                throw new HttpException(401, 'device register not saved.');
             }
         }
 
