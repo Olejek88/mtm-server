@@ -95,7 +95,7 @@ class SensorConfig extends MtmActiveRecord
         return ['_id', 'uuid', 'config',
             'sensorChannelUuid',
             'sensorChannel' => function ($model) {
-                return $model->contragent;
+                return $model->sensorChannel;
             },
             'createdAt', 'changedAt'
         ];

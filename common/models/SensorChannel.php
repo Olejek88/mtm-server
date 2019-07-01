@@ -60,7 +60,7 @@ class SensorChannel extends MtmActiveRecord
     {
         return [
             [['uuid', 'title', 'deviceUuid', 'measureTypeUuid'], 'required'],
-            [['oid','createdAt', 'changedAt'], 'safe'],
+            [['oid', 'createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['uuid', 'deviceUuid', 'register', 'measureTypeUuid'], 'string', 'max' => 50],
             [['title'], 'string', 'max' => 100],

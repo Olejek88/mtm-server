@@ -91,6 +91,7 @@ class DeviceRegisterController extends Controller
             $model = DeviceRegister::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new DeviceRegister();
+//                $model->_id = $item['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
@@ -99,13 +100,11 @@ class DeviceRegisterController extends Controller
             $model->deviceUuid = $item['deviceUuid'];
             $model->date = $item['date'];
             $model->description = $item['description'];
+            $model->createdAt = $item['createdAt'];
+            $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'device register not saved.');
-            } else {
-                $model->createdAt = $items['createdAt'];
-                $model->changedAt = $item['changedAt'];
-                $model->save();
             }
         }
 

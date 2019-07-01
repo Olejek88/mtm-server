@@ -136,7 +136,7 @@ class SensorChannelController extends Controller
             $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new SensorChannel();
-//                $model->_id = $items['_id'];
+//                $model->_id = $item['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
@@ -146,13 +146,11 @@ class SensorChannelController extends Controller
             $model->register = $item['register'];
             $model->deviceUuid = $item['deviceUuid'];
             $model->measureTypeUuid = $item['measureTypeUuid'];
+            $model->createdAt = $item['createdAt'];
+            $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'sensor channel not saved.');
-            } else {
-                $model->createdAt = $items['createdAt'];
-                $model->changedAt = $items['changedAt'];
-                $model->save();
             }
         }
 

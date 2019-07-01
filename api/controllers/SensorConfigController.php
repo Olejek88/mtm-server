@@ -136,7 +136,7 @@ class SensorConfigController extends Controller
             $model = SensorConfig::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new SensorConfig();
-//                $model->_id = $items['_id'];
+//                $model->_id = $item['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
@@ -144,13 +144,11 @@ class SensorConfigController extends Controller
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->config = $item['config'];
             $model->sensorChannelUuid = $item['sensorChannelUuid'];
+            $model->createdAt = $item['createdAt'];
+            $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'sensor config not saved.');
-            } else {
-                $model->createdAt = $items['createdAt'];
-                $model->changedAt = $items['changedAt'];
-                $model->save();
             }
         }
 

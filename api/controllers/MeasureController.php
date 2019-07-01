@@ -91,7 +91,7 @@ class MeasureController extends Controller
             $model = Measure::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new Measure();
-//                $model->_id = $items['_id'];
+//                $model->_id = $item['_id'];
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
@@ -100,13 +100,11 @@ class MeasureController extends Controller
             $model->sensorChannelUuid = $item['sensorChannelUuid'];
             $model->value = $item['value'];
             $model->date = $item['date'];
+            $model->createdAt = $item['createdAt'];
+            $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'measure not saved.');
-            } else {
-                $model->createdAt = $items['createdAt'];
-                $model->changedAt = $items['changedAt'];
-                $model->save();
             }
         }
 
