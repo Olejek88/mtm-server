@@ -21,8 +21,8 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  *
- * @property ActiveQuery $measureType
- * @property ActiveQuery $device
+ * @property MeasureType $measureType
+ * @property Device $device
  */
 class SensorChannel extends MtmActiveRecord
 {
@@ -104,14 +104,16 @@ class SensorChannel extends MtmActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getMeasureType() {
+    public function getMeasureType()
+    {
         return $this->hasOne(MeasureType::class, ['uuid' => 'measureTypeUuid']);
     }
 
     /**
      * @return ActiveQuery
      */
-    public function getDevice() {
+    public function getDevice()
+    {
         return $this->hasOne(Device::class, ['uuid' => 'deviceUuid']);
     }
 
