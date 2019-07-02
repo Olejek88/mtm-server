@@ -48,7 +48,9 @@ class Device extends MtmActiveRecord
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'createdAt',
                 'updatedAtAttribute' => 'changedAt',
-                'value' => new Expression('NOW()'),
+                'value' => function () {
+                    return $this->scenario == self::SCENARIO_CUSTOM_UPDATE ? $this->changedAt : new Expression('NOW()');
+                },
             ],
         ];
     }
@@ -114,6 +116,7 @@ class Device extends MtmActiveRecord
                 'required'
             ],
             [['date', 'oid', 'createdAt', 'changedAt'], 'safe'],
+            [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['deleted'], 'boolean'],
             [
                 [

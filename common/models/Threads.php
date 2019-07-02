@@ -2,9 +2,9 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
@@ -30,7 +30,7 @@ use yii\db\Expression;
  * @property Device $device
  * @property DeviceType $deviceType
  */
-class Threads extends ActiveRecord
+class Threads extends MtmActiveRecord
 {
     public function behaviors()
     {
@@ -39,7 +39,9 @@ class Threads extends ActiveRecord
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'createdAt',
                 'updatedAtAttribute' => 'changedAt',
-                'value' => new Expression('NOW()'),
+                'value' => function () {
+                    return $this->scenario == self::SCENARIO_CUSTOM_UPDATE ? $this->changedAt : new Expression('NOW()');
+                },
             ],
         ];
     }
@@ -62,6 +64,9 @@ class Threads extends ActiveRecord
             [['c_time', 'message', 'createdAt', 'changedAt'], 'safe'],
             [['speed', 'status', 'work'], 'integer'],
             [['uuid', 'title', 'deviceTypeUuid', 'nodeUuid', 'deviceUuid', 'port', 'oid'], 'string', 'max' => 50],
+            [['createdAt', 'changedAt'], 'safe'],
+            [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

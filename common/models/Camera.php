@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\components\MtmActiveRecord;
@@ -30,7 +31,6 @@ use yii\db\Expression;
  */
 class Camera extends MtmActiveRecord
 {
-
     /**
      * Behaviors.
      *
@@ -42,9 +42,10 @@ class Camera extends MtmActiveRecord
             [
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'createdAt',
-
                 'updatedAtAttribute' => 'changedAt',
-                'value' => new Expression('NOW()'),
+                'value' => function () {
+                    return $this->scenario == self::SCENARIO_CUSTOM_UPDATE ? $this->changedAt : new Expression('NOW()');
+                },
             ],
         ];
     }
@@ -79,7 +80,7 @@ class Camera extends MtmActiveRecord
             'deviceStatus' => function ($model) {
                 return $model->deviceStatus;
             },
-            'deleted', 'address','createdAt', 'changedAt'
+            'deleted', 'address', 'createdAt', 'changedAt'
         ];
     }
 
@@ -103,6 +104,7 @@ class Camera extends MtmActiveRecord
                 'required'
             ],
             [['createdAt', 'changedAt'], 'safe'],
+            [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['deleted'], 'boolean'],
             [
                 [
@@ -190,7 +192,8 @@ class Camera extends MtmActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getPhoto() {
+    public function getPhoto()
+    {
         return $this->hasMany(Photo::class, ['equipmentUuid' => 'uuid']);
     }
 

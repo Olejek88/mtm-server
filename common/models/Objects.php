@@ -26,6 +26,7 @@ use yii\db\Expression;
  * @property House $house
  * @property string $address
  * @property string $fullTitle
+ * @property Organisation $organisation
  * @property ObjectType $objectType
  */
 class Objects extends MtmActiveRecord
@@ -79,7 +80,7 @@ class Objects extends MtmActiveRecord
             'house' => function ($model) {
                 return $model->house;
             },
-            'latitude','longitude',
+            'latitude', 'longitude',
             'createdAt',
             'changedAt',
         ];
@@ -113,15 +114,23 @@ class Objects extends MtmActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getObjectType() {
+    public function getObjectType()
+    {
         return $this->hasOne(ObjectType::class, ['uuid' => 'objectTypeUuid']);
     }
 
-    public function getFullTitle() {
-        return 'ул.'.$this->house['street']['title'].', д.'.$this->house['number'];
+    public function getFullTitle()
+    {
+        return 'ул.' . $this->house['street']['title'] . ', д.' . $this->house['number'];
     }
 
-    public function getAddress() {
-        return 'ул.'.$this->house['street']['title'].', д.'.$this->house['number'].' '.$this->title;
+    public function getAddress()
+    {
+        return 'ул.' . $this->house['street']['title'] . ', д.' . $this->house['number'] . ' ' . $this->title;
+    }
+
+    public function getOrganisation()
+    {
+        return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
     }
 }

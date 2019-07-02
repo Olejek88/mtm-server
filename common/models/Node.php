@@ -21,6 +21,7 @@ use yii\db\Expression;
  * @property boolean $deleted
  *
  * @property ActiveQuery $deviceStatus
+ * @property Organisation $organisation
  * @property Object $object
  */
 class Node extends MtmActiveRecord
@@ -158,5 +159,10 @@ class Node extends MtmActiveRecord
     public function getObject()
     {
         return $this->hasOne(Objects::class, ['uuid' => 'objectUuid']);
+    }
+
+    public function getOrganisation()
+    {
+        return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
     }
 }

@@ -39,7 +39,9 @@ class Measure extends MtmActiveRecord
                 'class' => TimestampBehavior::class,
                 'createdAtAttribute' => 'createdAt',
                 'updatedAtAttribute' => 'changedAt',
-                'value' => new Expression('NOW()'),
+                'value' => function () {
+                    return $this->scenario == self::SCENARIO_CUSTOM_UPDATE ? $this->changedAt : new Expression('NOW()');
+                },
             ],
         ];
     }
@@ -78,6 +80,7 @@ class Measure extends MtmActiveRecord
             [['value'], 'number'],
             [['uuid', 'sensorChannelUuid', 'date', 'oid'], 'string', 'max' => 50],
             [['oid', 'createdAt', 'changedAt'], 'safe'],
+            [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['oid'], 'checkOrganizationOwn'],
         ];
     }
