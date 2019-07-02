@@ -14,14 +14,10 @@ $userImage = Yii::$app->view->params['userImage'];
 <header class="main-header">
 
     <?= Html::a('<span class="logo-mini">M</span><span class="logo-lg">' . Yii::$app->name = 'МТМ' . '</span>',
-        Yii::$app->homeUrl, ['class' => 'logo']) ?>
+        ['site/index'], ['class' => 'logo']) ?>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
         <!-- Sidebar toggle button-->
-        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" style="padding: 10px 15px">
-            <span class="sr-only">Toggle navigation</span>
-        </a>
-        <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu" style="padding-top: 0; padding-bottom: 0">
             <ul class="nav navbar-nav">
                 <li class="tasks-menu">

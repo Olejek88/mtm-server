@@ -87,7 +87,6 @@ class NodeController extends Controller
         $searchModel = new NodeSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
-
         return $this->render(
             'index',
             [
@@ -598,31 +597,16 @@ class NodeController extends Controller
      * @param integer $id Id
      *
      * @return mixed
-     * @throws NotFoundHttpException
-     * @throws Throwable
-     * @throws StaleObjectException
+     * @throws InvalidConfigException
      */
     public
     function actionDelete($id)
     {
-        $equipment = $this->findModel($id);
-        $photos = Photo::find()
-            ->select('*')
-            ->where(['equipmentUuid' => $equipment['uuid']])
-            ->all();
-        foreach ($photos as $photo) {
-            $photo->delete();
+        $node = Node::find()->where(['_id' => $id])->one();
+        if ($node) {
+            $node['deleted'] = true;
+            $node->save();
         }
-
-        $measures = Measure::find()
-            ->select('*')
-            ->where(['equipmentUuid' => $equipment['uuid']])
-            ->all();
-        foreach ($measures as $measure) {
-            $measure->delete();
-        }
-
-        $this->findModel($id)->delete();
         return $this->redirect(['index']);
     }
 

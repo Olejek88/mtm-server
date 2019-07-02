@@ -1,7 +1,6 @@
 <?php
 
 use common\models\Journal;
-use common\models\OrderStatus;
 
 $journals = Journal::find()->select('*')->orderBy('date DESC')->limit(3)->all();
 ?>
@@ -30,36 +29,6 @@ $journals = Journal::find()->select('*')->orderBy('date DESC')->limit(3)->all();
                                 <h4 class="control-sidebar-subheading">' . $journal['date'] . '</h4>
                            <p>' . $journal['description'] . '</p>
                            </div></a></li>';
-                }
-                ?>
-            </ul>
-            <!-- /.control-sidebar-menu -->
-
-            <h3 class="control-sidebar-heading">Прогресс нарядов</h3>
-            <ul class="control-sidebar-menu">
-                <?php
-                $orders = $this->params['lastOrders'];
-                foreach ($orders as $order) {
-                    $percent = 0;
-                    $color = 'label-danger';
-                    if ($order['orderStatusUuid'] == OrderStatus::COMPLETE) {
-                        $percent = 100;
-                        $color = 'label-info';
-                    }
-                    if ($order['orderStatusUuid'] == OrderStatus::IN_WORK) {
-                        $percent = 55;
-                        $color = 'label-warning';
-                    }
-                    echo '<li>
-                                <a href="/orders/view?id=' . $order["_id"] . '">
-                                <h4 class="control-sidebar-subheading">' . $order['title'] . '
-                                <span class="label ' . $color . ' pull-right">' . $percent . '%</span>
-                                </h4>
-                                <div class="progress progress-xxs">
-                                    <div class="progress-bar progress-bar-danger" style="width: ' . $percent . '%"></div>
-                                </div>
-                                </a>
-                            </li>';
                 }
                 ?>
             </ul>

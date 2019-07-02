@@ -33,7 +33,7 @@ $gridColumns = [
             return GridView::ROW_COLLAPSED;
         },
         'detail' => function ($model, $key, $index, $column) {
-            return Yii::$app->controller->renderPartial('device-details', ['model' => $model]);
+            return Yii::$app->controller->renderPartial('../device/device-details', ['model' => $model]);
         },
         'expandIcon' => '<span class="glyphicon glyphicon-expand"></span>',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
@@ -128,6 +128,7 @@ $gridColumns = [
         'attribute' => 'interface',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],
@@ -184,12 +185,14 @@ $gridColumns = [
         'width' => '180px',
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Адрес',
+        'mergeHeader' => true,
         'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
     ],
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
+        'template'=> '{edit}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

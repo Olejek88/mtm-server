@@ -36,19 +36,21 @@ if (Yii::$app->controller->action->id === 'login' || Yii::$app->controller->acti
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
+    <body class="hold-transition skin-blue sidebar-mini <!--sidebar-collapse-->">
     <?php $this->beginBody() ?>
     <div class="wrapper">
 
         <?= $this->render(
-            'header.php',
+/*            'header.php',*/
+            'header-pyramid.php',
             [
                 'directoryAsset' => $directoryAsset,
             ]
         ) ?>
 
         <?= $this->render(
-            'left.php',
+            'left-pyramid.php',
+/*            'left.php',*/
             [
                 'directoryAsset' => $directoryAsset,
             ]

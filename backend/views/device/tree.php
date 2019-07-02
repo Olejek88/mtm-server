@@ -20,9 +20,9 @@ $this->title = 'Дерево оборудования';
         </colgroup>
         <thead style="background-color: #337ab7; color: white">
         <tr>
-            <th colspan="1">
+<!--            <th colspan="1">
                 <?php
-                try {
+/*                try {
                     echo Select2::widget([
                         'id' => 'type_select',
                         'name' => 'type_select',
@@ -36,14 +36,14 @@ $this->title = 'Дерево оборудования';
                 } catch (Exception $e) {
 
                 }
-                ?>
+                */?>
             </th>
             <th align="center" colspan="1" style="background-color: #3c8dbc; color: whitesmoke">
                 <button class="btn btn-success" type="button" id="addButton" style="padding: 5px 10px">
                     Выбрать
                 </button>
             </th>
-            <th align="center" colspan="4" style="background-color: #3c8dbc; color: whitesmoke">Оборудование системы
+-->            <th align="center" colspan="6" style="background-color: #3c8dbc; color: whitesmoke">Оборудование системы
             </th>
         </tr>
         <tr style="background-color: #3c8dbc; color: whitesmoke">
