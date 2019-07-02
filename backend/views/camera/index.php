@@ -28,13 +28,14 @@ $gridColumns = [
         'vAlign' => 'middle',
         'width' => '180px',
         'header' => 'Название',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
+        'mergeHeader' => true,
         'format' => 'raw',
     ],
     [
         'class' => 'kartik\grid\DataColumn',
         'attribute' => 'nodeUuid',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'width' => '180px',
         'value' => function ($data) {
             return $data['node']['object']->getAddress().' ['.$data['node']['address'].']';
@@ -47,6 +48,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'deviceStatusUuid',
+        'mergeHeader' => true,
         'header' => 'Статус ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
                 '/device-status/create?from=device/index',
                 ['title' => Yii::t('app', 'Добавить')]),
@@ -87,6 +89,7 @@ $gridColumns = [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'address',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'width' => '180px',
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'URL',
