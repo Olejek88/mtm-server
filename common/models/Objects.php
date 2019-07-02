@@ -121,12 +121,12 @@ class Objects extends MtmActiveRecord
 
     public function getFullTitle()
     {
-        return 'ул.' . $this->house['street']['title'] . ', д.' . $this->house['number'];
+        return 'ул.' . $this->house->street->title . ', д.' . $this->house->number;
     }
 
     public function getAddress()
     {
-        return 'ул.' . $this->house['street']['title'] . ', д.' . $this->house['number'] . ' ' . $this->title;
+        return 'ул.' . $this->house->street->title . ', д.' . $this->house->number . ' ' . $this->title;
     }
 
     public function getOrganisation()

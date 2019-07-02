@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\components\MtmActiveRecord;
@@ -231,6 +232,6 @@ class Device extends MtmActiveRecord
      */
     public function getFullTitle()
     {
-        return $this['object']->getFullTitle().' ['.$this['deviceType']['title'].']';
+        return $this->object->getFullTitle() . ' [' . $this->deviceType->title . ']';
     }
 }

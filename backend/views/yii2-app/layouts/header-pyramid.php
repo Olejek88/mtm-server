@@ -11,6 +11,36 @@ $currentUser = Yii::$app->view->params['currentUser'];
 $userImage = Yii::$app->view->params['userImage'];
 ?>
 
+<style>
+    .main-header .logo {
+        -webkit-transition: width 0.3s ease-in-out;
+        -o-transition: width 0.3s ease-in-out;
+        transition: width 0.3s ease-in-out;
+        display: block;
+        float: left;
+        height: 50px;
+        font-size: 20px;
+        line-height: 50px;
+        text-align: center;
+        width: 280px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        padding: 0 15px;
+        font-weight: 300;
+        overflow: hidden;
+    }
+
+    .main-header .navbar {
+        -webkit-transition: margin-left 0.3s ease-in-out;
+        -o-transition: margin-left 0.3s ease-in-out;
+        transition: margin-left 0.3s ease-in-out;
+        margin-bottom: 0;
+        margin-left: 280px;
+        border: none;
+        min-height: 50px;
+        border-radius: 0;
+    }
+</style>
+
 <header class="main-header">
 
     <?= Html::a('<span class="logo-mini">M</span><span class="logo-lg">' . Yii::$app->name = 'МТМ' . '</span>',
