@@ -2,20 +2,22 @@
 
 namespace backend\controllers;
 
+use backend\models\Role;
 use backend\models\UserSearch;
 use common\components\MainFunctions;
 use common\models\Journal;
-use common\models\User;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\web\UploadedFile;
 use Throwable;
+use Exception;
+use backend\models\User as NewUser;
+use common\models\User;
 
 /**
  * UsersController implements the CRUD actions for Users model.
@@ -66,92 +68,82 @@ class UserController extends Controller
      * Creates a new Users model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws Exception
      */
     public function actionCreate()
     {
-        $model = new User;
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            // получаем изображение для последующего сохранения
-            $file = UploadedFile::getInstance($model, 'image');
-            if ($file && $file->tempName) {
-                $fileName = self::_saveFile($model, $file);
-                if ($fileName) {
-                    $model->image = $fileName;
-                } else {
-                    // уведомить пользователя, админа о невозможности сохранить файл
-                }
+        $model = new NewUser;
+        if ($model->load(Yii::$app->request->post()) && $newUser = $model->save()) {
+            $role = new Role();
+            if ($role->load(Yii::$app->request->post())) {
+                $am = Yii::$app->getAuthManager();
+                $newRole = $am->getRole($role->role);
+                $am->assign($newRole, $newUser->_id);
             }
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                MainFunctions::register('Добавлен пользователь ' . $model->name);
-                return $this->redirect(['view', 'id' => $model->_id]);
-            } else {
-                return $this->render('create', ['model' => $model]);
-            }
+            return $this->redirect('view?id=' . $newUser->_id);
         } else {
+            $am = Yii::$app->getAuthManager();
+            $roles = $am->getRoles();
+            $roleList = ArrayHelper::map($roles, 'name', 'description');
+
+            $role = new Role();
+            // значение по умолчанию
+            $role->role = User::ROLE_OPERATOR;
+
             return $this->render('create', [
                 'model' => $model,
+                'role' => $role,
+                'roleList' => $roleList,
             ]);
         }
     }
 
     /**
-     * Updates an existing Users model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @param $id
+     * @return string
      */
-    // public function actionUpdate($id)
-    // {
-    //     $model = new User;
-    //     $model = $model::find()->where(['id' => $id])->one();
-    //
-    //     return $this->render('update', [
-    //         'model' => $model,
-    //     ]);
-    // }
-
     public function actionUpdate($id)
     {
-        $model = new User;
-        $model = $model::find()->where(['_id' => $id])->one();
-
-        // сохраняем старое значение image
-        $oldImage = $model->image;
-
-        if ($model->load(Yii::$app->request->post())) {
-            // получаем изображение для последующего сохранения
-            $file = UploadedFile::getInstance($model, 'image');
-            if ($file && $file->tempName) {
-                $fileName = self::_saveFile($model, $file);
-                if ($fileName) {
-                    $model->image = $fileName;
-                } else {
-                    $model->image = $oldImage;
-                    // уведомить пользователя, админа о невозможности сохранить файл
-                }
-            } else {
-                $model->image = $oldImage;
-            }
-
-            if ($model->save()) {
-                MainFunctions::register('Обновлен профиль пользователя ' . $model->name);
-                //return $this->redirect(['view', 'id' => $model->_id]);
-            } else {
-                return $this->render(
-                    'update',
-                    [
-                        'model' => $model,
-                    ]
-                );
-            }
-        }
-        return $this->render(
-            'update',
-            [
-                'model' => $model,
-            ]
-        );
+//        $model = new User;
+//        $model = $model::find()->where(['_id' => $id])->one();
+//
+//        // сохраняем старое значение image
+//        $oldImage = $model->image;
+//
+//        if ($model->load(Yii::$app->request->post())) {
+//            // получаем изображение для последующего сохранения
+//            $file = UploadedFile::getInstance($model, 'image');
+//            if ($file && $file->tempName) {
+//                $fileName = self::_saveFile($model, $file);
+//                if ($fileName) {
+//                    $model->image = $fileName;
+//                } else {
+//                    $model->image = $oldImage;
+//                    // уведомить пользователя, админа о невозможности сохранить файл
+//                }
+//            } else {
+//                $model->image = $oldImage;
+//            }
+//
+//            if ($model->save()) {
+//                MainFunctions::register('Обновлен профиль пользователя ' . $model->name);
+//                //return $this->redirect(['view', 'id' => $model->_id]);
+//            } else {
+//                return $this->render(
+//                    'update',
+//                    [
+//                        'model' => $model,
+//                    ]
+//                );
+//            }
+//        }
+//        return $this->render(
+//            'update',
+//            [
+//                'model' => $model,
+//            ]
+//        );
+        return $this->redirect('/user/index');
     }
 
     /**
@@ -160,14 +152,12 @@ class UserController extends Controller
      * @param integer $id
      * @return mixed
      * @throws Throwable
-     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
-        $model = new User;
-        $model = $model::find()->where(['_id' => $id])->one();
-
-        $model->delete();
+//        $model = new User;
+//        $model = $model::find()->where(['_id' => $id])->one();
+//        $model->delete();
 
         return $this->redirect(['index']);
     }
@@ -179,9 +169,7 @@ class UserController extends Controller
     public function actionTable()
     {
         if (isset($_POST['editableAttribute'])) {
-            $model = User::find()
-                ->where(['_id' => $_POST['editableKey']])
-                ->one();
+            $model = User::find()->where(['_id' => $_POST['editableKey']])->one();
             if ($_POST['editableAttribute']=='type') {
                 $model['type']=intval($_POST['Users'][$_POST['editableIndex']]['type']);
                 if ($model['active']==true) $model['active']=1;
@@ -197,6 +185,7 @@ class UserController extends Controller
                 return json_encode("hui2");
             }
         }
+
         $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
@@ -224,32 +213,6 @@ class UserController extends Controller
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-
-    /**
-     * Сохраняем файл согласно нашим правилам.
-     *
-     * @param User $model Пользователь
-     * @param UploadedFile $file Файл
-     *
-     * @return string | null
-     */
-    private static function _saveFile($model, $file)
-    {
-        $dir = $model->getImageDir();
-        if (!is_dir($dir)) {
-            if (!mkdir($dir, 0755, true)) {
-                return null;
-            }
-        }
-
-        $targetDir = Yii::getAlias($dir);
-        $fileName = $model->uuid . '.' . $file->extension;
-        if ($file->saveAs($targetDir . $fileName)) {
-            return $fileName;
-        } else {
-            return null;
         }
     }
 
@@ -294,12 +257,11 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
-        $userImage = Yii::$app->request->baseUrl . '/images/unknown2.png';
         $user = $this->findModel($id)->one();
         if ($user) {
             $events = [];
             $journals = Journal::find()
-                ->where(['=', 'userUuid', $user['uuid']])
+                ->where(['=', 'userUuid', $user->uuid])
                 ->limit(5)
                 ->all();
             foreach ($journals as $journal) {
@@ -314,7 +276,6 @@ class UserController extends Controller
                 [
                     'model' => $user,
                     'events' => $sort_events,
-                    'image' => $userImage
                 ]
             );
         }

@@ -44,16 +44,16 @@ $this->title = Yii::t('app', 'Пользователи');
                                         return $data->_id;
                                     }
                                 ],
-                                [
-                                    'attribute' => 'email',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'content' => function ($data) {
-                                        return $data->email;
-                                    }
-                                ],
+//                                [
+//                                    'attribute' => 'email',
+//                                    'contentOptions' => [
+//                                        'class' => 'table_class',
+//                                    ],
+//                                    'headerOptions' => ['class' => 'text-center'],
+//                                    'content' => function ($data) {
+//                                        return $data->email;
+//                                    }
+//                                ],
                                 [
                                     'attribute' => 'username',
                                     'contentOptions' => [
@@ -74,16 +74,16 @@ $this->title = Yii::t('app', 'Пользователи');
                                         return $data->name;
                                     }
                                 ],
-                                [
-                                    'attribute' => 'auth_key',
-                                    'contentOptions' => [
-                                        'class' => 'table_class',
-                                    ],
-                                    'headerOptions' => ['class' => 'text-center'],
-                                    'content' => function ($data) {
-                                        return $data->auth_key;
-                                    }
-                                ],
+//                                [
+//                                    'attribute' => 'auth_key',
+//                                    'contentOptions' => [
+//                                        'class' => 'table_class',
+//                                    ],
+//                                    'headerOptions' => ['class' => 'text-center'],
+//                                    'content' => function ($data) {
+//                                        return $data->auth_key;
+//                                    }
+//                                ],
                                 [
                                     'class' => 'yii\grid\ActionColumn',
                                     'header' => 'Действия',
