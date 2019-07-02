@@ -38,22 +38,15 @@ $this->title = Yii::t('app', 'Измеренные значения');
                                     'style' => 'width: 50px; text-align: center'
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
-                                'content' => function ($data) {
-                                    return $data->_id;
-                                }
                             ],
                             [
-                                'attribute' => 'sensorChannelUuid',
+                                'attribute' => 'sensorChannel.device.fullTitle',
                                 'contentOptions' => [
                                     'class' => 'table_class',
                                     'hAlign' => 'center',
                                     'style' => 'width: 200px'
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
-                                'content' => function ($data) {
-                                    return $data['sensorChannel']['device']->getFullTitle();
-
-                                }
                             ],
                             [
                                 'attribute' => 'value',
@@ -62,9 +55,6 @@ $this->title = Yii::t('app', 'Измеренные значения');
                                     'style' => 'width: 50px'
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
-                                'content' => function ($data) {
-                                    return $data->value;
-                                }
                             ],
                             [
                                 'attribute' => 'date',
@@ -73,9 +63,6 @@ $this->title = Yii::t('app', 'Измеренные значения');
                                     'style' => 'width: 100px'
                                 ],
                                 'headerOptions' => ['class' => 'text-center'],
-                                'content' => function ($data) {
-                                    return $data->date;
-                                }
                             ],
                             [
                                 'class' => 'yii\grid\ActionColumn',

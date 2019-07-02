@@ -69,18 +69,29 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         echo $devicesGroup;
         echo $nodesList;
         echo $nodesGroup;
-        echo $camerasList;
-        echo $camerasGroup;
+        if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) {
+            echo $camerasList;
+            echo $camerasGroup;
+        }
         ?>
 
         var overlayMapsA = {};
         var overlayMapsB = {
-            "Светильники": devices,
-            "Камеры": cameras,
-            "Шкафы:": nodes
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Светильники": devices,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Камеры": cameras,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Шкафы:": nodes'; ?>
         };
 
-        var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(<?= $coordinates ?>, 13);
+        <?php
+            if (!isset($_GET['view'])) {
+                echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(".$coordinates.", 13);";
+            } else {
+                if ($_GET['view']=='2')
+                    echo "var map = L.map('mapid', {zoomControl: false, layers: [cameras]}).setView(".$coordinates.", 13);";
+                if ($_GET['view']=='1')
+                    echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, nodes]}).setView(".$coordinates.", 13);";
+            }
+        ?>
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
             id: 'mapbox.streets'

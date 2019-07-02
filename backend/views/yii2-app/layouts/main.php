@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\web\View;
+use common\models\User;
 
 /* @var $this View */
 /* @var $content string */
@@ -36,19 +37,31 @@ if (Yii::$app->controller->action->id === 'login' || Yii::$app->controller->acti
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
+
+    <?php
+    if (Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+        $collapsed = 'sidebar-collapse';
+        $header = 'header.php';
+        $left = 'left.php';
+    } else {
+        $collapsed = '';
+        $header = 'header-pyramid.php';
+        $left = 'left-pyramid.php';
+    }
+    ?>
+    <body class="hold-transition skin-blue sidebar-mini <?= $collapsed ?>">
     <?php $this->beginBody() ?>
     <div class="wrapper">
 
         <?= $this->render(
-            'header.php',
+            $header,
             [
                 'directoryAsset' => $directoryAsset,
             ]
         ) ?>
 
         <?= $this->render(
-            'left.php',
+            $left,
             [
                 'directoryAsset' => $directoryAsset,
             ]

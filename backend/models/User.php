@@ -2,16 +2,18 @@
 
 namespace backend\models;
 
-use common\models\User;
+use common\components\MainFunctions;
+use Yii;
 use yii\base\Model;
+use Exception;
 
 /**
  * Signup form
  */
-class UserArm extends Model
+class User extends Model
 {
+    public $name;
     public $username;
-    public $email;
     public $password;
 
 
@@ -26,11 +28,9 @@ class UserArm extends Model
             ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
-            ['email', 'trim'],
-            ['email', 'required'],
-            ['email', 'email'],
-            ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
+            ['name', 'trim'],
+            ['name', 'required'],
+            ['name', 'string', 'min' => 2, 'max' => 255],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
@@ -40,19 +40,24 @@ class UserArm extends Model
     /**
      * Signs user up.
      *
-     * @return User|null the saved model or null if saving fails
-     * @throws \Exception
+     * @return \common\models\User|null the saved model or null if saving fails
+     * @throws Exception
      */
-    public function armUser()
+    public function save()
     {
         if (!$this->validate()) {
             return null;
         }
 
-        $user = new User();
+        $user = new \common\models\User();
         $user->username = $this->username;
-        $user->email = $this->email;
+        $user->email = 'email@' . time() . '.ru';
+        $user->oid = \common\models\User::getOid(Yii::$app->user->identity);
         $user->setPassword($this->password);
+        $user->uuid = MainFunctions::GUID();
+        $user->name = $this->name;
+        $user->type = '0';
+        $user->contact = 'нет';
         $user->generateAuthKey();
 
         return $user->save() ? $user : null;

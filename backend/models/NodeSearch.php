@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use common\models\Node;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -37,6 +38,7 @@ class NodeSearch extends Node
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws InvalidConfigException
      */
     public function search($params)
     {
@@ -60,6 +62,7 @@ class NodeSearch extends Node
         $query->andFilterWhere([
             '_id' => $this->_id,
             'deviceStatusUuid' => $this->deviceStatusUuid,
+            'deleted' => 0,
             'objectUuid' => $this->objectUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,

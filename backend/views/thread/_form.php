@@ -68,7 +68,7 @@ use yii\widgets\ActiveForm;
             ],
         ]);
     ?>
-    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::ORGANISATION_UUID])->label(false); ?>
+    <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'port')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'speed')->textInput(['maxlength' => true]) ?>

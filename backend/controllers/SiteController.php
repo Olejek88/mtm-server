@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\DeviceSearch;
 use backend\models\SignupForm;
 use backend\models\UserSearch;
 use common\components\MainFunctions;
@@ -118,6 +119,7 @@ class SiteController extends Controller
             $objectsGroup .= 'object' . $object["_id"];
             $cnt++;
         }
+
 
         $layers = self::getLayers();
 
@@ -310,9 +312,12 @@ class SiteController extends Controller
                 }
             }
         }
+        $searchModel = new DeviceSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 15;
 
         return $this->render(
-            'dashboard',
+            'dashboard-pyramid',
             [
                 'counts' => $counts,
                 'measures' => $measures,

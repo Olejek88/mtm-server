@@ -6,8 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Objects */
 
-$this->title = $model['number'];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Квартира'), 'url' => ['index']];
+$this->title = $model['title'];
 ?>
 <div class="task-view box-padding">
 
@@ -33,10 +32,9 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Квартира'), 
                             'attributes' => [
                                 '_id',
                                 'uuid',
-                                'number',
-                                'houseUuid',
-                                'flatStatusUuid',
-                                'flatTypeUuid',
+                                'title',
+                                'house.number',
+                                'objectType.title',
                                 'createdAt',
                                 'changedAt',
                             ],
