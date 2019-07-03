@@ -1,6 +1,8 @@
 <?php
 /* @var $model common\models\User */
 
+/* @var $roleList array */
+
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Обновить');
@@ -22,6 +24,7 @@ $this->title = Yii::t('app', 'Обновить');
                     <h6>
                         <?= $this->render('_form', [
                             'model' => $model,
+                            'roleList' => $roleList,
                         ]) ?>
                     </h6>
                 </div>

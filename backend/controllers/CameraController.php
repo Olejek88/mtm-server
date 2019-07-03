@@ -100,35 +100,11 @@ class CameraController extends Controller
     {
         $model = $this->findModel($id);
         if ($model != null) {
-            $params = Yii::$app->params;
-            if (isset($params['amqpServer']['host']) &&
-                isset($params['amqpServer']['port']) &&
-                isset($params['amqpServer']['user']) &&
-                isset($params['amqpServer']['password'])) {
-                try {
-                    $connection = new AMQPStreamConnection($params['amqpServer']['host'],
-                        $params['amqpServer']['port'],
-                        $params['amqpServer']['user'],
-                        $params['amqpServer']['password']);
-
-                    $channel = $connection->channel();
-                    $channel->exchange_declare('light', 'direct', false, true, false);
-                    $pkt = [
-                        'type' => 'camera',
-                        'action' => 'publish',
-                        'uuid' => $model->uuid,
-                    ];
-                    $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-                    $route = 'routeNode-' . $model->organisation->_id . '-' . $model->node->_id;
-                    $channel->basic_publish($msq, 'light', $route);
-                } catch (Exception $e) {
-
-                }
-            }
+            $model->startTranslation();
         }
 
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -188,11 +164,17 @@ class CameraController extends Controller
     {
         if (isset($_GET['uuid'])) {
             $model = Camera::find()->where(['uuid' => $_GET['uuid']])->one();
-            if ($model)
+            if ($model) {
+                if (!$model->startTranslation()) {
+                    // по каким-то причинам команду на начало трансляции отправить не удалось
+                }
+
                 return $this->render('dashboard', [
                     'model' => $model
                 ]);
+            }
         }
+
         return self::actionIndex();
     }
 

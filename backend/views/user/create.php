@@ -1,10 +1,7 @@
 <?php
 /* @var $model common\models\User */
-/* @var $role Role */
-
 /* @var $roleList array */
 
-use backend\models\Role;
 use yii\helpers\Html;
 
 $this->title = 'Новый пользователь';
@@ -24,7 +21,6 @@ $this->title = 'Новый пользователь';
                     <h6>
                         <?= $this->render('_form', [
                             'model' => $model,
-                            'role' => $role,
                             'roleList' => $roleList,
                         ]) ?>
                     </h6>

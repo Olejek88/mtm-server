@@ -2,7 +2,6 @@
 
 namespace backend\controllers;
 
-use backend\models\Role;
 use backend\models\UserSearch;
 use common\components\MainFunctions;
 use common\models\Journal;
@@ -13,6 +12,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use Throwable;
 use Exception;
@@ -76,27 +76,16 @@ class UserController extends Controller
             return $this->redirect('/site/index');
         }
 
-        $model = new NewUser;
+        $model = new NewUser();
         if ($model->load(Yii::$app->request->post()) && $newUser = $model->save()) {
-            $role = new Role();
-            if ($role->load(Yii::$app->request->post())) {
-                $am = Yii::$app->getAuthManager();
-                $newRole = $am->getRole($role->role);
-                $am->assign($newRole, $newUser->_id);
-            }
             return $this->redirect('view?id=' . $newUser->_id);
         } else {
             $am = Yii::$app->getAuthManager();
             $roles = $am->getRoles();
             $roleList = ArrayHelper::map($roles, 'name', 'description');
 
-            $role = new Role();
-            // значение по умолчанию
-            $role->role = User::ROLE_OPERATOR;
-
             return $this->render('create', [
                 'model' => $model,
-                'role' => $role,
                 'roleList' => $roleList,
             ]);
         }
@@ -105,6 +94,7 @@ class UserController extends Controller
     /**
      * @param $id
      * @return string
+     * @throws Exception
      */
     public function actionUpdate($id)
     {
@@ -112,46 +102,35 @@ class UserController extends Controller
             return $this->redirect('/site/index');
         }
 
-//        $model = new User;
-//        $model = $model::find()->where(['_id' => $id])->one();
-//
-//        // сохраняем старое значение image
-//        $oldImage = $model->image;
-//
-//        if ($model->load(Yii::$app->request->post())) {
-//            // получаем изображение для последующего сохранения
-//            $file = UploadedFile::getInstance($model, 'image');
-//            if ($file && $file->tempName) {
-//                $fileName = self::_saveFile($model, $file);
-//                if ($fileName) {
-//                    $model->image = $fileName;
-//                } else {
-//                    $model->image = $oldImage;
-//                    // уведомить пользователя, админа о невозможности сохранить файл
-//                }
-//            } else {
-//                $model->image = $oldImage;
-//            }
-//
-//            if ($model->save()) {
-//                MainFunctions::register('Обновлен профиль пользователя ' . $model->name);
-//                //return $this->redirect(['view', 'id' => $model->_id]);
-//            } else {
-//                return $this->render(
-//                    'update',
-//                    [
-//                        'model' => $model,
-//                    ]
-//                );
-//            }
-//        }
-//        return $this->render(
-//            'update',
-//            [
-//                'model' => $model,
-//            ]
-//        );
-        return $this->redirect('/user/index');
+        $user = User::find()->where(['_id' => $id])->one();
+        if ($user == null) {
+            throw new HttpException(404);
+        }
+
+        $model = new NewUser();
+        $model->scenario = 'update';
+        if ($model->load(Yii::$app->request->post()) && $model->update($user)) {
+            MainFunctions::register('Обновлен профиль пользователя ' . $user->name);
+            return $this->redirect(['view', 'id' => $user->_id]);
+        } else {
+            $am = Yii::$app->getAuthManager();
+            $roles = $am->getRoles();
+            $roleList = ArrayHelper::map($roles, 'name', 'description');
+
+            $assignments = $am->getAssignments($user->_id);
+            foreach ($assignments as $value) {
+                $model->role = $value->roleName;
+                break;
+            }
+
+            $model->username = $user->username;
+            $model->name = $user->name;
+            $model->status = $user->status;
+            return $this->render('update', [
+                'model' => $model,
+                'roleList' => $roleList,
+            ]);
+        }
     }
 
     /**
@@ -163,9 +142,16 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-//        $model = new User;
-//        $model = $model::find()->where(['_id' => $id])->one();
-//        $model->delete();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $model = User::find()->where(['_id' => $id])->one();
+        if ($model != null) {
+            $am = Yii::$app->getAuthManager();
+            $am->revokeAll($model->_id);
+            $model->delete();
+        }
 
         return $this->redirect(['index']);
     }
@@ -182,17 +168,17 @@ class UserController extends Controller
             }
 
             $model = User::find()->where(['_id' => $_POST['editableKey']])->one();
-            if ($_POST['editableAttribute']=='type') {
-                $model['type']=intval($_POST['Users'][$_POST['editableIndex']]['type']);
-                if ($model['active']==true) $model['active']=1;
-                else $model['active']=0;
+            if ($_POST['editableAttribute'] == 'type') {
+                $model['type'] = intval($_POST['Users'][$_POST['editableIndex']]['type']);
+                if ($model['active'] == true) $model['active'] = 1;
+                else $model['active'] = 0;
                 $model->save();
                 return json_encode($model->errors);
             }
-            if ($_POST['editableAttribute']=='active') {
-                if ($_POST['Users'][$_POST['editableIndex']]['active']==true)
-                    $model['active']=1;
-                else $model['active']=0;
+            if ($_POST['editableAttribute'] == 'active') {
+                if ($_POST['Users'][$_POST['editableIndex']]['active'] == true)
+                    $model['active'] = 1;
+                else $model['active'] = 0;
                 $model->save();
                 return json_encode("hui2");
             }
@@ -266,6 +252,7 @@ class UserController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
+     * @throws HttpException
      */
     public function actionView($id)
     {
@@ -290,6 +277,8 @@ class UserController extends Controller
                     'events' => $sort_events,
                 ]
             );
+        } else {
+            throw new HttpException(404, 'Not found.');
         }
     }
 
