@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\SensorConfigSearch;
 use common\models\SensorConfig;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -55,6 +56,10 @@ class SensorConfigController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = SensorConfig::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -98,6 +103,10 @@ class SensorConfigController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new SensorConfig();
         $searchModel = new SensorConfigSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -133,6 +142,10 @@ class SensorConfigController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             // сохраняем модель
@@ -169,6 +182,10 @@ class SensorConfigController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

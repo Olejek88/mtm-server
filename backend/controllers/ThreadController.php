@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\ThreadSearch;
 use common\components\MainFunctions;
 use common\models\Threads;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
@@ -12,6 +13,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 use Throwable;
+use yii\base\InvalidConfigException;
 
 /**
  * ThreadController implements the CRUD actions for Thread model.
@@ -56,10 +58,15 @@ class ThreadController extends Controller
      * Lists all Thread models.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Threads::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -121,8 +128,11 @@ class ThreadController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Threads();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = new Threads();
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
@@ -150,6 +160,10 @@ class ThreadController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
@@ -199,9 +213,12 @@ class ThreadController extends Controller
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public
-    function actionDelete($id)
+    public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
         return $this->redirect(['index']);
     }
@@ -215,8 +232,7 @@ class ThreadController extends Controller
      * @return Threads the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected
-    function findModel($id)
+    protected function findModel($id)
     {
         if (($model = Threads::findOne($id)) !== null) {
             return $model;

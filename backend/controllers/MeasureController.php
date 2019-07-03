@@ -78,6 +78,9 @@ class MeasureController extends Controller
      */
     public function actionCreate()
     {
+        // вообще отлючаем возможность создавать новые записи
+        return $this->redirect('/site/index');
+
         $model = new Measure();
         if ($model->load(Yii::$app->request->post())) {
             if ($model['sensorChannel'])
@@ -122,6 +125,9 @@ class MeasureController extends Controller
      */
     public function actionUpdate($id)
     {
+        // вообще отлючаем возможность создавать новые записи
+        return $this->redirect('/site/index');
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
@@ -143,6 +149,9 @@ class MeasureController extends Controller
      */
     public function actionDelete($id)
     {
+        // вообще отлючаем возможность создавать новые записи
+        return $this->redirect('/site/index');
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

@@ -3,13 +3,10 @@
 namespace backend\controllers;
 
 use backend\models\ObjectsSearch;
-use common\components\MainFunctions;
-use common\models\Contragent;
 use common\models\House;
-use common\models\ObjectContragent;
 use common\models\Objects;
 use common\models\Street;
-use common\models\Users;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -93,6 +90,10 @@ class ObjectController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new Objects();
         $searchModel = new ObjectsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -123,8 +124,11 @@ class ObjectController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -145,6 +149,10 @@ class ObjectController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['table']);
@@ -214,9 +222,12 @@ class ObjectController extends Controller
      *
      * @return mixed
      */
-    public
-    function actionNew()
+    public function actionNew()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["selected_node"])) {
             $folder = $_POST["folder"];
             if (isset($_POST["uuid"]))
@@ -254,6 +265,10 @@ class ObjectController extends Controller
      */
     public function actionEdit()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["selected_node"])) {
             if (isset($_POST["uuid"]))
                 $uuid = $_POST["uuid"];
@@ -301,10 +316,14 @@ class ObjectController extends Controller
      *
      * @return mixed
      * @throws StaleObjectException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function actionRemove()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["selected_node"])) {
             if (isset($_POST["uuid"]))
                 $uuid = $_POST["uuid"];
@@ -350,9 +369,12 @@ class ObjectController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionSave()
+    public function actionSave()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["type"]))
             $type = $_POST["type"];
         else $type = 0;

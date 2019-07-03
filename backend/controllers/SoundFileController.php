@@ -90,6 +90,10 @@ class SoundFileController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new SoundFile();
         if ($model->load(Yii::$app->request->post())) {
             // process uploaded image file instance
@@ -124,6 +128,10 @@ class SoundFileController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         $model->scenario = 'update';
 
@@ -164,6 +172,10 @@ class SoundFileController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         $model->scenario = 'delete';
         $model->deleted = true;
@@ -178,9 +190,12 @@ class SoundFileController extends Controller
      *
      * @return mixed
      */
-    public
-    function actionNew()
+    public function actionNew()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         $message = new SoundFile();
         return $this->renderAjax('_add_form', [
             'model' => $message
@@ -191,9 +206,12 @@ class SoundFileController extends Controller
      * Creates a new Message model.
      * @return mixed
      */
-    public
-    function actionSave()
+    public function actionSave()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         $model = new SoundFile();
         if ($model->load(Yii::$app->request->post())) {
             // получаем изображение для последующего сохранения
@@ -217,8 +235,7 @@ class SoundFileController extends Controller
     /**
      * @return mixed
      */
-    public
-    function actionSend()
+    public function actionSend()
     {
         if ($_GET['messageUuid'] && $_GET['nodeId']) {
             $pkt = [

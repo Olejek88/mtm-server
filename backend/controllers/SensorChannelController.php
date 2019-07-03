@@ -2,6 +2,7 @@
 namespace backend\controllers;
 
 use backend\models\SensorChannelSearch;
+use common\models\User;
 use Yii;
 use common\models\SensorChannel;
 use yii\db\StaleObjectException;
@@ -133,8 +134,11 @@ class SensorChannelController extends Controller
      */
     public function actionCreate()
     {
-        $model = new SensorChannel();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = new SensorChannel();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -158,8 +162,11 @@ class SensorChannelController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -186,6 +193,10 @@ class SensorChannelController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
