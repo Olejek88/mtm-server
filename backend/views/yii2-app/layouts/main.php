@@ -41,16 +41,16 @@ if (Yii::$app->controller->action->id === 'login' || Yii::$app->controller->acti
     <div class="wrapper">
 
         <?= $this->render(
-/*            'header.php',*/
-            'header-pyramid.php',
+            'header.php',
+/*            'header-pyramid.php',*/
             [
                 'directoryAsset' => $directoryAsset,
             ]
         ) ?>
 
         <?= $this->render(
-            'left-pyramid.php',
-/*            'left.php',*/
+/*            'left-pyramid.php',*/
+            'left.php',
             [
                 'directoryAsset' => $directoryAsset,
             ]
