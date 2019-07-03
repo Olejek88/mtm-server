@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\HouseSearchType;
 use common\models\HouseType;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -77,8 +78,9 @@ class HouseTypeController extends Controller
      */
     public function actionCreate()
     {
-        // вообще отлючаем возможность создавать новые записи
-        return $this->redirect('/site/index');
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
         $model = new HouseType();
         $searchModel = new HouseSearchType();
@@ -105,8 +107,9 @@ class HouseTypeController extends Controller
      */
     public function actionUpdate($id)
     {
-        // вообще отлючаем возможность создавать новые записи
-        return $this->redirect('/site/index');
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -129,8 +132,9 @@ class HouseTypeController extends Controller
      */
     public function actionDelete($id)
     {
-        // вообще отлючаем возможность создавать новые записи
-        return $this->redirect('/site/index');
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
         $this->findModel($id)->delete();
 
