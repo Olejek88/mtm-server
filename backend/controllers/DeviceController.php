@@ -208,7 +208,7 @@ class DeviceController extends Controller
      * @return string
      * @throws InvalidConfigException
      */
-    public function actionDashboard($uuid)
+    public function actionDashboard()
     {
         if (isset($_GET['uuid'])) {
             $device = Device::find()

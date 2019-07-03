@@ -4,9 +4,9 @@
 
 
 $this->title = Yii::t('app', 'Камера');
+$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerCssFile('/css/vendor/video-js.min.css');
 ?>
-<link href="/css/video-js.min.css" rel="stylesheet">
-<script src="/js/video.min.js"></script>
 
 <div class="box box-info">
     <div class="box-header with-border">
