@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\DeviceSearchStatus;
 use common\models\DeviceStatus;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -17,6 +18,18 @@ use Throwable;
  */
 class DeviceStatusController extends Controller
 {
+    const NOT_MOUNTED = "A01B7550-4211-4D7A-9935-80A2FC257E92";
+    const WORK = "E681926C-F4A3-44BD-9F96-F0493712798D";
+    const NOT_WORK = "D5D31037-6640-4A8B-8385-355FC71DEBD7";
+    const UNKNOWN = "ED20012C-629A-4275-9BFA-A81D08B45758";
+
+    private static $hardUuid = [
+        self::NOT_MOUNTED,
+        self::WORK,
+        self::NOT_WORK,
+        self::UNKNOWN,
+    ];
+
     /**
      * @inheritdoc
      */
@@ -76,6 +89,10 @@ class DeviceStatusController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new DeviceStatus();
         $searchModel = new DeviceSearchStatus();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -98,7 +115,17 @@ class DeviceStatusController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
+        if ($model == null) {
+            return $this->redirect(['/site/index']);
+        } else if (in_array($model->uuid, self::$hardUuid)) {
+            return $this->redirect(['view', 'id' => $model->_id]);
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -119,7 +146,19 @@ class DeviceStatusController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $model = $this->findModel($id);
+        if ($model == null) {
+            return $this->redirect(['/site/index']);
+        } else if (in_array($model->uuid, self::$hardUuid)) {
+            return $this->redirect(['/site/index']);
+        }
+
+        $model->delete();
+
         return $this->redirect(['index']);
     }
 

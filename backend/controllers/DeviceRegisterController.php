@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\DeviceRegisterSearch;
 use common\models\DeviceRegister;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -77,6 +78,10 @@ class DeviceRegisterController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new DeviceRegister();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
@@ -96,8 +101,11 @@ class DeviceRegisterController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
@@ -118,6 +126,10 @@ class DeviceRegisterController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

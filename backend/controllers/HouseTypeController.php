@@ -77,6 +77,9 @@ class HouseTypeController extends Controller
      */
     public function actionCreate()
     {
+        // вообще отлючаем возможность создавать новые записи
+        return $this->redirect('/site/index');
+
         $model = new HouseType();
         $searchModel = new HouseSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -102,8 +105,10 @@ class HouseTypeController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        // вообще отлючаем возможность создавать новые записи
+        return $this->redirect('/site/index');
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -124,6 +129,9 @@ class HouseTypeController extends Controller
      */
     public function actionDelete($id)
     {
+        // вообще отлючаем возможность создавать новые записи
+        return $this->redirect('/site/index');
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

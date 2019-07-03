@@ -9,6 +9,7 @@ use common\models\House;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Street;
+use common\models\User;
 use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -55,6 +56,10 @@ class CameraController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -134,6 +139,10 @@ class CameraController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new Camera();
         $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -157,8 +166,11 @@ class CameraController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -195,6 +207,10 @@ class CameraController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
         return $this->redirect(['index']);
     }

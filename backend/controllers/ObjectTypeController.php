@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\ObjectSearchType;
 use common\models\ObjectType;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -77,6 +78,10 @@ class ObjectTypeController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new ObjectType();
         $searchModel = new ObjectSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -101,8 +106,11 @@ class ObjectTypeController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -123,6 +131,10 @@ class ObjectTypeController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

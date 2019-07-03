@@ -72,6 +72,10 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new NewUser;
         if ($model->load(Yii::$app->request->post()) && $newUser = $model->save()) {
             $role = new Role();
@@ -104,6 +108,10 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
 //        $model = new User;
 //        $model = $model::find()->where(['_id' => $id])->one();
 //
@@ -169,6 +177,10 @@ class UserController extends Controller
     public function actionTable()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = User::find()->where(['_id' => $_POST['editableKey']])->one();
             if ($_POST['editableAttribute']=='type') {
                 $model['type']=intval($_POST['Users'][$_POST['editableIndex']]['type']);

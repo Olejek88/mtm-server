@@ -13,11 +13,11 @@ use common\models\Measure;
 use common\models\Message;
 use common\models\Photo;
 use common\models\Street;
+use common\models\User;
 use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
-use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
@@ -68,6 +68,10 @@ class NodeController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Node::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -122,8 +126,11 @@ class NodeController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Node();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = new Node();
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
@@ -146,6 +153,10 @@ class NodeController extends Controller
      */
     public function actionNew()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('index');
+        }
+
         $equipments = array();
 /*        $equipment_count = 0;
         $objects = Objects::find()
@@ -219,6 +230,10 @@ class NodeController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
@@ -599,9 +614,12 @@ class NodeController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionDelete($id)
+    public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $node = Node::find()->where(['_id' => $id])->one();
         if ($node) {
             $node['deleted'] = true;
@@ -619,8 +637,7 @@ class NodeController extends Controller
      * @return Node the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected
-    function findModel($id)
+    protected function findModel($id)
     {
         if (($model = Node::findOne($id)) !== null) {
             return $model;
