@@ -22,12 +22,11 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
     <div class="box-body no-padding" style="min-height: 600px">
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12" style="width: 800px;">
                 <video
                         id="my-player"
                         class="video-js"
-                        width='1024'
-                        height='100%'
+                        width='800'
                         controls
                         preload="auto"
                         poster="/images/camera_view.jpg"
@@ -57,6 +56,11 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
                         errorInterval: 5
                     });
                 </script>
+                <div style="text-align: center;">
+                    <a class="btn btn-success" style=" color: black; background-color: lightskyblue"
+                       onclick="window.history.go(-1); return false;">Назад</a>
+
+                </div>
             </div>
         </div>
     </div>
