@@ -71,19 +71,16 @@ class ThreadController extends Controller
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
             if ($_POST['editableAttribute'] == 'title') {
-                $model['title'] = $_POST['Thread'][$_POST['editableIndex']]['title'];
+                $model['title'] = $_POST['editableAttribute'];
             }
             if ($_POST['editableAttribute'] == 'deviceTypeUuid') {
-                $model['deviceTypeUuid'] = $_POST['Thread'][$_POST['editableIndex']]['deviceTypeUuid'];
+                $model['deviceTypeUuid'] = $_POST['editableIndex'];
             }
             if ($_POST['editableAttribute'] == 'port') {
-                $model['port'] = $_POST['Thread'][$_POST['editableIndex']]['port'];
+                $model['port'] = $_POST['editableAttribute'];
             }
             if ($_POST['editableAttribute'] == 'status') {
-                $model['status'] = $_POST['Thread'][$_POST['editableIndex']]['status'];
-            }
-            if ($_POST['editableAttribute'] == 'port') {
-                $model['speed'] = $_POST['Thread'][$_POST['editableIndex']]['speed'];
+                $model['status'] = $_POST['editableIndex'];
             }
             $model->save();
             return json_encode('');

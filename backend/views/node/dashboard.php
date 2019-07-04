@@ -3,11 +3,9 @@
  * @var $camera
  */
 
-use common\models\Device;
-use common\models\User;
-use yii\helpers\Html;
-
 $this->title = Yii::t('app', 'Контроллер');
+$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerCssFile('/css/vendor/video-js.min.css');
 ?>
 
 <br/>
