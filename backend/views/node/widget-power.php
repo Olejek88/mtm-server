@@ -2,8 +2,11 @@
 
 /* @var $categories
  * @var $values
+ * @var $node
  */
 
+use common\models\Device;
+use common\models\DeviceType;
 use common\models\Measure;
 use common\models\MeasureType;
 use common\models\SensorChannel;
@@ -12,27 +15,30 @@ use yii\helpers\Html;
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
 $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 
-$last_measures = Measure::find()
-    ->where(['sensorChannelUuid' => (SensorChannel::find()->select('uuid')
-        ->where(['measureTypeUuid' => MeasureType::POWER]))])
-    ->orderBy('date')->all();
-$cnt=0;
-$categories='';
-$values='';
+$device = (Device::find()->select('uuid')
+    ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]));
+$sChannel = (SensorChannel::find()->select('uuid')
+    ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
+$last_measures = (Measure::find()
+    ->where(['sensorChannelUuid' => $sChannel])->orderBy('date DESC'))->all();
+
+$cnt = 0;
+$categories = '';
+$values = '';
 foreach ($last_measures as $measure) {
-    if ($cnt>0) {
+    if ($cnt > 0) {
         $categories .= ',';
-        $values.=',';
+        $values .= ',';
     }
-    $categories.= "'".$measure['date']."'";
-    $values.=$measure['value'];
+    $categories .= "'" . $measure->date . "'";
+    $values .= $measure->value;
     $cnt++;
 }
 
 ?>
 <div class="box">
     <div class="box-header with-border">
-        <h3 class="box-title">Последние измерения</h3>
+        <h3 class="box-title">Последние измерения 1</h3>
 
         <div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
@@ -100,7 +106,7 @@ foreach ($last_measures as $measure) {
                                     }
                                 },
                                 series: [{
-                                    name: 'Потребляемая мощность (кВт/ч)',
+                                    name: 'Потребляемая мощность (Вт/ч)',
                                     data: [<?php echo $values; ?>]
                                 }]
                             });

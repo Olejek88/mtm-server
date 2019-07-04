@@ -14,9 +14,6 @@ use common\models\Message;
 use common\models\Photo;
 use common\models\Street;
 use common\models\User;
-use Exception;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -24,7 +21,6 @@ use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidConfigException;
-use Throwable;
 
 /**
  * NodeController implements the CRUD actions for Node model.
@@ -510,7 +506,7 @@ class NodeController extends Controller
                         $measures = Measure::find()
                             ->select('*')
                             ->where(['equipmentUuid' => $equipment['uuid']])
-                            ->orderBy('date')
+                            ->orderBy('date DESC')
                             ->all();
 
                         $measure_count_column=0;

@@ -5,6 +5,8 @@ use common\models\Measure;
 use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
+use common\models\DeviceType;
+use common\models\MeasureType;
 
 /* @var $node
  */
@@ -38,26 +40,29 @@ use yii\data\ActiveDataProvider;
                 ],
                 'headerOptions' => ['class' => 'text-center'],
             ],
-/*            [
-                'attribute' => 'sensorChannel.measureType.title',
-                'hAlign' => 'center',
-                'header' => 'Тип измерения',
-                'vAlign' => 'middle',
-                'contentOptions' => [
-                    'class' => 'table_class'
-                ],
-                'headerOptions' => ['class' => 'text-center'],
-            ]*/
+            /*            [
+                            'attribute' => 'sensorChannel.measureType.title',
+                            'hAlign' => 'center',
+                            'header' => 'Тип измерения',
+                            'vAlign' => 'middle',
+                            'contentOptions' => [
+                                'class' => 'table_class'
+                            ],
+                            'headerOptions' => ['class' => 'text-center'],
+                        ]*/
         ];
 
-        $measures = Measure::find()
-            ->where(['sensorChannelUuid' => (SensorChannel::find()->select('uuid')
-                ->where(['deviceUuid' => (Device::find()->select('uuid')
-                    ->where(['nodeUuid' => $node['uuid']]))]))])->limit(5);
+        $device = (Device::find()->select('uuid')
+            ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]));
+        $sChannel = (SensorChannel::find()->select('uuid')
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
+        $measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])->limit(5)->orderBy('date DESC'));
         $provider = new ActiveDataProvider(
             [
                 'query' => $measures,
-                'sort' =>false,
+                'sort' => false,
+                'pagination' => false,
             ]
         );
 
