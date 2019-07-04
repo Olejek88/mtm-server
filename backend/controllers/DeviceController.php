@@ -113,6 +113,27 @@ class DeviceController extends Controller
     }
 
     /**
+     * Lists all Device models.
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionIndexSmall()
+    {
+        $searchModel = new DeviceSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 15;
+
+        return $this->render(
+            'index-small',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]
+        );
+    }
+
+    /**
      * Displays a single Device model.
      *
      * @param integer $id Id
@@ -446,6 +467,136 @@ class DeviceController extends Controller
 
         return $this->render(
             'tree',
+            ['device' => $fullTree, 'deviceTypes' => $items]
+        );
+    }
+
+    /**
+     * Build tree of device
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionTreeSmall()
+    {
+        ini_set('memory_limit', '-1');
+        $fullTree = array();
+        $streets = Street::find()
+            ->select('*')
+            ->orderBy('title')
+            ->all();
+        foreach ($streets as $street) {
+            $fullTree['children'][] = [
+                'title' => $street['title'],
+                'source' => '../device/tree',
+                'uuid' => $street['uuid'],
+                'expanded' => true,
+                'type' => 'street',
+                'folder' => true
+            ];
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
+            orderBy('number')->all();
+            foreach ($houses as $house) {
+                $childIdx = count($fullTree['children']) - 1;
+                $fullTree['children'][$childIdx]['children'][] = [
+                    'uuid' => $house['uuid'],
+                    'type' => 'house',
+                    'expanded' => true,
+                    'title' => $house->getFullTitle(),
+                    'folder' => true
+                ];
+                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                foreach ($objects as $object) {
+                    $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
+                    $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
+                        'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'source' => '../device/tree',
+                        'uuid' => $object['uuid'],
+                        'expanded' => true,
+                        'type' => 'object',
+                        'folder' => true
+                    ];
+                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    foreach ($nodes as $node) {
+                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
+                        if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                            $class = 'critical1';
+                        } elseif ($node['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                            $class = 'critical2';
+                        } else {
+                            $class = 'critical3';
+                        }
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
+                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
+                            'title' => 'Контроллер [' . $node['address'] . ']',
+                            'source' => '../device/tree',
+                            'objectUuid' => $object['uuid'],
+                            'uuid' => $node['uuid'],
+                            'type' => 'node',
+                            'expanded' => true,
+                            'register' => $node['address'],
+                            'folder' => true
+                        ];
+                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        if (isset($_GET['type']))
+                            $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                                ->andWhere(['deviceTypeUuid' => $_GET['type']])
+                                ->all();
+                        foreach ($devices as $device) {
+                            $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                                $class = 'critical1';
+                            } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                                $class = 'critical2';
+                            } else {
+                                $class = 'critical3';
+                            }
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
+                                'title' => $device['deviceType']['title'],
+                                'status' => '<div class="progress"><div class="'
+                                    . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                                'register' => $device['port'] . ' [' . $device['address'] . ']',
+                                'uuid' => $device['uuid'],
+                                'expanded' => true,
+                                'objectUuid' => $object['uuid'],
+                                'nodeUuid' => $node['uuid'],
+                                'measure' => '',
+                                'source' => '../device/tree',
+                                'type' => 'device',
+                                'date' => $device['date'],
+                                'folder' => true
+                            ];
+                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                            foreach ($channels as $channel) {
+                                $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
+                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                $date = '-';
+                                if (!$measure) {
+                                    $config = null;
+                                    $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                    if ($config) {
+                                        $date = $config['changedAt'];
+                                    }
+                                } else {
+                                    $date = $measure['date'];
+                                }
+                                $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][$childIdx5]['children'][] = [
+                                    'title' => $channel['title'],
+                                    'uuid' => $channel['uuid'],
+                                    'date' => $date,
+                                    'folder' => false
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $deviceTypes = DeviceType::find()->all();
+        $items = ArrayHelper::map($deviceTypes, 'uuid', 'title');
+
+        return $this->render(
+            'tree-small',
             ['device' => $fullTree, 'deviceTypes' => $items]
         );
     }

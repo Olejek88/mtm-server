@@ -33,7 +33,6 @@ use yii\web\IdentityInterface;
  * @property boolean $deleted
  *
  * @property int $id
- * @property string $photoUrl
  * @property Organisation $organisation
  * @property string $imageDir
  */
@@ -44,16 +43,12 @@ class User extends ActiveRecord implements IdentityInterface
 
     const ROLE_ADMIN = 'admin';
     const ROLE_OPERATOR = 'operator';
-    const ROLE_ANALYST = 'analyst';
-    const ROLE_USER = 'user';
 
     const PERMISSION_ADMIN = 'permissionAdmin';
     const PERMISSION_OPERATOR = 'permissionOperator';
-    const PERMISSION_ANALYST = 'permissionAnalyst';
-    const PERMISSION_USER = 'permissionUser';
 
     private static $_IMAGE_ROOT = 'users';
-    public const USER_SERVICE_UUID = '00000000-9BF0-4542-B127-F4ECEFCE49DA';
+    // uuid нужен для создания организации в которую будет входить пользователь по умолчанию
     public const ORGANISATION_UUID = '00000001-DA70-4FFE-8B40-DC6F2AC8BAB0';
 
     /**
@@ -313,23 +308,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $localPath = 'storage/' . self::$_IMAGE_ROOT . '/';
         return $localPath;
-    }
-
-    /**
-     * URL изображения.
-     *
-     * @return string
-     */
-    public function getPhotoUrl()
-    {
-        $localPath = '/storage/' . self::$_IMAGE_ROOT . '/' . $this->uuid . '.jpg';
-        if (file_exists(Yii::getAlias('@backend/web/' . $localPath))) {
-            $url = $localPath;
-        } else {
-            $url = null;
-        }
-
-        return $url;
     }
 
     /**

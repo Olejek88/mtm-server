@@ -77,15 +77,17 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
 
         var overlayMapsA = {};
         var overlayMapsB = {
-            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Светильники": devices,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='1')) echo '"Светильники": devices,'; ?>
             <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Камеры": cameras,'; ?>
-            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Шкафы:": nodes'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='1')) echo '"Шкафы:": nodes'; ?>
         };
 
         <?php
             if (!isset($_GET['view'])) {
                 echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(".$coordinates.", 13);";
             } else {
+                if ($_GET['view']=='4')
+                    echo "var map = L.map('mapid', {zoomControl: false, layers: []}).setView(".$coordinates.", 13);";
                 if ($_GET['view']=='2')
                     echo "var map = L.map('mapid', {zoomControl: false, layers: [cameras]}).setView(".$coordinates.", 13);";
                 if ($_GET['view']=='1')
@@ -106,3 +108,4 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         }).addTo(map);
 
     </script>
+</div>

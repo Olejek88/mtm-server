@@ -317,7 +317,7 @@ class SiteController extends Controller
         $dataProvider->pagination->pageSize = 15;
 
         return $this->render(
-            'dashboard-pyramid',
+            'dashboard',
             [
                 'counts' => $counts,
                 'measures' => $measures,

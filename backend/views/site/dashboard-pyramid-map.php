@@ -33,7 +33,7 @@ $this->title = Yii::t('app', 'Сводная');
 
 <!-- Main row -->
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-7">
         <?php
         if (!isset($_GET['type']) || (isset($_GET['type']) && $_GET['type'] == '1')) {
             echo $this->render('index', ['coordinates' => $coordinates,
@@ -41,12 +41,26 @@ $this->title = Yii::t('app', 'Сводная');
                 'nodesGroup' => $nodesGroup, 'nodesList' => $nodesList,
                 'camerasGroup' => $camerasGroup, 'camerasList' => $camerasList]);
         }
-        if (isset($_GET['type']) && ($_GET['type'] == '2'))
-            echo $this->render('../device/index', ['searchModel' => $searchModel, 'dataProvider' => $dataProvider]);
-        if (isset($_GET['type']) && ($_GET['type'] == '3'))
-            echo $this->render('../device/tree', ['device' => $tree]);
         ?>
     </div>
+    <div class="col-md-5">
+        <div class="row">
+            <div class="col-md-12">
+            <?php
+        if (!isset($_GET['type']))
+        echo $this->render('../device/index-small', ['searchModel' => $searchModel, 'dataProvider' => $dataProvider]);
+        ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+            <?php
+        if (!isset($_GET['type']))
+        echo $this->render('../device/tree-small', ['device' => $tree]);
+        ?>
+            </div>
+        </div>
+        </div>
 </div>
 
 <!--<footer class="main-footer" style="margin-left: 0 !important;">
