@@ -43,7 +43,7 @@ $gridColumns = [
         'width' => '180px',
         'mergeHeader' => true,
         'filterType' => GridView::FILTER_SELECT2,
-        'header' => 'Порт',
+        'header' => 'Название',
         'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
     ],
