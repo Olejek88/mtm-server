@@ -286,32 +286,9 @@ class SiteController extends Controller
         $cameras = Camera::find()->all();
 
         foreach ($cameras as $camera) {
-            $params = Yii::$app->params;
-            if (isset($params['amqpServer']['host']) &&
-                isset($params['amqpServer']['port']) &&
-                isset($params['amqpServer']['user']) &&
-                isset($params['amqpServer']['password'])) {
-                try {
-                    $connection = new AMQPStreamConnection($params['amqpServer']['host'],
-                        $params['amqpServer']['port'],
-                        $params['amqpServer']['user'],
-                        $params['amqpServer']['password']);
-
-                    $channel = $connection->channel();
-                    $channel->exchange_declare('light', 'direct', false, true, false);
-                    $pkt = [
-                        'type' => 'camera',
-                        'action' => 'publish',
-                        'uuid' => $camera->uuid,
-                    ];
-                    $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-                    $route = 'routeNode-' . $camera->organisation->_id . '-' . $camera->node->_id;
-                    $channel->basic_publish($msq, 'light', $route);
-                } catch (Exception $e) {
-
-                }
-            }
+            $camera->startTranslation();
         }
+
         $searchModel = new DeviceSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;

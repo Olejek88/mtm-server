@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use backend\models\DeviceSearchType;
 use common\models\DeviceType;
+use common\models\User;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -17,6 +18,15 @@ use Throwable;
  */
 class DeviceTypeController extends Controller
 {
+    const DEVICE_ELECTRO = '0FBACF26-31CA-4B92-BCA3-220E09A6D2D3';
+    const DEVICE_LIGHT = 'CFD3C7CC-170C-4764-9A8D-10047C8B8B1D';
+
+    private static $hardUuid = [
+        self::DEVICE_ELECTRO,
+        self::DEVICE_LIGHT,
+    ];
+
+
     /**
      * Behaviors
      *
@@ -91,6 +101,10 @@ class DeviceTypeController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new DeviceType();
         $searchModel = new DeviceSearchType();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -122,7 +136,17 @@ class DeviceTypeController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
+        if ($model == null) {
+            return $this->redirect(['/site/index']);
+        } else if (in_array($model->uuid, self::$hardUuid)) {
+            return $this->redirect(['view', 'id' => $model->_id]);
+        }
+
         if (Yii::$app->request->isPost) {
             // $model->load(Yii::$app->request->post()) && $model->save()
             $model->load(Yii::$app->request->post());
@@ -151,7 +175,19 @@ class DeviceTypeController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $model = $this->findModel($id);
+        if ($model == null) {
+            return $this->redirect(['/site/index']);
+        } else if (in_array($model->uuid, self::$hardUuid)) {
+            return $this->redirect(['view', 'id' => $model->_id]);
+        }
+
+        $model->delete();
+
         return $this->redirect(['index']);
     }
 

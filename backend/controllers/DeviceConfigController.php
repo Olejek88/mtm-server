@@ -101,6 +101,7 @@ class DeviceConfigController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionCreate()
     {

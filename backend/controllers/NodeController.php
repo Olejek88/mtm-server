@@ -13,18 +13,14 @@ use common\models\Measure;
 use common\models\Message;
 use common\models\Photo;
 use common\models\Street;
-use Exception;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
+use common\models\User;
 use Yii;
-use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidConfigException;
-use Throwable;
 
 /**
  * NodeController implements the CRUD actions for Node model.
@@ -68,6 +64,10 @@ class NodeController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Node::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -122,8 +122,11 @@ class NodeController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Node();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = new Node();
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
@@ -146,6 +149,10 @@ class NodeController extends Controller
      */
     public function actionNew()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('index');
+        }
+
         $equipments = array();
 /*        $equipment_count = 0;
         $objects = Objects::find()
@@ -171,30 +178,7 @@ class NodeController extends Controller
         if ($node) {
             $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
             if ($camera) {
-                $params = Yii::$app->params;
-                if (isset($params['amqpServer']['host']) &&
-                    isset($params['amqpServer']['port']) &&
-                    isset($params['amqpServer']['user']) &&
-                    isset($params['amqpServer']['password'])) {
-                    try {
-                        $connection = new AMQPStreamConnection($params['amqpServer']['host'],
-                            $params['amqpServer']['port'],
-                            $params['amqpServer']['user'],
-                            $params['amqpServer']['password']);
-
-                        $channel = $connection->channel();
-                        $channel->exchange_declare('light', 'direct', false, true, false);
-                        $pkt = [
-                            'type' => 'camera',
-                            'action' => 'publish',
-                            'uuid' => $camera->uuid,
-                        ];
-                        $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-                        $route = 'routeNode-' . $camera->organisation->_id . '-' . $camera->node->_id;
-                        $channel->basic_publish($msq, 'light', $route);
-                    } catch (Exception $e) {
-                    }
-                }
+                $camera->startTranslation();
             }
         }
 
@@ -219,6 +203,10 @@ class NodeController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
@@ -518,7 +506,7 @@ class NodeController extends Controller
                         $measures = Measure::find()
                             ->select('*')
                             ->where(['equipmentUuid' => $equipment['uuid']])
-                            ->orderBy('date')
+                            ->orderBy('date DESC')
                             ->all();
 
                         $measure_count_column=0;
@@ -599,9 +587,12 @@ class NodeController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionDelete($id)
+    public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $node = Node::find()->where(['_id' => $id])->one();
         if ($node) {
             $node['deleted'] = true;
@@ -619,8 +610,7 @@ class NodeController extends Controller
      * @return Node the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected
-    function findModel($id)
+    protected function findModel($id)
     {
         if (($model = Node::findOne($id)) !== null) {
             return $model;

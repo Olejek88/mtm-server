@@ -9,6 +9,7 @@ use common\models\House;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Street;
+use common\models\User;
 use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -55,6 +56,10 @@ class CameraController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -95,35 +100,11 @@ class CameraController extends Controller
     {
         $model = $this->findModel($id);
         if ($model != null) {
-            $params = Yii::$app->params;
-            if (isset($params['amqpServer']['host']) &&
-                isset($params['amqpServer']['port']) &&
-                isset($params['amqpServer']['user']) &&
-                isset($params['amqpServer']['password'])) {
-                try {
-                    $connection = new AMQPStreamConnection($params['amqpServer']['host'],
-                        $params['amqpServer']['port'],
-                        $params['amqpServer']['user'],
-                        $params['amqpServer']['password']);
-
-                    $channel = $connection->channel();
-                    $channel->exchange_declare('light', 'direct', false, true, false);
-                    $pkt = [
-                        'type' => 'camera',
-                        'action' => 'publish',
-                        'uuid' => $model->uuid,
-                    ];
-                    $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-                    $route = 'routeNode-' . $model->organisation->_id . '-' . $model->node->_id;
-                    $channel->basic_publish($msq, 'light', $route);
-                } catch (Exception $e) {
-
-                }
-            }
+            $model->startTranslation();
         }
 
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -134,6 +115,10 @@ class CameraController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = new Camera();
         $searchModel = new CameraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -157,8 +142,11 @@ class CameraController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->_id]);
         } else {
@@ -176,11 +164,17 @@ class CameraController extends Controller
     {
         if (isset($_GET['uuid'])) {
             $model = Camera::find()->where(['uuid' => $_GET['uuid']])->one();
-            if ($model)
+            if ($model) {
+                if (!$model->startTranslation()) {
+                    // по каким-то причинам команду на начало трансляции отправить не удалось
+                }
+
                 return $this->render('dashboard', [
                     'model' => $model
                 ]);
+            }
         }
+
         return self::actionIndex();
     }
 
@@ -195,6 +189,10 @@ class CameraController extends Controller
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $this->findModel($id)->delete();
         return $this->redirect(['index']);
     }

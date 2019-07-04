@@ -57,6 +57,10 @@ class OrganisationController extends ControllerAlias
     public function actionTable()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Organisation::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -109,6 +113,8 @@ class OrganisationController extends ControllerAlias
      */
     public function actionUpdate($id)
     {
+        return $this->redirect('/site/index');
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {

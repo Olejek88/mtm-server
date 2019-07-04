@@ -3,6 +3,9 @@
 namespace common\models;
 
 use common\components\MtmActiveRecord;
+use Exception;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -203,5 +206,36 @@ class Camera extends MtmActiveRecord
     public function getOrganisation()
     {
         return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
+    }
+
+    public function startTranslation()
+    {
+        $params = Yii::$app->params;
+        if (isset($params['amqpServer']['host']) &&
+            isset($params['amqpServer']['port']) &&
+            isset($params['amqpServer']['user']) &&
+            isset($params['amqpServer']['password'])) {
+            try {
+                $connection = new AMQPStreamConnection($params['amqpServer']['host'],
+                    $params['amqpServer']['port'],
+                    $params['amqpServer']['user'],
+                    $params['amqpServer']['password']);
+
+                $channel = $connection->channel();
+                $channel->exchange_declare('light', 'direct', false, true, false);
+                $pkt = [
+                    'type' => 'camera',
+                    'action' => 'publish',
+                    'uuid' => $this->uuid,
+                ];
+                $msq = new AMQPMessage(json_encode($pkt), array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
+                $route = 'routeNode-' . $this->organisation->_id . '-' . $this->node->_id;
+                $channel->basic_publish($msq, 'light', $route);
+            } catch (Exception $e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

@@ -69,7 +69,7 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         echo $devicesGroup;
         echo $nodesList;
         echo $nodesGroup;
-        if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) {
+        if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '2')) {
             echo $camerasList;
             echo $camerasGroup;
         }
@@ -77,10 +77,9 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
 
         var overlayMapsA = {};
         var overlayMapsB = {
-            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='1')) echo '"Светильники": devices,'; ?>
-            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='2')) echo '"Камеры": cameras,'; ?>
-            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view']=='1')) echo '"Шкафы:": nodes'; ?>
-        };
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Светильники": devices,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '2')) echo '"Камеры": cameras,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Шкафы:": nodes'; ?>        };
 
         <?php
             if (!isset($_GET['view'])) {

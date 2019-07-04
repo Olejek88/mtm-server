@@ -77,6 +77,10 @@ class DeviceController extends Controller
     public function actionIndex()
     {
         if (isset($_POST['editableAttribute'])) {
+            if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                return json_encode('Нет прав.');
+            }
+
             $model = Device::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->one();
@@ -159,8 +163,11 @@ class DeviceController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Device();
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
 
+        $model = new Device();
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
@@ -170,7 +177,7 @@ class DeviceController extends Controller
             // сохраняем запись
             if ($model->save(false)) {
                 MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
-                    $model['node']['object']->getAddress() . ' [' . $model['node']['address'] . ']');
+                    $model->node->object->getAddress() . ' [' . $model->node->address . ']');
                 return $this->redirect(['view', 'id' => $model->_id]);
             }
             echo json_encode($model->errors);
@@ -189,6 +196,10 @@ class DeviceController extends Controller
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
@@ -239,6 +250,7 @@ class DeviceController extends Controller
                 }
             }
         }
+
         if (isset($_POST['type']) && $_POST['type'] == 'params') {
             if (isset($_POST['device'])) {
                 $device = Device::find()->where(['uuid' => $_POST['device']])->one();
@@ -709,9 +721,12 @@ class DeviceController extends Controller
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public
-    function actionDelete($id)
+    public function actionDelete($id)
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
         $device = $this->findModel($id);
         $photos = Photo::find()
             ->select('*')
@@ -742,8 +757,7 @@ class DeviceController extends Controller
      * @return Device the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected
-    function findModel($id)
+    protected function findModel($id)
     {
         if (($model = Device::findOne($id)) !== null) {
             return $model;
@@ -782,9 +796,12 @@ class DeviceController extends Controller
      *
      * @return mixed
      */
-    public
-    function actionNew()
+    public function actionNew()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["selected_node"])) {
             if (isset($_POST["uuid"]))
                 $uuid = $_POST["uuid"];
@@ -859,6 +876,10 @@ class DeviceController extends Controller
      */
     public function actionEdit()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["source"]))
             $source = $_POST["source"];
         else $source = '../device/tree';
@@ -935,9 +956,12 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionSave()
+    public function actionSave()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["type"]))
             $type = $_POST["type"];
         else $type = 0;
@@ -1012,6 +1036,10 @@ class DeviceController extends Controller
      */
     public function actionRemove()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["uuid"])) {
             $model = Device::find()->where(['uuid' => $_POST['uuid']])->one();
             $model["deleted"] = true;
@@ -1027,9 +1055,12 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionSetConfig()
+    public function actionSetConfig()
     {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
         if (isset($_POST["selected_node"])) {
             if (isset($_POST["uuid"]))
                 $uuid = $_POST["uuid"];
