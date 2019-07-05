@@ -98,7 +98,7 @@ class Photo extends ActiveRecord implements IPhoto
      *
      * @return array
      */
-    public function fields()
+    public function fields1()
     {
         return ['_id','uuid',
             'cameraUuid',

@@ -99,7 +99,7 @@ class DeviceRegister extends MtmActiveRecord
         );
     }
 
-    public function fields()
+    public function fields1()
     {
         return ['uuid',
             'device' => function ($model) {

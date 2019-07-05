@@ -52,7 +52,7 @@ class City extends MtmActiveRecord
         ];
     }
 
-    public function fields()
+    public function fields1()
     {
         return [
             '_id',

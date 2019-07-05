@@ -71,7 +71,7 @@ class Device extends MtmActiveRecord
      *
      * @return array
      */
-    public function fields()
+    public function fields1()
     {
         return ['_id', 'uuid', 'address', 'name',
             'nodeUuid',

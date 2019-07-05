@@ -52,7 +52,7 @@ class Organisation extends ActiveRecord
         ];
     }
 
-    public function fields()
+    public function fields1()
     {
         return [
             '_id',

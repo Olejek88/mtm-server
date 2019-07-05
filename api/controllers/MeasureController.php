@@ -101,7 +101,7 @@ class MeasureController extends Controller
             $model->value = $item['value'];
             $model->date = $item['date'];
             $model->createdAt = $item['createdAt'];
-            $model->changedAt = $item['changedAt'];
+//            $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
                 throw new HttpException(401, 'measure not saved.');
