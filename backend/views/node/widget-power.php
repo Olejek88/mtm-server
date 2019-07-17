@@ -20,7 +20,7 @@ $device = (Device::find()->select('uuid')
 $sChannel = (SensorChannel::find()->select('uuid')
     ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
 $last_measures = (Measure::find()
-    ->where(['sensorChannelUuid' => $sChannel])->orderBy('date DESC'))->all();
+    ->where(['sensorChannelUuid' => $sChannel])->orderBy('date DESC'))->limit(100)->all();
 
 $cnt = 0;
 $categories = '';
