@@ -15,6 +15,7 @@ use common\models\House;
 use common\models\Journal;
 use common\models\LoginForm;
 use common\models\Measure;
+use common\models\MeasureType;
 use common\models\Node;
 use common\models\Objects;
 use common\models\SensorChannel;
@@ -477,7 +478,8 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: lightIcon}).bindPopup(\'' . $link . '<br/>'
+                    . '], {icon: lightIcon}).bindPopup(\'' .
+                    $link . '<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -528,15 +530,52 @@ class SiteController extends Controller
         $nodesList = '';
         foreach ($nodes as $node) {
             if ($node["object"]["latitude"] > 0) {
+                $link="<span class='badge' style='background-color: green; height: 22px; margin-top: -3px'>есть</span>";
+                $security="<span class='badge' style='background-color: green; height: 22px; margin-top: -3px'>в норме</span>";
+                $power="<span class='badge' style='background-color: green; height: 22px; margin-top: -3px'>в норме</span>";
+                $contactors="-";
+                $u="-";
+                $w="-";
+                $w_total="-";
+                $device = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                    ->andWhere(['nodeUuid' => $node['uuid']])->one();
+                if ($device) {
+                    $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                    foreach ($channels as $channel) {
+                        $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                            ->andWhere(['sensorChannelUuid' => $channel['uuid']])
+                            ->andWhere(['type' => 0])
+                            ->orderBy('date DESC')
+                            ->one();
+                        if (!$measure) {
+                            if ($channel['measureType']['uuid']==MeasureType::POWER)
+                                $w = $measure['value'];
+                            if ($channel['measureType']['uuid']==MeasureType::VOLTAGE)
+                                $u = $measure['value'];
+                            if ($channel['measureType']['uuid']==MeasureType::CURRENT)
+                                $w_total = $measure['value'];
+                        }
+                    }
+                }
+                $software="2.0.1";
+                $phone=$node["address"];
                 $nodesList .= 'var node'
                     . $node["_id"]
                     . '= L.marker([' . $node["object"]["latitude"]
                     . ',' . $node["object"]["longitude"]
                     . '], {icon: nodeIcon}).bindPopup(\'<b>'
-                    . Html::a($node["address"],
+                    . Html::a($node["object"]->getAddress(),
                         ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
                     . '</b><br/>'
-                    . $node["object"]->getAddress() . '\').openPopup();';
+                    . 'Связь: ' . $link.'<br/>'
+                    . 'Охрана: ' . $security.'<br/>'
+                    . 'Питание: ' . $power.'<br/>'
+                    . 'Контакторы: ' . $contactors.'<br/>'
+                    . 'Напряжение,В: ' . $u.'<br/>'
+                    . 'Мощность,кВт/ч: ' . $w.'<br/>'
+                    . 'Сумма,кВт: ' . $w_total.'<br/>'
+                    . 'Версия ПО: ' . $software.'<br/>'
+                    . 'Телефон/адрес: ' . $phone.'<br/>\').openPopup()';
                 $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
                     $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
