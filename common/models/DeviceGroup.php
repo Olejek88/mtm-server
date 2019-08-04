@@ -9,20 +9,20 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "device_register".
+ * This is the model class for table "device_group".
  *
- * @property int $_id
+ * @property integer $_id
  * @property string $uuid
  * @property string $oid идентификатор организации
  * @property string $deviceUuid
- * @property string $date
- * @property string $description
+ * @property string $groupUuid
  * @property string $createdAt
  * @property string $changedAt
  *
+ * @property Group $group
  * @property Device $device
  */
-class DeviceRegister extends MtmActiveRecord
+class DeviceGroup extends MtmActiveRecord
 {
     /**
      * Behaviors.
@@ -48,7 +48,7 @@ class DeviceRegister extends MtmActiveRecord
      */
     public static function tableName()
     {
-        return 'device_register';
+        return 'device_group';
     }
 
     /**
@@ -57,54 +57,61 @@ class DeviceRegister extends MtmActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'deviceUuid', 'date'], 'required'],
-            [['data'], 'safe'],
-            [['uuid', 'deviceUuid', 'oid'], 'string', 'max' => 50],
-            [['description'], 'string', 'max' => 250],
-            [['createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'deviceUuid', 'groupUuid'], 'required'],
+            [['oid', 'createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
+            [['uuid', 'deviceUuid', 'groupUuid'], 'string', 'max' => 50],
+            [['title'], 'string', 'max' => 100],
             [['oid'], 'checkOrganizationOwn'],
         ];
     }
 
     /**
-     * Labels.
+     * Проверка целостности модели?
      *
-     * @return array
-     *
+     * @return bool
+     */
+    public function upload()
+    {
+        if ($this->validate()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return [
+            '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'deviceUuid' => Yii::t('app', 'Оборудование'),
-            'device' => Yii::t('app', 'Оборудование'),
-            'description' => Yii::t('app', 'Запись'),
-            'date' => Yii::t('app', 'Дата'),
+            'title' => Yii::t('app', 'Название'),
+            'device' => Yii::t('app', 'Устройство'),
+            'deviceUuid' => Yii::t('app', 'Устройство'),
+            'group' => Yii::t('app', 'Группа'),
+            'groupUuid' => Yii::t('app', 'Группа'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
     }
 
     /**
-     * Объект связанного поля.
-     *
+     * @return ActiveQuery
+     */
+    public function getGroup()
+    {
+        return $this->hasOne(Group::class, ['uuid' => 'groupUuid']);
+    }
+
+    /**
      * @return ActiveQuery
      */
     public function getDevice()
     {
-        return $this->hasOne(
-            Device::class, ['uuid' => 'deviceUuid']
-        );
+        return $this->hasOne(Device::class, ['uuid' => 'deviceUuid']);
     }
 
-    public function fields1()
-    {
-        return ['uuid',
-            'device' => function ($model) {
-                return $model->device;
-            }, 'date', 'description', 'createdAt', 'changedAt'
-        ];
-    }
 }

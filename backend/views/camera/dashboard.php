@@ -57,8 +57,7 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
                     });
                 </script>
                 <div style="text-align: center;">
-                    <a class="btn btn-success" style=" color: black; background-color: lightskyblue"
-                       onclick="window.history.go(-1); return false;">Назад</a>
+                    <a class="btn btn-success" onclick="window.history.go(-1); return false;">Назад</a>
 
                 </div>
             </div>

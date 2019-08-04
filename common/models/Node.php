@@ -16,6 +16,10 @@ use yii\db\Expression;
  * @property string $address
  * @property string $deviceStatusUuid
  * @property string $objectUuid
+ * @property string $lastDate
+ * @property boolean $security
+ * @property string $phone
+ * @property string $software
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
@@ -59,9 +63,9 @@ class Node extends MtmActiveRecord
      *
      * @return array
      */
-    public function fields()
+    public function fields1()
     {
-        return ['_id', 'uuid', 'oid',
+        return ['_id', 'uuid', 'oid', 'lastDate', 'security', 'phone', 'software',
             'objectUuid',
             'object' => function ($model) {
                 return $model->object;
@@ -120,6 +124,10 @@ class Node extends MtmActiveRecord
             'objectUuid' => Yii::t('app', 'Объект'),
             'object' => Yii::t('app', 'Объект'),
             'address' => Yii::t('app', 'Адрес'),
+            'software' => Yii::t('app', 'Версия ПО'),
+            'phone' => Yii::t('app', 'Телефон'),
+            'lastDate' => Yii::t('app', 'Дата последней связи'),
+            'security' => Yii::t('app', 'Охрана'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];

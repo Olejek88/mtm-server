@@ -2,22 +2,22 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "organisation".
+ * This is the model class for table "group".
  *
  * @property integer $_id
  * @property string $uuid
+ * @property string $oid идентификатор организации
  * @property string $title
  * @property string $createdAt
  * @property string $changedAt
- * @property boolean $deleted
  */
-class Organisation extends ActiveRecord
+class Group extends MtmActiveRecord
 {
     public function behaviors()
     {
@@ -36,7 +36,7 @@ class Organisation extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'organisation';
+        return 'group';
     }
 
     /**
@@ -47,8 +47,8 @@ class Organisation extends ActiveRecord
         return [
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
-            [['deleted'], 'boolean'],
-            [['uuid', 'title'], 'string', 'max' => 50],
+            [['uuid', 'title', 'oid'], 'string', 'max' => 50],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

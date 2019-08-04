@@ -103,7 +103,7 @@ class DeviceConfig extends MtmActiveRecord
      *
      * @return array
      */
-    public function fields()
+    public function fields1()
     {
         return ['_id', 'uuid', 'parameter', 'value',
             'deviceUuid',

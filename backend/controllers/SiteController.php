@@ -172,9 +172,9 @@ class SiteController extends Controller
             ->count();
         $complete = 0;
 
-        $measures = Measure::find()
-            ->orderBy('date')
-            ->all();
+//        $measures = Measure::find()
+//            ->orderBy('date')
+//            ->all();
 
         $users = User::find()
             ->where(['oid' => User::getOid(Yii::$app->user->identity)])
@@ -298,7 +298,7 @@ class SiteController extends Controller
             'dashboard',
             [
                 'counts' => $counts,
-                'measures' => $measures,
+//                'measures' => $measures,
                 'devices' => $devices,
                 'cameras' => $cameras,
                 'users' => $users,
