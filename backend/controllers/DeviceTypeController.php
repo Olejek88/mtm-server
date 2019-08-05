@@ -18,12 +18,10 @@ use Throwable;
  */
 class DeviceTypeController extends Controller
 {
-    const DEVICE_ELECTRO = '0FBACF26-31CA-4B92-BCA3-220E09A6D2D3';
-    const DEVICE_LIGHT = 'CFD3C7CC-170C-4764-9A8D-10047C8B8B1D';
-
     private static $hardUuid = [
-        self::DEVICE_ELECTRO,
-        self::DEVICE_LIGHT,
+        DeviceType::DEVICE_COUNTER,
+        DeviceType::DEVICE_ZB_COORDINATOR,
+        DeviceType::DEVICE_LIGHT,
     ];
 
 
