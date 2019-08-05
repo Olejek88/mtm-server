@@ -120,7 +120,6 @@ class DeviceController extends Controller
      * Lists all Device models.
      *
      * @return mixed
-     * @throws InvalidConfigException
      */
     public function actionIndexSmall()
     {
@@ -697,16 +696,20 @@ class DeviceController extends Controller
     /**
      * Build tree of device by user
      *
-     * @param integer $id Id
-     * @param $date_start
-     * @param $date_end
      * @return mixed
      */
-    public function actionTable($id, $date_start, $date_end)
+    public function actionReport()
     {
-        ini_set('memory_limit', '-1');
+        $searchModel = new DeviceSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]);
+        $dataProvider->pagination->pageSize = 50;
         return $this->render(
-            'tree-user'
+            'report',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]
         );
     }
 

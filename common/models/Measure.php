@@ -19,6 +19,8 @@ use yii\base\InvalidConfigException;
  * @property string $sensorChannelUuid
  * @property double $value
  * @property string $date
+ * @property integer $type
+ * @property integer $parameter
  * @property string $createdAt
  * @property string $changedAt
  *
@@ -161,6 +163,23 @@ class Measure extends MtmActiveRecord
         $model = Measure::find()->where(["sensorChannelUuid" => $sensorChannelUuid])
             ->andWhere('date >= "' . $startDate . '"')
             ->andWhere('date < "' . $endDate . '"')
+            ->orderBy('date DESC')
+            ->one();
+        return $model;
+    }
+
+    /**
+     * @param $sensorChannelUuid
+     * @param $type
+     * @param $parameter
+     * @return ActiveRecord
+     * @throws InvalidConfigException
+     */
+    public static function getLastMeasure($sensorChannelUuid, $type, $parameter)
+    {
+        $model = Measure::find()->where(["sensorChannelUuid" => $sensorChannelUuid])
+            ->andWhere(['type' => $type])
+            ->andWhere(['parameter' => $parameter])
             ->orderBy('date DESC')
             ->one();
         return $model;

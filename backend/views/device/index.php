@@ -192,7 +192,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'template'=> '{edit}',
+        'template'=> '{update}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

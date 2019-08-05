@@ -532,6 +532,7 @@ class SiteController extends Controller
                 $link = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>есть</span>";
                 $security = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
                 $power = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
+                $temperature = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>28.82(C)</span>";
                 $contactors = "-";
                 $u = "-";
                 $w = "-";
@@ -585,6 +586,7 @@ class SiteController extends Controller
                     . 'Охрана: ' . $security . '<br/>'
                     . 'Питание: ' . $power . '<br/>'
                     . 'Контакторы: ' . $contactors . '<br/>'
+                    . 'Температура: ' . $temperature . '<br/>'
                     . 'Напряжение,В: ' . $u . '<br/>'
                     . 'Мощность,кВт/ч: ' . $w . '<br/>'
                     . 'Сумма,кВт: ' . $w_total . '<br/>'

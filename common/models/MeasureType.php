@@ -23,6 +23,13 @@ class MeasureType extends ActiveRecord
     const CURRENT = 'E38C561F-9E88-407E-A465-83803A625627';
     const STATUS = 'E45EA488-DB97-4D38-9067-6B4E29B965F8';
 
+    const MEASURE_TYPE_CURRENT = 0;
+    const MEASURE_TYPE_HOUSE = 1;
+    const MEASURE_TYPE_DAYS = 2;
+    const MEASURE_TYPE_MONTH = 4;
+    const MEASURE_TYPE_INTERVAL = 7;
+    const MEASURE_TYPE_TOTAL = 9;
+
     /**
      * @inheritdoc
      */
