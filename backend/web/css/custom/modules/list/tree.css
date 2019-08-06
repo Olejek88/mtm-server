@@ -77,3 +77,19 @@ span.fancytree-expander {
 span.fancytree-checkbox, span.fancytree-expander, span.fancytree-custom-icon {
     margin-top: 6px !important;
 }
+
+.badge-green {
+    background-color: green;
+    height: 20px;
+    padding-left:7px;
+    margin-right: 8px;
+    margin-top: -3px
+}
+
+.badge-red {
+    background-color: indianred;
+    height: 20px;
+    padding-left:7px;
+    margin-right: 8px;
+    margin-top: -3px
+}

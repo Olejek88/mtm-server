@@ -110,6 +110,27 @@ $gridColumns = [
         }
     ],
     [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'phone',
+        'width' => '180px',
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class'
+        ],
+        'headerOptions' => ['class' => 'text-center']
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'software',
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'contentOptions' => [
+            'class' => 'table_class'
+        ],
+        'headerOptions' => ['class' => 'text-center']
+    ],
+    [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
         'headerOptions' => ['class' => 'kartik-sheet-style'],

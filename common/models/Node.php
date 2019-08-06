@@ -94,7 +94,7 @@ class Node extends MtmActiveRecord
                 ],
                 'required'
             ],
-            [['address', 'oid', 'createdAt', 'changedAt'], 'safe'],
+            [['address', 'oid', 'phone','software','createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
             [
                 [

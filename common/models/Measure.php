@@ -185,4 +185,28 @@ class Measure extends MtmActiveRecord
         return $model;
     }
 
+    /**
+     * @param $measureTypeUuid
+     * @param $nodeUuid
+     * @param $type
+     * @param $parameter
+     * @return ActiveRecord|null
+     * @throws InvalidConfigException
+     */
+    public static function getLastMeasureNodeByType($measureTypeUuid, $nodeUuid, $type, $parameter)
+    {
+        $device = Device::find()->where(['nodeUuid' => $nodeUuid])->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])->one();
+        if ($device) {
+            $channel = SensorChannel::find()
+                ->where(['deviceUuid' => $device['uuid']])
+                ->andWhere(['measureTypeUuid' => $measureTypeUuid])
+                ->one();
+            if ($channel) {
+                $measure = self::getLastMeasure($channel['uuid'], $type, $parameter);
+                if ($measure)
+                    return $measure;
+            }
+        }
+        return null;
+    }
 }

@@ -55,7 +55,7 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
 
     <div class="col-md-4">
 
-        <?= $this->render('widget-node-stats', ['node' => $node]); ?>
+        <?= $this->render('widget-status', ['node' => $node]); ?>
     </div>
 </div>
 

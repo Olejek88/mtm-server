@@ -80,6 +80,13 @@ class NodeController extends Controller
             if ($_POST['editableAttribute'] == 'nodeUuid') {
                 $model['nodeUuid'] = $_POST['Node'][$_POST['editableIndex']]['nodeUuid'];
             }
+            if ($_POST['editableAttribute'] == 'software') {
+                $model['software'] = $_POST['Node'][$_POST['editableIndex']]['software'];
+            }
+            if ($_POST['editableAttribute'] == 'phone') {
+                $model['phone'] = $_POST['Node'][$_POST['editableIndex']]['phone'];
+            }
+
             $model->save();
             return json_encode('');
         }
@@ -89,6 +96,26 @@ class NodeController extends Controller
         $dataProvider->pagination->pageSize = 15;
         return $this->render(
             'index',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]
+        );
+    }
+
+    /**
+     * Build tree of device by user
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionStatus()
+    {
+        $searchModel = new NodeSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 50;
+        return $this->render(
+            'status',
             [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,

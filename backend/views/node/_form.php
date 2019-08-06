@@ -38,6 +38,8 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php echo $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'software')->textInput(['maxlength' => true]) ?>
 
 
     <?php
