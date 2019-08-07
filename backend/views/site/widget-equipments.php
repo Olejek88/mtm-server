@@ -21,6 +21,7 @@ use yii\helpers\Html;
     <div class="box-body">
         <ul class="products-list product-list-in-box">
             <?php
+            $count=0;
             foreach ($devices as $device) {
                 $path = '/images/no-image-icon-4.png';
                 if ($device['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO)
@@ -38,6 +39,8 @@ use yii\helpers\Html;
                                     $device["node"]['object']->getAddress().'
                                     </span>
                                 </div></li>';
+                $count++;
+                if ($count>5) break;
             }
             ?>
             <!-- /.item -->

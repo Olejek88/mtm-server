@@ -51,13 +51,13 @@ use yii\helpers\Html;
     }
 
     echo $form->field($device, 'name')->textInput(['maxlength' => true]);
-    if (isset($deviceTypeUuid) && $deviceTypeUuid==DeviceType::DEVICE_LIGHT) {
+
+    if (isset($deviceTypeUuid) && ($deviceTypeUuid."" == DeviceType::DEVICE_LIGHT)) {
         echo $form->field($device, 'deviceTypeUuid')->hiddenInput(['value' => DeviceType::DEVICE_LIGHT])->label(false);
     } else {
         $deviceType = DeviceType::find()->all();
         $items = ArrayHelper::map($deviceType, 'uuid', 'title');
-        echo $form->field($device, 'deviceTypeUuid',
-            ['template' => MainFunctions::getAddButton("/device-type/create")])->widget(Select2::class,
+        echo $form->field($device, 'deviceTypeUuid')->widget(Select2::class,
             [
                 'data' => $items,
                 'language' => 'ru',

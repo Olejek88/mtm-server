@@ -10,6 +10,7 @@ use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
 use common\models\Measure;
+use common\models\MeasureType;
 use common\models\mtm\MtmDevLightActionSetLight;
 use common\models\mtm\MtmDevLightConfig;
 use common\models\mtm\MtmDevLightConfigLight;
@@ -177,6 +178,16 @@ class DeviceController extends Controller
             if ($model->save(false)) {
                 MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                     $model->node->object->getAddress() . ' [' . $model->node->address . ']');
+
+                if ($model['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO) {
+                    self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
+                    self::createChannel($model->uuid, MeasureType::CURRENT, "Ток");
+                    self::createChannel($model->uuid, MeasureType::VOLTAGE, "Напряжение");
+                    self::createChannel($model->uuid, MeasureType::FREQUENCY, "Частота");
+                }
+                if ($model['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
+                    self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура воздуха");
+                }
                 return $this->redirect(['view', 'id' => $model->_id]);
             }
             echo json_encode($model->errors);
@@ -358,6 +369,7 @@ class DeviceController extends Controller
         $fullTree = array();
         $streets = Street::find()
             ->select('*')
+            ->where(['deleted' => 0])
             ->orderBy('title')
             ->all();
         foreach ($streets as $street) {
@@ -369,8 +381,9 @@ class DeviceController extends Controller
                 'type' => 'street',
                 'folder' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
+            $houses = House::find()->where(['streetUuid' => $street['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->orderBy('number')->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
@@ -380,7 +393,9 @@ class DeviceController extends Controller
                     'title' => $house->getFullTitle(),
                     'folder' => true
                 ];
-                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
@@ -391,7 +406,9 @@ class DeviceController extends Controller
                         'type' => 'object',
                         'folder' => true
                     ];
-                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])
+                        ->andWhere(['deleted' => 0])
+                        ->all();
                     foreach ($nodes as $node) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
                         if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
@@ -412,7 +429,9 @@ class DeviceController extends Controller
                             'register' => $node['address'],
                             'folder' => true
                         ];
-                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                            ->andWhere(['deleted' => 0])
+                            ->all();
                         if (isset($_GET['type']))
                             $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
                                 ->andWhere(['deviceTypeUuid' => $_GET['type']])
@@ -441,7 +460,8 @@ class DeviceController extends Controller
                                 'date' => $device['date'],
                                 'folder' => true
                             ];
-                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])
+                                ->all();
                             foreach ($channels as $channel) {
                                 $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
                                 $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
@@ -814,7 +834,7 @@ class DeviceController extends Controller
             else $type = 0;
             if (isset($_POST["deviceTypeUuid"]))
                 $deviceTypeUuid = $_POST["deviceTypeUuid"];
-            else $deviceTypeUuid = DeviceType::DEVICE_LIGHT;
+            else $deviceTypeUuid = 0;
             if (isset($_POST["objectUuid"]))
                 $objectUuid = $_POST["objectUuid"];
             else $objectUuid = '';
@@ -1024,32 +1044,21 @@ class DeviceController extends Controller
                     $model = new Device();
                 if ($model->load(Yii::$app->request->post())) {
                     if ($model->save(false) && isset($_POST['deviceUuid'])) {
-                        return $this->redirect($source);
+                        //return $this->redirect($source);
+                    }
+                    if ($model['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO) {
+                        self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
+                        self::createChannel($model->uuid, MeasureType::CURRENT, "Ток");
+                        self::createChannel($model->uuid, MeasureType::VOLTAGE, "Напряжение");
+                        self::createChannel($model->uuid, MeasureType::FREQUENCY, "Частота");
+                    }
+                    if ($model['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
+                        self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура");
                     }
                 }
             }
         }
         return $this->redirect($source);
-    }
-
-    /**
-     * функция отрабатывает сигналы от дерева и выполняет отвязывание выбранного оборудования от пользователя
-     * @return mixed
-     * @throws InvalidConfigException
-     */
-    public function actionRemove()
-    {
-        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return 'Нет прав.';
-        }
-
-        if (isset($_POST["uuid"])) {
-            $model = Device::find()->where(['uuid' => $_POST['uuid']])->one();
-            $model["deleted"] = true;
-            $model->save();
-        }
-        $this->enableCsrfValidation = false;
-        return 0;
     }
 
     /**
@@ -1167,5 +1176,84 @@ class DeviceController extends Controller
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param $deviceUuid
+     * @param $measureTypeUuid
+     * @param $title
+     */
+    function createChannel($deviceUuid, $measureTypeUuid, $title)
+    {
+        $sensorChannel = new SensorChannel();
+        $sensorChannel->uuid = MainFunctions::GUID();
+        $sensorChannel->deviceUuid = $deviceUuid;
+        $sensorChannel->measureTypeUuid = $measureTypeUuid;
+        $sensorChannel->oid = User::getOid(Yii::$app->user->identity);
+        $sensorChannel->register = "0";
+        $sensorChannel->title = $title;
+        $sensorChannel->save();
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет удаление
+     *
+     * @return mixed
+     * @throws StaleObjectException
+     * @throws \Throwable
+     */
+    public function actionRemove()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
+        if (isset($_POST["selected_node"])) {
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+            if (isset($_POST["type"]))
+                $type = $_POST["type"];
+            else $type = 0;
+
+            if ($uuid && $type) {
+                if ($type == 'street') {
+                    $street = Street::find()->where(['uuid' => $uuid])->one();
+                    if ($street) {
+                        $house = House::find()->where(['streetUuid' => $street['uuid']])->one();
+                        if (!$house) {
+                            $street->delete();
+                            return 'ok';
+                        }
+                    }
+                }
+                if ($type == 'house') {
+                    $house = House::find()->where(['uuid' => $uuid])->one();
+                    if ($house) {
+                        $house['deleted'] = true;
+                        $house->save();
+                        return 'ok';
+                    }
+                }
+                if ($type == 'object') {
+                    $object = Objects::find()->where(['uuid' => $uuid])->one();
+                    if ($object) {
+                        $object['deleted'] = true;
+                        $object->save();
+                        return 'ok';
+                    }
+
+                }
+                if ($type == 'device') {
+                    $device = Device::find()->where(['uuid' => $uuid])->one();
+                    if ($device) {
+                        $device['deleted'] = true;
+                        $device->save();
+                        return 'ok';
+                    }
+                }
+            }
+        }
+        return 'Нельзя удалить этот объект';
     }
 }
