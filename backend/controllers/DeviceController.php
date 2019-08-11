@@ -6,6 +6,7 @@ use backend\models\DeviceSearch;
 use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceConfig;
+use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
@@ -28,6 +29,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -179,13 +181,13 @@ class DeviceController extends Controller
                 MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                     $model->node->object->getAddress() . ' [' . $model->node->address . ']');
 
-                if ($model['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO) {
+                if ($model['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO) {
                     self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
                     self::createChannel($model->uuid, MeasureType::CURRENT, "Ток");
                     self::createChannel($model->uuid, MeasureType::VOLTAGE, "Напряжение");
                     self::createChannel($model->uuid, MeasureType::FREQUENCY, "Частота");
                 }
-                if ($model['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
+                if ($model['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура воздуха");
                 }
                 return $this->redirect(['view', 'id' => $model->_id]);
@@ -245,11 +247,10 @@ class DeviceController extends Controller
             $device = Device::find()
                 ->where(['uuid' => $_GET['uuid']])
                 ->one();
-        } else {
-            $device = Device::find()
-                ->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
-                ->one();
-        }
+            if ($device && $device['deviceTypeUuid'])
+                return self::actionDashboardElectro($device['uuid']);
+        } else
+            return self::actionIndex();
 
         if (isset($_POST['type']) && $_POST['type'] == 'set') {
             if (isset($_POST['device'])) {
@@ -358,12 +359,268 @@ class DeviceController extends Controller
     }
 
     /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionDashboardElectro($uuid)
+    {
+        if (isset($_GET['uuid'])) {
+            $device = Device::find()
+                ->where(['uuid' => $uuid])
+                ->one();
+        } else {
+            return $this->actionIndex();
+        }
+
+        // power by days
+        $sChannel = (SensorChannel::find()->select('uuid')
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->andWhere(['parameter' => 0])
+            ->orderBy('date DESC'))
+            ->limit(100)
+            ->all();
+        $cnt = 0;
+        $data = [];
+        $categories = '';
+        $values = '';
+        foreach (array_reverse($last_measures) as $measure) {
+            if ($cnt > 0) {
+                $categories .= ',';
+                $values .= ',';
+            }
+            $categories .= "'" . $measure->date . "'";
+            $values .= $measure->value;
+            $cnt++;
+        }
+
+        // archive days
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->orderBy('date DESC'))
+            ->all();
+        $cnt = -1;
+        $last_date = '';
+        foreach ($last_measures as $measure) {
+            if ($measure['date'] != $last_date)
+                $last_date = $measure['date'];
+            $data['days'][$cnt]['date'] = $measure['date'];
+            if ($measure['parameter'] == 1)
+                $data['days'][$cnt]['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $data['days'][$cnt]['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $data['days'][$cnt]['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $data['days'][$cnt]['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $data['days'][$cnt]['ws'] = $measure['value'];
+        }
+
+        // archive month
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+            ->orderBy('date DESC'))
+            ->all();
+        $cnt = -1;
+        $last_date = '';
+        foreach ($last_measures as $measure) {
+            if ($measure['date'] != $last_date)
+                $last_date = $measure['date'];
+            $data['month'][$cnt]['date'] = $measure['date'];
+            if ($measure['parameter'] == 1)
+                $data['month'][$cnt]['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $data['month'][$cnt]['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $data['month'][$cnt]['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $data['month'][$cnt]['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $data['month'][$cnt]['ws'] = $measure['value'];
+        }
+
+        // integrate
+        $integrates = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL_CURRENT])
+            ->orderBy('date DESC'))
+            ->all();
+        foreach ($integrates as $measure) {
+            if ($measure['parameter'] == 1)
+                $parameters['increment']['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $parameters['increment']['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $parameters['increment']['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $parameters['increment']['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $parameters['increment']['ws'] = $measure['value'];
+        }
+
+        $current_month = '2019-08-01 00:00:00';
+        $prev_month = '2019-08-01 00:00:00';
+        $parameters['increment']['date']['last'] = $current_month;
+        $parameters['increment']['date']['prev'] = $prev_month;
+        $parameters['month']['date']['last'] = $current_month;
+        $parameters['month']['date']['prev'] = $prev_month;
+        $integrates = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL])
+            ->orderBy('date DESC'))
+            ->all();
+        foreach ($integrates as $measure) {
+            if ($measure['parameter'] == 1) {
+                if ($measure['date'] == $current_month)
+                    $parameters['increment']['w1']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['increment']['w1']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 2) {
+                if ($measure['date'] == $current_month)
+                    $parameters['increment']['w2']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['increment']['w2']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 3) {
+                if ($measure['date'] == $current_month)
+                    $parameters['increment']['w3']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['increment']['w3']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 4) {
+                if ($measure['date'] == $current_month)
+                    $parameters['increment']['w4']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['increment']['w4']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 0) {
+                if ($measure['date'] == $current_month)
+                    $parameters['increment']['ws']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['increment']['ws']['prev'] = $measure['value'];
+            }
+        }
+        $integrates = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+            ->orderBy('date DESC'))
+            ->all();
+        foreach ($integrates as $measure) {
+            if ($measure['parameter'] == 1) {
+                if ($measure['date'] == $current_month)
+                    $parameters['month']['w1']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['month']['w1']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 2) {
+                if ($measure['date'] == $current_month)
+                    $parameters['month']['w2']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['month']['w2']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 3) {
+                if ($measure['date'] == $current_month)
+                    $parameters['month']['w3']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['month']['w3']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 4) {
+                if ($measure['date'] == $current_month)
+                    $parameters['month']['w4']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['month']['w4']['prev'] = $measure['value'];
+            }
+            if ($measure['parameter'] == 0) {
+                if ($measure['date'] == $current_month)
+                    $parameters['month']['ws']['last'] = $measure['value'];
+                if ($measure['date'] == $prev_month)
+                    $parameters['month']['ws']['prev'] = $measure['value'];
+            }
+        }
+
+        $parameters['trends']['title']="";
+        $measures=[];
+        if ($sChannel) {
+            $parameters['trends']['title'] = $sChannel['title'];
+            $measures = (Measure::find()
+                ->where(['sensorChannelUuid' => $sChannel['uuid']])
+                ->andWhere(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['parameter' => 0])
+                ->orderBy('date DESC'))->limit(200)->all();
+        }
+
+        $cnt = 0;
+        $parameters['trends']['categories'] = '';
+        $parameters['trends']['values'] = '';
+        foreach (array_reverse($measures) as $measure) {
+            if ($cnt > 0) {
+                $parameters['trends']['categories'] .= ',';
+                $parameters['trends']['values'] .= ',';
+            }
+            $parameters['trends']['categories'] .= "'" . $measure->date . "'";
+            $parameters['trends']['values'] .= $measure->value;
+            $cnt++;
+        }
+
+        $parameters['trends']['title']="";
+        $measures=[];
+        if ($sChannel) {
+            $parameters['trends']['title'] = $sChannel['title'];
+            $measures = (Measure::find()
+                ->where(['sensorChannelUuid' => $sChannel['uuid']])
+                ->andWhere(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['parameter' => 0])
+                ->orderBy('date DESC'))->limit(200)->all();
+        }
+
+        $cnt = 0;
+        $parameters['days']['categories'] = '';
+        $parameters['days']['values'] = '';
+        foreach (array_reverse($measures) as $measure) {
+            if ($cnt > 0) {
+                $parameters['days']['categories'] .= ',';
+                $parameters['days']['values'] .= ',';
+            }
+            $parameters['days']['categories'] .= "'" . $measure->date . "'";
+            $parameters['days']['values'] .= $measure->value;
+            $cnt++;
+        }
+
+        $deviceRegisters = DeviceRegister::find()
+            ->where(['deviceUuid' => $device['uuid']])->all();
+        $parameters['register']['provider'] = new ActiveDataProvider(
+            [
+                'query' => $deviceRegisters,
+                'sort' =>false,
+            ]
+        );
+
+        return $this->render(
+            'dashboard',
+            [
+                'device' => $device,
+                'parameters' => $parameters
+            ]
+        );
+    }
+
+    /**
      * Build tree of device
      *
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionTree()
+    public
+    function actionTree()
     {
         ini_set('memory_limit', '-1');
         $fullTree = array();
@@ -508,7 +765,8 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionTreeSmall()
+    public
+    function actionTreeSmall()
     {
         ini_set('memory_limit', '-1');
         $fullTree = array();
@@ -638,7 +896,8 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionTreeLight()
+    public
+    function actionTreeLight()
     {
         ini_set('memory_limit', '-1');
         $fullTree = array();
@@ -718,7 +977,8 @@ class DeviceController extends Controller
      *
      * @return mixed
      */
-    public function actionReport()
+    public
+    function actionReport()
     {
         $searchModel = new DeviceSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -744,7 +1004,8 @@ class DeviceController extends Controller
      * @throws Throwable
      * @throws StaleObjectException
      */
-    public function actionDelete($id)
+    public
+    function actionDelete($id)
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return $this->redirect('/site/index');
@@ -780,7 +1041,8 @@ class DeviceController extends Controller
      * @return Device the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected
+    function findModel($id)
     {
         if (($model = Device::findOne($id)) !== null) {
             return $model;
@@ -819,7 +1081,8 @@ class DeviceController extends Controller
      *
      * @return mixed
      */
-    public function actionNew()
+    public
+    function actionNew()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
@@ -897,7 +1160,8 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionEdit()
+    public
+    function actionEdit()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
@@ -979,7 +1243,8 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionSave()
+    public
+    function actionSave()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
@@ -1046,13 +1311,13 @@ class DeviceController extends Controller
                     if ($model->save(false) && isset($_POST['deviceUuid'])) {
                         //return $this->redirect($source);
                     }
-                    if ($model['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO) {
+                    if ($model['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO) {
                         self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
                         self::createChannel($model->uuid, MeasureType::CURRENT, "Ток");
                         self::createChannel($model->uuid, MeasureType::VOLTAGE, "Напряжение");
                         self::createChannel($model->uuid, MeasureType::FREQUENCY, "Частота");
                     }
-                    if ($model['deviceTypeUuid']==DeviceType::DEVICE_LIGHT) {
+                    if ($model['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                         self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура");
                     }
                 }
@@ -1067,7 +1332,8 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionSetConfig()
+    public
+    function actionSetConfig()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
@@ -1202,7 +1468,8 @@ class DeviceController extends Controller
      * @throws StaleObjectException
      * @throws \Throwable
      */
-    public function actionRemove()
+    public
+    function actionRemove()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
@@ -1255,5 +1522,28 @@ class DeviceController extends Controller
             }
         }
         return 'Нельзя удалить этот объект';
+    }
+
+    /**
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public
+    function actionRegister($uuid)
+    {
+        $deviceRegisters = DeviceRegister::find()->where(['deviceUuid' => $uuid]);
+        $provider = new ActiveDataProvider(
+            [
+                'query' => $deviceRegisters,
+                'sort' => false,
+            ]
+        );
+        return $this->render(
+            'view',
+            [
+                'provider' => $provider
+            ]
+        );
     }
 }

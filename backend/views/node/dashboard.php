@@ -1,4 +1,9 @@
 <?php
+use common\models\Device;
+use common\models\DeviceType;
+use common\models\MeasureType;
+use common\models\SensorChannel;
+
 /* @var $node
  * @var $camera
  */
@@ -6,7 +11,17 @@
 $this->title = Yii::t('app', 'Контроллер');
 $this->registerJsFile('/js/vendor/video.min.js');
 $this->registerCssFile('/css/vendor/video-js.min.css');
+
+$sensorChannelUuid = 0;
+$deviceElectro = Device::find()->where(['nodeUuid' => $node['uuid']])->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])->one();
+if ($deviceElectro) {
+    $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])->andWhere(['measureTypeUuid' => MeasureType::POWER])->all();
+    if ($sensorChannel)
+        $sensorChannelUuid = $sensorChannel['uuid'];
+}
+
 ?>
+
 
 <br/>
 <!-- Info boxes -->
@@ -58,5 +73,10 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
         <?= $this->render('widget-status', ['node' => $node]); ?>
     </div>
 </div>
-
+<div class="row">
+    <div class="col-md-12">
+        <?= $this->render('widget-trends', ['sensorChannelUuid' => $sensorChannelUuid,
+            'type' => MeasureType::MEASURE_TYPE_INTERVAL, 'parameter' => 0]); ?>
+    </div>
+</div>
 <!-- /.content-wrapper -->
