@@ -3,12 +3,6 @@
  * @var $parameters
  */
 
-use common\models\mtm\MtmDevLightConfig;
-use kartik\slider\Slider;
-use kartik\widgets\Select2;
-use yii\helpers\Html;
-use yii\widgets\Pjax;
-
 ?>
 <div class="box box-success">
     <div class="box-header with-border">
@@ -65,11 +59,11 @@ use yii\widgets\Pjax;
                                 yAxis: {
                                     min: 0,
                                     title: {
-                                        text: '<?= $title ?>'
+                                        text: '<?= $parameters['trends']['title'] ?>'
                                     }
                                 },
                                 series: [{
-                                    name: '<?= $title ?>',
+                                    name: '<?= $parameters['trends']['title'] ?>',
                                     data: [<?php echo $parameters['trends']['values']; ?>]
                                 }]
                             });

@@ -377,7 +377,7 @@ class DeviceController extends Controller
 
         // power by days
         $sChannel = (SensorChannel::find()->select('uuid')
-            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
@@ -406,6 +406,9 @@ class DeviceController extends Controller
             ->orderBy('date DESC'))
             ->all();
         $cnt = -1;
+        $data['days']=[];
+        $data['month']=[];
+
         $last_date = '';
         foreach ($last_measures as $measure) {
             if ($measure['date'] != $last_date)
@@ -448,6 +451,12 @@ class DeviceController extends Controller
         }
 
         // integrate
+        $parameters['increment']['w1']['current'] = "-";
+        $parameters['increment']['w2']['current'] = "-";
+        $parameters['increment']['w3']['current'] = "-";
+        $parameters['increment']['w4']['current'] = "-";
+        $parameters['increment']['ws']['current'] = "-";
+
         $integrates = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL_CURRENT])
@@ -466,8 +475,30 @@ class DeviceController extends Controller
                 $parameters['increment']['ws'] = $measure['value'];
         }
 
-        $current_month = '2019-08-01 00:00:00';
-        $prev_month = '2019-08-01 00:00:00';
+        $current_month = date("Y-m-01 00:00:00",strtotime("-1 months"));
+        $prev_month = date("Y-m-01 00:00:00",strtotime("-2 months"));
+
+        $parameters['increment']['w1']['last'] = "-";
+        $parameters['increment']['w2']['last'] = "-";
+        $parameters['increment']['w3']['last'] = "-";
+        $parameters['increment']['w4']['last'] = "-";
+        $parameters['increment']['ws']['last'] = "-";
+        $parameters['increment']['w1']['prev'] = "-";
+        $parameters['increment']['w2']['prev'] = "-";
+        $parameters['increment']['w3']['prev'] = "-";
+        $parameters['increment']['w4']['prev'] = "-";
+        $parameters['increment']['ws']['prev'] = "-";
+        $parameters['month']['w1']['last'] = "-";
+        $parameters['month']['w2']['last'] = "-";
+        $parameters['month']['w3']['last'] = "-";
+        $parameters['month']['w4']['last'] = "-";
+        $parameters['month']['ws']['last'] = "-";
+        $parameters['month']['w1']['prev'] = "-";
+        $parameters['month']['w2']['prev'] = "-";
+        $parameters['month']['w3']['prev'] = "-";
+        $parameters['month']['w4']['prev'] = "-";
+        $parameters['month']['ws']['prev'] = "-";
+
         $parameters['increment']['date']['last'] = $current_month;
         $parameters['increment']['date']['prev'] = $prev_month;
         $parameters['month']['date']['last'] = $current_month;
@@ -596,7 +627,7 @@ class DeviceController extends Controller
         }
 
         $deviceRegisters = DeviceRegister::find()
-            ->where(['deviceUuid' => $device['uuid']])->all();
+            ->where(['deviceUuid' => $device['uuid']]);
         $parameters['register']['provider'] = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
@@ -604,11 +635,74 @@ class DeviceController extends Controller
             ]
         );
 
+        $parameters['current']['i1'] = "-";
+        $parameters['current']['i2'] = "-";
+        $parameters['current']['i3'] = "-";
+        $parameters['current']['u1'] = "-";
+        $parameters['current']['u2'] = "-";
+        $parameters['current']['u3'] = "-";
+        $parameters['current']['f1'] = "-";
+        $parameters['current']['f2'] = "-";
+        $parameters['current']['f3'] = "-";
+        $parameters['current']['w1'] = "-";
+        $parameters['current']['w2'] = "-";
+        $parameters['current']['w3'] = "-";
+        $parameters['current']['ws'] = "-";
+
+        $measures = (Measure::find()
+            ->where(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+            ->orderBy('date DESC'))->limit(200)
+            ->all();
+        foreach ($measures as $measure) {
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::CURRENT ||
+                $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
+                if ($measure['parameter'] == 1)
+                    $parameters['current']['i1'] = $measure['value'];
+                if ($measure['parameter'] == 2)
+                    $parameters['current']['i2'] = $measure['value'];
+                if ($measure['parameter'] == 3)
+                    $parameters['current']['i3'] = $measure['value'];
+            }
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::VOLTAGE ||
+                $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
+                if ($measure['parameter'] == 1)
+                    $parameters['current']['u1'] = $measure['value'];
+                if ($measure['parameter'] == 2)
+                    $parameters['current']['u2'] = $measure['value'];
+                if ($measure['parameter'] == 3)
+                    $parameters['current']['u3'] = $measure['value'];
+            }
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::FREQUENCY ||
+                $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
+                if ($measure['parameter'] == 1)
+                    $parameters['current']['f1'] = $measure['value'];
+                if ($measure['parameter'] == 2)
+                    $parameters['current']['f2'] = $measure['value'];
+                if ($measure['parameter'] == 3)
+                    $parameters['current']['f3'] = $measure['value'];
+            }
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::POWER ||
+                $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
+                if ($measure['parameter'] == 0)
+                    $parameters['current']['ws'] = $measure['value'];
+                if ($measure['parameter'] == 1)
+                    $parameters['current']['w1'] = $measure['value'];
+                if ($measure['parameter'] == 2)
+                    $parameters['current']['w2'] = $measure['value'];
+                if ($measure['parameter'] == 3)
+                    $parameters['current']['w3'] = $measure['value'];
+            }
+        }
+
+
+        $parameters['trends']['title'] = $sChannel['title'];
+
         return $this->render(
-            'dashboard',
+            'dashboard-electro',
             [
                 'device' => $device,
-                'parameters' => $parameters
+                'parameters' => $parameters,
+                'data' => $data
             ]
         );
     }

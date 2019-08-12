@@ -1,11 +1,8 @@
 <?php
 /* @var $device
  * @var $parameters
+ * @var $data
  */
-
-use common\models\Device;
-use common\models\User;
-use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Устройство');
 ?>
@@ -26,20 +23,24 @@ $this->title = Yii::t('app', 'Устройство');
 </div>
 <div class="row">
     <div class="col-md-12">
-        <?= $this->render('widget-electro-trends', ['device' => $device]); ?>
+        <?= $this->render('widget-electro-trends', ['device' => $device, 'parameters' => $parameters]); ?>
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="row">
-            <?= $this->render('widget-light-power', ['device' => $device]); ?>
+            <div class="col-md-12">
+                <?= $this->render('widget-electro-power', ['device' => $device, 'parameters' => $parameters]); ?>
+            </div>
         </div>
         <div class="row">
-            <?= $this->render('widget-light-params', ['device' => $device, 'parameters' => $parameters]); ?>
+            <div class="col-md-12">
+                <?= $this->render('widget-electro-params', ['device' => $device, 'parameters' => $parameters]); ?>
+            </div>
         </div>
     </div>
-    <div class="col-md-8">
-        <?= $this->render('widget-light-archive', ['device' => $device]); ?>
+    <div class="col-md-7">
+        <?= $this->render('widget-electro-archive-days', ['device' => $device, 'parameters' => $parameters, 'data' => $data]); ?>
     </div>
 </div>
 

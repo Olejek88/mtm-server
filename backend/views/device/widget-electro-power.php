@@ -51,7 +51,7 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
                                     text: ''
                                 },
                                 xAxis: {
-                                    categories: [<?php echo $parameters['power']['days']['categories']; ?>]
+                                    categories: [<?php echo $parameters['days']['categories']; ?>]
                                 },
                                 legend: {
                                     align: 'right',
@@ -85,17 +85,14 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
                                 },
                                 series: [{
                                     name: 'Потребляемая мощность (Вт/ч)',
-                                    data: [<?php echo $parameters['power']['days']['values']; ?>]
+                                    data: [<?php echo $parameters['days']['values']; ?>]
                                 }]
                             });
                         });
                     </script>
                 </div>
-                <!-- /.chart-responsive -->
             </div>
-            <!-- /.col -->
         </div>
-        <!-- /.row -->
     </div>
 </div>
 

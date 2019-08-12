@@ -3,13 +3,6 @@
  * @var $parameters
  */
 
-use common\models\mtm\MtmDevLightConfig;
-use kartik\slider\Slider;
-use kartik\widgets\DatePicker;
-use kartik\widgets\Select2;
-use yii\helpers\Html;
-use yii\widgets\Pjax;
-
 ?>
 <div class="box box-success">
     <div class="box-header with-border">
@@ -22,7 +15,9 @@ use yii\widgets\Pjax;
                 <tr class="kartik-sheet-style" style="height: 20px">
                     <th class="text-center kv-align-middle" data-col-seq="0" style="width: 25%;"></th>
                     <th class="text-center kv-align-middle" data-col-seq="1" style="width: 15%;">Тариф1, кВт*ч</th>
-                    <th class="text-center kv-align-center kv-align-middle" data-col-seq="2" style="width: 15%;">Тариф2, кВт*ч</th>
+                    <th class="text-center kv-align-center kv-align-middle" data-col-seq="2" style="width: 15%;">Тариф2,
+                        кВт*ч
+                    </th>
                     <th class="text-center kv-align-middle" data-col-seq="3" style="width: 15%;">Тариф3, кВт*ч</th>
                     <th class="text-center kv-align-center kv-align-middle" data-col-seq="4">Тариф4, кВт*ч</th>
                     <th class="text-center kv-align-center kv-align-middle" data-col-seq="5">Сумма, кВт*ч</th>
@@ -31,43 +26,72 @@ use yii\widgets\Pjax;
                 <tbody>
                 <tr data-key="1">
                     <td class="kv-align-center kv-align-middle" data-col-seq="0">Текущие значения</td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w1']?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w2']?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w3']?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w4']?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['ws']?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w1']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w2']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w3']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w4']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['ws']['current'] ?></td>
                 </tr>
                 <tr data-key="1">
-                    <td class="kv-align-center kv-align-middle" data-col-seq="0">на <?= $parameters['increment']['date']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w1']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w2']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w3']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w4']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['ws']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle" data-col-seq="0">
+                        на <?= $parameters['increment']['date']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w1']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w2']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w3']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w4']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['ws']['last'] ?></td>
                 </tr>
                 <tr data-key="1">
-                    <td class="kv-align-center kv-align-middle" data-col-seq="0">на <?= $parameters['month']['date']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w1']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w2']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w3']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w4']['last'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['ws']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle" data-col-seq="0">
+                        на <?= $parameters['month']['date']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w1']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w2']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w3']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w4']['last'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['ws']['last'] ?></td>
                 </tr>
                 <tr data-key="1">
-                    <td class="kv-align-center kv-align-middle" data-col-seq="0">на <?= $parameters['increment']['date']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w1']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w2']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w3']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['w4']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['increment']['ws']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle" data-col-seq="0">
+                        на <?= $parameters['increment']['date']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w1']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w2']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w3']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['w4']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['increment']['ws']['prev'] ?></td>
                 </tr>
                 <tr data-key="1">
-                    <td class="kv-align-center kv-align-middle" data-col-seq="0">на <?= $parameters['month']['date']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w1']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w2']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w3']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['w4']['prev'] ?></td>
-                    <td class="kv-align-center kv-align-middle" data-col-seq="1"><?= $parameters['month']['ws']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle" data-col-seq="0">
+                        на <?= $parameters['month']['date']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w1']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w2']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w3']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w4']['prev'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['ws']['prev'] ?></td>
                 </tr>
                 </tbody>
             </table>
