@@ -3,12 +3,16 @@
  * @var $parameters
  */
 
-?>
+use yii\helpers\Html; ?>
 <div class="box box-success">
     <div class="box-header with-border">
         <h3 class="box-title">Тренды</h3>
         <div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <div class="btn-group">
+                <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
+                    <i class='fa fa-link'></i></button>", ['/device/trends', 'uuid' => $device['uuid']]); ?>
+            </div>
             <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
         </div>
     </div>

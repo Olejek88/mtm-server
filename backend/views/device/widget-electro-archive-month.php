@@ -14,6 +14,17 @@ use yii\widgets\Pjax;
 <div class="box box-success">
     <div class="box-header with-border">
         <h3 class="box-title">Архив показаний по месяцам</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                    <i class="fa fa-wrench"></i></button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><?php echo Html::a("Измерения", ['/measures']); ?></li>
+                </ul>
+            </div>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
     </div>
     <div class="box-body">
         <div id="requests-table-container" class="panel table-responsive kv-grid-container" style="overflow: auto">

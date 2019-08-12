@@ -1,5 +1,6 @@
 <?php
 /* @var $parameters
+ * @var $device
  */
 
 use common\models\Device;
@@ -7,9 +8,21 @@ use common\models\DeviceRegister;
 use common\models\Node;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
+use yii\helpers\Html;
 
 ?>
-<div class="info-box">
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">Журнал работы</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <div class="btn-group">
+                <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
+                    <i class='fa fa-link'></i></button>", ['/device/register', 'uuid' => $device['uuid']]); ?>
+            </div>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
     <!-- /.box-header -->
     <div class="box-body">
         <?php
@@ -36,17 +49,6 @@ use yii\data\ActiveDataProvider;
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
                 'width' => '100px',
-            ],
-            [
-                'attribute' => 'deviceUuid',
-                'hAlign' => 'center',
-                'vAlign' => 'middle',
-                'width' => '180px',
-                'value' => 'device.name',
-                'format' => 'raw',
-                'contentOptions' => [
-                    'class' => 'table_class'
-                ],
             ],
             [
                 'attribute' => 'description',
@@ -83,11 +85,6 @@ use yii\data\ActiveDataProvider;
                 'responsive' => false,
                 'hover' => true,
                 'floatHeader' => false,
-                'panel' => [
-                    'type' => GridView::TYPE_PRIMARY,
-                    'heading' => '<i class="glyphicon glyphicons-spade"></i>&nbsp; Журнал устройств',
-                    'headingOptions' => ['style' => 'background: #337ab7']
-                ],
             ]
         );
         ?>

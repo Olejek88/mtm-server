@@ -708,6 +708,131 @@ class DeviceController extends Controller
     }
 
     /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionArchive($uuid)
+    {
+        if (isset($_GET['uuid'])) {
+            $device = Device::find()
+                ->where(['uuid' => $uuid])
+                ->one();
+        } else {
+            return $this->actionIndex();
+        }
+
+        // power by days
+        $sChannel = (SensorChannel::find()->select('uuid')
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->andWhere(['parameter' => 0])
+            ->orderBy('date DESC'))
+            ->limit(100)
+            ->all();
+        $cnt = 0;
+        $data = [];
+        $data['trends']['days']['categories'] = '';
+        $data['trends']['days']['values'] = '';
+        foreach (array_reverse($last_measures) as $measure) {
+            if ($cnt > 0) {
+                $data['trends']['days']['categories'] .= ',';
+                $data['trends']['days']['values'] .= ',';
+            }
+            $data['trends']['days']['categories'] .= "'" . $measure->date . "'";
+            $data['trends']['days']['values'] .= $measure->value;
+            $cnt++;
+        }
+
+        // archive days
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->orderBy('date DESC'))
+            ->all();
+        $cnt = -1;
+        $data['days']=[];
+        $data['month']=[];
+
+        $last_date = '';
+        foreach ($last_measures as $measure) {
+            if ($measure['date'] != $last_date)
+                $last_date = $measure['date'];
+            $data['days'][$cnt]['date'] = $measure['date'];
+            if ($measure['parameter'] == 1)
+                $data['days'][$cnt]['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $data['days'][$cnt]['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $data['days'][$cnt]['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $data['days'][$cnt]['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $data['days'][$cnt]['ws'] = $measure['value'];
+        }
+
+        // power by month
+        $sChannel = (SensorChannel::find()->select('uuid')
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+            ->andWhere(['parameter' => 0])
+            ->orderBy('date DESC'))
+            ->limit(100)
+            ->all();
+        $cnt = 0;
+        $data['trends']['month']['categories'] = '';
+        $data['trends']['month']['values'] = '';
+        foreach (array_reverse($last_measures) as $measure) {
+            if ($cnt > 0) {
+                $data['trends']['month']['categories'] .= ',';
+                $data['trends']['month']['values'] .= ',';
+            }
+            $data['trends']['month']['categories'] .= "'" . $measure->date . "'";
+            $data['trends']['month']['values'] .= $measure->value;
+            $cnt++;
+        }
+
+        // archive month
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+            ->orderBy('date DESC'))
+            ->all();
+        $cnt = -1;
+        $last_date = '';
+        foreach ($last_measures as $measure) {
+            if ($measure['date'] != $last_date)
+                $last_date = $measure['date'];
+            $data['month'][$cnt]['date'] = $measure['date'];
+            if ($measure['parameter'] == 1)
+                $data['month'][$cnt]['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $data['month'][$cnt]['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $data['month'][$cnt]['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $data['month'][$cnt]['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $data['month'][$cnt]['ws'] = $measure['value'];
+        }
+
+        $data['trends']['title'] = $sChannel['title'];
+
+        return $this->render(
+            'archive',
+            [
+                'data' => $data
+            ]
+        );
+    }
+
+    /**
      * Build tree of device
      *
      * @return mixed
@@ -1623,6 +1748,47 @@ class DeviceController extends Controller
      * @return string
      * @throws InvalidConfigException
      */
+    public function actionTrends($uuid)
+    {
+        $sensorChannelPowerUuid=0;
+        $sensorChannelVoltageUuid=0;
+        $sensorChannelCurrentUuid=0;
+        $sensorChannelFrequencyUuid=0;
+        $deviceElectro = Device::find()->where(['uuid' => $uuid])->one();
+        if ($deviceElectro) {
+            $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])->one();
+            if ($sensorChannel1)
+                $sensorChannelPowerUuid = $sensorChannel1['uuid'];
+            $sensorChannel2 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::VOLTAGE])->one();
+            if ($sensorChannel2)
+                $sensorChannelVoltageUuid = $sensorChannel2['uuid'];
+            $sensorChannel3 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::CURRENT])->one();
+            if ($sensorChannel3)
+                $sensorChannelCurrentUuid = $sensorChannel3['uuid'];
+            $sensorChannel4 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::FREQUENCY])->one();
+            if ($sensorChannel4)
+                $sensorChannelFrequencyUuid = $sensorChannel4['uuid'];
+        }
+        return $this->render(
+            'trends',
+            [
+                'sensorChannelPowerUuid' => $sensorChannelPowerUuid,
+                'sensorChannelVoltageUuid' => $sensorChannelVoltageUuid,
+                'sensorChannelCurrentUuid' => $sensorChannelCurrentUuid,
+                'sensorChannelFrequencyUuid' => $sensorChannelFrequencyUuid
+            ]
+        );
+    }
+
+    /**
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
     public
     function actionRegister($uuid)
     {
@@ -1634,7 +1800,7 @@ class DeviceController extends Controller
             ]
         );
         return $this->render(
-            'view',
+            'register',
             [
                 'provider' => $provider
             ]

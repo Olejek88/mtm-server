@@ -37,6 +37,17 @@ $this->title = Yii::t('app', 'Журнал работы устройств');
                 'width' => '100px',
             ],
             [
+                'attribute' => 'deviceUuid',
+                'hAlign' => 'center',
+                'vAlign' => 'middle',
+                'width' => '180px',
+                'value' => 'device.name',
+                'format' => 'raw',
+                'contentOptions' => [
+                    'class' => 'table_class'
+                ],
+            ],
+            [
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
                 'width' => '180px',

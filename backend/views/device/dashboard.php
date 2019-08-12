@@ -7,7 +7,7 @@ use common\models\Device;
 use common\models\User;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Устройство');
+$this->title = Yii::t('app', 'Сводная страница по устройству');
 ?>
 
 <br/>

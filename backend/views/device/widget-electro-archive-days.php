@@ -14,6 +14,14 @@ use yii\widgets\Pjax;
 <div class="box box-success">
     <div class="box-header with-border">
         <h3 class="box-title">Архив показаний по дням</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <div class="btn-group">
+                <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
+                    <i class='fa fa-link'></i></button>", ['/device/archive', 'uuid' => $device['uuid']]); ?>
+            </div>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
     </div>
     <div class="box-body">
         <div id="requests-table-container" class="panel table-responsive kv-grid-container" style="overflow: auto">

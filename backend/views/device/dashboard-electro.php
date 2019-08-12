@@ -16,7 +16,6 @@ $this->title = Yii::t('app', 'Устройство');
     <div class="col-md-7">
         <?= $this->render('widget-electro-integrate', ['device' => $device, 'parameters' => $parameters]); ?>
     </div>
-
     <div class="col-md-5">
         <?= $this->render('widget-electro-register', ['device' => $device, 'parameters' => $parameters]); ?>
     </div>
