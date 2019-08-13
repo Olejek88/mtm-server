@@ -98,6 +98,8 @@ class MeasureController extends Controller
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->sensorChannelUuid = $item['sensorChannelUuid'];
+            $model->parameter = $item['parameter'];
+            $model->type = $item['type'];
             $model->value = $item['value'];
             $model->date = $item['date'];
             $model->createdAt = $item['createdAt'];

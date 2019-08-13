@@ -6,9 +6,11 @@ use backend\models\DeviceSearch;
 use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceConfig;
+use common\models\DeviceGroup;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Group;
 use common\models\House;
 use common\models\Measure;
 use common\models\MeasureType;
@@ -406,8 +408,8 @@ class DeviceController extends Controller
             ->orderBy('date DESC'))
             ->all();
         $cnt = -1;
-        $data['days']=[];
-        $data['month']=[];
+        $data['days'] = [];
+        $data['month'] = [];
 
         $last_date = '';
         foreach ($last_measures as $measure) {
@@ -475,8 +477,8 @@ class DeviceController extends Controller
                 $parameters['increment']['ws'] = $measure['value'];
         }
 
-        $current_month = date("Y-m-01 00:00:00",strtotime("-1 months"));
-        $prev_month = date("Y-m-01 00:00:00",strtotime("-2 months"));
+        $current_month = date("Y-m-01 00:00:00", strtotime("-1 months"));
+        $prev_month = date("Y-m-01 00:00:00", strtotime("-2 months"));
 
         $parameters['increment']['w1']['last'] = "-";
         $parameters['increment']['w2']['last'] = "-";
@@ -578,8 +580,8 @@ class DeviceController extends Controller
             }
         }
 
-        $parameters['trends']['title']="";
-        $measures=[];
+        $parameters['trends']['title'] = "";
+        $measures = [];
         if ($sChannel) {
             $parameters['trends']['title'] = $sChannel['title'];
             $measures = (Measure::find()
@@ -602,8 +604,8 @@ class DeviceController extends Controller
             $cnt++;
         }
 
-        $parameters['trends']['title']="";
-        $measures=[];
+        $parameters['trends']['title'] = "";
+        $measures = [];
         if ($sChannel) {
             $parameters['trends']['title'] = $sChannel['title'];
             $measures = (Measure::find()
@@ -631,7 +633,7 @@ class DeviceController extends Controller
         $parameters['register']['provider'] = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
-                'sort' =>false,
+                'sort' => false,
             ]
         );
 
@@ -755,8 +757,8 @@ class DeviceController extends Controller
             ->orderBy('date DESC'))
             ->all();
         $cnt = -1;
-        $data['days']=[];
-        $data['month']=[];
+        $data['days'] = [];
+        $data['month'] = [];
 
         $last_date = '';
         foreach ($last_measures as $measure) {
@@ -1189,6 +1191,109 @@ class DeviceController extends Controller
             'tree-light',
             ['device' => $fullTree, 'deviceTypes' => $items]
         );
+    }
+
+    /**
+     * Build tree of device
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionTreeGroup()
+    {
+        ini_set('memory_limit', '-1');
+        $fullTree = array();
+        $groups = Group::find()
+            ->select('*')
+            ->orderBy('title')
+            ->all();
+        foreach ($groups as $group) {
+            $fullTree['children'][] = [
+                'title' => $group['title'],
+                'expanded' => true,
+                'source' => '../device/tree-group',
+                'address' => '',
+                'status' => '',
+                'uuid' => $group['uuid'],
+                'type' => 'group',
+                'folder' => true
+            ];
+            $devices = DeviceGroup::find()->where(['groupUuid' => $group['uuid']])->all();
+            foreach ($devices as $deviceGroup) {
+                $childIdx = count($fullTree['children']) - 1;
+                if ($deviceGroup['device']['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                    $class = 'critical1';
+                } elseif ($deviceGroup['device']['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                    $class = 'critical2';
+                } else {
+                    $class = 'critical3';
+                }
+                $channels = SensorChannel::find()->where(['deviceUuid' => $deviceGroup['device']['uuid']])->count();
+                //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
+                $config = 'конфигурация';
+                $fullTree['children'][$childIdx]['children'][] = [
+                    'title' => $deviceGroup['device']['deviceType']['title'],
+                    'status' => '<div class="progress"><div class="'
+                        . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
+                    'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
+                    'address' => $deviceGroup['device']['address'],
+                    'uuid' => $deviceGroup['device']['uuid'],
+                    'source' => '../device/tree-group',
+                    'nodes' => $deviceGroup['device']['address'],
+                    'type' => 'device',
+                    'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
+                    'channels' => $channels,
+                    'config' => $config,
+                    'date' => $deviceGroup['device']['date'],
+                    'folder' => false
+                ];
+            }
+        }
+        $fullTree['children'][] = [
+            'title' => 'Без группы',
+            'expanded' => true,
+            'source' => '../device/tree-group',
+            'address' => '',
+            'status' => '',
+            'uuid' => '0',
+            'type' => 'group',
+            'folder' => true
+        ];
+        $devices = Device::find()->where(['device.deviceTypeUuid' => DeviceType::DEVICE_LIGHT])->all();
+        foreach ($devices as $device) {
+            $group = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
+            if (!$group) {
+                $childIdx = count($fullTree['children']) - 1;
+                if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                    $class = 'critical1';
+                } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                    $class = 'critical2';
+                } else {
+                    $class = 'critical3';
+                }
+                $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
+                $config = 'конфигурация';
+                $fullTree['children'][$childIdx]['children'][] = [
+                    'title' => $device->getFullTitle(),
+                    'status' => '<div class="progress"><div class="'
+                        . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                    'register' => $device['port'] . ' [' . $device['address'] . ']',
+                    'address' => $device['address'],
+                    'uuid' => $device['uuid'],
+                    'source' => '../device/tree-group',
+                    'type' => 'device',
+                    'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
+                    'nodes' => $device['node']['address'],
+                    'channels' => $channels,
+                    'config' => $config,
+                    'date' => $device['date'],
+                    'folder' => false
+                ];
+            }
+        }
+        //echo json_encode($fullTree);
+        return $this->render('tree-group', ['device' => $fullTree]);
     }
 
     /**
@@ -1748,12 +1853,13 @@ class DeviceController extends Controller
      * @return string
      * @throws InvalidConfigException
      */
-    public function actionTrends($uuid)
+    public
+    function actionTrends($uuid)
     {
-        $sensorChannelPowerUuid=0;
-        $sensorChannelVoltageUuid=0;
-        $sensorChannelCurrentUuid=0;
-        $sensorChannelFrequencyUuid=0;
+        $sensorChannelPowerUuid = 0;
+        $sensorChannelVoltageUuid = 0;
+        $sensorChannelCurrentUuid = 0;
+        $sensorChannelFrequencyUuid = 0;
         $deviceElectro = Device::find()->where(['uuid' => $uuid])->one();
         if ($deviceElectro) {
             $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
@@ -1805,5 +1911,71 @@ class DeviceController extends Controller
                 'provider' => $provider
             ]
         );
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление новой группы
+     *
+     * @return mixed
+     */
+    public
+    function actionGroupAdd()
+    {
+        $group = new Group();
+        return $this->renderAjax('_add_group', ['group' => $group]);
+    }
+
+    /**
+     * Creates a new Group.
+     * @return mixed
+     */
+    public
+    function actionGroupSave()
+    {
+        if (isset($_POST["source"]))
+            $source = $_POST["source"];
+        else $source = '../device/tree-group';
+
+        $model = new Group();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save(false)) {
+                return $this->redirect($source);
+            }
+        }
+        return $this->redirect($source);
+    }
+
+    /**
+     * Creates a new Group.
+     * @return mixed
+     * @throws InvalidConfigException
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public
+    function actionGroupMove()
+    {
+        if (isset($_POST["from"]) && isset($_POST["to"])) {
+            $model = DeviceGroup::find()
+                ->where(['deviceUuid' => $_POST['from']])
+                ->one();
+            if ($model) {
+                if ($_POST['to']) {
+                    $model['groupUuid'] = $_POST['to'];
+                    $model->save();
+                } else {
+                    $model->delete();
+                }
+
+            } else {
+                $modelGroup = new DeviceGroup();
+                $modelGroup->uuid = MainFunctions::GUID();
+                $modelGroup->oid = User::getOid(Yii::$app->user->identity);
+                $modelGroup->deviceUuid = $_POST["from"];
+                $modelGroup->groupUuid = $_POST["to"];
+                $modelGroup->save();
+            }
+        }
+        return self::actionTreeGroup();
     }
 }

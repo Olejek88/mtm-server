@@ -7,7 +7,7 @@ use yii\db\Migration;
  */
 class m190804_062627_add_new_fields extends Migration
 {
-    const DEVICE_GROUP = '{{%sensor_group}}';
+    const DEVICE_GROUP = '{{%device_group}}';
     const GROUP = '{{%group}}';
     const DEVICE = '{{%device}}';
 
@@ -72,7 +72,7 @@ class m190804_062627_add_new_fields extends Migration
             'fk-device_group-groupUuid',
             self::DEVICE_GROUP,
             'groupUuid',
-            self::DEVICE,
+            self::GROUP,
             'uuid',
             $delete = 'RESTRICT',
             $update = 'CASCADE'

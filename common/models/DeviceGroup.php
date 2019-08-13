@@ -57,11 +57,10 @@ class DeviceGroup extends MtmActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'title', 'deviceUuid', 'groupUuid'], 'required'],
+            [['uuid', 'deviceUuid', 'groupUuid'], 'required'],
             [['oid', 'createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['uuid', 'deviceUuid', 'groupUuid'], 'string', 'max' => 50],
-            [['title'], 'string', 'max' => 100],
             [['oid'], 'checkOrganizationOwn'],
         ];
     }
@@ -88,7 +87,6 @@ class DeviceGroup extends MtmActiveRecord
         return [
             '_id' => Yii::t('app', '№'),
             'uuid' => Yii::t('app', 'Uuid'),
-            'title' => Yii::t('app', 'Название'),
             'device' => Yii::t('app', 'Устройство'),
             'deviceUuid' => Yii::t('app', 'Устройство'),
             'group' => Yii::t('app', 'Группа'),
