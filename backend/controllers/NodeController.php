@@ -4,17 +4,22 @@ namespace backend\controllers;
 
 use backend\models\NodeSearch;
 use common\models\Camera;
+use common\models\Device;
+use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\MeasureType;
 use common\models\Node;
 use common\models\Objects;
 use common\models\House;
 use common\models\Measure;
 use common\models\Message;
 use common\models\Photo;
+use common\models\SensorChannel;
 use common\models\Street;
 use common\models\User;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
@@ -80,6 +85,13 @@ class NodeController extends Controller
             if ($_POST['editableAttribute'] == 'nodeUuid') {
                 $model['nodeUuid'] = $_POST['Node'][$_POST['editableIndex']]['nodeUuid'];
             }
+            if ($_POST['editableAttribute'] == 'software') {
+                $model['software'] = $_POST['Node'][$_POST['editableIndex']]['software'];
+            }
+            if ($_POST['editableAttribute'] == 'phone') {
+                $model['phone'] = $_POST['Node'][$_POST['editableIndex']]['phone'];
+            }
+
             $model->save();
             return json_encode('');
         }
@@ -89,6 +101,26 @@ class NodeController extends Controller
         $dataProvider->pagination->pageSize = 15;
         return $this->render(
             'index',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]
+        );
+    }
+
+    /**
+     * Build tree of device by user
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function actionStatus()
+    {
+        $searchModel = new NodeSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 50;
+        return $this->render(
+            'status',
             [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
@@ -617,5 +649,77 @@ class NodeController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionTrends($uuid)
+    {
+        $node = Node::find()
+            ->where(['uuid' => $uuid])
+            ->one();
+
+        $sensorChannelPowerUuid=0;
+        $sensorChannelVoltageUuid=0;
+        $sensorChannelCurrentUuid=0;
+        $sensorChannelFrequencyUuid=0;
+        $deviceElectro = Device::find()
+            ->where(['nodeUuid' => $node['uuid']])
+            ->andWhere(['deleted' => 0])
+            ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+            ->one();
+        if ($deviceElectro) {
+            $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])->one();
+            if ($sensorChannel1)
+                $sensorChannelPowerUuid = $sensorChannel1['uuid'];
+            $sensorChannel2 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::VOLTAGE])->one();
+            if ($sensorChannel2)
+                $sensorChannelVoltageUuid = $sensorChannel2['uuid'];
+            $sensorChannel3 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::CURRENT])->one();
+            if ($sensorChannel3)
+                $sensorChannelCurrentUuid = $sensorChannel3['uuid'];
+            $sensorChannel4 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::FREQUENCY])->one();
+            if ($sensorChannel4)
+                $sensorChannelFrequencyUuid = $sensorChannel4['uuid'];
+        }
+        return $this->render(
+            'trends',
+            [
+                'sensorChannelPowerUuid' => $sensorChannelPowerUuid,
+                'sensorChannelVoltageUuid' => $sensorChannelVoltageUuid,
+                'sensorChannelCurrentUuid' => $sensorChannelCurrentUuid,
+                'sensorChannelFrequencyUuid' => $sensorChannelFrequencyUuid
+            ]
+        );
+    }
+
+    /**
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionRegister($uuid)
+    {
+        $deviceRegisters = DeviceRegister::find()
+            ->where(['deviceUuid' => (Node::find()->where(['uuid' => $uuid])->one())]);
+        $provider = new ActiveDataProvider(
+            [
+                'query' => $deviceRegisters,
+                'sort' =>false,
+            ]
+        );
+        return $this->render(
+            'register',
+            [
+                'provider' => $provider
+            ]
+        );
     }
 }

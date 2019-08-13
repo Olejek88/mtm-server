@@ -33,7 +33,7 @@ $this->title = Yii::t('app', 'Сводная');
 
 <!-- Main row -->
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-7">
         <?php
         if (isset($_GET['type'])) {
             switch ($_GET['type']) {
@@ -64,6 +64,24 @@ $this->title = Yii::t('app', 'Сводная');
         }
         ?>
     </div>
+    <div class="col-md-5">
+        <div class="row">
+            <div class="col-md-12">
+            <?php
+        if (!isset($_GET['type']))
+        echo $this->render('../device/index-small', ['searchModel' => $searchModel, 'dataProvider' => $dataProvider]);
+        ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+            <?php
+        if (!isset($_GET['type']))
+        echo $this->render('../device/tree-small', ['device' => $tree]);
+        ?>
+            </div>
+        </div>
+        </div>
 </div>
 
 <!--<footer class="main-footer" style="margin-left: 0 !important;">

@@ -15,15 +15,13 @@ use common\models\House;
 use common\models\Journal;
 use common\models\LoginForm;
 use common\models\Measure;
+use common\models\MeasureType;
 use common\models\Node;
 use common\models\Objects;
 use common\models\SensorChannel;
 use common\models\SensorConfig;
 use common\models\Street;
 use common\models\User;
-use Exception;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -131,6 +129,7 @@ class SiteController extends Controller
                 'devicesGroup' => $layers['devicesGroup'],
                 'camerasList' => $layers['camerasList'],
                 'camerasGroup' => $layers['camerasGroup'],
+                'polylineList' => $layers['polylineList'],
                 'nodesList' => $layers['nodesList'],
                 'nodesGroup' => $layers['nodesGroup'],
                 'coordinates' => $layers['coordinates']
@@ -294,7 +293,7 @@ class SiteController extends Controller
         $dataProvider->pagination->pageSize = 15;
 
         return $this->render(
-            'dashboard-pyramid',
+            'dashboard',
             [
                 'counts' => $counts,
 //                'measures' => $measures,
@@ -460,6 +459,7 @@ class SiteController extends Controller
         $cnt = 0;
         $default_coordinates = "[55.54,61.36]";
         $coordinates = $default_coordinates;
+        $polylineList = '';
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
         foreach ($devices as $device) {
@@ -477,7 +477,8 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: lightIcon}).bindPopup(\'' . $link . '<br/>'
+                    . '], {icon: lightIcon}).bindPopup(\'' .
+                    $link . '<br/>'
                     . $device["object"]->getAddress() . '\').openPopup();';
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -528,15 +529,69 @@ class SiteController extends Controller
         $nodesList = '';
         foreach ($nodes as $node) {
             if ($node["object"]["latitude"] > 0) {
+                $link = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>есть</span>";
+                $security = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
+                $power = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
+                $temperature = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>28.82(C)</span>";
+                $contactors = "-";
+                $u = "-";
+                $w = "-";
+                $w_total = "-";
+                $device = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                    ->andWhere(['nodeUuid' => $node['uuid']])->one();
+                if ($device) {
+                    $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                    foreach ($channels as $channel) {
+                        $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                            ->andWhere(['sensorChannelUuid' => $channel['uuid']])
+                            ->andWhere(['type' => 0])
+                            ->orderBy('date DESC')
+                            ->one();
+                        if (!$measure) {
+                            if ($channel['measureType']['uuid'] == MeasureType::POWER)
+                                $w = $measure['value'];
+                            if ($channel['measureType']['uuid'] == MeasureType::VOLTAGE)
+                                $u = $measure['value'];
+                            if ($channel['measureType']['uuid'] == MeasureType::CURRENT)
+                                $w_total = $measure['value'];
+                        }
+                    }
+                }
+
+                $coords[] = [$node['object']['latitude'], $node['object']['longitude']];
+                $devices = Device::find()
+                    ->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+                    ->andWhere(['nodeUuid' => $node['uuid']])
+                    ->all();
+                foreach ($devices as $device) {
+                    $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
+                }
+                if (count($coords)) {
+                    $polylineList .= 'L.polyline(' . json_encode($coords) . ', {weight: 3, color: \'green\'}).addTo(map);';
+                    //$polylineList .= 'var polylinePoints' . $cnt . ' = ' . json_encode($coords) . ';';
+                    //$polylineList .= 'var polyline' . $cnt . ' = L.polyline(polylinePoints' . $cnt . ').addTo(map);';
+                }
+
+                $software = $node["software"];
+                $phone = $node["address"];
                 $nodesList .= 'var node'
                     . $node["_id"]
                     . '= L.marker([' . $node["object"]["latitude"]
                     . ',' . $node["object"]["longitude"]
                     . '], {icon: nodeIcon}).bindPopup(\'<b>'
-                    . Html::a($node["address"],
+                    . Html::a($node["object"]->getAddress(),
                         ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
                     . '</b><br/>'
-                    . $node["object"]->getAddress() . '\').openPopup();';
+                    . 'Связь: ' . $link . '<br/>'
+                    . 'Охрана: ' . $security . '<br/>'
+                    . 'Питание: ' . $power . '<br/>'
+                    . 'Контакторы: ' . $contactors . '<br/>'
+                    . 'Температура: ' . $temperature . '<br/>'
+                    . 'Напряжение,В: ' . $u . '<br/>'
+                    . 'Мощность,кВт/ч: ' . $w . '<br/>'
+                    . 'Сумма,кВт: ' . $w_total . '<br/>'
+                    . 'Версия ПО: ' . $software . '<br/>'
+                    . 'Телефон/адрес: ' . $phone . '<br/>\').openPopup();';
                 $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
                     $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
@@ -557,6 +612,7 @@ class SiteController extends Controller
         $layer['devicesGroup'] = $equipmentsGroup;
         $layer['camerasList'] = $camerasList;
         $layer['camerasGroup'] = $camerasGroup;
+        $layer['polylineList'] = $polylineList;
 
         return $layer;
     }

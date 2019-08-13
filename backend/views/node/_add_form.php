@@ -50,6 +50,9 @@ use yii\helpers\Html;
             ->label(false);
     }
     echo $form->field($node, 'address')->textInput(['maxlength' => true]);
+    echo $form->field($node, 'phone')->textInput(['maxlength' => true]);
+    echo $form->field($node, 'software')->textInput(['maxlength' => true]);
+
     echo $form->field($node, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false);
     echo $form->field($node, 'nodeStatusUuid')->hiddenInput(['value' => DeviceStatus::WORK])->label(false);
 

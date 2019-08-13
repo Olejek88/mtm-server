@@ -45,7 +45,8 @@ $gridColumns = [
         'vAlign' => 'middle',
         'width' => '180px',
         'value' => function ($data) {
-            return $data['node']['object']->getAddress().' ['.$data['node']['address'].']';
+            return Html::a($data['node']['object']->getAddress().' ['.$data['node']['address'].']',
+                ['/device/dashboard','uuid' => $data['uuid']]);
         },
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Адрес',
@@ -53,7 +54,7 @@ $gridColumns = [
         'format' => 'raw',
     ],
     [
-        'class' => 'kartik\grid\EditableColumn',
+        'class' => 'kartik\grid\DataColumn',
         'attribute' => 'deviceTypeUuid',
         'hAlign' => 'center',
         'vAlign' => 'middle',
@@ -73,16 +74,6 @@ $gridColumns = [
         'contentOptions' => [
             'class' => 'table_class'
         ],
-        'editableOptions' => function ($model, $key, $index, $widget) {
-            $models = ArrayHelper::map(DeviceType::find()->orderBy('title')->all(), 'uuid', 'title');
-            return [
-                'header' => 'Тип оборудования',
-                'size' => 'lg',
-                'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'displayValueConfig' => $models,
-                'data' => $models
-            ];
-        },
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
@@ -192,7 +183,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'template'=> '{edit}',
+        'template'=> '{update}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

@@ -144,6 +144,30 @@ echo FancytreeWidget::widget([
                            }); 
                     }')
                 ],
+                'delete' => [
+                    'name' => 'Удалить',
+                    'icon' => 'delete',
+                    'callback' => new JsExpression('function(key, opt) {
+                            var sel = $.ui.fancytree.getTree().getSelectedNodes();
+                            $.each(sel, function (event, data) {
+                                 $.ajax({
+                                      url: "remove",
+                                      type: "post",
+                                      data: {
+                                            type: data.type,
+                                            selected_node: data.key,
+                                            uuid: data.data.uuid
+                                      },
+                                    error: function (result) {
+                                        console.log(result);                                 
+                                    },
+                                    success: function (result) {
+                                        data.remove();            
+                                    }                                    
+                                 });
+                            });
+                    }')
+                ],
             ]
         ],
         'table' => [

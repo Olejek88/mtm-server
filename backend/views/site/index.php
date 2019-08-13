@@ -11,6 +11,7 @@
 /* @var $devicesGroup */
 /* @var  $nodesList */
 /* @var  $nodesGroup */
+/* @var  $polylineList */
 /* @var  $camerasList */
 /* @var  $camerasGroup */
 
@@ -35,6 +36,12 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
     </div>
 </div>
 
+<style>
+.leaflet-popup-content {
+    margin: 10px 10px;
+    line-height: 1.6;
+}
+</style>
 <div class="box-relative">
     <div id="mapid" style="width: 100%; height: 800px"></div>
 
@@ -42,25 +49,25 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         var houseIcon = L.icon({
             iconUrl: '/images/house_marker_green.png',
             iconSize: [32, 51],
-            iconAnchor: [22, 94],
+            iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
         var nodeIcon = L.icon({
             iconUrl: '/images/router_marker_green.png',
             iconSize: [32, 51],
-            iconAnchor: [22, 94],
+            iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
         var cameraIcon = L.icon({
             iconUrl: '/images/camera_marker_green.png',
             iconSize: [32, 51],
-            iconAnchor: [22, 94],
+            iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
         var lightIcon = L.icon({
             iconUrl: '/images/light_marker_green.png',
             iconSize: [32, 51],
-            iconAnchor: [22, 94],
+            iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
 
@@ -82,14 +89,16 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Шкафы:": nodes'; ?>        };
 
         <?php
-        if (!isset($_GET['view']) || $_GET['view'] == '') {
-            echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(" . $coordinates . ", 13);";
-        } else {
-            if ($_GET['view'] == '2')
-                echo "var map = L.map('mapid', {zoomControl: false, layers: [cameras]}).setView(" . $coordinates . ", 13);";
-            if ($_GET['view'] == '1')
-                echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, nodes]}).setView(" . $coordinates . ", 13);";
-        }
+            if (!isset($_GET['view'])) {
+                echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(".$coordinates.", 13);";
+            } else {
+                if ($_GET['view']=='4')
+                    echo "var map = L.map('mapid', {zoomControl: false, layers: []}).setView(".$coordinates.", 13);";
+                if ($_GET['view']=='2')
+                    echo "var map = L.map('mapid', {zoomControl: false, layers: [cameras]}).setView(".$coordinates.", 13);";
+                if ($_GET['view']=='1')
+                    echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, nodes]}).setView(".$coordinates.", 13);";
+            }
         ?>
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
@@ -104,4 +113,8 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             position: 'bottomleft'
         }).addTo(map);
 
+        <?php
+        echo $polylineList;
+        ?>
     </script>
+</div>

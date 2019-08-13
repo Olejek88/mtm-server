@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-md-9 col-sm-8" style="width: 100%">
                 <div class="pad" style="padding: 1px">
-                    <div id="mapid" style="width: 100%; height: 360px"></div>
+                    <div id="mapid" style="width: 100%; height: 460px"></div>
                 </div>
             </div>
         </div>

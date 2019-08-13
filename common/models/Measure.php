@@ -19,6 +19,8 @@ use yii\base\InvalidConfigException;
  * @property string $sensorChannelUuid
  * @property double $value
  * @property string $date
+ * @property integer $type
+ * @property integer $parameter
  * @property string $createdAt
  * @property string $changedAt
  *
@@ -166,4 +168,45 @@ class Measure extends MtmActiveRecord
         return $model;
     }
 
+    /**
+     * @param $sensorChannelUuid
+     * @param $type
+     * @param $parameter
+     * @return ActiveRecord
+     * @throws InvalidConfigException
+     */
+    public static function getLastMeasure($sensorChannelUuid, $type, $parameter)
+    {
+        $model = Measure::find()->where(["sensorChannelUuid" => $sensorChannelUuid])
+            ->andWhere(['type' => $type])
+            ->andWhere(['parameter' => $parameter])
+            ->orderBy('date DESC')
+            ->one();
+        return $model;
+    }
+
+    /**
+     * @param $measureTypeUuid
+     * @param $nodeUuid
+     * @param $type
+     * @param $parameter
+     * @return ActiveRecord|null
+     * @throws InvalidConfigException
+     */
+    public static function getLastMeasureNodeByType($measureTypeUuid, $nodeUuid, $type, $parameter)
+    {
+        $device = Device::find()->where(['nodeUuid' => $nodeUuid])->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])->one();
+        if ($device) {
+            $channel = SensorChannel::find()
+                ->where(['deviceUuid' => $device['uuid']])
+                ->andWhere(['measureTypeUuid' => $measureTypeUuid])
+                ->one();
+            if ($channel) {
+                $measure = self::getLastMeasure($channel['uuid'], $type, $parameter);
+                if ($measure)
+                    return $measure;
+            }
+        }
+        return null;
+    }
 }
