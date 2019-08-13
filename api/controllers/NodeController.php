@@ -101,6 +101,8 @@ class NodeController extends Controller
                 'address' => $result->address,
                 'createdAt' => $result['createdAt'],
                 'changedAt' => $result['changedAt'],
+                'longitude' => $result->object->longitude,
+                'latitude' => $result->object->latitude,
             ];
         } else {
             return null;
