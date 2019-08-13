@@ -30,8 +30,8 @@ class MeasureType extends ActiveRecord
     const MEASURE_TYPE_HOUSE = 1;
     const MEASURE_TYPE_DAYS = 2;
     const MEASURE_TYPE_MONTH = 4;
-    const MEASURE_TYPE_INTERVAL = 7;
-    const MEASURE_TYPE_TOTAL = 9;
+    const MEASURE_TYPE_INTERVAL = 9;
+    const MEASURE_TYPE_TOTAL = 7;
     const MEASURE_TYPE_TOTAL_CURRENT = 10;
 
     /**

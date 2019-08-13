@@ -1,6 +1,6 @@
 <?php
 /* @var $device
- * @var $data
+ * @var $dataAll
  */
 
 use common\models\mtm\MtmDevLightConfig;
@@ -8,6 +8,9 @@ use kartik\slider\Slider;
 use kartik\widgets\Select2;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
+
+$this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
+$this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 
 $this->title = Yii::t('app', 'Архив по устройству');
 ?>
@@ -32,14 +35,14 @@ $this->title = Yii::t('app', 'Архив по устройству');
                         </thead>
                         <tbody>
                         <?php
-                        foreach ($data['days'] as $data) {
+                        foreach ($dataAll['days'] as $data) {
                             echo '<tr data-key="1">
-                              <td class="kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
                               </tr>';
                         }
                         ?>
@@ -69,14 +72,14 @@ $this->title = Yii::t('app', 'Архив по устройству');
                         </thead>
                         <tbody>
                         <?php
-                        foreach ($data['month'] as $data) {
+                        foreach ($dataAll['month'] as $data) {
                             echo '<tr data-key="1">
-                              <td class="kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
                               </tr>';
                         }
                         ?>
@@ -95,21 +98,21 @@ $this->title = Yii::t('app', 'Архив по устройству');
             </div>
             <div class="box-body">
                 <div class="chart">
-                    <div id="container-line" style="height: 350px;"></div>
+                    <div id="container-days" style="height: 350px;"></div>
                     <script type="text/javascript">
                         document.addEventListener("DOMContentLoaded", function () {
-                            Highcharts.chart('container-line', {
+                            Highcharts.chart('container-days', {
                                 data: {
                                     table: 'datatable'
                                 },
                                 chart: {
-                                    type: 'bar'
+                                    type: 'column'
                                 },
                                 title: {
                                     text: ''
                                 },
                                 xAxis: {
-                                    categories: [<?php echo $data['trends']['days']['categories']; ?>]
+                                    categories: [<?php echo $dataAll['trends']['days']['categories']; ?>]
                                 },
                                 legend: {
                                     align: 'right',
@@ -138,12 +141,12 @@ $this->title = Yii::t('app', 'Архив по устройству');
                                 yAxis: {
                                     min: 0,
                                     title: {
-                                        text: '<?= $data['trends']['title'] ?>'
+                                        text: '<?= $dataAll['trends']['title'] ?>'
                                     }
                                 },
                                 series: [{
-                                    name: '<?= $data['trends']['title'] ?>',
-                                    data: [<?php echo $data['trends']['days']['values']; ?>]
+                                    name: '<?= $dataAll['trends']['title'] ?>',
+                                    data: [<?php echo $dataAll['trends']['days']['values']; ?>]
                                 }]
                             });
                         });
@@ -159,21 +162,21 @@ $this->title = Yii::t('app', 'Архив по устройству');
             </div>
             <div class="box-body">
                 <div class="chart">
-                    <div id="container-line" style="height: 350px;"></div>
+                    <div id="container-month" style="height: 350px;"></div>
                     <script type="text/javascript">
                         document.addEventListener("DOMContentLoaded", function () {
-                            Highcharts.chart('container-line', {
+                            Highcharts.chart('container-month', {
                                 data: {
                                     table: 'datatable'
                                 },
                                 chart: {
-                                    type: 'bar'
+                                    type: 'column'
                                 },
                                 title: {
                                     text: ''
                                 },
                                 xAxis: {
-                                    categories: [<?php echo $data['trends']['month']['categories']; ?>]
+                                    categories: [<?php echo $dataAll['trends']['month']['categories']; ?>]
                                 },
                                 legend: {
                                     align: 'right',
@@ -202,12 +205,12 @@ $this->title = Yii::t('app', 'Архив по устройству');
                                 yAxis: {
                                     min: 0,
                                     title: {
-                                        text: '<?= $data['trends']['title'] ?>'
+                                        text: '<?= $dataAll['trends']['title'] ?>'
                                     }
                                 },
                                 series: [{
-                                    name: '<?= $data['trends']['title'] ?>',
-                                    data: [<?php echo $data['trends']['month']['categories']; ?>]
+                                    name: '<?= $dataAll['trends']['title'] ?>',
+                                    data: [<?php echo $dataAll['trends']['month']['values']; ?>]
                                 }]
                             });
                         });

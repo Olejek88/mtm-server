@@ -1,7 +1,7 @@
 <?php
 /* @var $device
  * @var $parameters
- * @var $data
+ * @var $dataAll
  */
 
 $this->title = Yii::t('app', 'Устройство');
@@ -39,7 +39,7 @@ $this->title = Yii::t('app', 'Устройство');
         </div>
     </div>
     <div class="col-md-7">
-        <?= $this->render('widget-electro-archive-days', ['device' => $device, 'parameters' => $parameters, 'data' => $data]); ?>
+        <?= $this->render('widget-electro-archive-days', ['device' => $device, 'parameters' => $parameters, 'dataAll' => $dataAll]); ?>
     </div>
 </div>
 

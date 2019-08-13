@@ -77,7 +77,8 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
                                     }
                                 },
                                 series: [{
-                                    name: 'Потребляемая мощность (Вт/ч)',
+                                    name: '(кВт)',
+                                    showInLegend: false,
                                     data: [<?php echo $parameters['days']['values']; ?>]
                                 }]
                             });

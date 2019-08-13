@@ -3,10 +3,14 @@
  * @var $parameters
  */
 
-use yii\helpers\Html; ?>
+use yii\helpers\Html;
+$this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
+$this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
+
+?>
 <div class="box box-success">
     <div class="box-header with-border">
-        <h3 class="box-title">Тренды</h3>
+        <h3 class="box-title"><?= $parameters['trends']['title'] ?></h3>
         <div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
             <div class="btn-group">
@@ -20,10 +24,10 @@ use yii\helpers\Html; ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="chart">
-                    <div id="container-line" style="height: 350px;"></div>
+                    <div id="container<?= $parameters['uuid']?>" style="height: 350px;"></div>
                     <script type="text/javascript">
                         document.addEventListener("DOMContentLoaded", function () {
-                            Highcharts.chart('container-line', {
+                            Highcharts.chart('container<?= $parameters['uuid']?>', {
                                 data: {
                                     table: 'datatable'
                                 },

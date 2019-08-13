@@ -29,8 +29,7 @@ $this->title = 'Дерево оборудования';
         <col width="*">
         <col width="120px">
         <col width="140px">
-        <col width="120px">
-        <col width="150px">
+        <col width="*">
     </colgroup>
     <thead style="background-color: #337ab7; color: white">
     <tr>
@@ -40,7 +39,6 @@ $this->title = 'Дерево оборудования';
         <th align="center">Оборудование</th>
         <th>Статус</th>
         <th>Дата</th>
-        <th>Показания</th>
         <th>Регистр</th>
     </tr>
     </thead>
@@ -50,7 +48,6 @@ $this->title = 'Дерево оборудования';
         <td class="alt"></td>
         <td class="center"></td>
         <td class="alt"></td>
-        <td class="center"></td>
     </tr>
     </tbody>
 </table>
@@ -79,114 +76,15 @@ $this->title = 'Дерево оборудования';
             "titleColumnIdx" => "1",
             "statusColumnIdx" => "2",
             "dateColumnIdx" => "3",
-            "measureColumnIdx" => "4",
-            "registerColumnIdx" => "5"
+            "registerColumnIdx" => "4"
         ],
         'renderColumns' => new JsExpression('function(event, data) {
             var node = data.node;
             $tdList = $(node.tr).find(">td");
             $tdList.eq(1).html(node.data.status);
             $tdList.eq(2).html(node.data.date);
-            $tdList.eq(3).html(node.data.measure);
-            $tdList.eq(4).html(node.data.register);
+            $tdList.eq(3).html(node.data.register);
         }')
     ]
 ]);
 ?>
-
-<div class="modal remote fade" id="modalDefects">
-    <div class="modal-dialog">
-        <div class="modal-content loader-lg">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-center">Зафиксированные дефекты</h4>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped table-hover text-left">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Дефект</th>
-                        <th>Тип</th>
-                        <th>Время</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--                    <?php /*foreach ($defects as $defect): */ ?>
-                        <tr>
-                        </tr>
-                    --><?php /*endforeach; */ ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal remote fade" id="modalTasks">
-    <div class="modal-dialog">
-        <div class="modal-content loader-lg">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-center">Последние операции над оборудованием</h4>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped table-hover text-left">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Операция</th>
-                        <th>Время</th>
-                        <th>Вердикт</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--                    <?php /*foreach ($operations as $operation): */ ?>
-                        <tr>
-                            <td><? /*= $operation['id'] */ ?></td>
-                            <td><? /*= $operation['user'] */ ?></td>
-                            <td><? /*= $operation['title'] */ ?></td>
-                            <td><? /*= $operation['date'] */ ?></td>
-                            <td><? /*= $operation['verdict'] */ ?></td>
-                        </tr>
-                    --><?php /*endforeach; */ ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal remote fade" id="modalRegister">
-    <div class="modal-dialog">
-        <div class="modal-content loader-lg">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title text-center">Журнал оборудования</h4>
-            </div>
-            <div class="modal-body">
-                <table class="table table-striped table-hover text-left">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Пользователь</th>
-                        <th>Тип события</th>
-                        <th>Время</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!--                    <?php /*foreach ($registers as $register): */ ?>
-                        <tr>
-                            <td><? /*= $register['uuid'] */ ?></td>
-                            <td><? /*= $register['user'] */ ?></td>
-                            <td><? /*= $register['type'] */ ?></td>
-                            <td><? /*= $register['date'] */ ?></td>
-                        </tr>
-                    --><?php /*endforeach; */ ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>

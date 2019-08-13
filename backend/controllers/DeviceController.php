@@ -249,7 +249,7 @@ class DeviceController extends Controller
             $device = Device::find()
                 ->where(['uuid' => $_GET['uuid']])
                 ->one();
-            if ($device && $device['deviceTypeUuid'])
+            if ($device && $device['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO)
                 return self::actionDashboardElectro($device['uuid']);
         } else
             return self::actionIndex();
@@ -378,8 +378,7 @@ class DeviceController extends Controller
         }
 
         // power by days
-        $sChannel = (SensorChannel::find()->select('uuid')
-            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
+        $sChannel = (SensorChannel::find()->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
@@ -410,11 +409,12 @@ class DeviceController extends Controller
         $cnt = -1;
         $data['days'] = [];
         $data['month'] = [];
-
         $last_date = '';
         foreach ($last_measures as $measure) {
-            if ($measure['date'] != $last_date)
+            if ($measure['date'] != $last_date) {
                 $last_date = $measure['date'];
+                $cnt++;
+            }
             $data['days'][$cnt]['date'] = $measure['date'];
             if ($measure['parameter'] == 1)
                 $data['days'][$cnt]['w1'] = $measure['value'];
@@ -466,17 +466,18 @@ class DeviceController extends Controller
             ->all();
         foreach ($integrates as $measure) {
             if ($measure['parameter'] == 1)
-                $parameters['increment']['w1'] = $measure['value'];
+                $parameters['increment']['w1']['current'] = $measure['value'];
             if ($measure['parameter'] == 2)
-                $parameters['increment']['w2'] = $measure['value'];
+                $parameters['increment']['w2']['current'] = $measure['value'];
             if ($measure['parameter'] == 3)
-                $parameters['increment']['w3'] = $measure['value'];
+                $parameters['increment']['w3']['current'] = $measure['value'];
             if ($measure['parameter'] == 4)
-                $parameters['increment']['w4'] = $measure['value'];
+                $parameters['increment']['w4']['current'] = $measure['value'];
             if ($measure['parameter'] == 0)
-                $parameters['increment']['ws'] = $measure['value'];
+                $parameters['increment']['ws']['current'] = $measure['value'];
         }
 
+        $month = date("Y-m-01 00:00:00", time());
         $current_month = date("Y-m-01 00:00:00", strtotime("-1 months"));
         $prev_month = date("Y-m-01 00:00:00", strtotime("-2 months"));
 
@@ -501,10 +502,11 @@ class DeviceController extends Controller
         $parameters['month']['w4']['prev'] = "-";
         $parameters['month']['ws']['prev'] = "-";
 
-        $parameters['increment']['date']['last'] = $current_month;
-        $parameters['increment']['date']['prev'] = $prev_month;
-        $parameters['month']['date']['last'] = $current_month;
-        $parameters['month']['date']['prev'] = $prev_month;
+        $parameters['increment']['date']['last'] = date("Y-m-01", strtotime($current_month));
+        $parameters['increment']['date']['prev'] = date("Y-m-01", strtotime($prev_month));
+        $parameters['month']['date']['last'] = date("Y-m-01", strtotime($current_month));
+        $parameters['month']['date']['prev'] = date("Y-m-01", strtotime($prev_month));
+        $parameters['month']['date']['current'] = date("Y-m-01", strtotime($month));
         $integrates = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL])
@@ -586,12 +588,13 @@ class DeviceController extends Controller
             $parameters['trends']['title'] = $sChannel['title'];
             $measures = (Measure::find()
                 ->where(['sensorChannelUuid' => $sChannel['uuid']])
-                ->andWhere(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
                 ->andWhere(['parameter' => 0])
                 ->orderBy('date DESC'))->limit(200)->all();
         }
 
         $cnt = 0;
+        $parameters['uuid'] = $sChannel['_id'];
         $parameters['trends']['categories'] = '';
         $parameters['trends']['values'] = '';
         foreach (array_reverse($measures) as $measure) {
@@ -599,18 +602,18 @@ class DeviceController extends Controller
                 $parameters['trends']['categories'] .= ',';
                 $parameters['trends']['values'] .= ',';
             }
-            $parameters['trends']['categories'] .= "'" . $measure->date . "'";
+            $parameters['trends']['categories'] .= "'" . date("d H:i", strtotime($measure->date)) . "'";
             $parameters['trends']['values'] .= $measure->value;
             $cnt++;
         }
 
-        $parameters['trends']['title'] = "";
+        $parameters['days']['title'] = "";
         $measures = [];
         if ($sChannel) {
             $parameters['trends']['title'] = $sChannel['title'];
             $measures = (Measure::find()
                 ->where(['sensorChannelUuid' => $sChannel['uuid']])
-                ->andWhere(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
                 ->andWhere(['parameter' => 0])
                 ->orderBy('date DESC'))->limit(200)->all();
         }
@@ -656,7 +659,7 @@ class DeviceController extends Controller
             ->orderBy('date DESC'))->limit(200)
             ->all();
         foreach ($measures as $measure) {
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::CURRENT ||
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::CURRENT &&
                 $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
                 if ($measure['parameter'] == 1)
                     $parameters['current']['i1'] = $measure['value'];
@@ -665,7 +668,7 @@ class DeviceController extends Controller
                 if ($measure['parameter'] == 3)
                     $parameters['current']['i3'] = $measure['value'];
             }
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::VOLTAGE ||
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::VOLTAGE &&
                 $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
                 if ($measure['parameter'] == 1)
                     $parameters['current']['u1'] = $measure['value'];
@@ -674,16 +677,12 @@ class DeviceController extends Controller
                 if ($measure['parameter'] == 3)
                     $parameters['current']['u3'] = $measure['value'];
             }
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::FREQUENCY ||
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::FREQUENCY &&
                 $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
-                if ($measure['parameter'] == 1)
+                if ($measure['parameter'] == 0)
                     $parameters['current']['f1'] = $measure['value'];
-                if ($measure['parameter'] == 2)
-                    $parameters['current']['f2'] = $measure['value'];
-                if ($measure['parameter'] == 3)
-                    $parameters['current']['f3'] = $measure['value'];
             }
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::POWER ||
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::POWER &&
                 $measure['sensorChannel']['deviceUuid'] == $device['uuid']) {
                 if ($measure['parameter'] == 0)
                     $parameters['current']['ws'] = $measure['value'];
@@ -704,7 +703,7 @@ class DeviceController extends Controller
             [
                 'device' => $device,
                 'parameters' => $parameters,
-                'data' => $data
+                'dataAll' => $data
             ]
         );
     }
@@ -727,8 +726,9 @@ class DeviceController extends Controller
         }
 
         // power by days
-        $sChannel = (SensorChannel::find()->select('uuid')
-            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
+        $sChannel = SensorChannel::find()
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER])
+            ->one();
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
@@ -738,6 +738,7 @@ class DeviceController extends Controller
             ->all();
         $cnt = 0;
         $data = [];
+        $data['trends'] = [];
         $data['trends']['days']['categories'] = '';
         $data['trends']['days']['values'] = '';
         foreach (array_reverse($last_measures) as $measure) {
@@ -762,8 +763,10 @@ class DeviceController extends Controller
 
         $last_date = '';
         foreach ($last_measures as $measure) {
-            if ($measure['date'] != $last_date)
+            if ($measure['date'] != $last_date) {
                 $last_date = $measure['date'];
+                $cnt++;
+            }
             $data['days'][$cnt]['date'] = $measure['date'];
             if ($measure['parameter'] == 1)
                 $data['days'][$cnt]['w1'] = $measure['value'];
@@ -778,8 +781,6 @@ class DeviceController extends Controller
         }
 
         // power by month
-        $sChannel = (SensorChannel::find()->select('uuid')
-            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
@@ -809,8 +810,10 @@ class DeviceController extends Controller
         $cnt = -1;
         $last_date = '';
         foreach ($last_measures as $measure) {
-            if ($measure['date'] != $last_date)
+            if ($measure['date'] != $last_date) {
                 $last_date = $measure['date'];
+                $cnt++;
+            }
             $data['month'][$cnt]['date'] = $measure['date'];
             if ($measure['parameter'] == 1)
                 $data['month'][$cnt]['w1'] = $measure['value'];
@@ -825,11 +828,11 @@ class DeviceController extends Controller
         }
 
         $data['trends']['title'] = $sChannel['title'];
-
+        //echo json_encode($data);
         return $this->render(
             'archive',
             [
-                'data' => $data
+                'dataAll' => $data
             ]
         );
     }
@@ -1856,36 +1859,96 @@ class DeviceController extends Controller
     public
     function actionTrends($uuid)
     {
-        $sensorChannelPowerUuid = 0;
-        $sensorChannelVoltageUuid = 0;
-        $sensorChannelCurrentUuid = 0;
-        $sensorChannelFrequencyUuid = 0;
         $deviceElectro = Device::find()->where(['uuid' => $uuid])->one();
+        $parameters1 = [];
+        $parameters2 = [];
+        $parameters3 = [];
+        $parameters4 = [];
+
         if ($deviceElectro) {
             $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])->one();
-            if ($sensorChannel1)
-                $sensorChannelPowerUuid = $sensorChannel1['uuid'];
+
+            if ($sensorChannel1) {
+                $measures = (Measure::find()
+                    ->where(['sensorChannelUuid' => $sensorChannel1['uuid']])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
+                    ->orderBy('date DESC'))
+                    ->limit(200)->all();
+
+                $cnt = 0;
+                $parameters1['uuid'] = $sensorChannel1['_id'];
+                $parameters1['trends']['title'] = $sensorChannel1['title'];
+                $parameters1['trends']['categories'] = '';
+                $parameters1['trends']['values'] = '';
+                foreach (array_reverse($measures) as $measure) {
+                    if ($cnt > 0) {
+                        $parameters1['trends']['categories'] .= ',';
+                        $parameters1['trends']['values'] .= ',';
+                    }
+                    $parameters1['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters1['trends']['values'] .= $measure->value;
+                    $cnt++;
+                }
+            }
+
             $sensorChannel2 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::VOLTAGE])->one();
-            if ($sensorChannel2)
-                $sensorChannelVoltageUuid = $sensorChannel2['uuid'];
+            if ($sensorChannel2) {
+                $measures = (Measure::find()
+                    ->where(['sensorChannelUuid' => $sensorChannel2['uuid']])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
+                    ->orderBy('date DESC'))
+                    ->limit(200)->all();
+
+                $cnt = 0;
+                $parameters2['uuid'] = $sensorChannel2['_id'];
+                $parameters2['trends']['title'] = $sensorChannel2['title'];
+                $parameters2['trends']['categories'] = '';
+                $parameters2['trends']['values'] = '';
+                foreach (array_reverse($measures) as $measure) {
+                    if ($cnt > 0) {
+                        $parameters2['trends']['categories'] .= ',';
+                        $parameters2['trends']['values'] .= ',';
+                    }
+                    $parameters2['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters2['trends']['values'] .= $measure->value;
+                    $cnt++;
+                }
+            }
+
             $sensorChannel3 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::CURRENT])->one();
-            if ($sensorChannel3)
-                $sensorChannelCurrentUuid = $sensorChannel3['uuid'];
-            $sensorChannel4 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
-                ->andWhere(['measureTypeUuid' => MeasureType::FREQUENCY])->one();
-            if ($sensorChannel4)
-                $sensorChannelFrequencyUuid = $sensorChannel4['uuid'];
+            if ($sensorChannel3) {
+                $measures = (Measure::find()
+                    ->where(['sensorChannelUuid' => $sensorChannel3['uuid']])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
+                    ->orderBy('date DESC'))
+                    ->limit(200)->all();
+
+                $cnt = 0;
+                $parameters3['uuid'] = $sensorChannel3['_id'];
+                $parameters3['trends']['title'] = $sensorChannel3['title'];
+                $parameters3['trends']['categories'] = '';
+                $parameters3['trends']['values'] = '';
+                foreach (array_reverse($measures) as $measure) {
+                    if ($cnt > 0) {
+                        $parameters3['trends']['categories'] .= ',';
+                        $parameters3['trends']['values'] .= ',';
+                    }
+                    $parameters3['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters3['trends']['values'] .= $measure->value;
+                    $cnt++;
+                }
+            }
         }
         return $this->render(
             'trends',
             [
-                'sensorChannelPowerUuid' => $sensorChannelPowerUuid,
-                'sensorChannelVoltageUuid' => $sensorChannelVoltageUuid,
-                'sensorChannelCurrentUuid' => $sensorChannelCurrentUuid,
-                'sensorChannelFrequencyUuid' => $sensorChannelFrequencyUuid
+                'device' => $deviceElectro,
+                'parameters1' => $parameters1,
+                'parameters2' => $parameters2,
+                'parameters3' => $parameters3
             ]
         );
     }
