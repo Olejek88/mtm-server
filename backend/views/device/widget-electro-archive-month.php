@@ -1,7 +1,7 @@
 <?php
 /* @var $device
  * @var $parameters
- * @var $data
+ * @var $dataAll
  */
 
 use common\models\mtm\MtmDevLightConfig;
@@ -41,14 +41,14 @@ use yii\widgets\Pjax;
                 </thead>
                 <tbody>
                 <?php
-                    foreach ($data['month'] as $data) {
+                    foreach ($dataAll['month'] as $data) {
                         echo '<tr data-key="1">
-                              <td class="kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="2">'.$data['w2'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="3">'.$data['w3'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="4">'.$data['w4'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="5">'.$data['ws'].'</td>
                               </tr>';
                     }
                 ?>

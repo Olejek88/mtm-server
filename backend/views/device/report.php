@@ -71,7 +71,7 @@ $gridColumns = [
         'value' => function ($data) {
             $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
             if ($sensorChannel) {
-                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 0);
+                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 1);
                 return $tarif['value'];
             }
             return '-';
@@ -86,7 +86,7 @@ $gridColumns = [
         'value' => function ($data) {
             $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
             if ($sensorChannel) {
-                $tarif['value'] = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 1);
+                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 2);
                 return $tarif['value'];
             }
             return '-';
@@ -101,7 +101,7 @@ $gridColumns = [
         'value' => function ($data) {
             $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
             if ($sensorChannel) {
-                $tarif['value'] = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 2);
+                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 3);
                 return $tarif['value'];
             }
             return '-';
@@ -116,7 +116,7 @@ $gridColumns = [
         'value' => function ($data) {
             $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
             if ($sensorChannel) {
-                $tarif['value'] = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 3);
+                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 4);
                 return $tarif['value'];
             }
             return '-';
@@ -131,7 +131,7 @@ $gridColumns = [
         'value' => function ($data) {
             $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
             if ($sensorChannel) {
-                $tarif['value'] = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 4);
+                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 0);
                 return $tarif['value'];
             }
             return '-';

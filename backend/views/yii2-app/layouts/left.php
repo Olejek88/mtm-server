@@ -42,6 +42,7 @@ $userImage = Yii::$app->view->params['userImage'];
                         "items" => [
                             ["label" => "Таблицей", 'icon' => 'fa fa-table', "url" => ["/device"]],
                             ["label" => "Деревом", 'icon' => 'fa fa-tree', "url" => ["/device/tree"]],
+                            ["label" => "Отчет о потреблении", 'icon' => 'fa fa-table', "url" => ["/device/report"]],
                             ["label" => "Светильники", 'icon' => 'fa fa-tree', "url" => ["/device/tree-light"]],
                             ["label" => "Группы светильников", 'icon' => 'fa fa-tree', "url" => ["/device/tree-group"]],
                             ["label" => "Камеры", 'icon' => 'fa fa-camera', "url" => ["/camera/tree"]],
@@ -61,6 +62,7 @@ $userImage = Yii::$app->view->params['userImage'];
                         'icon' => 'fa fa-bar-chart',
                         "items" => [
                             ["label" => "Контроллеры", 'icon' => 'fa fa-table', "url" => ["/node"]],
+                            ["label" => "Статус шкафов", 'icon' => 'fa fa-table', "url" => ["/node/status"]],
                             ["label" => "Потоки", 'icon' => 'fa fa-bar-chart', "url" => ["/thread"]],
                             ["label" => "Каналы измерения", 'icon' => 'fa fa-line-chart', "url" => ["/sensor-channel/table"]],
                             ["label" => "Сообщения", 'icon' => 'fa fa-book', "url" => ["/sound-file"]]

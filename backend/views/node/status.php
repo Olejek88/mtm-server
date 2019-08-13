@@ -68,7 +68,7 @@ $gridColumns = [
         'width' => '60px',
         'value' => function ($data) {
             $u1 = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,0);
-            if ($u1 && $u1>200 && $u1<251)
+            if ($u1['value'] && $u1['value']>200 && $u1['value']<251)
                 return "<span class='badge badge-green'>В норме</span>";
             else
                 return "<span class='badge badge-red'>Авария</span>";

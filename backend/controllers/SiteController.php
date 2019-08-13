@@ -539,20 +539,21 @@ class SiteController extends Controller
                 $w_total = "-";
                 $device = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
                     ->andWhere(['nodeUuid' => $node['uuid']])->one();
+                //echo json_encode($device['uuid']);
                 if ($device) {
                     $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
                     foreach ($channels as $channel) {
+                        //echo json_encode($channel['uuid']);
                         $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
-                            ->andWhere(['sensorChannelUuid' => $channel['uuid']])
-                            ->andWhere(['type' => 0])
+                            ->andWhere(['type' => MeasureType::MEASURE_TYPE_CURRENT])
                             ->orderBy('date DESC')
                             ->one();
-                        if (!$measure) {
-                            if ($channel['measureType']['uuid'] == MeasureType::POWER)
+                        if ($measure) {
+                            if ($channel['measureTypeUuid'] == MeasureType::POWER)
                                 $w = $measure['value'];
-                            if ($channel['measureType']['uuid'] == MeasureType::VOLTAGE)
+                            if ($channel['measureTypeUuid'] == MeasureType::VOLTAGE)
                                 $u = $measure['value'];
-                            if ($channel['measureType']['uuid'] == MeasureType::CURRENT)
+                            if ($channel['measureTypeUuid'] == MeasureType::CURRENT)
                                 $w_total = $measure['value'];
                         }
                     }

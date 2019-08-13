@@ -22,7 +22,10 @@ if ($sensorChannelUuid) {
     if ($sensorChannel)
         $title = $sensorChannel['title'];
     $measures = (Measure::find()
-        ->where(['sensorChannelUuid' => $sensorChannelUuid])->orderBy('date DESC'))->limit(200)->all();
+        ->where(['sensorChannelUuid' => $sensorChannelUuid])
+        ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
+        ->orderBy('date DESC'))
+        ->limit(200)->all();
 }
 
 $cnt = 0;

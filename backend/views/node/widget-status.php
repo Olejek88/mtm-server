@@ -17,7 +17,7 @@ else
     $security = "<span class='badge badge-red'>Открыт</span>";
 
 $u1 = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE, $node['uuid'], MeasureType::MEASURE_TYPE_CURRENT, 0);
-if ($u1 && $u1 > 200 && $u1 < 251)
+if ($u1['value'] && $u1['value'] > 200 && $u1['value'] < 251)
     $status = "<span class='badge badge-green'>В норме</span>";
 else
     $status = "<span class='badge badge-red'>Авария</span>";

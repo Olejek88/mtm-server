@@ -1,7 +1,7 @@
 <?php
 /* @var $device
  * @var $parameters
- * @var $data
+ * @var $dataAll
  */
 
 use common\models\mtm\MtmDevLightConfig;
@@ -38,7 +38,7 @@ use yii\widgets\Pjax;
                 </thead>
                 <tbody>
                 <?php
-                    foreach ($data['days'] as $data) {
+                    foreach ($dataAll['days'] as $data) {
                         echo '<tr data-key="1">
                               <td class="kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
                               <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>

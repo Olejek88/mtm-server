@@ -53,7 +53,7 @@
                 </tr>
                 <tr data-key="1">
                     <td class="kv-align-center kv-align-middle" data-col-seq="0">
-                        на <?= $parameters['month']['date']['last'] ?></td>
+                        c <?= $parameters['month']['date']['last'] ?> по <?= $parameters['month']['date']['current'] ?></td>
                     <td class="kv-align-center kv-align-middle"
                         data-col-seq="1"><?= $parameters['month']['w1']['last'] ?></td>
                     <td class="kv-align-center kv-align-middle"
@@ -81,7 +81,7 @@
                 </tr>
                 <tr data-key="1">
                     <td class="kv-align-center kv-align-middle" data-col-seq="0">
-                        на <?= $parameters['month']['date']['prev'] ?></td>
+                        c <?= $parameters['month']['date']['prev'] ?> по <?= $parameters['month']['date']['last'] ?></td>
                     <td class="kv-align-center kv-align-middle"
                         data-col-seq="1"><?= $parameters['month']['w1']['prev'] ?></td>
                     <td class="kv-align-center kv-align-middle"
