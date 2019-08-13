@@ -22,7 +22,7 @@ use yii\db\Expression;
  *
  * @property ActiveQuery $deviceStatus
  * @property Organisation $organisation
- * @property Object $object
+ * @property Objects $object
  */
 class Node extends MtmActiveRecord
 {
