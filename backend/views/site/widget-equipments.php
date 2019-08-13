@@ -24,7 +24,7 @@ use yii\helpers\Html;
             $count=0;
             foreach ($devices as $device) {
                 $path = '/images/no-image-icon-4.png';
-                if ($device['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO)
+                if ($device['deviceTypeUuid'] == DeviceType::DEVICE_COUNTER)
                     $path = '/images/elektro.jpg';
                 if ($device['deviceTypeUuid']==DeviceType::DEVICE_LIGHT)
                     $path = '/images/light.jpg';

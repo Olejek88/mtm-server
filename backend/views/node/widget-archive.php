@@ -53,7 +53,7 @@ use common\models\MeasureType;
         ];
 
         $device = (Device::find()->select('uuid')
-            ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]));
+            ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
         $sChannel = (SensorChannel::find()->select('uuid')
             ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
         $measures = (Measure::find()

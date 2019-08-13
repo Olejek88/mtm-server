@@ -159,7 +159,7 @@ class SiteController extends Controller
         $counts['street'] = Street::find()->count();
         $counts['objects'] = Objects::find()->count();
         $counts['device'] = Device::find()->count();
-        $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])->count();
+        $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_COUNTER])->count();
         $counts['light'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])->count();
         $counts['channel'] = SensorChannel::find()->count();
         $counts['node'] = Node::find()->count();
