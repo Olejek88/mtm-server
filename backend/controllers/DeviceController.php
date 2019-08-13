@@ -249,7 +249,7 @@ class DeviceController extends Controller
             $device = Device::find()
                 ->where(['uuid' => $_GET['uuid']])
                 ->one();
-            if ($device && $device['deviceTypeUuid'])
+            if ($device && $device['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO)
                 return self::actionDashboardElectro($device['uuid']);
         } else
             return self::actionIndex();
@@ -594,6 +594,7 @@ class DeviceController extends Controller
         }
 
         $cnt = 0;
+        $parameters['uuid'] = $sChannel['_id'];
         $parameters['trends']['categories'] = '';
         $parameters['trends']['values'] = '';
         foreach (array_reverse($measures) as $measure) {
