@@ -1236,7 +1236,7 @@ class DeviceController extends Controller
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']['deviceType']['title'],
+                    'title' => $deviceGroup['device']->getFullTitle(),
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
@@ -1761,7 +1761,7 @@ class DeviceController extends Controller
      * @return mixed|null
      * @throws InvalidConfigException
      */
-    function getParameter($deviceUuid, $parameter)
+    static function getParameter($deviceUuid, $parameter)
     {
         $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->one();
         if ($deviceConfig) {
@@ -2024,8 +2024,18 @@ class DeviceController extends Controller
                 ->one();
             if ($model) {
                 if ($_POST['to']) {
-                    $model['groupUuid'] = $_POST['to'];
-                    $model->save();
+                    $model = DeviceGroup::find()
+                        ->where(['deviceUuid' => $_POST['from']])
+                        ->andWhere(['groupUuid' => $_POST['to']])
+                        ->one();
+                    if (!$model) {
+                        $modelGroup = new DeviceGroup();
+                        $modelGroup->uuid = MainFunctions::GUID();
+                        $modelGroup->oid = User::getOid(Yii::$app->user->identity);
+                        $modelGroup->deviceUuid = $_POST["from"];
+                        $modelGroup->groupUuid = $_POST["to"];
+                        $modelGroup->save();
+                    }
                 } else {
                     $model->delete();
                 }

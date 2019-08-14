@@ -39,14 +39,29 @@ use yii\widgets\Pjax;
                 <tbody>
                 <?php
                     foreach ($dataAll['days'] as $data) {
-                        echo '<tr data-key="1">
-                              <td class="kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
-                              <td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
-                              </tr>';
+                        echo '<tr data-key="1">';
+                        echo '<td class="kv-align-center kv-align-middle" data-col-seq="0">'.$data['date'].'</td>';
+                        if (isset($data['w1']))
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w1'].'</td>';
+                        else
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                        if (isset($data['w2']))
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>';
+                        else
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                        if (isset($data['w3']))
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>';
+                        else
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                        if (isset($data['w4']))
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>';
+                        else
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                        if (isset($data['ws']))
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>';
+                        else
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                        echo '</tr>';
                     }
                 ?>
                 </tbody>

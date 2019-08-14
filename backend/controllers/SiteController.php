@@ -9,6 +9,8 @@ use common\components\MainFunctions;
 use common\models\Camera;
 use common\models\City;
 use common\models\Device;
+use common\models\DeviceConfig;
+use common\models\DeviceGroup;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
@@ -462,12 +464,28 @@ class SiteController extends Controller
         $polylineList = '';
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
+        $group='-';
+        $dimming = '-';
+        $current_power = '-';
+        $t = '-';
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
+                    $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
+                    if ($deviceGroup)
+                        $group = $deviceGroup['group']['title'];
+                    $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                    $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
+                    $measure = Measure::find()
+                        ->where(['sensorChannelUuid' => (SensorChannel::find()
+                            ->select('uuid')
+                            ->where(['measureTypeUuid' => MeasureType::TEMPERATURE])
+                            ->andWhere(['deviceUuid' => $device['uuid']]))])->one();
+                    if ($measure)
+                        $t = $measure['value'];
                 } else {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
@@ -477,9 +495,15 @@ class SiteController extends Controller
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: lightIcon}).bindPopup(\'' .
-                    $link . '<br/>'
-                    . $device["object"]->getAddress() . '\').openPopup();';
+                    . '], {icon: lightIcon}).bindPopup(\''
+                    . $link . '</span>'
+                    . '<br/>'
+                    . 'Адрес: ' . $device['address'] . '<br/>'
+                    . 'Группа: ' . $group . '<br/>'
+                    . 'Мощность: ' . $current_power . '<br/>'
+                    . 'Уровень освещения: ' . $dimming . '<br/>'
+                    . 'Температура: ' . $t . '<br/>\').openPopup();';
+
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
                     $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
