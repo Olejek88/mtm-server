@@ -14,10 +14,12 @@ use common\models\Group;
 use common\models\House;
 use common\models\Measure;
 use common\models\MeasureType;
+use common\models\mtm\MtmContactor;
 use common\models\mtm\MtmDevLightActionSetLight;
 use common\models\mtm\MtmDevLightConfig;
 use common\models\mtm\MtmDevLightConfigLight;
 use common\models\mtm\MtmPktHeader;
+use common\models\mtm\MtmResetCoordinator;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Organisation;
@@ -1977,5 +1979,43 @@ class DeviceController extends Controller
             }
         }
         return self::actionTreeGroup();
+    }
+
+    /**
+     * @param $state (0 - off, 1 - on)
+     * @param $device Device
+     */
+    public function contactor($state, $device)
+    {
+        $contactor = new MtmContactor();
+        $contactor->state = $state;
+        $pkt = [
+            'type' => 'light',
+            'address' => $device->address,
+            'data' => $contactor->getBase64Data(),
+        ];
+
+        $org_id = User::getOid(Yii::$app->user->identity);
+        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+        $node_id = $device->node->_id;
+        self::sendConfig($pkt, $org_id, $node_id);
+    }
+
+    /**
+     * @param $node Node
+     */
+    public function resetCoordinator($node)
+    {
+        $reset = new MtmResetCoordinator();
+        $pkt = [
+            'type' => 'light',
+            'address' => 0x0000,
+            'data' => $reset->getBase64Data(),
+        ];
+
+        $org_oid = User::getOid(Yii::$app->user->identity);
+        $org_id = Organisation::find()->where(['uuid' => $org_oid])->one()->_id;
+        $node_id = $node->_id;
+        self::sendConfig($pkt, $org_id, $node_id);
     }
 }
