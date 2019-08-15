@@ -39,6 +39,20 @@
                 </tr>
                 <tr data-key="1">
                     <td class="kv-align-center kv-align-middle" data-col-seq="0">
+                        с <?= $parameters['month']['date']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w1']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w2']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w3']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['w4']['current'] ?></td>
+                    <td class="kv-align-center kv-align-middle"
+                        data-col-seq="1"><?= $parameters['month']['ws']['current'] ?></td>
+                </tr>
+                <tr data-key="1">
+                    <td class="kv-align-center kv-align-middle" data-col-seq="0">
                         на <?= $parameters['increment']['date']['last'] ?></td>
                     <td class="kv-align-center kv-align-middle"
                         data-col-seq="1"><?= $parameters['increment']['w1']['last'] ?></td>

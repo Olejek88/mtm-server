@@ -183,7 +183,14 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'template'=> '{update}',
+        'buttons' => [
+            'days' => function ($url, $model) {
+                return Html::a('<span class="fa fa-tasks"></span>&nbsp',
+                    ['/device/archive-days', 'uuid' => $model['uuid']]
+                );
+            }
+        ],
+        'template'=> '{update} {days}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

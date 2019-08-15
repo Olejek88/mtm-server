@@ -507,6 +507,7 @@ class DeviceController extends Controller
         $parameters['month']['date']['last'] = date("Y-m-01", strtotime($current_month));
         $parameters['month']['date']['prev'] = date("Y-m-01", strtotime($prev_month));
         $parameters['month']['date']['current'] = date("Y-m-01", strtotime($month));
+
         $integrates = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL])
@@ -555,30 +556,40 @@ class DeviceController extends Controller
                     $parameters['month']['w1']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w1']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w1']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 2) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['w2']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w2']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w2']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 3) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['w3']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w3']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w3']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 4) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['w4']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w4']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w4']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 0) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['ws']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['ws']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['ws']['current'] = $measure['value'];
             }
         }
 
@@ -632,11 +643,14 @@ class DeviceController extends Controller
         }
 
         $deviceRegisters = DeviceRegister::find()
-            ->where(['deviceUuid' => $device['uuid']]);
+            ->where(['deviceUuid' => $device['uuid']])
+            ->orderBy('date DESC')
+            ->limit(8);
         $parameters['register']['provider'] = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
                 'sort' => false,
+                'pagination' => false
             ]
         );
 
@@ -831,6 +845,75 @@ class DeviceController extends Controller
         //echo json_encode($data);
         return $this->render(
             'archive',
+            [
+                'dataAll' => $data
+            ]
+        );
+    }
+
+    /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionArchiveDays($uuid)
+    {
+        if (isset($_GET['uuid'])) {
+            $device = Device::find()
+                ->where(['uuid' => $uuid])
+                ->one();
+        } else {
+            return $this->actionIndex();
+        }
+
+        // power by days
+        $sChannel = SensorChannel::find()
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER])
+            ->one();
+        // archive days
+        $start_time = '2018-12-31 00:00:00';
+        $end_time = '2021-12-31 00:00:00';
+        if (isset($_GET['end_time'])) {
+            $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+        }
+        if (isset($_GET['start_time'])) {
+            $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+        }
+
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->andWhere('date >= "'.$start_time.'"')
+            ->andWhere('date < "'.$end_time.'"')
+            ->orderBy('date DESC'))
+            ->all();
+        $cnt = -1;
+        $data['days'] = [];
+        $data['month'] = [];
+
+        $last_date = '';
+        foreach ($last_measures as $measure) {
+            if ($measure['date'] != $last_date) {
+                $last_date = $measure['date'];
+                $cnt++;
+            }
+            $data['days'][$cnt]['date'] = $measure['date'];
+            if ($measure['parameter'] == 1)
+                $data['days'][$cnt]['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $data['days'][$cnt]['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $data['days'][$cnt]['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $data['days'][$cnt]['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $data['days'][$cnt]['ws'] = $measure['value'];
+        }
+
+        return $this->render(
+            'archive-days',
             [
                 'dataAll' => $data
             ]

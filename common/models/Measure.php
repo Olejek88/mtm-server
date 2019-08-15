@@ -28,7 +28,6 @@ use yii\base\InvalidConfigException;
  */
 class Measure extends MtmActiveRecord
 {
-
     /**
      * Behaviors
      *
@@ -166,6 +165,26 @@ class Measure extends MtmActiveRecord
             ->orderBy('date DESC')
             ->one();
         return $model;
+    }
+
+    /**
+     * @param $sensorChannelUuid
+     * @param $startDate
+     * @param $endDate
+     * @param $parameter
+     * @return ActiveRecord
+     * @throws InvalidConfigException
+     */
+    public static function getSumMeasureBetweenDates($sensorChannelUuid, $startDate, $endDate, $parameter)
+    {
+        $sum = Measure::find()
+            ->where(["sensorChannelUuid" => $sensorChannelUuid])
+            ->andWhere(['parameter' => $parameter])
+            ->andWhere('date >= "' . $startDate . '"')
+            ->andWhere('date < "' . $endDate . '"')
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->sum('value');
+        return number_format($sum,3);
     }
 
     /**

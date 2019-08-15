@@ -37,27 +37,30 @@ $this->title = Yii::t('app', 'Журнал работы устройств');
                 'width' => '100px',
             ],
             [
-                'attribute' => 'deviceUuid',
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
                 'width' => '180px',
-                'value' => 'device.name',
                 'format' => 'raw',
+                'header' => 'Адрес',
                 'contentOptions' => [
                     'class' => 'table_class'
                 ],
+                'content' => function ($data) {
+                    return '['.$data['device']->getFullTitle().']';
+                }
             ],
             [
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
                 'width' => '180px',
+                'header' => 'Контроллер',
+                'content' => function ($data) {
+                    return '['.$data['device']['node']['phone'].']';
+                },
                 'format' => 'raw',
                 'contentOptions' => [
                     'class' => 'table_class'
                 ],
-                'content' => function ($data) {
-                    return '['.$data['device']['name'].' '.$data['device']['address'].']';
-                }
             ],
             [
                 'attribute' => 'description',
