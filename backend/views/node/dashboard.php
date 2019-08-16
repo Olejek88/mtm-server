@@ -6,6 +6,7 @@ use common\models\SensorChannel;
 
 /* @var $node
  * @var $camera
+ * @var $coordinator
  * @var $parameters
  */
 
@@ -40,7 +41,7 @@ if ($deviceElectro) {
     </div>
 
     <div class="col-md-4">
-        <?= $this->render('widget-status', ['node' => $node, 'parameters' => $parameters]); ?>
+        <?= $this->render('widget-status', ['node' => $node, 'parameters' => $parameters, 'device' => $coordinator]); ?>
     </div>
 
     <div class="col-md-7">

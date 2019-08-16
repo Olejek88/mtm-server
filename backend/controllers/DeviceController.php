@@ -1790,7 +1790,7 @@ class DeviceController extends Controller
      * @param $org_id
      * @param $node_id
      */
-    function sendConfig($packet, $org_id, $node_id)
+    static function sendConfig($packet, $org_id, $node_id)
     {
         $params = Yii::$app->params;
         if (!isset($params['amqpServer']['host']) ||
@@ -1948,7 +1948,6 @@ class DeviceController extends Controller
         $parameters1 = [];
         $parameters2 = [];
         $parameters3 = [];
-        $parameters4 = [];
 
         if ($deviceElectro) {
             $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
@@ -2139,9 +2138,9 @@ class DeviceController extends Controller
 
     /**
      * @param $state (0 - off, 1 - on)
-     * @param $device Device
+     * @param $device
      */
-    public function contactor($state, $device)
+    public static function contactor($state, $device)
     {
         $contactor = new MtmContactor();
         $contactor->state = $state;
@@ -2158,9 +2157,9 @@ class DeviceController extends Controller
     }
 
     /**
-     * @param $node Node
+     * @param $node
      */
-    public function resetCoordinator($node)
+    public static function resetCoordinator($node)
     {
         $reset = new MtmResetCoordinator();
         $pkt = [

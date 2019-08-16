@@ -1,11 +1,14 @@
 <?php
 /* @var $node
  * @var $parameters
+ * @var $device
  */
 
 use common\models\Measure;
 use common\models\MeasureType;
 use yii\helpers\Html;
+use yii\widgets\Pjax;
+
 ?>
 <div class="box box-success">
     <div class="box-header with-border">
@@ -36,19 +39,27 @@ use yii\helpers\Html;
             <tr data-key="1">
                 <td class="table_class kv-align-middle" data-col-seq="0">Управление контактором</td>
                 <td class="kv-align-center kv-align-middle" data-col-seq="1">
-                <form action="dashboard">
                     <?php
+                    Pjax::begin(['id' => 'options']);
+                    echo Html::beginForm(['dashboard', 'uuid' => $node['uuid'], 'type' => 0], 'post',
+                        ['data-pjax' => '', 'class' => 'form-inline']);
                     if (isset($parameters['control']['contact']) && $parameters['control']['contact']) {
-                        echo Html::hiddenInput('on', 0);
                         echo Html::submitButton(Yii::t('app', 'Выключить'),
-                            ['class' => 'btn btn-secondary btn-sm']);
+                            ['class' => 'btn btn-danger btn-sm']);
+                        echo Html::hiddenInput('device', $device['uuid']);
+                        echo Html::hiddenInput('type','node');
+                        echo Html::hiddenInput('on',0);
+
                     } else {
-                        echo Html::hiddenInput('on', 1);
                         echo Html::submitButton(Yii::t('app', 'Включить'),
                             ['class' => 'btn btn-success btn-sm']);
+                        echo Html::hiddenInput('device', $device['uuid']);
+                        echo Html::hiddenInput('type','node');
+                        echo Html::hiddenInput('on',1);
                     }
+                    echo Html::endForm();
+                    Pjax::end();
                     ?>
-                </form>
                 </td>
             </tr>
             <tr data-key="2">
@@ -84,6 +95,23 @@ use yii\helpers\Html;
             <tr data-key="7">
                 <td class="table_class kv-align-middle" data-col-seq="0">Энергия, кВт/ч</td>
                 <td class="table_class kv-align-middle" data-col-seq="1"><?php echo $parameters['total'] ?></td>
+            </tr>
+            <tr data-key="1">
+                <td class="table_class kv-align-middle" data-col-seq="0">Сбросить координатор</td>
+                <td class="kv-align-center kv-align-middle" data-col-seq="1">
+                    <?php
+                    Pjax::begin(['id' => 'options']);
+                    echo Html::beginForm(['dashboard', 'uuid' => $node['uuid'], 'type' => 0], 'post',
+                        ['data-pjax' => '', 'class' => 'form-inline']);
+                    echo Html::submitButton(Yii::t('app', 'Сбросить'),
+                           ['class' => 'btn btn-info btn-sm']);
+                    echo Html::hiddenInput('device', $device['uuid']);
+                    echo Html::hiddenInput('type','node');
+                    echo Html::hiddenInput('reset',1);
+                    echo Html::endForm();
+                    Pjax::end();
+                    ?>
+                </td>
             </tr>
             </tbody>
         </table>

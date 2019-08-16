@@ -5,6 +5,7 @@ namespace backend\controllers;
 use backend\models\NodeSearch;
 use common\models\Camera;
 use common\models\Device;
+use common\models\DeviceConfig;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -203,6 +204,12 @@ class NodeController extends Controller
      */
     public function actionDashboard($uuid, $type)
     {
+        if (isset($_POST['on'])) {
+            $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+            if ($device)
+                DeviceController::contactor($_POST['on'], $device);
+        }
+
         $node = Node::find()
             ->where(['uuid' => $uuid])
             ->one();
@@ -212,6 +219,10 @@ class NodeController extends Controller
         $parameters = [];
 
         if ($node) {
+            if (isset($_POST['reset'])) {
+                DeviceController::resetCoordinator($node);
+            }
+
             $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
             if ($camera) {
                 $camera->startTranslation();
@@ -321,6 +332,7 @@ class NodeController extends Controller
             'dashboard',
             [
                 'node' => $node,
+                'coordinator' => $coordinator,
                 'camera' => $camera,
                 'type' => $type,
                 'parameters' => $parameters

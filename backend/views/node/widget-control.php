@@ -4,6 +4,8 @@
  */
 
 use yii\helpers\Html;
+use yii\widgets\Pjax;
+
 ?>
 <div class="box box-success">
     <div class="box-header with-border">
@@ -28,12 +30,27 @@ use yii\helpers\Html;
                             echo '<td class="kv-align-center kv-align-middle" style="background-color: red">Открыто</td>';
                         ?>
                     <td class="kv-align-center kv-align-middle" data-col-seq="1">
-                        <form action="dashboard">
                             <?php
+                            Pjax::begin(['id' => 'options']);
+                            echo Html::beginForm(['dashboard', 'uuid' => $device['uuid'], 'type' => 0], 'post',
+                                ['data-pjax' => '', 'class' => 'form-inline']);
+                            if (isset($parameters['control']['contact']) && $parameters['control']['contact']) {
+                                echo Html::submitButton(Yii::t('app', 'Выключить'),
+                                    ['class' => 'btn btn-danger']);
+                                echo Html::hiddenInput('uuid',$device['uuid']);
+                                echo Html::hiddenInput('type','node');
+                                echo Html::hiddenInput('on',0);
+
+                            } else {
+                                echo Html::submitButton(Yii::t('app', 'Включить'),
+                                    ['class' => 'btn btn-success']);
+                                echo Html::hiddenInput('uuid',$device['uuid']);
+                                echo Html::hiddenInput('type','node');
                                 echo Html::hiddenInput('on',1);
-                                echo Html::submitButton(Yii::t('app', 'Выбрать'),
-                                ['class' => 'btn btn-info']) ?>
-                        </form>
+                            }
+                            echo Html::endForm();
+                            Pjax::end();
+                         ?>
                     </td>
                     <?php
                         if (isset($parameters['control']['contact']) && $parameters['control']['contact'])

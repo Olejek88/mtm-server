@@ -47,7 +47,8 @@ $gridColumns = [
         'attribute' => 'objectUuid',
         'vAlign' => 'middle',
         'value' => function ($data) {
-            return $data['object']['house']['street']->title . ', ' . $data['object']['house']->number . '-' . $data['object']->title;
+            return Html::a($data['object']['house']['street']->title . ', ' . $data['object']['house']->number . '-' . $data['object']->title,
+                ['/node/dashboard','uuid' => $data['uuid'], 'type' => 'node']);
         },
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Объект ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
