@@ -239,7 +239,6 @@ class DeviceController extends Controller
     /**
      * Dashboard
      *
-     * @param $uuid
      * @return string
      * @throws InvalidConfigException
      */
@@ -842,6 +841,7 @@ class DeviceController extends Controller
         }
 
         $data['trends']['title'] = $sChannel['title'];
+
         //echo json_encode($data);
         return $this->render(
             'archive',

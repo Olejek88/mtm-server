@@ -141,7 +141,7 @@ class ThreadController extends Controller
             }
             // сохраняем запись
             if ($model->save(false)) {
-                MainFunctions::register("Добавлен новый поток ".$model['title'].']');
+                MainFunctions::register("Добавлен новый поток [".$model['title'].']');
                 return $this->redirect(['view', 'id' => $model->_id]);
             }
             echo json_encode($model->errors);

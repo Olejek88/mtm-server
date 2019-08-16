@@ -6,6 +6,7 @@ use common\models\SensorChannel;
 
 /* @var $node
  * @var $camera
+ * @var $parameters
  */
 
 $this->title = Yii::t('app', 'Контроллер');
@@ -27,12 +28,37 @@ if ($deviceElectro) {
 <!-- Info boxes -->
 <div class="row">
     <div class="col-md-12">
-    <?= $this->render('widget-node-info', ['node' => $node, 'type' => $type]); ?>
+    <?= $this->render('widget-node-info', ['node' => $node, 'type' => $type, 'device' => $deviceElectro]); ?>
     </div>
 </div>
 <!-- /.row -->
 
-<!-- Main row -->
+<div class="row">
+    <!-- Left col -->
+    <div class="col-md-8">
+        <?= $this->render('widget-sensor-channel', ['node' => $node]); ?>
+    </div>
+
+    <div class="col-md-4">
+        <?= $this->render('widget-status', ['node' => $node, 'parameters' => $parameters]); ?>
+    </div>
+
+    <div class="col-md-7">
+        <?= $this->render('widget-devices', ['node' => $node]); ?>
+    </div>
+
+    <div class="col-md-5">
+        <?= $this->render('widget-device-register', ['node' => $node]); ?>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <?= $this->render('widget-trends', ['sensorChannelUuid' => $sensorChannelUuid,
+            'type' => MeasureType::MEASURE_TYPE_INTERVAL, 'parameter' => 0]); ?>
+    </div>
+</div>
+
 <div class="row">
     <!-- Left col -->
     <div class="col-md-5">
@@ -53,30 +79,4 @@ if ($deviceElectro) {
     </div>
 </div>
 
-<!-- Main row -->
-<div class="row">
-    <!-- Left col -->
-    <div class="col-md-7">
-        <?= $this->render('widget-devices', ['node' => $node]); ?>
-    </div>
-
-    <div class="col-md-5">
-        <?= $this->render('widget-device-register', ['node' => $node]); ?>
-    </div>
-
-    <div class="col-md-8">
-        <?= $this->render('widget-sensor-channel', ['node' => $node]); ?>
-    </div>
-
-    <div class="col-md-4">
-
-        <?= $this->render('widget-status', ['node' => $node]); ?>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <?= $this->render('widget-trends', ['sensorChannelUuid' => $sensorChannelUuid,
-            'type' => MeasureType::MEASURE_TYPE_INTERVAL, 'parameter' => 0]); ?>
-    </div>
-</div>
 <!-- /.content-wrapper -->

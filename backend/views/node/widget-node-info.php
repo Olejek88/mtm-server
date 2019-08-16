@@ -1,5 +1,7 @@
 <?php
-/* @var $node */
+/* @var $node
+ * @var $device
+ */
 
 use common\models\DeviceStatus;
 use yii\helpers\Html;
@@ -39,8 +41,8 @@ use yii\helpers\Html;
             <small class="float-right">Телефон: <?php echo $node['phone'] ?></small><br/>
         </div>
         <div class="col-md-3">
-            <span class="float-right"><?php echo Html::a('<i class="fa fa-bar-chart"></i> Тренды',['trends', 'uuid' => $node['uuid']]) ?></span><br/>
-            <span class="float-right"><?php echo Html::a('<i class="fa fa-table"></i> Журнал',['register', 'uuid' => $node['uuid']]) ?></span>
+            <span class="float-right"><?php echo Html::a('<i class="fa fa-bar-chart"></i> Тренды',['../device/trends', 'uuid' => $device['uuid']]) ?></span><br/>
+            <span class="float-right"><?php echo Html::a('<i class="fa fa-table"></i> Журнал',['../device/register', 'uuid' => $device['uuid']]) ?></span>
         </div>
     </div>
 </div>
