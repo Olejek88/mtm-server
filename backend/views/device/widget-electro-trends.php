@@ -65,7 +65,6 @@ $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
                                     }
                                 },
                                 yAxis: {
-                                    min: 0,
                                     title: {
                                         text: '<?= $parameters['trends']['title'] ?>'
                                     }

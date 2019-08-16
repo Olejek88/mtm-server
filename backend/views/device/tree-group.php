@@ -69,7 +69,7 @@ echo FancytreeWidget::widget([
 				return true;
 			}'),
             'dragDrop' => new JsExpression('function(node, data) {
-				data.otherNode.moveTo(node, data.hitMode);
+				data.otherNode. copyTo(node, data.hitMode);
 				console.log(data.otherNode.data.uuid);
 				console.log(node.data.uuid);
 				$.ajax({

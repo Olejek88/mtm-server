@@ -5,27 +5,28 @@ namespace backend\controllers;
 use backend\models\NodeSearch;
 use common\models\Camera;
 use common\models\Device;
+use common\models\DeviceConfig;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
-use common\models\MeasureType;
-use common\models\Node;
-use common\models\Objects;
 use common\models\House;
 use common\models\Measure;
+use common\models\MeasureType;
 use common\models\Message;
+use common\models\Node;
+use common\models\Objects;
 use common\models\Photo;
 use common\models\SensorChannel;
 use common\models\Street;
 use common\models\User;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\base\InvalidConfigException;
 
 /**
  * NodeController implements the CRUD actions for Node model.
@@ -186,10 +187,10 @@ class NodeController extends Controller
         }
 
         $equipments = array();
-/*        $equipment_count = 0;
-        $objects = Objects::find()
-            ->select('*')
-            ->all();*/
+        /*        $equipment_count = 0;
+                $objects = Objects::find()
+                    ->select('*')
+                    ->all();*/
         return $this->render('new', ['equipments' => $equipments]);
     }
 
@@ -203,23 +204,138 @@ class NodeController extends Controller
      */
     public function actionDashboard($uuid, $type)
     {
+        if (isset($_POST['on'])) {
+            $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+            if ($device)
+                DeviceController::contactor($_POST['on'], $device);
+        }
+
         $node = Node::find()
             ->where(['uuid' => $uuid])
             ->one();
-        $camera=null;
+        $camera = null;
+        $energy = null;
+        $coordinator = null;
+        $parameters = [];
+
         if ($node) {
+            if (isset($_POST['reset'])) {
+                DeviceController::resetCoordinator($node);
+            }
+
             $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
             if ($camera) {
                 $camera->startTranslation();
             }
+            $parameters['control']['signal'] = $node['security'];
+
+            $energy = Device::find()
+                ->where(['nodeUuid' => $node['uuid']])
+                ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                ->one();
+
+            $coordinator = Device::find()
+                ->where(['nodeUuid' => $node['uuid']])
+                ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                ->one();
         }
+        /*
+                $parameters['control']['contact'] =
+        */
+        if ($energy) {
+            $measures = (Measure::find()
+                ->where(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->orderBy('date DESC'))
+                ->limit(100)
+                ->all();
+            foreach ($measures as $measure) {
+                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::VOLTAGE &&
+                    $measure['sensorChannel']['deviceUuid'] == $energy['uuid']) {
+                    if ($measure['parameter'] == 1)
+                        $parameters['control']['u'] = $measure['value'];
+                }
+                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::CURRENT &&
+                    $measure['sensorChannel']['deviceUuid'] == $energy['uuid']) {
+                    if ($measure['parameter'] == 1)
+                        $parameters['control']['i'] = $measure['value'];
+                }
+                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::POWER &&
+                    $measure['sensorChannel']['deviceUuid'] == $energy['uuid']) {
+                    if ($measure['parameter'] == 0)
+                        $parameters['control']['w'] = $measure['value'];
+                }
+            }
+        }
+
+        if ($coordinator) {
+            $measures = (Measure::find()
+                ->where(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+                ->orderBy('date DESC'))
+                ->limit(100)
+                ->all();
+            foreach ($measures as $measure) {
+                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN1 &&
+                    $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                        $parameters['control']['contact'] = $measure['value'];
+                }
+                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+                    $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                    $parameters['control']['signal'] = $measure['value'];
+                }
+            }
+        }
+
+        $parameters['u1'] = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 1);
+        $parameters['u2'] = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 2);
+        $parameters['u3'] = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 3);
+        if (!$parameters['u1']) $parameters['u1'] = '-';
+        else $parameters['u1'] = $parameters['u1']['value'];
+        if (!$parameters['u2']) $parameters['u2'] = '-';
+        else $parameters['u2'] = $parameters['u2']['value'];
+        if (!$parameters['u3']) $parameters['u3'] = '-';
+        else $parameters['u3'] = $parameters['u3']['value'];
+
+        $parameters['voltage'] = "<span style='color: darkgreen'>" . $parameters['u1'] . "," . $parameters['u2'] . "," . $parameters['u3'] . "</span>";
+
+        $parameters['i1'] = Measure::getLastMeasureNodeByType(MeasureType::CURRENT, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 1);
+        $parameters['i2'] = Measure::getLastMeasureNodeByType(MeasureType::CURRENT, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 2);
+        $parameters['i3'] = Measure::getLastMeasureNodeByType(MeasureType::CURRENT, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 3);
+        if (!$parameters['i1']) $parameters['i1'] = '-';
+        else $parameters['i1'] = $parameters['i1']['value'];
+        if (!$parameters['i2']) $parameters['i2'] = '-';
+        else $parameters['i2'] = $parameters['i2']['value'];
+        if (!$parameters['i3']) $parameters['i3'] = '-';
+        else $parameters['i3'] = $parameters['i3']['value'];
+
+        $parameters['current'] = "<span style='color: darkgreen'>" . $parameters['i1'] . "," . $parameters['i2'] . "," . $parameters['i3'] . "</span>";
+
+        $parameters['w'] = Measure::getLastMeasureNodeByType(MeasureType::POWER, $node['uuid'],
+            MeasureType::MEASURE_TYPE_CURRENT, 0);
+        if (!$parameters['w']) $parameters['w'] = '-';
+        else $parameters['w'] = $parameters['w']['value'];
+
+        $parameters['power'] = "<span style='color: darkgreen'>" . $parameters['w'] . "</span>";
+
+        $w = Measure::getLastMeasureNodeByType(MeasureType::POWER, $node['uuid'],
+            MeasureType::MEASURE_TYPE_TOTAL, 0);
+        if (!$w) $w = '-';
+        else $w = $w['value'];
+        $parameters['total'] = "<span style='color: darkgreen'>" . $w . "</span>";
 
         return $this->render(
             'dashboard',
             [
                 'node' => $node,
+                'coordinator' => $coordinator,
                 'camera' => $camera,
-                'type' => $type
+                'type' => $type,
+                'parameters' => $parameters
             ]
         );
     }
@@ -233,7 +349,8 @@ class NodeController extends Controller
      * @return mixed
      * @throws NotFoundHttpException
      */
-    public function actionUpdate($id)
+    public
+    function actionUpdate($id)
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return $this->redirect('/site/index');
@@ -267,7 +384,8 @@ class NodeController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionTree()
+    public
+    function actionTree()
     {
         $c = 'children';
         $fullTree = array();
@@ -508,7 +626,8 @@ class NodeController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionTreeMeasure()
+    public
+    function actionTreeMeasure()
     {
         ini_set('memory_limit', '-1');
         $fullTree = array();
@@ -541,7 +660,7 @@ class NodeController extends Controller
                             ->orderBy('date DESC')
                             ->all();
 
-                        $measure_count_column=0;
+                        $measure_count_column = 0;
                         $fullTree[$oCnt0]['measure_date0'] = '';
                         $fullTree[$oCnt0]['measure_value0'] = '';
                         $fullTree[$oCnt0]['measure_date1'] = '';
@@ -551,41 +670,39 @@ class NodeController extends Controller
                         $fullTree[$oCnt0]['measure_date3'] = '';
                         $fullTree[$oCnt0]['measure_value3'] = '';
                         $fullTree[$oCnt0]['measure_user'] = '';
-                        $measure_first=0;
-                        $measure_last=0;
-                        $measure_date_first=0;
-                        $measure_date_last=0;
+                        $measure_first = 0;
+                        $measure_last = 0;
+                        $measure_date_first = 0;
+                        $measure_date_last = 0;
                         foreach ($measures as $measure) {
-                            $fullTree[$oCnt0]['measure_date'.$measure_count_column] = $measure['date'];
-                            $fullTree[$oCnt0]['measure_value'.$measure_count_column] = $measure['value'];
+                            $fullTree[$oCnt0]['measure_date' . $measure_count_column] = $measure['date'];
+                            $fullTree[$oCnt0]['measure_value' . $measure_count_column] = $measure['value'];
                             $fullTree[$oCnt0]['measure_user'] = $measure['user']->name;
-                            if ($measure_count_column==0) {
+                            if ($measure_count_column == 0) {
                                 $measure_first = $measure['value'];
                                 $measure_date_first = $measure['date'];
-                            }
-                            else {
-                                $measure_last=$measure['value'];
+                            } else {
+                                $measure_last = $measure['value'];
                                 $measure_date_last = $measure['date'];
                             }
                             $measure_count_column++;
-                            if ($measure_count_column>3) break;
+                            if ($measure_count_column > 3) break;
                         }
 
                         $datetime1 = date_create($measure_date_first);
                         $datetime2 = date_create($measure_date_last);
                         if ($datetime2 && $datetime1) {
                             $diff = $datetime2->diff($datetime1);
-                            $interval = $diff->format("%h")+($diff->days*24);
-                            $value = number_format($measure_last-$measure_first,2);
-                        }
-                        else {
+                            $interval = $diff->format("%h") + ($diff->days * 24);
+                            $value = number_format($measure_last - $measure_first, 2);
+                        } else {
                             $interval = 0;
-                            $value=0;
+                            $value = 0;
                         }
                         $fullTree[$oCnt0]['interval'] = $interval;
                         $fullTree[$oCnt0]['value'] = $value;
-                        if ($interval>0)
-                            $fullTree[$oCnt0]['relative'] = number_format($value/$interval,2);
+                        if ($interval > 0)
+                            $fullTree[$oCnt0]['relative'] = number_format($value / $interval, 2);
 
                         $message = Message::find()
                             ->select('*')
@@ -619,7 +736,8 @@ class NodeController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public function actionDelete($id)
+    public
+    function actionDelete($id)
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return $this->redirect('/site/index');
@@ -642,7 +760,8 @@ class NodeController extends Controller
      * @return Node the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected
+    function findModel($id)
     {
         if (($model = Node::findOne($id)) !== null) {
             return $model;
@@ -656,16 +775,17 @@ class NodeController extends Controller
      * @return string
      * @throws InvalidConfigException
      */
-    public function actionTrends($uuid)
+    public
+    function actionTrends($uuid)
     {
         $node = Node::find()
             ->where(['uuid' => $uuid])
             ->one();
 
-        $sensorChannelPowerUuid=0;
-        $sensorChannelVoltageUuid=0;
-        $sensorChannelCurrentUuid=0;
-        $sensorChannelFrequencyUuid=0;
+        $sensorChannelPowerUuid = 0;
+        $sensorChannelVoltageUuid = 0;
+        $sensorChannelCurrentUuid = 0;
+        $sensorChannelFrequencyUuid = 0;
         $deviceElectro = Device::find()
             ->where(['nodeUuid' => $node['uuid']])
             ->andWhere(['deleted' => 0])
@@ -705,14 +825,15 @@ class NodeController extends Controller
      * @return string
      * @throws InvalidConfigException
      */
-    public function actionRegister($uuid)
+    public
+    function actionRegister($uuid)
     {
         $deviceRegisters = DeviceRegister::find()
             ->where(['deviceUuid' => (Node::find()->where(['uuid' => $uuid])->one())]);
         $provider = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
-                'sort' =>false,
+                'sort' => false,
             ]
         );
         return $this->render(

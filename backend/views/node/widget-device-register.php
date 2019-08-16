@@ -61,11 +61,13 @@ use yii\data\ActiveDataProvider;
         ];
 
         $deviceRegisters = DeviceRegister::find()
-            ->where(['deviceUuid' => (Node::find()->where(['uuid' => $node['uuid']])->one())]);
+            ->where(['deviceUuid' => (Node::find()->where(['uuid' => $node['uuid']])->one())])
+            ->limit(8);
         $provider = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
                 'sort' =>false,
+                'pagination' => false
             ]
         );
 

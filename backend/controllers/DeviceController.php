@@ -241,7 +241,6 @@ class DeviceController extends Controller
     /**
      * Dashboard
      *
-     * @param $uuid
      * @return string
      * @throws InvalidConfigException
      */
@@ -509,6 +508,7 @@ class DeviceController extends Controller
         $parameters['month']['date']['last'] = date("Y-m-01", strtotime($current_month));
         $parameters['month']['date']['prev'] = date("Y-m-01", strtotime($prev_month));
         $parameters['month']['date']['current'] = date("Y-m-01", strtotime($month));
+
         $integrates = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL])
@@ -557,30 +557,40 @@ class DeviceController extends Controller
                     $parameters['month']['w1']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w1']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w1']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 2) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['w2']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w2']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w2']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 3) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['w3']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w3']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w3']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 4) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['w4']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['w4']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['w4']['current'] = $measure['value'];
             }
             if ($measure['parameter'] == 0) {
                 if ($measure['date'] == $current_month)
                     $parameters['month']['ws']['last'] = $measure['value'];
                 if ($measure['date'] == $prev_month)
                     $parameters['month']['ws']['prev'] = $measure['value'];
+                if ($measure['date'] == $month)
+                    $parameters['month']['ws']['current'] = $measure['value'];
             }
         }
 
@@ -634,11 +644,14 @@ class DeviceController extends Controller
         }
 
         $deviceRegisters = DeviceRegister::find()
-            ->where(['deviceUuid' => $device['uuid']]);
+            ->where(['deviceUuid' => $device['uuid']])
+            ->orderBy('date DESC')
+            ->limit(8);
         $parameters['register']['provider'] = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
                 'sort' => false,
+                'pagination' => false
             ]
         );
 
@@ -830,9 +843,79 @@ class DeviceController extends Controller
         }
 
         $data['trends']['title'] = $sChannel['title'];
+
         //echo json_encode($data);
         return $this->render(
             'archive',
+            [
+                'dataAll' => $data
+            ]
+        );
+    }
+
+    /**
+     * Dashboard
+     *
+     * @param $uuid
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionArchiveDays($uuid)
+    {
+        if (isset($_GET['uuid'])) {
+            $device = Device::find()
+                ->where(['uuid' => $uuid])
+                ->one();
+        } else {
+            return $this->actionIndex();
+        }
+
+        // power by days
+        $sChannel = SensorChannel::find()
+            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER])
+            ->one();
+        // archive days
+        $start_time = '2018-12-31 00:00:00';
+        $end_time = '2021-12-31 00:00:00';
+        if (isset($_GET['end_time'])) {
+            $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+        }
+        if (isset($_GET['start_time'])) {
+            $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+        }
+
+        $last_measures = (Measure::find()
+            ->where(['sensorChannelUuid' => $sChannel])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->andWhere('date >= "'.$start_time.'"')
+            ->andWhere('date < "'.$end_time.'"')
+            ->orderBy('date DESC'))
+            ->all();
+        $cnt = -1;
+        $data['days'] = [];
+        $data['month'] = [];
+
+        $last_date = '';
+        foreach ($last_measures as $measure) {
+            if ($measure['date'] != $last_date) {
+                $last_date = $measure['date'];
+                $cnt++;
+            }
+            $data['days'][$cnt]['date'] = $measure['date'];
+            if ($measure['parameter'] == 1)
+                $data['days'][$cnt]['w1'] = $measure['value'];
+            if ($measure['parameter'] == 2)
+                $data['days'][$cnt]['w2'] = $measure['value'];
+            if ($measure['parameter'] == 3)
+                $data['days'][$cnt]['w3'] = $measure['value'];
+            if ($measure['parameter'] == 4)
+                $data['days'][$cnt]['w4'] = $measure['value'];
+            if ($measure['parameter'] == 0)
+                $data['days'][$cnt]['ws'] = $measure['value'];
+        }
+
+        return $this->render(
+            'archive-days',
             [
                 'dataAll' => $data
             ]
@@ -1238,7 +1321,7 @@ class DeviceController extends Controller
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']['deviceType']['title'],
+                    'title' => $deviceGroup['device']->getFullTitle(),
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
@@ -1707,7 +1790,7 @@ class DeviceController extends Controller
      * @param $org_id
      * @param $node_id
      */
-    function sendConfig($packet, $org_id, $node_id)
+    static function sendConfig($packet, $org_id, $node_id)
     {
         $params = Yii::$app->params;
         if (!isset($params['amqpServer']['host']) ||
@@ -1763,7 +1846,7 @@ class DeviceController extends Controller
      * @return mixed|null
      * @throws InvalidConfigException
      */
-    function getParameter($deviceUuid, $parameter)
+    static function getParameter($deviceUuid, $parameter)
     {
         $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->one();
         if ($deviceConfig) {
@@ -1865,7 +1948,6 @@ class DeviceController extends Controller
         $parameters1 = [];
         $parameters2 = [];
         $parameters3 = [];
-        $parameters4 = [];
 
         if ($deviceElectro) {
             $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
@@ -2026,8 +2108,18 @@ class DeviceController extends Controller
                 ->one();
             if ($model) {
                 if ($_POST['to']) {
-                    $model['groupUuid'] = $_POST['to'];
-                    $model->save();
+                    $model = DeviceGroup::find()
+                        ->where(['deviceUuid' => $_POST['from']])
+                        ->andWhere(['groupUuid' => $_POST['to']])
+                        ->one();
+                    if (!$model) {
+                        $modelGroup = new DeviceGroup();
+                        $modelGroup->uuid = MainFunctions::GUID();
+                        $modelGroup->oid = User::getOid(Yii::$app->user->identity);
+                        $modelGroup->deviceUuid = $_POST["from"];
+                        $modelGroup->groupUuid = $_POST["to"];
+                        $modelGroup->save();
+                    }
                 } else {
                     $model->delete();
                 }
@@ -2046,9 +2138,9 @@ class DeviceController extends Controller
 
     /**
      * @param $state (0 - off, 1 - on)
-     * @param $device Device
+     * @param $device
      */
-    public function contactor($state, $device)
+    public static function contactor($state, $device)
     {
         $contactor = new MtmContactor();
         $contactor->state = $state;
@@ -2065,9 +2157,9 @@ class DeviceController extends Controller
     }
 
     /**
-     * @param $node Node
+     * @param $node
      */
-    public function resetCoordinator($node)
+    public static function resetCoordinator($node)
     {
         $reset = new MtmResetCoordinator();
         $pkt = [

@@ -5,9 +5,27 @@ use common\models\Measure;
 use common\models\MeasureType;
 use common\models\SensorChannel;
 use kartik\grid\GridView;
+use kartik\widgets\DatePicker;
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Отчет по потреблению электроэнергии');
+
+$start_date = '2018-12-31';
+$end_date = '2021-12-31';
+$start_time = '2018-12-31 00:00:00';
+$end_time = '2021-12-31 00:00:00';
+
+$type = '';
+if (isset($_GET['type']))
+    $type = $_GET['type'];
+if (isset($_GET['end_time'])) {
+    $end_date = $_GET['end_time'];
+    $end_time = date('Y-m-d H:i:s', strtotime($end_date));
+}
+if (isset($_GET['start_time'])) {
+    $start_date = $_GET['start_time'];
+    $start_time = date('Y-m-d H:i:s', strtotime($start_date));
+}
 
 $gridColumns = [
     [
@@ -58,6 +76,7 @@ $gridColumns = [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
         'width' => '100px',
+        'pageSummary' => false,
         'value' => function ($data) {
             return $data['node']['phone'];
         },
@@ -67,12 +86,25 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
+        'pageSummary' => true,
         'value' => function ($data) {
-            $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
+            $start_time = '2018-12-31 00:00:00';
+            $end_time = '2021-12-31 00:00:00';
+            if (isset($_GET['end_time'])) {
+                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+            }
+            if (isset($_GET['start_time'])) {
+                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+            }
+            $sensorChannel = SensorChannel::find()
+                ->where(['deviceUuid' => $data['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])
+                ->one();
             if ($sensorChannel) {
-                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 1);
-                return $tarif['value'];
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 1);
+                return $value;
             }
             return '-';
         },
@@ -82,12 +114,25 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
+        'pageSummary' => true,
         'value' => function ($data) {
-            $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
+            $start_time = '2018-12-31 00:00:00';
+            $end_time = '2021-12-31 00:00:00';
+            if (isset($_GET['end_time'])) {
+                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+            }
+            if (isset($_GET['start_time'])) {
+                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+            }
+            $sensorChannel = SensorChannel::find()
+                ->where(['deviceUuid' => $data['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])
+                ->one();
             if ($sensorChannel) {
-                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 2);
-                return $tarif['value'];
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time,2);
+                return $value;
             }
             return '-';
         },
@@ -97,12 +142,25 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
+        'pageSummary' => true,
         'value' => function ($data) {
-            $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
+            $start_time = '2018-12-31 00:00:00';
+            $end_time = '2021-12-31 00:00:00';
+            if (isset($_GET['end_time'])) {
+                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+            }
+            if (isset($_GET['start_time'])) {
+                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+            }
+            $sensorChannel = SensorChannel::find()
+                ->where(['deviceUuid' => $data['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])
+                ->one();
             if ($sensorChannel) {
-                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 3);
-                return $tarif['value'];
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 3);
+                return $value;
             }
             return '-';
         },
@@ -112,12 +170,25 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
+        'pageSummary' => true,
         'value' => function ($data) {
-            $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
+            $start_time = '2018-12-31 00:00:00';
+            $end_time = '2021-12-31 00:00:00';
+            if (isset($_GET['end_time'])) {
+                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+            }
+            if (isset($_GET['start_time'])) {
+                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+            }
+            $sensorChannel = SensorChannel::find()
+                ->where(['deviceUuid' => $data['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])
+                ->one();
             if ($sensorChannel) {
-                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 4);
-                return $tarif['value'];
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 4);
+                return $value;
             }
             return '-';
         },
@@ -127,15 +198,29 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
+        'pageSummary' => true,
         'value' => function ($data) {
-            $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $data['uuid']])->one();
+            $start_time = '2018-12-31 00:00:00';
+            $end_time = '2021-12-31 00:00:00';
+            if (isset($_GET['end_time'])) {
+                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
+            }
+            if (isset($_GET['start_time'])) {
+                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
+            }
+            $sensorChannel = SensorChannel::find()
+                ->where(['deviceUuid' => $data['uuid']])
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])
+                ->one();
             if ($sensorChannel) {
-                $tarif = Measure::getLastMeasure($sensorChannel, MeasureType::MEASURE_TYPE_CURRENT, 0);
-                return $tarif['value'];
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 0);
+                return $value;
             }
             return '-';
         },
+        'footer' => '0',
         'header' => 'Сумма',
         'format' => 'raw',
     ]
@@ -146,6 +231,7 @@ echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'columns' => $gridColumns,
+    'showPageSummary' => true,
     'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
     'headerRowOptions' => ['class' => 'kartik-sheet-style'],
     'filterRowOptions' => ['class' => 'kartik-sheet-style'],
@@ -153,7 +239,30 @@ echo GridView::widget([
         '{toggleData}'
     ],
     'toolbar' => [
-        '{export}'
+        ['content' =>
+            '<form action="report"><table style="width: 800px; padding: 3px"><tr><td style="width: 300px">' .
+            DatePicker::widget([
+                'name' => 'start_time',
+                'value' => $start_date,
+                'removeButton' => false,
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'yyyy-mm-dd'
+                ]
+            ]).'</td><td style="width: 300px">'.
+            DatePicker::widget([
+                'name' => 'end_time',
+                'value' => $end_date,
+                'removeButton' => false,
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'yyyy-mm-dd'
+                ]
+            ]).'</td><td style="width: 100px">'.Html::submitButton(Yii::t('app', 'Выбрать'), [
+                'class' => 'btn btn-info']).'</td>
+                <td style="width: 100px">{export}</td></tr></table></form>',
+            'options' => ['style' => 'width:100%']
+            ]
     ],
     'export' => [
         'fontAwesome' => true,
@@ -161,7 +270,6 @@ echo GridView::widget([
         'filename' => 'equipments'
     ],
     'pjax' => true,
-    'showPageSummary' => false,
     'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
     'summary' => '',
     'bordered' => true,
@@ -172,7 +280,7 @@ echo GridView::widget([
     'hover' => true,
     'panel' => [
         'type' => GridView::TYPE_PRIMARY,
-        'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Текущие показания',
+        'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Отчет по потреблению электроэнергии',
         'headingOptions' => ['style' => 'background: #337ab7']
     ],
 ]);
