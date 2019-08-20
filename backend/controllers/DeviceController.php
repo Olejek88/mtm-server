@@ -1030,7 +1030,8 @@ class DeviceController extends Controller
                                 ->all();
                             foreach ($channels as $channel) {
                                 $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
-                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                                    ->orderBy(['_id' => SORT_DESC])->one();
                                 $date = '-';
                                 if (!$measure) {
                                     $config = null;

@@ -1,6 +1,8 @@
 <?php
 /* @var $model common\models\SensorConfig */
 
+/* @var $form string */
+
 use kartik\grid\GridView;
 use yii\helpers\Html;
 
@@ -21,7 +23,7 @@ $this->title = Yii::t('app', 'Создать конфигурацию');
             <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="list">
                     <h6>
-                        <?= $this->render('_form', [
+                        <?= $this->render($form, [
                             'model' => $model,
                         ]) ?>
                     </h6>

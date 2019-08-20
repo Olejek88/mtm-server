@@ -23,6 +23,7 @@ use yii\db\Expression;
  *
  * @property MeasureType $measureType
  * @property Device $device
+ * @property SensorConfig $sensorConfig
  */
 class SensorChannel extends MtmActiveRecord
 {
@@ -117,4 +118,11 @@ class SensorChannel extends MtmActiveRecord
         return $this->hasOne(Device::class, ['uuid' => 'deviceUuid']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
+    public function getSensorConfig()
+    {
+        return $this->hasOne(SensorConfig::class, ['sensorChannelUuid' => 'uuid']);
+    }
 }
