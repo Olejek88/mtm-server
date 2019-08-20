@@ -7,6 +7,7 @@ use common\models\Measure;
 use common\models\MeasureType;
 use common\models\Node;
 use common\models\SensorChannel;
+use common\models\User;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
@@ -14,7 +15,6 @@ use yii\helpers\ArrayHelper;
 
 ?>
 <div class="info-box">
-    <!-- /.box-header -->
     <div class="box-body">
         <?php
         $gridColumns = [
@@ -90,7 +90,12 @@ use yii\helpers\ArrayHelper;
             ]
         ];
 
-        $channels = SensorChannel::find()->where(['deviceUuid' => (Node::find()->where(['uuid' => $node['uuid']])->one())]);
+        $devices = Device::find()->select('uuid')->where(['nodeUuid' => $node['uuid']])->all();
+        $devicesList2 = [];
+        foreach ($devices as $device) {
+            $devicesList2[] = $device['uuid'];
+        }
+        $channels = SensorChannel::find()->where(['IN','deviceUuid', $devicesList2]);
         $provider = new ActiveDataProvider(
             [
                 'query' => $channels,

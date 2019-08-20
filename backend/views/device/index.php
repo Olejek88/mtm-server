@@ -15,6 +15,7 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
@@ -44,13 +45,12 @@ $gridColumns = [
         'attribute' => 'nodeUuid',
         'vAlign' => 'middle',
         'width' => '180px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             return Html::a($data['node']['object']->getAddress().' ['.$data['node']['address'].']',
                 ['/device/dashboard','uuid' => $data['uuid']]);
         },
-        'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Адрес',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
     ],
     [
@@ -85,6 +85,7 @@ $gridColumns = [
             'class' => 'table_class'
         ],
         'headerOptions' => ['class' => 'text-center'],
+        'mergeHeader' => true,
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'width' => '180px',
@@ -154,9 +155,8 @@ $gridColumns = [
         'attribute' => 'serial',
         'vAlign' => 'middle',
         'width' => '180px',
-        'filterType' => GridView::FILTER_SELECT2,
+        'mergeHeader' => true,
         'header' => 'Серийный',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
     ],
     [
@@ -164,9 +164,8 @@ $gridColumns = [
         'attribute' => 'port',
         'vAlign' => 'middle',
         'width' => '180px',
-        'filterType' => GridView::FILTER_SELECT2,
+        'mergeHeader' => true,
         'header' => 'Порт',
-        'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
     ],
     [

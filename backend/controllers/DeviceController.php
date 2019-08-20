@@ -396,7 +396,7 @@ class DeviceController extends Controller
                 $categories .= ',';
                 $values .= ',';
             }
-            $categories .= "'" . $measure->date . "'";
+            $categories .= "'" . date_format(date_create($measure['date']), 'Y-m-d') . "'";
             $values .= $measure->value;
             $cnt++;
         }
@@ -643,7 +643,7 @@ class DeviceController extends Controller
                 $parameters['days']['categories'] .= ',';
                 $parameters['days']['values'] .= ',';
             }
-            $parameters['days']['categories'] .= "'" . $measure->date . "'";
+            $parameters['days']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
             $parameters['days']['values'] .= $measure->value;
             $cnt++;
         }
@@ -766,7 +766,7 @@ class DeviceController extends Controller
                 $data['trends']['days']['categories'] .= ',';
                 $data['trends']['days']['values'] .= ',';
             }
-            $data['trends']['days']['categories'] .= "'" . $measure->date . "'";
+            $data['trends']['days']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
             $data['trends']['days']['values'] .= $measure->value;
             $cnt++;
         }
@@ -816,7 +816,7 @@ class DeviceController extends Controller
                 $data['trends']['month']['categories'] .= ',';
                 $data['trends']['month']['values'] .= ',';
             }
-            $data['trends']['month']['categories'] .= "'" . $measure->date . "'";
+            $data['trends']['month']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
             $data['trends']['month']['values'] .= $measure->value;
             $cnt++;
         }
@@ -1975,7 +1975,7 @@ class DeviceController extends Controller
                         $parameters1['trends']['categories'] .= ',';
                         $parameters1['trends']['values'] .= ',';
                     }
-                    $parameters1['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters1['trends']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
                     $parameters1['trends']['values'] .= $measure->value;
                     $cnt++;
                 }
@@ -2000,7 +2000,7 @@ class DeviceController extends Controller
                         $parameters2['trends']['categories'] .= ',';
                         $parameters2['trends']['values'] .= ',';
                     }
-                    $parameters2['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters2['trends']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
                     $parameters2['trends']['values'] .= $measure->value;
                     $cnt++;
                 }
@@ -2025,7 +2025,7 @@ class DeviceController extends Controller
                         $parameters3['trends']['categories'] .= ',';
                         $parameters3['trends']['values'] .= ',';
                     }
-                    $parameters3['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters3['trends']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
                     $parameters3['trends']['values'] .= $measure->value;
                     $cnt++;
                 }
