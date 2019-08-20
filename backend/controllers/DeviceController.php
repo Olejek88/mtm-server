@@ -250,7 +250,7 @@ class DeviceController extends Controller
             $device = Device::find()
                 ->where(['uuid' => $_GET['uuid']])
                 ->one();
-            if ($device && $device['deviceTypeUuid']==DeviceType::DEVICE_ELECTRO)
+            if ($device && $device['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO)
                 return self::actionDashboardElectro($device['uuid']);
         } else
             return self::actionIndex();
@@ -887,8 +887,8 @@ class DeviceController extends Controller
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-            ->andWhere('date >= "'.$start_time.'"')
-            ->andWhere('date < "'.$end_time.'"')
+            ->andWhere('date >= "' . $start_time . '"')
+            ->andWhere('date < "' . $end_time . '"')
             ->orderBy('date DESC'))
             ->all();
         $cnt = -1;
