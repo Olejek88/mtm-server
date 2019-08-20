@@ -5,7 +5,6 @@ namespace backend\controllers;
 use backend\models\NodeSearch;
 use common\models\Camera;
 use common\models\Device;
-use common\models\DeviceConfig;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -239,9 +238,7 @@ class NodeController extends Controller
                 ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
                 ->one();
         }
-        /*
-                $parameters['control']['contact'] =
-        */
+
         if ($energy) {
             $measures = (Measure::find()
                 ->where(['type' => MeasureType::MEASURE_TYPE_CURRENT])

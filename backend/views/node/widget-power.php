@@ -20,12 +20,17 @@ $device = (Device::find()->select('uuid')
 $sChannel = (SensorChannel::find()->select('uuid')
     ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
 $last_measures = (Measure::find()
-    ->where(['sensorChannelUuid' => $sChannel])->orderBy('date DESC'))->limit(100)->all();
+    ->where(['sensorChannelUuid' => $sChannel])
+    ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
+    ->andWhere(['parameter' => 0])
+    ->orderBy('date DESC'))
+    ->limit(100)
+    ->all();
 
 $cnt = 0;
 $categories = '';
 $values = '';
-foreach ($last_measures as $measure) {
+foreach (array_reverse($last_measures) as $measure) {
     if ($cnt > 0) {
         $categories .= ',';
         $values .= ',';

@@ -33,7 +33,7 @@ foreach (array_reverse($measures) as $measure) {
         $categories .= ',';
         $values .= ',';
     }
-    $categories .= "'" . $measure->date . "'";
+    $categories .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
     $values .= $measure->value;
     $cnt++;
 }

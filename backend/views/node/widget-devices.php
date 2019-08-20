@@ -6,6 +6,7 @@ use common\models\Device;
 use common\models\DeviceStatus;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
+use yii\helpers\Html;
 
 ?>
 <div class="info-box">
@@ -30,7 +31,10 @@ use yii\data\ActiveDataProvider;
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
                 'width' => '180px',
-                'value' => 'deviceType.title',
+                'value' => function ($data) {
+                    return Html::a($data['node']['object']->getAddress().' ['.$data['name'].']',
+                        ['/device/dashboard','uuid' => $data['uuid']]);
+                },
                 'format' => 'raw',
                 'contentOptions' => [
                     'class' => 'table_class'
