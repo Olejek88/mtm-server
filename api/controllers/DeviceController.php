@@ -133,16 +133,16 @@ class DeviceController extends Controller
             }
         }
 
-        $items = $req->getBodyParam('items');
+        $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
             $model = Device::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                throw new HttpException(404, 'The specified post cannot be found.');
+                $model = new Device();
+                $model->uuid = $item['uuid'];
+                $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-//            $model->uuid = $item['uuid'];
-//            $model->oid = $organisation->uuid;
             $model->address = $item['address'];
             $model->name = $item['name'];
             $model->serial = $item['serial'];
@@ -150,6 +150,7 @@ class DeviceController extends Controller
             $model->interface = $item['interface'];
             $model->deviceStatusUuid = $item['deviceStatusUuid'];
             $model->date = $item['last_date'];
+            $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {

@@ -3,22 +3,22 @@
 namespace api\controllers;
 
 use common\components\MtmActiveRecord;
+use common\models\DeviceConfig;
 use common\models\Node;
 use common\models\Organisation;
-use common\models\SensorChannel;
 use common\models\User;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 //use yii\filters\auth\HttpBearerAuth;
 use yii\web\BadRequestHttpException;
-use yii\web\HttpException;
 use yii\rest\Controller;
+use yii\web\HttpException;
 use yii\web\Response;
-use yii\base\InvalidConfigException;
 
-class SensorChannelController extends Controller
+class DeviceConfigController extends Controller
 {
-    public $modelClass = SensorChannel::class;
+    public $modelClass = DeviceConfig::class;
 
     /**
      * @inheritdoc
@@ -27,7 +27,7 @@ class SensorChannelController extends Controller
     {
         $verbs = parent::verbs();
 //        $verbs['create'] = ['POST'];
-//        $verbs['index'] = ['GET'];
+        $verbs['index'] = ['GET'];
         $verbs['send'] = ['POST'];
         return $verbs;
     }
@@ -78,6 +78,8 @@ class SensorChannelController extends Controller
             $node = Node::findOne($nid);
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
+            } else {
+                $query->andWhere(['nodeUuid' => $node->uuid]);
             }
         }
 
@@ -133,24 +135,22 @@ class SensorChannelController extends Controller
 
         $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
-            $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
+            $model = DeviceConfig::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new SensorChannel();
-//                $model->_id = $item['_id'];
+                $model = new DeviceConfig();
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-            $model->title = $item['title'];
-            $model->register = $item['register'];
             $model->deviceUuid = $item['deviceUuid'];
-            $model->measureTypeUuid = $item['measureTypeUuid'];
+            $model->parameter = $item['parameter'];
+            $model->value = $item['serial'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
-                throw new HttpException(401, 'sensor channel not saved.');
+                throw new HttpException(401, 'device not saved.');
             }
         }
 
