@@ -150,6 +150,7 @@ class DeviceController extends Controller
             $model->interface = $item['interface'];
             $model->deviceStatusUuid = $item['deviceStatusUuid'];
             $model->date = $item['last_date'];
+            $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {

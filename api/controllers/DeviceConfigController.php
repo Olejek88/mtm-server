@@ -3,7 +3,7 @@
 namespace api\controllers;
 
 use common\components\MtmActiveRecord;
-use common\models\Camera;
+use common\models\DeviceConfig;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\User;
@@ -16,9 +16,9 @@ use yii\rest\Controller;
 use yii\web\HttpException;
 use yii\web\Response;
 
-class CameraController extends Controller
+class DeviceConfigController extends Controller
 {
-    public $modelClass = Camera::class;
+    public $modelClass = DeviceConfig::class;
 
     /**
      * @inheritdoc
@@ -135,22 +135,22 @@ class CameraController extends Controller
 
         $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
-            $model = Camera::find()->where(['uuid' => $item['uuid']])->one();
+            $model = DeviceConfig::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new Camera();
+                $model = new DeviceConfig();
                 $model->uuid = $item['uuid'];
                 $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-            $model->title = $item['title'];
-            $model->deviceStatusUuid = $item['deviceStatusUuid'];
-            $model->address = $item['address'];
+            $model->deviceUuid = $item['deviceUuid'];
+            $model->parameter = $item['parameter'];
+            $model->value = $item['serial'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
-                throw new HttpException(401, 'camera not saved.');
+                throw new HttpException(401, 'device not saved.');
             }
         }
 
