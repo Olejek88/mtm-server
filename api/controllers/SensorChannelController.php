@@ -131,7 +131,7 @@ class SensorChannelController extends Controller
             }
         }
 
-        $items = $req->getBodyParam('items');
+        $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
             $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
