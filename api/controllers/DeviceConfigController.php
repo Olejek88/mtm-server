@@ -79,14 +79,15 @@ class DeviceConfigController extends Controller
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
             } else {
-                $query->andWhere(['nodeUuid' => $node->uuid]);
+                $query->joinWith('device');
+                $query->andWhere(['device.nodeUuid' => $node->uuid]);
             }
         }
 
         // проверяем параметры запроса
         $changedAfter = $req->getQueryParam('changedAfter');
         if ($changedAfter != null) {
-            $query->andWhere(['>=', 'changedAt', $changedAfter]);
+            $query->andWhere(['>=', $class::tableName() . '.changedAt', $changedAfter]);
         }
 
         // проверяем что хоть какие-то условия были заданы
