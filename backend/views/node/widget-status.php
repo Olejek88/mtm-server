@@ -30,10 +30,10 @@ use yii\widgets\Pjax;
             <tr data-key="1">
                 <td class="table_class kv-align-middle" data-col-seq="0">Состояние двери</td>
                 <?php
-                if (isset($parameters['control']['signal']) && $parameters['control']['signal'])
-                    echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Закрыто</td>';
-                else
+                if (isset($parameters['control']['door']) && $parameters['control']['door'])
                     echo '<td class="kv-align-center kv-align-middle" style="background-color: red; color: white">Открыто</td>';
+                else
+                    echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Закрыто</td>';
                 ?>
             </tr>
             <tr data-key="1">
@@ -43,7 +43,7 @@ use yii\widgets\Pjax;
                     Pjax::begin(['id' => 'options']);
                     echo Html::beginForm(['dashboard', 'uuid' => $node['uuid'], 'type' => 0], 'post',
                         ['data-pjax' => '', 'class' => 'form-inline']);
-                    if (isset($parameters['control']['contact']) && $parameters['control']['contact']) {
+                    if (isset($parameters['control']['relay']) && $parameters['control']['relay']) {
                         echo Html::submitButton(Yii::t('app', 'Выключить'),
                             ['class' => 'btn btn-danger btn-sm']);
                         echo Html::hiddenInput('device', $device['uuid']);
@@ -65,10 +65,19 @@ use yii\widgets\Pjax;
             <tr data-key="2">
                 <td class="table_class kv-align-middle" data-col-seq="0">Контактор сети</td>
                 <?php
-                    if (isset($parameters['control']['contact']) && $parameters['control']['contact'])
-                        echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включены</td>';
+                    if (isset($parameters['control']['contactor']) && $parameters['control']['contactor'])
+                        echo '<td class="kv-align-center kv-align-middle" style="background-color: red; color: white">Отключен</td>';
                     else
-                        echo '<td class="kv-align-center kv-align-middle" style="background-color: gray; color: white">Отключены</td>';
+                        echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включен</td>';
+                ?>
+            </tr>
+            <tr data-key="2">
+                <td class="table_class kv-align-middle" data-col-seq="0">Реле управления контактором</td>
+                <?php
+                    if (isset($parameters['control']['relay']) && $parameters['control']['relay'])
+                        echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включено</td>';
+                    else
+                        echo '<td class="kv-align-center kv-align-middle" style="background-color: gray; color: white">Отключено</td>';
                 ?>
             </tr>
             <tr data-key="3">
