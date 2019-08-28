@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'uuid',
             'oid',
             'title',
-            'period_title1',
+            //'period_title1',
             //'time1:datetime',
             //'value1',
             //'period_title2',
@@ -38,9 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'period_title4',
             //'time4:datetime',
             //'value4',
-            //'period_title5',
-            //'time5:datetime',
-            //'value5',
             //'createdAt',
             //'changedAt',
 
