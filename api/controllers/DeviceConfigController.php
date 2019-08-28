@@ -146,7 +146,7 @@ class DeviceConfigController extends Controller
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
             $model->deviceUuid = $item['deviceUuid'];
             $model->parameter = $item['parameter'];
-            $model->value = $item['serial'];
+            $model->value = $item['value'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 

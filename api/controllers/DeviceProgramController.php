@@ -158,6 +158,8 @@ class DeviceProgramController extends Controller
             $model->period_title4 = $item['period_title4'];
             $model->time4 = $item['time4'];
             $model->value4 = $item['value4'];
+            $model->period_title5 = $item['period_title5'];
+            $model->value5 = $item['value5'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 

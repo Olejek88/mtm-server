@@ -46,6 +46,8 @@ YiiAsset::register($this);
             'period_title4',
             'time4',
             'value4',
+            'period_title5',
+            'value5',
             'createdAt',
             'changedAt',
         ],
