@@ -27,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'oid',
             'title',
             //'period_title1',
-            //'time1',
             //'value1',
             //'period_title2',
             //'time2',

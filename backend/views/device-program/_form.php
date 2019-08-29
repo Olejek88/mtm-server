@@ -34,26 +34,6 @@ use kartik\widgets\TouchSpin;
     <b><?= $model->attributeLabels()['period_title1'] ?></b>
 
     <?=
-    $form->field($model, 'time1')->widget(TouchSpin::class, [
-        'options' => [
-            'placeholder' => 'Adjust ...',
-        ],
-        'pluginOptions' => [
-            'initval' => 20,
-            'verticalbuttons' => true,
-            'verticalup' => '<i class="fa fa-plus"></i>',
-            'verticaldown' => '<i class="fa fa-minus"></i>',
-//            'buttonup_class' => 'btn btn-outline-secondary bootstrap-touchspin-up',
-//            'buttondown_class' => 'btn btn-outline-secondary bootstrap-touchspin-down',
-            'min' => 0,
-            'max' => 100,
-            'postfix' => '%',
-            'boostat' => 5,
-        ],
-    ]);
-    ?>
-
-    <?=
     $form->field($model, 'value1')->widget(TouchSpin::class, [
         'options' => [
             'placeholder' => 'Adjust ...',

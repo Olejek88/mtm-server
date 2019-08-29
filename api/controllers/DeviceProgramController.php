@@ -147,7 +147,6 @@ class DeviceProgramController extends Controller
             $model->oid = $organisation->uuid;
             $model->title = $item['title'];
             $model->period_title1 = $item['period_title1'];
-            $model->time1 = $item['time1'];
             $model->value1 = $item['value1'];
             $model->period_title2 = $item['period_title2'];
             $model->time2 = $item['time2'];
