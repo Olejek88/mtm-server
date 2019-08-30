@@ -3,7 +3,7 @@
 namespace api\controllers;
 
 use common\components\MtmActiveRecord;
-use common\models\DeviceConfig;
+use common\models\DeviceProgram;
 use common\models\Node;
 use common\models\Organisation;
 use common\models\User;
@@ -16,9 +16,9 @@ use yii\rest\Controller;
 use yii\web\HttpException;
 use yii\web\Response;
 
-class DeviceConfigController extends Controller
+class DeviceProgramController extends Controller
 {
-    public $modelClass = DeviceConfig::class;
+    public $modelClass = DeviceProgram::class;
 
     /**
      * @inheritdoc
@@ -79,8 +79,8 @@ class DeviceConfigController extends Controller
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
             } else {
-                $query->joinWith('device');
-                $query->andWhere(['device.nodeUuid' => $node->uuid]);
+//                $query->joinWith('device');
+//                $query->andWhere(['device.nodeUuid' => $node->uuid]);
             }
         }
 
@@ -136,22 +136,34 @@ class DeviceConfigController extends Controller
 
         $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
-            $model = DeviceConfig::find()->where(['uuid' => $item['uuid']])->one();
+            $model = DeviceProgram::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new DeviceConfig();
-                $model->uuid = $item['uuid'];
-                $model->oid = $organisation->uuid;
+                $model = new DeviceProgram();
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-            $model->deviceUuid = $item['deviceUuid'];
-            $model->parameter = $item['parameter'];
-            $model->value = $item['value'];
+            $model->_id = $item['_id'];
+            $model->uuid = $item['uuid'];
+            $model->oid = $organisation->uuid;
+            $model->title = $item['title'];
+            $model->period_title1 = $item['period_title1'];
+            $model->value1 = $item['value1'];
+            $model->period_title2 = $item['period_title2'];
+            $model->time2 = $item['time2'];
+            $model->value2 = $item['value2'];
+            $model->period_title3 = $item['period_title3'];
+            $model->time3 = $item['time3'];
+            $model->value3 = $item['value3'];
+            $model->period_title4 = $item['period_title4'];
+            $model->time4 = $item['time4'];
+            $model->value4 = $item['value4'];
+            $model->period_title5 = $item['period_title5'];
+            $model->value5 = $item['value5'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
-                throw new HttpException(401, 'device not saved.');
+                throw new HttpException(401, 'device_program not saved.');
             }
         }
 
