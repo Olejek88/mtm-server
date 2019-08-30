@@ -59,6 +59,11 @@ class DeviceProgram extends MtmActiveRecord
         return [
             [['uuid', 'oid'], 'required'],
             [['time2', 'time3', 'time4'], 'integer', 'min' => 0, 'max' => 100],
+            [['time2', 'time3', 'time4'], function ($attribute, $params, $validator) {
+                if (($this->time2 + $this->time3 + $this->time4) > 100) {
+                    $this->addError($attribute, 'Сумма длительностей периодов ночи не должна превышать 100%');
+                }
+            }],
             [['value1', 'value2', 'value3', 'value4', 'value5'], 'integer', 'min' => 0, 'max' => 100],
             [['createdAt', 'changedAt'], 'safe'],
             [
