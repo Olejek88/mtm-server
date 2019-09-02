@@ -413,7 +413,7 @@ class DeviceController extends Controller
                 $categories .= ',';
                 $values .= ',';
             }
-            $categories .= "'" . $measure->date . "'";
+            $categories .= "'" . date_format(date_create($measure['date']), 'Y-m-d') . "'";
             $values .= $measure->value;
             $cnt++;
         }
@@ -519,6 +519,11 @@ class DeviceController extends Controller
         $parameters['month']['w3']['prev'] = "-";
         $parameters['month']['w4']['prev'] = "-";
         $parameters['month']['ws']['prev'] = "-";
+        $parameters['month']['w1']['current'] = "-";
+        $parameters['month']['w2']['current'] = "-";
+        $parameters['month']['w3']['current'] = "-";
+        $parameters['month']['w4']['current'] = "-";
+        $parameters['month']['ws']['current'] = "-";
 
         $parameters['increment']['date']['last'] = date("Y-m-01", strtotime($current_month));
         $parameters['increment']['date']['prev'] = date("Y-m-01", strtotime($prev_month));
@@ -655,7 +660,7 @@ class DeviceController extends Controller
                 $parameters['days']['categories'] .= ',';
                 $parameters['days']['values'] .= ',';
             }
-            $parameters['days']['categories'] .= "'" . $measure->date . "'";
+            $parameters['days']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
             $parameters['days']['values'] .= $measure->value;
             $cnt++;
         }
@@ -778,7 +783,7 @@ class DeviceController extends Controller
                 $data['trends']['days']['categories'] .= ',';
                 $data['trends']['days']['values'] .= ',';
             }
-            $data['trends']['days']['categories'] .= "'" . $measure->date . "'";
+            $data['trends']['days']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
             $data['trends']['days']['values'] .= $measure->value;
             $cnt++;
         }
@@ -828,7 +833,7 @@ class DeviceController extends Controller
                 $data['trends']['month']['categories'] .= ',';
                 $data['trends']['month']['values'] .= ',';
             }
-            $data['trends']['month']['categories'] .= "'" . $measure->date . "'";
+            $data['trends']['month']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
             $data['trends']['month']['values'] .= $measure->value;
             $cnt++;
         }
@@ -1988,7 +1993,7 @@ class DeviceController extends Controller
                         $parameters1['trends']['categories'] .= ',';
                         $parameters1['trends']['values'] .= ',';
                     }
-                    $parameters1['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters1['trends']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
                     $parameters1['trends']['values'] .= $measure->value;
                     $cnt++;
                 }
@@ -2013,7 +2018,7 @@ class DeviceController extends Controller
                         $parameters2['trends']['categories'] .= ',';
                         $parameters2['trends']['values'] .= ',';
                     }
-                    $parameters2['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters2['trends']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
                     $parameters2['trends']['values'] .= $measure->value;
                     $cnt++;
                 }
@@ -2038,7 +2043,7 @@ class DeviceController extends Controller
                         $parameters3['trends']['categories'] .= ',';
                         $parameters3['trends']['values'] .= ',';
                     }
-                    $parameters3['trends']['categories'] .= "'" . $measure->date . "'";
+                    $parameters3['trends']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
                     $parameters3['trends']['values'] .= $measure->value;
                     $cnt++;
                 }
@@ -2190,5 +2195,146 @@ class DeviceController extends Controller
         $org_id = Organisation::find()->where(['uuid' => $org_oid])->one()->_id;
         $node_id = $node->_id;
         self::sendConfig($pkt, $org_id, $node_id);
+    }
+
+    /**
+     * @param $nodeUuid
+     * @return mixed|null
+     * @throws InvalidConfigException
+     */
+    static function getSumPowerByNode($nodeUuid)
+    {
+        $devices = Device::find()
+            ->where(['nodeUuid' => $nodeUuid])
+            ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+            ->all();
+        $levels = [
+            MtmDevLightConfig::$LIGHT_POWER_12 => 12,
+            MtmDevLightConfig::$LIGHT_POWER_40 => 40,
+            MtmDevLightConfig::$LIGHT_POWER_60 => 60,
+            MtmDevLightConfig::$LIGHT_POWER_80 => 80,
+            MtmDevLightConfig::$LIGHT_POWER_100 => 100,
+            MtmDevLightConfig::$LIGHT_POWER_120 => 120
+        ];
+        $power = 0;
+        foreach ($devices as $device) {
+            $level = self::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+            $power += $levels[intval($level)];
+        }
+        return $power;
+    }
+
+    /**
+     * @param $groupUuid
+     * @return mixed|null
+     * @throws InvalidConfigException
+     */
+    static function getSumPowerByGroup($groupUuid)
+    {
+        $devices = DeviceGroup::find()
+            ->where(['groupUuid' => $groupUuid])
+            ->one();
+        $power = 0;
+        foreach ($devices as $device) {
+            $levels = [
+                MtmDevLightConfig::$LIGHT_POWER_12 => 12,
+                MtmDevLightConfig::$LIGHT_POWER_40 => 40,
+                MtmDevLightConfig::$LIGHT_POWER_60 => 60,
+                MtmDevLightConfig::$LIGHT_POWER_80 => 80,
+                MtmDevLightConfig::$LIGHT_POWER_100 => 100,
+                MtmDevLightConfig::$LIGHT_POWER_120 => 120
+            ];
+            $level = self::getParameter($device['deviceUuid'], DeviceConfig::PARAM_POWER);
+            $power += $levels[intval($level)];
+        }
+        return $power;
+    }
+
+    /**
+     * @return mixed|null
+     * @throws InvalidConfigException
+     */
+    public function actionReportGroup()
+    {
+        $data['group'] = [];
+        $group_num=0;
+        $groups = Group::find()->all();
+        foreach ($groups as $group) {
+            $data['group'][$group_num]['title'] = $group['title'];
+            $data['group'][$group_num]['month'] = [];
+            for ($mon=0; $mon<12; $mon++) {
+                $data['group'][$group_num]['month'][$mon]['date'] = '-';
+                $data['group'][$group_num]['month'][$mon]['w1'] = 0;
+                $data['group'][$group_num]['month'][$mon]['w2'] = 0;
+                $data['group'][$group_num]['month'][$mon]['w3'] = 0;
+                $data['group'][$group_num]['month'][$mon]['w4'] = 0;
+                $data['group'][$group_num]['month'][$mon]['ws'] = 0;
+            }
+            $devices = DeviceGroup::find()
+                ->where(['groupUuid' => $group['uuid']])
+                ->all();
+            foreach ($devices as $device) {
+                $sumPower = self::getSumPowerByNode($device['device']['nodeUuid']);
+                $levels = [
+                    MtmDevLightConfig::$LIGHT_POWER_12 => 12,
+                    MtmDevLightConfig::$LIGHT_POWER_40 => 40,
+                    MtmDevLightConfig::$LIGHT_POWER_60 => 60,
+                    MtmDevLightConfig::$LIGHT_POWER_80 => 80,
+                    MtmDevLightConfig::$LIGHT_POWER_100 => 100,
+                    MtmDevLightConfig::$LIGHT_POWER_120 => 120
+                ];
+                $level = self::getParameter($device['device']['uuid'], DeviceConfig::PARAM_POWER);
+                $power = $levels[intval($level)];
+                $knt = 0;
+                if ($sumPower)
+                    $knt = $power/$sumPower;
+                $counter = Device::find()
+                    ->where(['nodeUuid' => $device['device']['nodeUuid']])
+                    ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                    ->one();
+                if ($counter && $knt>0) {
+                    $sChannel = SensorChannel::find()
+                        ->where(['deviceUuid' => $counter['uuid'], 'measureTypeUuid' => MeasureType::POWER])
+                        ->one();
+                    if ($sChannel) {
+                        for ($mon=0; $mon<12; $mon++) {
+                            if ($mon>0) {
+                                $month = date("Ym01000000", strtotime("-" . $mon . " months"));
+                                $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01", strtotime("-".$mon." months"));
+                            }
+                            else {
+                                $month = date("Ym01000000");
+                                $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01");
+                            }
+                            $last_measures = Measure::find()
+                                ->where(['sensorChannelUuid' => $sChannel['uuid']])
+                                ->andWhere(['date' => $month])
+                                ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                                ->all();
+                            foreach ($last_measures as $measure) {
+                                $value = $measure['value'] * $knt;
+                                if ($measure['parameter'] == 1)
+                                    $data['group'][$group_num]['month'][$mon]['w1'] += $value;
+                                if ($measure['parameter'] == 2)
+                                    $data['group'][$group_num]['month'][$mon]['w2'] += $value;
+                                if ($measure['parameter'] == 3)
+                                    $data['group'][$group_num]['month'][$mon]['w3'] += $value;
+                                if ($measure['parameter'] == 4)
+                                    $data['group'][$group_num]['month'][$mon]['w4'] += $value;
+                                if ($measure['parameter'] == 0)
+                                    $data['group'][$group_num]['month'][$mon]['ws'] += $value;
+                            }
+                        }
+                    }
+                }
+            }
+            $group_num++;
+        }
+        return $this->render(
+            'report-group',
+            [
+                'dataAll' => $data
+            ]
+        );
     }
 }

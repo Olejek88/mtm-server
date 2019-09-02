@@ -18,6 +18,7 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
@@ -46,20 +47,20 @@ $gridColumns = [
         'class' => 'kartik\grid\DataColumn',
         'attribute' => 'objectUuid',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'value' => function ($data) {
             return Html::a($data['object']['house']['street']->title . ', ' . $data['object']['house']->number . '-' . $data['object']->title,
                 ['/node/dashboard','uuid' => $data['uuid'], 'type' => 'node']);
         },
-        'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Объект ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
                 '/object/create?from=equipment/index',
                 ['title' => Yii::t('app', 'Добавить')]),
-        'filterInputOptions' => ['placeholder' => 'Любой'],
         'format' => 'raw',
     ],
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'deviceStatusUuid',
+        'mergeHeader' => true,
         'header' => 'Статус ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
                 '/device-status/create?from=equipment/index',
                 ['title' => Yii::t('app', 'Добавить')]),
@@ -99,6 +100,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'address',
+        'mergeHeader' => true,
         'width' => '180px',
         'hAlign' => 'center',
         'vAlign' => 'middle',
@@ -113,6 +115,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'phone',
+        'mergeHeader' => true,
         'width' => '180px',
         'hAlign' => 'center',
         'vAlign' => 'middle',
@@ -126,6 +129,7 @@ $gridColumns = [
         'attribute' => 'software',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class'
         ],

@@ -16,7 +16,7 @@ $this->title = 'Дерево оборудования';
             <col width="120px">
             <col width="140px">
             <col width="120px">
-            <col width="150px">
+            <col width="*">
         </colgroup>
         <thead style="background-color: #337ab7; color: white">
         <tr>

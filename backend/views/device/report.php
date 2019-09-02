@@ -32,9 +32,10 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class',
-            'style' => 'width: 40px; text-align: center'
+            'style' => 'width: 40px'
         ],
         'headerOptions' => ['class' => 'text-center'],
         'content' => function ($data) {
@@ -44,6 +45,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'width' => '180px',
         'value' => function ($data) {
             return Html::a($data['node']['object']->getAddress(),
@@ -59,6 +61,7 @@ $gridColumns = [
         'value' => function ($data) {
             return $data['name'];
         },
+        'mergeHeader' => true,
         'header' => 'Название счетчика',
         'format' => 'raw',
     ],
@@ -70,12 +73,14 @@ $gridColumns = [
             return $data['serial'];
         },
         'header' => 'Серийный №',
+        'mergeHeader' => true,
         'format' => 'raw',
     ],
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
         'width' => '100px',
+        'mergeHeader' => true,
         'pageSummary' => false,
         'value' => function ($data) {
             return $data['node']['phone'];
@@ -88,6 +93,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '100px',
+        'mergeHeader' => true,
         'pageSummary' => true,
         'value' => function ($data) {
             $start_time = '2018-12-31 00:00:00';
@@ -116,6 +122,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '100px',
+        'mergeHeader' => true,
         'pageSummary' => true,
         'value' => function ($data) {
             $start_time = '2018-12-31 00:00:00';
@@ -144,6 +151,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '100px',
+        'mergeHeader' => true,
         'pageSummary' => true,
         'value' => function ($data) {
             $start_time = '2018-12-31 00:00:00';
@@ -172,6 +180,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '100px',
+        'mergeHeader' => true,
         'pageSummary' => true,
         'value' => function ($data) {
             $start_time = '2018-12-31 00:00:00';
@@ -200,6 +209,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '100px',
+        'mergeHeader' => true,
         'pageSummary' => true,
         'value' => function ($data) {
             $start_time = '2018-12-31 00:00:00';

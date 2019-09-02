@@ -42,7 +42,6 @@ $userImage = Yii::$app->view->params['userImage'];
                         "items" => [
                             ["label" => "Таблицей", 'icon' => 'fa fa-table', "url" => ["/device"]],
                             ["label" => "Деревом", 'icon' => 'fa fa-tree', "url" => ["/device/tree"]],
-                            ["label" => "Отчет о потреблении", 'icon' => 'fa fa-table', "url" => ["/device/report"]],
                             ["label" => "Светильники", 'icon' => 'fa fa-tree', "url" => ["/device/tree-light"]],
                             ["label" => "Группы светильников", 'icon' => 'fa fa-tree', "url" => ["/device/tree-group"]],
                             ["label" => "Камеры", 'icon' => 'fa fa-camera', "url" => ["/camera/tree"]],
@@ -74,12 +73,15 @@ $userImage = Yii::$app->view->params['userImage'];
 
         <?= dmstr\widgets\Menu::widget(
             [
-                'options' => ['class' => 'sidebar-menu push-analytics', 'data-widget' => 'tree',],
+                'options' => ['class' => 'sidebar-menu push-analytics', 'data-widget' => 'tree'],
                 'items' => [
                     [
-                        'label' => 'Измерения',
+                        "label" => "Отчеты",
                         'icon' => 'glyphicon glyphicon-stats',
-                        'url' => '/measure',
+                        "items" => [
+                            ["label" => "Отчет о потреблении", 'icon' => 'fa fa-table', "url" => ["/device/report"]],
+                            ["label" => "Отчет по группам", 'icon' => 'fa fa-table', "url" => ["/device/report-group"]]
+                        ],
                     ],
                 ],
             ]
