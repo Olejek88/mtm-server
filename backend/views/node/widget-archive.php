@@ -52,12 +52,21 @@ use common\models\MeasureType;
                         ]*/
         ];
 
+        $measures = [];
         $device = (Device::find()->select('uuid')
             ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
-        $sChannel = (SensorChannel::find()->select('uuid')
-            ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
-        $measures = (Measure::find()
-            ->where(['sensorChannelUuid' => $sChannel])->limit(5)->orderBy('date DESC'));
+        if ($device) {
+            $sChannel = (SensorChannel::find()->select('uuid')
+                ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
+            if ($sChannel) {
+                $measures = (Measure::find()
+                    ->where(['sensorChannelUuid' => $sChannel])
+                    ->andWhere(['parameter' => 0])
+                    ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
+                    ->limit(5)
+                    ->orderBy('date DESC'));
+            }
+        }
         $provider = new ActiveDataProvider(
             [
                 'query' => $measures,

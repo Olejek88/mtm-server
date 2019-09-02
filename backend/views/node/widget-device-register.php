@@ -5,6 +5,7 @@
 use common\models\Device;
 use common\models\DeviceRegister;
 use common\models\Node;
+use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 
@@ -60,9 +61,16 @@ use yii\data\ActiveDataProvider;
             ]
         ];
 
+        $devices = Device::find()->select('uuid')->where(['nodeUuid' => $node['uuid']])->all();
+        $devicesList2 = [];
+        foreach ($devices as $device) {
+            $devicesList2[] = $device['uuid'];
+        }
+
         $deviceRegisters = DeviceRegister::find()
-            ->where(['deviceUuid' => (Node::find()->where(['uuid' => $node['uuid']])->one())])
-            ->limit(8);
+            ->where(['IN','deviceUuid', $devicesList2])
+            ->limit(8)
+            ->orderBy('date desc');
         $provider = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
