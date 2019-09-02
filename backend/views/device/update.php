@@ -2,8 +2,10 @@
 
 use common\models\Device;
 use yii\helpers\Html;
+use common\models\DeviceProgram;
 
 /* @var $model Device */
+/* @var $program DeviceProgram */
 
 $this->title = 'Обновить оборудование';
 ?>
@@ -24,6 +26,7 @@ $this->title = 'Обновить оборудование';
                             '_form',
                             [
                                 'model' => $model,
+                                'program' => $program,
                             ]
                         ) ?>
                     </h6>

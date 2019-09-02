@@ -178,10 +178,22 @@ class DeviceController extends Controller
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
                 echo json_encode($model->errors);
-                return $this->render('create', ['model' => $model]);
+                return $this->render('create', ['model' => $model, 'program' => null]);
             }
             // сохраняем запись
             if ($model->save(false)) {
+                $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
+                if ($deviceConfig == null) {
+                    $deviceConfig = new DeviceConfig();
+                    $deviceConfig->uuid = MainFunctions::GUID();
+                    $deviceConfig->oid = User::getOid(Yii::$app->user->identity);
+                    $deviceConfig->parameter = 'Программа';
+                    $deviceConfig->deviceUuid = $model->uuid;
+                }
+
+                $deviceConfig->value = $model->lightProgram;
+                $deviceConfig->save();
+
                 MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                     $model->node->object->getAddress() . ' [' . $model->node->address . ']');
 
@@ -198,7 +210,7 @@ class DeviceController extends Controller
             }
             echo json_encode($model->errors);
         }
-        return $this->render('create', ['model' => $model]);
+        return $this->render('create', ['model' => $model, 'program' => null]);
     }
 
     /**
@@ -219,12 +231,16 @@ class DeviceController extends Controller
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
+                $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
+                $deviceConfig->value = $model->lightProgram;
+                $deviceConfig->save();
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
                 return $this->render(
                     'update',
                     [
                         'model' => $model,
+                        'program' => $model->getDeviceProgram(),
                     ]
                 );
             }
@@ -233,6 +249,7 @@ class DeviceController extends Controller
                 'update',
                 [
                     'model' => $model,
+                    'program' => $model->getDeviceProgram(),
                 ]
             );
         }
