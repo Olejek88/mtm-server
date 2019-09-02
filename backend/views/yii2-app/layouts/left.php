@@ -46,7 +46,8 @@ $userImage = Yii::$app->view->params['userImage'];
                             ["label" => "Светильники", 'icon' => 'fa fa-tree', "url" => ["/device/tree-light"]],
                             ["label" => "Группы светильников", 'icon' => 'fa fa-tree', "url" => ["/device/tree-group"]],
                             ["label" => "Камеры", 'icon' => 'fa fa-camera', "url" => ["/camera/tree"]],
-                            ["label" => "Камеры таблицей", 'icon' => 'fa fa-camera', "url" => ["/camera"]]
+                            ["label" => "Камеры таблицей", 'icon' => 'fa fa-camera', "url" => ["/camera"]],
+                            ["label" => "Программы светильников", 'icon' => 'fa fa-file-text', "url" => ["/device-program"]]
                         ],
                     ],
                 ],
