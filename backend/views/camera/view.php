@@ -9,7 +9,7 @@ use yii\web\View;
 /* @var $this View */
 
 
-$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerJsFile('/js/vendor/video.min.js', ['position' => View::POS_BEGIN]);
 $this->registerCssFile('/css/vendor/video-js.min.css');
 $this->title = "Камеры";
 ?>
@@ -59,7 +59,7 @@ $this->title = "Камеры";
                 </div>
                 <div>
                     <video
-                            id="my-player"
+                            id="my-player<?= $model["_id"] ?>"
                             class="video-js"
                             controls
                             preload="auto"
@@ -74,7 +74,7 @@ $this->title = "Камеры";
                         </p>
                     </video>
                     <script>
-                        v = videojs('my-player');
+                        v = videojs('my-player<?= $model["_id"] ?>');
                         v.on('error', function () {
                             console.log('XXX');
                             console.log(this.error());
