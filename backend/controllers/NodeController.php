@@ -88,6 +88,9 @@ class NodeController extends Controller
             if ($_POST['editableAttribute'] == 'software') {
                 $model['software'] = $_POST['Node'][$_POST['editableIndex']]['software'];
             }
+            if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
+                $model['deviceStatusUuid'] = $_POST['Node'][$_POST['editableIndex']]['deviceStatusUuid'];
+            }
             if ($_POST['editableAttribute'] == 'phone') {
                 $model['phone'] = $_POST['Node'][$_POST['editableIndex']]['phone'];
             }

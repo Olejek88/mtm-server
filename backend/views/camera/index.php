@@ -64,12 +64,12 @@ $gridColumns = [
             $list = [];
             $statuses = DeviceStatus::find()->orderBy('title')->all();
             foreach ($statuses as $stat) {
-                $color = 'background-color: white';
+                $color = 'background-color: gray';
                 if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
                     $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
                     $color = 'background-color: gray';
-                if ($stat['uuid'] == DeviceStatus::NOT_WORK)
-                    $color = 'background-color: lightred';
+                if ($stat['uuid'] == DeviceStatus::NOT_WORK || $stat['uuid'] == DeviceStatus::NO_CONNECT)
+                    $color = 'background-color: red';
                 if ($stat['uuid'] == DeviceStatus::WORK)
                     $color = 'background-color: green';
                 $list[$stat['uuid']] = $stat['title'];

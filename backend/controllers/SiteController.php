@@ -491,11 +491,15 @@ class SiteController extends Controller
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
                         . '</b>';
                 }
+                if ($device['deviceStatusUuid']==DeviceStatus::WORK)
+                    $icon = 'lightIcon';
+                else
+                    $icon = 'lightIconBad';
                 $equipmentsList .= 'var device'
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: lightIcon}).bindPopup(\''
+                    . '], {icon: '.$icon.'}).bindPopup(\''
                     . $link . '</span>'
                     . '<br/>'
                     . 'Адрес: ' . $device['address'] . '<br/>'
@@ -524,11 +528,15 @@ class SiteController extends Controller
         $camerasList = '';
         foreach ($cameras as $camera) {
             if ($camera["object"]["latitude"] > 0) {
+                if ($camera['deviceStatusUuid']==DeviceStatus::WORK)
+                    $icon = 'cameraIcon';
+                else
+                    $icon = 'cameraIconBad';
                 $camerasList .= 'var camera'
                     . $camera["_id"]
                     . '= L.marker([' . $camera["object"]["latitude"]
                     . ',' . $camera["object"]["longitude"]
-                    . '], {icon: cameraIcon}).bindPopup(\'<b>'
+                    . '], {icon: '.$icon.'}).bindPopup(\'<b>'
                     . Html::a($camera["title"],
                         ['/camera/dashboard', 'uuid' => $camera['uuid']]) . '</span>'
                     . '</b><br/>'
@@ -557,6 +565,14 @@ class SiteController extends Controller
                 $security = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
                 $power = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
                 $temperature = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>28.82(C)</span>";
+
+                if ($node['deviceStatusUuid']==DeviceStatus::NO_CONNECT)
+                    $link = "<span class=\'badge\' style=\'background-color: red; height: 18px; padding:3px; margin-top: -2px\'>нет</span>";
+                if ($node['deviceStatusUuid']==DeviceStatus::WORK)
+                    $icon = 'nodeIcon';
+                else
+                    $icon = 'nodeIconBad';
+
                 $contactors = "-";
                 $u = "-";
                 $w = "-";
@@ -591,6 +607,17 @@ class SiteController extends Controller
                 foreach ($devices as $device) {
                     $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
                 }
+                $last = [$node['object']['latitude'], $node['object']['longitude']];
+                for ($pos=0; $pos<count($coords);$pos++) {
+/*                    $min=9999;
+                    foreach ($coords as $coord) {
+                        $mod = sqrt(($coord[0]-$last[0])^2 + $coord[1]-$last[1])^2);
+                        if ($mod<$min)
+                            $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
+                    }*/
+                }
+
+
                 if (count($coords)) {
                     $polylineList .= 'L.polyline(' . json_encode($coords) . ', {weight: 3, color: \'green\'}).addTo(map);';
                     //$polylineList .= 'var polylinePoints' . $cnt . ' = ' . json_encode($coords) . ';';
@@ -603,7 +630,7 @@ class SiteController extends Controller
                     . $node["_id"]
                     . '= L.marker([' . $node["object"]["latitude"]
                     . ',' . $node["object"]["longitude"]
-                    . '], {icon: nodeIcon}).bindPopup(\'<b>'
+                    . '], {icon: '.$icon.'}).bindPopup(\'<b>'
                     . Html::a($node["object"]->getAddress(),
                         ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
                     . '</b><br/>'

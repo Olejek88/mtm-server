@@ -977,6 +977,63 @@ class DeviceController extends Controller
                         'type' => 'object',
                         'folder' => true
                     ];
+                    $devices = Device::find()
+                        ->where(['objectUuid' => $object['uuid']])
+                        ->andWhere(['deleted' => 0])
+                        ->all();
+                    foreach ($devices as $device) {
+                        $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
+                        if ($device['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
+                            $class = 'critical1';
+                        } elseif ($device['deviceStatusUuid'] == DeviceStatus::NOT_WORK) {
+                            $class = 'critical2';
+                        } else {
+                            $class = 'critical3';
+                        }
+                        $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
+                            'title' => $device['deviceType']['title'].' ['.$device['address'].']',
+                            'status' => '<div class="progress"><div class="'
+                                . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                            'register' => $device['port'] . ' [' . $device['address'] . ']',
+                            'uuid' => $device['uuid'],
+                            'expanded' => true,
+                            'objectUuid' => $object['uuid'],
+                            'measure' => '',
+                            'source' => '../device/tree',
+                            'type' => 'device',
+                            'date' => $device['date'],
+                            'folder' => true
+                        ];
+                        $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])
+                            ->all();
+                        foreach ($channels as $channel) {
+                            $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                            $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                            $date = '-';
+                            if (!$measure) {
+                                $config = null;
+                                $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                if ($config) {
+                                    $measure = Html::a('конфигурация', ['sensor-config/view', 'id' => $config['_id']]);
+                                    $date = $config['changedAt'];
+                                }
+                            } else {
+                                $date = $measure['date'];
+                                $measure = $measure['value'];
+                            }
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
+                                'title' => $channel['title'],
+                                'register' => $channel['register'],
+                                'uuid' => $channel['uuid'],
+                                'source' => '../device/tree',
+                                'type' => 'channel',
+                                'measure' => $measure,
+                                'date' => $date,
+                                'folder' => false
+                            ];
+                        }
+                    }
+
                     $nodes = Node::find()->where(['objectUuid' => $object['uuid']])
                         ->andWhere(['deleted' => 0])
                         ->all();
@@ -996,11 +1053,12 @@ class DeviceController extends Controller
                             'objectUuid' => $object['uuid'],
                             'uuid' => $node['uuid'],
                             'type' => 'node',
-                            'expanded' => true,
+                            'expanded' => false,
                             'register' => $node['address'],
                             'folder' => true
                         ];
-                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                        $devices = Device::find()
+                            ->where(['nodeUuid' => $node['uuid']])
                             ->andWhere(['deleted' => 0])
                             ->all();
                         if (isset($_GET['type']))
@@ -1017,12 +1075,12 @@ class DeviceController extends Controller
                                 $class = 'critical3';
                             }
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
-                                'title' => $device['deviceType']['title'],
+                                'title' => $device['deviceType']['title'].' ['.$device['address'].']',
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                                 'register' => $device['port'] . ' [' . $device['address'] . ']',
                                 'uuid' => $device['uuid'],
-                                'expanded' => true,
+                                'expanded' => false,
                                 'objectUuid' => $object['uuid'],
                                 'nodeUuid' => $node['uuid'],
                                 'measure' => '',
@@ -1202,6 +1260,17 @@ class DeviceController extends Controller
             'tree-small',
             ['device' => $fullTree, 'deviceTypes' => $items]
         );
+    }
+
+    /**
+     * @param $deviceUuid
+     * @param $parameter
+     * @return mixed|null
+     * @throws InvalidConfigException
+     */
+    static function add()
+    {
+
     }
 
     /**

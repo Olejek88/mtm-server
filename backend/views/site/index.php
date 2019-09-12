@@ -58,14 +58,32 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
+        var nodeIconBad = L.icon({
+            iconUrl: '/images/router_marker_red.png',
+            iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
         var cameraIcon = L.icon({
             iconUrl: '/images/camera_marker_green.png',
             iconSize: [32, 51],
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
+        var cameraIconBad = L.icon({
+            iconUrl: '/images/camera_marker_red.png',
+            iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
         var lightIcon = L.icon({
             iconUrl: '/images/light_marker_green.png',
+            iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
+        var lightIconBad = L.icon({
+            iconUrl: '/images/light_marker_red.png',
             iconSize: [32, 51],
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
