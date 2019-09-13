@@ -3,6 +3,7 @@ use common\models\Device;
 use common\models\DeviceType;
 use common\models\MeasureType;
 use common\models\SensorChannel;
+use yii\web\View;
 
 /* @var $node
  * @var $camera
@@ -11,7 +12,7 @@ use common\models\SensorChannel;
  */
 
 $this->title = Yii::t('app', 'Контроллер');
-$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerJsFile('/js/vendor/video.min.js', ['position' => View::POS_BEGIN]);
 $this->registerCssFile('/css/vendor/video-js.min.css');
 
 $sensorChannelUuid = 0;
