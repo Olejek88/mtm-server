@@ -14,9 +14,10 @@
 /* @var  $polylineList */
 /* @var  $camerasList */
 /* @var  $camerasGroup */
+/* @var  $define */
 
 $this->title = Yii::t('app', 'Карта объектов и светильников');
-
+$this->registerJs('$(window).on("resize", function () { $("#mapid").height($(window).height()-40); map.invalidateSize(); }).trigger("resize");');
 ?>
 <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
         integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
@@ -43,7 +44,7 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
 }
 </style>
 <div class="box-relative">
-    <div id="mapid" style="width: 100%; height: 800px"></div>
+    <div id="mapid" style="height: 800px; width: 100%"></div>
 
     <script>
         var houseIcon = L.icon({
@@ -102,6 +103,8 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         });
 
         <?php
+        echo $define;
+
         echo $devicesList;
         echo $devicesGroup;
         echo $nodesList;
@@ -147,4 +150,5 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         //echo $polylineList;
         ?>
     </script>
+
 </div>

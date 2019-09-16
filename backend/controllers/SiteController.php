@@ -134,7 +134,8 @@ class SiteController extends Controller
                 'polylineList' => $layers['polylineList'],
                 'nodesList' => $layers['nodesList'],
                 'nodesGroup' => $layers['nodesGroup'],
-                'coordinates' => $layers['coordinates']
+                'coordinates' => $layers['coordinates'],
+                'define' => $layers['define']
             ]
         );
     }
@@ -468,6 +469,9 @@ class SiteController extends Controller
         $dimming = '-';
         $current_power = '-';
         $t = '-';
+        $define = '';
+        $postDefine = '';
+
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
@@ -502,6 +506,9 @@ class SiteController extends Controller
                     $icon = 'lightIcon';
                 else
                     $icon = 'lightIconBad';
+                $define .= 'var deviceIcon'. $device["_id"].'='.$icon.';';
+                $define .= 'var deviceStatus'. $device["_id"].'=0;';
+
                 $equipmentsList .= 'var device'
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
@@ -606,31 +613,6 @@ class SiteController extends Controller
                     }
                 }
 
-                $coords[] = [$node['object']['latitude'], $node['object']['longitude']];
-                $devices = Device::find()
-                    ->where(['IN', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
-                    ->andWhere(['nodeUuid' => $node['uuid']])
-                    ->all();
-                foreach ($devices as $device) {
-                    $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
-                }
-                $last = [$node['object']['latitude'], $node['object']['longitude']];
-                for ($pos=0; $pos<count($coords);$pos++) {
-/*                    $min=9999;
-                    foreach ($coords as $coord) {
-                        $mod = sqrt(($coord[0]-$last[0])^2 + $coord[1]-$last[1])^2);
-                        if ($mod<$min)
-                            $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
-                    }*/
-                }
-
-
-                if (count($coords)) {
-                    $polylineList .= 'L.polyline(' . json_encode($coords) . ', {weight: 3, color: \'green\'}).addTo(map);';
-                    //$polylineList .= 'var polylinePoints' . $cnt . ' = ' . json_encode($coords) . ';';
-                    //$polylineList .= 'var polyline' . $cnt . ' = L.polyline(polylinePoints' . $cnt . ').addTo(map);';
-                }
-
                 $software = $node["software"];
                 $phone = $node["address"];
                 $nodesList .= 'var node'
@@ -651,6 +633,26 @@ class SiteController extends Controller
                     . 'Сумма,кВт: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
                     . 'Телефон/адрес: ' . $phone . '<br/>\').openPopup();';
+
+                $nodesList .= 'node'.$node["_id"].'.on(\'click\', function(e) {';
+                    $devices = Device::find()
+                        ->where(['IN', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
+                        ->andWhere(['nodeUuid' => $node['uuid']])
+                        ->all();
+                    foreach ($devices as $device) {
+                        $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
+                        $nodesList .= 'if (deviceStatus'.$device["_id"].'==1) { device' . $device["_id"] . '.setIcon(deviceIcon'.$device["_id"].'); deviceStatus'.$device["_id"].'=0; }';
+                        $nodesList .= PHP_EOL;
+                        $nodesList .= ' else { device' . $device["_id"] . '.setIcon(lightIconSelect); deviceStatus'.$device["_id"].'=1; } ';
+                        $nodesList .= PHP_EOL;
+                    }
+                $nodesList .= '});';
+
+                $coords[] = [$node['object']['latitude'], $node['object']['longitude']];
+                if (count($coords)) {
+                    $polylineList .= 'L.polyline(' . json_encode($coords) . ', {weight: 3, color: \'green\'}).addTo(map);';
+                }
+
                 $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $node["object"]["latitude"] > 0) {
                     $coordinates = "[" . $node["object"]["latitude"] . "," . $node["object"]["longitude"] . "]";
@@ -672,6 +674,7 @@ class SiteController extends Controller
         $layer['camerasList'] = $camerasList;
         $layer['camerasGroup'] = $camerasGroup;
         $layer['polylineList'] = $polylineList;
+        $layer['define'] = $define;
 
         return $layer;
     }
