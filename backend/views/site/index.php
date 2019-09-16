@@ -15,6 +15,7 @@
 /* @var  $camerasList */
 /* @var  $camerasGroup */
 /* @var  $define */
+/* @var  $postCode */
 
 $this->title = Yii::t('app', 'Карта объектов и светильников');
 $this->registerJs('$(window).on("resize", function () { $("#mapid").height($(window).height()-40); map.invalidateSize(); }).trigger("resize");');
@@ -146,9 +147,18 @@ $this->registerJs('$(window).on("resize", function () { $("#mapid").height($(win
             position: 'bottomleft'
         }).addTo(map);
 
+
         <?php
         //echo $polylineList;
+        echo $postCode;
         ?>
     </script>
 
+</div>
+
+<div class="modal remote fade" id="modalAddEquipment">
+    <div class="modal-dialog">
+        <div class="modal-content loader-lg" id="modalContentEquipment">
+        </div>
+    </div>
 </div>

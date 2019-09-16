@@ -135,7 +135,8 @@ class SiteController extends Controller
                 'nodesList' => $layers['nodesList'],
                 'nodesGroup' => $layers['nodesGroup'],
                 'coordinates' => $layers['coordinates'],
-                'define' => $layers['define']
+                'define' => $layers['define'],
+                'postCode' => $layers['postCode']
             ]
         );
     }
@@ -470,7 +471,6 @@ class SiteController extends Controller
         $current_power = '-';
         $t = '-';
         $define = '';
-        $postDefine = '';
 
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
@@ -507,7 +507,7 @@ class SiteController extends Controller
                 else
                     $icon = 'lightIconBad';
                 $define .= 'var deviceIcon'. $device["_id"].'='.$icon.';';
-                $define .= 'var deviceStatus'. $device["_id"].'=0;';
+                $define .= 'var deviceStatus'. $device["_id"].'=1;';
 
                 $equipmentsList .= 'var device'
                     . $device["_id"]
@@ -666,6 +666,25 @@ class SiteController extends Controller
         }
         $nodesGroup .= ']);' . PHP_EOL;
 
+        $postCode = PHP_EOL;
+        $postCode .= 'map.on(\'dblclick\', function(e) {
+            var marker = new L.marker(e.latlng, {icon: lightIconBad}).addTo(map);
+            marker.on(\'click\', function(e) {            
+                $.ajax({
+                    url: "../device/new-light",
+                    type: "post",
+                    data: {
+                        latitude: e.latlng.lat,
+                        longitude: e.latlng.lng
+                    },
+                    success: function (data) { 
+                        $(\'#modalAddEquipment\').modal(\'show\');
+                        $(\'#modalContentEquipment\').html(data);
+                    }
+                }); 
+            });            
+        });';
+
         $layer['coordinates'] = $coordinates;
         $layer['nodesList'] = $nodesList;
         $layer['nodesGroup'] = $nodesGroup;
@@ -675,6 +694,7 @@ class SiteController extends Controller
         $layer['camerasGroup'] = $camerasGroup;
         $layer['polylineList'] = $polylineList;
         $layer['define'] = $define;
+        $layer['postCode'] = $postCode;
 
         return $layer;
     }

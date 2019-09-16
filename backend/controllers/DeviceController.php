@@ -12,6 +12,7 @@ use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\Group;
 use common\models\House;
+use common\models\HouseType;
 use common\models\Measure;
 use common\models\MeasureType;
 use common\models\mtm\MtmContactor;
@@ -952,9 +953,11 @@ class DeviceController extends Controller
                 'type' => 'street',
                 'folder' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])
+            $houses = House::find()
+                ->where(['streetUuid' => $street['uuid']])
                 ->andWhere(['deleted' => 0])
-                ->orderBy('number')->all();
+                ->orderBy('number')
+                ->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
@@ -970,7 +973,7 @@ class DeviceController extends Controller
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
-                        'title' => $object['objectType']['title'] . ' ' . $object['title'],
+                        'title' => $object['title'],
                         'source' => '../device/tree',
                         'uuid' => $object['uuid'],
                         'expanded' => true,
@@ -991,7 +994,7 @@ class DeviceController extends Controller
                             $class = 'critical3';
                         }
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'title' => $device['deviceType']['title'].' ['.$device['address'].']',
+                            'title' => $device['deviceType']['title'] . ' [' . $device['address'] . ']',
                             'status' => '<div class="progress"><div class="'
                                 . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                             'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1075,7 +1078,7 @@ class DeviceController extends Controller
                                 $class = 'critical3';
                             }
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
-                                'title' => $device['deviceType']['title'].' ['.$device['address'].']',
+                                'title' => $device['deviceType']['title'] . ' [' . $device['address'] . ']',
                                 'status' => '<div class="progress"><div class="'
                                     . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                                 'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1263,17 +1266,6 @@ class DeviceController extends Controller
     }
 
     /**
-     * @param $deviceUuid
-     * @param $parameter
-     * @return mixed|null
-     * @throws InvalidConfigException
-     */
-    static function add()
-    {
-
-    }
-
-    /**
      * Build tree of device
      *
      * @return mixed
@@ -1313,7 +1305,7 @@ class DeviceController extends Controller
                         'folder' => true
                     ];
                     $devices = Device::find()->where(['objectUuid' => $object['uuid']])
-                        ->andWhere(['in','deviceTypeUuid', [DeviceType::DEVICE_LIGHT,DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
+                        ->andWhere(['in', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
                         ->all();
                     foreach ($devices as $device) {
                         $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
@@ -2308,12 +2300,12 @@ class DeviceController extends Controller
     public function actionReportGroup()
     {
         $data['group'] = [];
-        $group_num=0;
+        $group_num = 0;
         $groups = Group::find()->all();
         foreach ($groups as $group) {
             $data['group'][$group_num]['title'] = $group['title'];
             $data['group'][$group_num]['month'] = [];
-            for ($mon=0; $mon<12; $mon++) {
+            for ($mon = 0; $mon < 12; $mon++) {
                 $data['group'][$group_num]['month'][$mon]['date'] = '-';
                 $data['group'][$group_num]['month'][$mon]['w1'] = 0;
                 $data['group'][$group_num]['month'][$mon]['w2'] = 0;
@@ -2338,22 +2330,21 @@ class DeviceController extends Controller
                 $power = $levels[intval($level)];
                 $knt = 0;
                 if ($sumPower)
-                    $knt = $power/$sumPower;
+                    $knt = $power / $sumPower;
                 $counter = Device::find()
                     ->where(['nodeUuid' => $device['device']['nodeUuid']])
                     ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
                     ->one();
-                if ($counter && $knt>0) {
+                if ($counter && $knt > 0) {
                     $sChannel = SensorChannel::find()
                         ->where(['deviceUuid' => $counter['uuid'], 'measureTypeUuid' => MeasureType::POWER])
                         ->one();
                     if ($sChannel) {
-                        for ($mon=0; $mon<12; $mon++) {
-                            if ($mon>0) {
+                        for ($mon = 0; $mon < 12; $mon++) {
+                            if ($mon > 0) {
                                 $month = date("Ym01000000", strtotime("-" . $mon . " months"));
-                                $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01", strtotime("-".$mon." months"));
-                            }
-                            else {
+                                $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01", strtotime("-" . $mon . " months"));
+                            } else {
                                 $month = date("Ym01000000");
                                 $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01");
                             }
@@ -2387,5 +2378,74 @@ class DeviceController extends Controller
                 'dataAll' => $data
             ]
         );
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет добавление нового светильника
+     *
+     * @return mixed
+     */
+    public
+    function actionNewLight()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+        if (isset($_POST["latitude"]))
+            $latitude = $_POST["latitude"];
+        else $latitude = 0;
+        if (isset($_POST["longitude"]))
+            $longitude = $_POST["longitude"];
+        else $longitude = 0;
+
+        $device = new Device();
+        $object = new Objects();
+        return $this->renderAjax('_add_form_light', [
+            'device' => $device,
+            'object' => $object,
+            'latitude' => $latitude,
+            'longitude' => $longitude
+        ]);
+    }
+
+    /**
+     * Creates a new Device model.
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSaveLight()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+        if ($_POST['street']) {
+            $house = House::find()
+                ->where(['streetUuid' => $_POST['street']])
+                ->andWhere(['houseTypeUuid' => HouseType::HOUSE_TYPE_NO_NUMBER])
+                ->one();
+            if (!$house) {
+                $house = new House();
+                $house->uuid = (new MainFunctions)->GUID();
+                $house->number = '-';
+                $house->oid = User::getOid(Yii::$app->user->identity);
+                $house->streetUuid = $_POST['street'];
+                $house->houseTypeUuid = HouseType::HOUSE_TYPE_NO_NUMBER;
+                $house->save();
+            }
+
+            $object = new Objects();
+            if ($object->load(Yii::$app->request->post())) {
+                $object->houseUuid = $house['uuid'];
+                if ($object->save(false)) {
+                    $model = new Device();
+                    if ($model->load(Yii::$app->request->post())) {
+                        $model->objectUuid = $object['uuid'];
+                        $model->save(false);
+                    }
+                }
+            }
+        }
+        return $this->redirect("../site/index");
     }
 }
