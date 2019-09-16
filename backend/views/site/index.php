@@ -76,6 +76,12 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
+        var cameraIconSelect = L.icon({
+            iconUrl: '/images/camera_marker_blue.png',
+            iconSize: [33, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
         var lightIcon = L.icon({
             iconUrl: '/images/light_marker_green.png',
             iconSize: [32, 51],
@@ -85,6 +91,12 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         var lightIconBad = L.icon({
             iconUrl: '/images/light_marker_red.png',
             iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
+        var lightIconSelect = L.icon({
+            iconUrl: '/images/light_marker_blue.png',
+            iconSize: [33, 51],
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
@@ -132,7 +144,7 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
         }).addTo(map);
 
         <?php
-        echo $polylineList;
+        //echo $polylineList;
         ?>
     </script>
 </div>

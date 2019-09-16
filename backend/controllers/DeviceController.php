@@ -1313,7 +1313,7 @@ class DeviceController extends Controller
                         'folder' => true
                     ];
                     $devices = Device::find()->where(['objectUuid' => $object['uuid']])
-                        ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+                        ->andWhere(['in','deviceTypeUuid', [DeviceType::DEVICE_LIGHT,DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
                         ->all();
                     foreach ($devices as $device) {
                         $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
@@ -1336,7 +1336,7 @@ class DeviceController extends Controller
                             'uuid' => $device['uuid'],
                             'source' => '../device/tree-light',
                             'type' => 'device',
-                            'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
+                            'deviceTypeUuid' => $device['deviceTypeUuid'],
                             'channels' => $channels,
                             'config' => $config,
                             'date' => $device['date'],

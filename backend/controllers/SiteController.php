@@ -486,6 +486,13 @@ class SiteController extends Controller
                             ->andWhere(['deviceUuid' => $device['uuid']]))])->one();
                     if ($measure)
                         $t = $measure['value'];
+                } else if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT_WITHOUT_ZB) {
+                    $link = '<b>' . $device["name"] . '</b>';
+                    $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
+                    if ($deviceGroup)
+                        $group = $deviceGroup['group']['title'];
+                    $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                    $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                 } else {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
@@ -601,7 +608,7 @@ class SiteController extends Controller
 
                 $coords[] = [$node['object']['latitude'], $node['object']['longitude']];
                 $devices = Device::find()
-                    ->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+                    ->where(['IN', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
                     ->andWhere(['nodeUuid' => $node['uuid']])
                     ->all();
                 foreach ($devices as $device) {

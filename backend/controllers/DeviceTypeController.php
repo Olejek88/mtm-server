@@ -22,6 +22,7 @@ class DeviceTypeController extends Controller
         DeviceType::DEVICE_COUNTER,
         DeviceType::DEVICE_ZB_COORDINATOR,
         DeviceType::DEVICE_LIGHT,
+        DeviceType::DEVICE_LIGHT_WITHOUT_ZB
     ];
 
 
