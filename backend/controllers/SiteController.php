@@ -474,6 +474,7 @@ class SiteController extends Controller
 
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
+                $warnings = '';
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
@@ -502,10 +503,14 @@ class SiteController extends Controller
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
                         . '</b>';
                 }
-                if ($device['deviceStatusUuid']==DeviceStatus::WORK)
+
+                if ($device['deviceStatusUuid']==DeviceStatus::WORK) {
                     $icon = 'lightIcon';
-                else
+                }
+                else {
                     $icon = 'lightIconBad';
+                    $warnings = 'Статус: <span class="badge badge-green-red">'.$device['deviceStatus']['title'].'</span>';
+                }
                 $define .= 'var deviceIcon'. $device["_id"].'='.$icon.';';
                 $define .= 'var deviceStatus'. $device["_id"].'=1;';
 
@@ -520,7 +525,9 @@ class SiteController extends Controller
                     . 'Группа: ' . $group . '<br/>'
                     . 'Мощность: ' . $current_power . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
-                    . 'Температура: ' . $t . '<br/>\').openPopup();';
+                    . 'Температура: ' . $t . '<br/>'
+                    . $warnings
+                    .'\').openPopup();';
 
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -542,19 +549,23 @@ class SiteController extends Controller
         $camerasList = '';
         foreach ($cameras as $camera) {
             if ($camera["object"]["latitude"] > 0) {
+                $warnings = '';
                 if ($camera['deviceStatusUuid']==DeviceStatus::WORK)
                     $icon = 'cameraIcon';
-                else
+                else {
                     $icon = 'cameraIconBad';
+                    $warnings = 'Статус: <span class="badge badge-green-red">'.$camera['deviceStatus']['title'].'</span>';
+                }
                 $camerasList .= 'var camera'
                     . $camera["_id"]
                     . '= L.marker([' . $camera["object"]["latitude"]
                     . ',' . $camera["object"]["longitude"]
                     . '], {icon: '.$icon.'}).bindPopup(\'<b>'
                     . Html::a($camera["title"],
-                        ['/camera/dashboard', 'uuid' => $camera['uuid']]) . '</span>'
-                    . '</b><br/>'
-                    . $camera["object"]->getAddress() . '\').openPopup();';
+                        ['/camera/dashboard', 'uuid' => $camera['uuid']]) . '</b><br/>'
+                    . $camera["object"]->getAddress() . '<br/>'
+                    . $warnings
+                    . '\').openPopup();';
                 $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $camera["object"]["latitude"] > 0) {
                     $coordinates = "[" . $camera["object"]["latitude"] . "," . $camera["object"]["longitude"] . "]";
@@ -575,26 +586,36 @@ class SiteController extends Controller
         $nodesList = '';
         foreach ($nodes as $node) {
             if ($node["object"]["latitude"] > 0) {
-                $link = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>есть</span>";
-                $security = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
-                $power = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>в норме</span>";
-                $temperature = "<span class=\'badge\' style=\'background-color: green; height: 18px; padding:3px; margin-top: -2px\'>28.82(C)</span>";
-
+                $link = '<span class="badge badge-green-small">есть</span>';
+                $security = '<span class="badge badge-green-small">в норме</span>';
+                $power = '<span class="badge badge-green-small">в норме</span>';
+                $temperature = '<span class="badge badge-green-small">28.82(C)</span>';
+                $warnings = '';
                 if ($node['deviceStatusUuid']==DeviceStatus::NO_CONNECT)
-                    $link = "<span class=\'badge\' style=\'background-color: red; height: 18px; padding:3px; margin-top: -2px\'>нет</span>";
+                    $link = '<span class="badge badge-red-small">нет</span>';
                 if ($node['deviceStatusUuid']==DeviceStatus::WORK)
                     $icon = 'nodeIcon';
-                else
+                else {
                     $icon = 'nodeIconBad';
+                    $warnings = 'Статус узла: <span class="badge badge-red-small">' .
+                        $node['deviceStatus']['title'] . '</span>';
+                }
 
                 $contactors = "-";
                 $u = "-";
                 $w = "-";
                 $w_total = "-";
-                $device = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
-                    ->andWhere(['nodeUuid' => $node['uuid']])->one();
+                $device = Device::find()
+                    ->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                    ->andWhere(['deleted' => 0])
+                    ->andWhere(['nodeUuid' => $node['uuid']])
+                    ->one();
                 //echo json_encode($device['uuid']);
                 if ($device) {
+                    if ($device['deviceStatusUuid']!=DeviceStatus::WORK) {
+                        $warnings .= 'Статус счетчика: <span class="badge badge-red-small">'.$device['deviceStatus']['title'].'</span></br>';
+                    }
+
                     $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
                     foreach ($channels as $channel) {
                         //echo json_encode($channel['uuid']);
@@ -632,7 +653,9 @@ class SiteController extends Controller
                     . 'Мощность,кВт/ч: ' . $w . '<br/>'
                     . 'Сумма,кВт: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
-                    . 'Телефон/адрес: ' . $phone . '<br/>\').openPopup();';
+                    . 'Телефон/адрес: ' . $phone . '<br/>'
+                    . $warnings
+                    .'\').openPopup();';
 
                 $nodesList .= 'node'.$node["_id"].'.on(\'click\', function(e) {';
                     $devices = Device::find()

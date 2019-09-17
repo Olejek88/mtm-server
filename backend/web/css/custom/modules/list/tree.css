@@ -93,3 +93,21 @@ span.fancytree-checkbox, span.fancytree-expander, span.fancytree-custom-icon {
     margin-right: 8px;
     margin-top: -3px
 }
+
+.badge-green-small {
+    background-color: green;
+    height: 16px;
+    font-size: 11px;
+    padding-left: 5px;
+    margin-right: 5px;
+    margin-top: -4px
+}
+
+.badge-red-small {
+    background-color: indianred;
+    height: 16px;
+    font-size: 11px;
+    padding-left:4px;
+    margin-right: 4px;
+    margin-top: -4px
+}

@@ -976,6 +976,7 @@ class DeviceController extends Controller
                         'title' => $object['title'],
                         'source' => '../device/tree',
                         'uuid' => $object['uuid'],
+                        'objectUuid' => $object['uuid'],
                         'expanded' => true,
                         'type' => 'object',
                         'folder' => true
@@ -1602,12 +1603,20 @@ class DeviceController extends Controller
                     ]);
                 }
                 if ($type == 'object') {
-                    $node = new Node();
-                    return $this->renderAjax('../node/_add_form', [
-                        'node' => $node,
-                        'objectUuid' => $uuid,
+                    $device = new Device();
+                    return $this->renderAjax('_add_form', [
+                        'device' => $device,
+                        'objectUuid' => $objectUuid,
+                        'nodeUuid' => null,
+                        'deviceTypeUuid' => $deviceTypeUuid,
                         'source' => $source
                     ]);
+                    /*                    $node = new Node();
+                                        return $this->renderAjax('../node/_add_form', [
+                                            'node' => $node,
+                                            'objectUuid' => $uuid,
+                                            'source' => $source
+                                        ]);*/
                 }
                 if ($type == 'node') {
                     $device = new Device();

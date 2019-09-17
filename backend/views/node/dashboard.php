@@ -28,8 +28,11 @@ if ($deviceElectro) {
 <br/>
 <!-- Info boxes -->
 <div class="row">
-    <div class="col-md-12">
-    <?= $this->render('widget-node-info', ['node' => $node, 'type' => $type, 'device' => $deviceElectro]); ?>
+    <div class="col-md-4">
+        <?= $this->render('widget-node-info', ['node' => $node, 'type' => $type, 'device' => $deviceElectro]); ?>
+    </div>
+    <div class="col-md-8">
+        <?= $this->render('widget-node-warnings', ['node' => $node]); ?>
     </div>
 </div>
 <!-- /.row -->
