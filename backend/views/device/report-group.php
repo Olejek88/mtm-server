@@ -3,7 +3,6 @@
  * @var $dataAll
  */
 
-use common\models\Device;
 use kartik\widgets\DatePicker;
 use yii\helpers\Html;
 
@@ -90,9 +89,9 @@ if (isset($_GET['start_time'])) {
                             foreach ($dataAll['group'] as $data) {
                                 if ($cnt == 0)
                                     echo '<td class="text-center kv-align-center kv-align-middle">' . $data['month'][$mon]['date'] . '</td>';
-                                echo '<td class="text-center kv-align-center kv-align-middle">' . $data['month'][$mon]['w1'] . '</td>';
-                                echo '<td class="text-center kv-align-center kv-align-middle">' . $data['month'][$mon]['w2'] . '</td>';
-                                echo '<td class="text-center kv-align-center kv-align-middle">' . $data['month'][$mon]['ws'] . '</td>';
+                                echo '<td class="text-center kv-align-center kv-align-middle">' . number_format($data['month'][$mon]['w1'], 3) . '</td>';
+                                echo '<td class="text-center kv-align-center kv-align-middle">' . number_format($data['month'][$mon]['w2'], 3) . '</td>';
+                                echo '<td class="text-center kv-align-center kv-align-middle">' . number_format($data['month'][$mon]['ws'], 3) . '</td>';
                                 $cnt++;
                             }
                             echo '</tr>';

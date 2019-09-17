@@ -3,7 +3,6 @@
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
-use common\models\Measure;
 use common\models\ObjectContragent;
 use kartik\editable\Editable;
 use kartik\grid\GridView;

@@ -1,13 +1,13 @@
 <?php
 
 use common\components\MainFunctions;
+use common\models\Node;
 use common\models\User;
+use kartik\widgets\FileInput;
+use kartik\widgets\Select2;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Node;
-use yii\helpers\ArrayHelper;
-use kartik\widgets\Select2;
-use kartik\widgets\FileInput;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\SoundFile */

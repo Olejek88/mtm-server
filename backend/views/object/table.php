@@ -14,6 +14,7 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
@@ -26,6 +27,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'attribute' => 'house',
+        'mergeHeader' => true,
         'vAlign' => 'middle',
         'width' => '220px',
         'value' => function ($data) {
@@ -39,6 +41,7 @@ $gridColumns = [
         'attribute' => 'title',
         'vAlign' => 'middle',
         'width' => '180px',
+        'mergeHeader' => true,
         'header' => 'Объект',
         'format' => 'raw',
     ],
@@ -76,6 +79,7 @@ $gridColumns = [
         'attribute' => 'changedAt',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'headerOptions' => ['class' => 'kv-sticky-column'],
         'contentOptions' => ['class' => 'kv-sticky-column'],
         'header' => 'Дата изменения',
@@ -83,6 +87,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
+        'template' => '{update}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

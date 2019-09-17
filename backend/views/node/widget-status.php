@@ -4,8 +4,6 @@
  * @var $device
  */
 
-use common\models\Measure;
-use common\models\MeasureType;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 

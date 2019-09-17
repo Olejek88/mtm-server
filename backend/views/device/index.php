@@ -47,7 +47,7 @@ $gridColumns = [
         'width' => '180px',
         'mergeHeader' => true,
         'value' => function ($data) {
-            return Html::a($data['node']['object']->getAddress().' ['.$data['node']['address'].']',
+            return Html::a($data['object']->getFullTitle() . ' [' . $data['node']['address'] . ']',
                 ['/device/dashboard','uuid' => $data['uuid']]);
         },
         'header' => 'Адрес',

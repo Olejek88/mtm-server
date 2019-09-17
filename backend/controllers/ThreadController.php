@@ -6,14 +6,14 @@ use backend\models\ThreadSearch;
 use common\components\MainFunctions;
 use common\models\Threads;
 use common\models\User;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
-use Throwable;
-use yii\base\InvalidConfigException;
 
 /**
  * ThreadController implements the CRUD actions for Thread model.

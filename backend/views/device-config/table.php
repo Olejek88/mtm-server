@@ -1,13 +1,8 @@
 <?php
 /* @var $searchModel backend\models\DeviceConfigSearch */
 
-use common\models\DeviceStatus;
-use common\models\MeasureType;
 use common\models\DeviceChannel;
-use kartik\editable\Editable;
 use kartik\grid\GridView;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Конфигурация');
 

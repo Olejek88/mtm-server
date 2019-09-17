@@ -2,17 +2,17 @@
 namespace backend\controllers;
 
 use backend\models\SensorChannelSearch;
-use common\models\User;
-use Yii;
 use common\models\SensorChannel;
+use common\models\User;
+use Exception;
+use Throwable;
+use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use Exception;
-use Throwable;
 
 /**
  * StageOperationController implements the CRUD actions for StageOperation model.

@@ -71,6 +71,7 @@ use yii\data\ActiveDataProvider;
                 'sort' =>false,
             ]
         );
+        $provider->pagination->pageSize = 8;
 
         echo GridView::widget(
             [

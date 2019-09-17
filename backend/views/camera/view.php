@@ -2,8 +2,8 @@
 
 use common\models\Camera;
 use yii\helpers\Html;
-use yii\widgets\DetailView;
 use yii\web\View;
+use yii\widgets\DetailView;
 
 /* @var $model Camera */
 /* @var $this View */

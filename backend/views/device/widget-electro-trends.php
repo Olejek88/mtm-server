@@ -4,6 +4,7 @@
  */
 
 use yii\helpers\Html;
+
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
 $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 

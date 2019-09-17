@@ -1,11 +1,8 @@
 <?php
 
-use common\components\MainFunctions;
 use common\models\Device;
 use common\models\Measure;
-use common\models\Photo;
 use common\models\SensorChannel;
-use yii\helpers\Html;
 
 /* @var $model Device */
 

@@ -48,7 +48,7 @@ use yii\helpers\Html;
     </div>
     <!-- /.box-body -->
     <div class="box-footer text-center">
-        <?php echo Html::a('Все оборудование', ['/equipment'],
+        <?php echo Html::a('Все оборудование', ['/device/tree'],
             ['class' => 'btn btn-sm btn-info btn-flat pull-left']); ?>
     </div>
     <!-- /.box-footer -->

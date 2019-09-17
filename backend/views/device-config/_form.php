@@ -2,7 +2,6 @@
 
 use common\components\MainFunctions;
 use common\models\Device;
-use common\models\House;
 use common\models\DeviceChannel;
 use common\models\User;
 use kartik\widgets\Select2;

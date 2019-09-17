@@ -7,14 +7,14 @@ use common\models\House;
 use common\models\Objects;
 use common\models\Street;
 use common\models\User;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use Throwable;
-use yii\base\InvalidConfigException;
 
 /**
  * ObjectController implements the CRUD actions for Object model.

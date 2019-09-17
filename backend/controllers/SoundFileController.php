@@ -2,18 +2,18 @@
 
 namespace backend\controllers;
 
+use backend\models\SoundFileSearch;
 use common\models\Organisation;
+use common\models\SoundFile;
 use common\models\User;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 use Yii;
-use common\models\SoundFile;
-use backend\models\SoundFileSearch;
+use yii\base\InvalidConfigException;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use Throwable;
-use yii\base\InvalidConfigException;
 
 /**
  * SoundFileController implements the CRUD actions for SoundFile model.

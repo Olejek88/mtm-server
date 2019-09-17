@@ -1,4 +1,5 @@
 <?php
+
 use common\models\Device;
 use common\models\DeviceType;
 use common\models\MeasureType;
