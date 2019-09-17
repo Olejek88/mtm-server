@@ -11,10 +11,12 @@ use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\DeviceProgram;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Device */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $program DeviceProgram */
 ?>
 
 <div class="device-form">
@@ -129,6 +131,24 @@ use yii\widgets\ActiveForm;
             'language' => 'ru',
             'options' => [
                 'placeholder' => 'Выберите контроллер..'
+            ],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+        ]);
+
+    ?>
+
+    <?php
+    $programs = DeviceProgram::find()->all();
+    $items = ArrayHelper::map($programs, 'title', 'title');
+    echo $form->field($model, 'lightProgram')->widget(Select2::class,
+        [
+            'data' => $items,
+            'language' => 'ru',
+            'options' => [
+                'value' => isset($program) ? $program->title : '',
+                'placeholder' => 'Выберите программу управления..'
             ],
             'pluginOptions' => [
                 'allowClear' => true

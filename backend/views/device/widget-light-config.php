@@ -36,6 +36,7 @@ use yii\widgets\Pjax;
                 echo Html::hiddenInput('device', $device['uuid']);
                 echo Slider::widget([
                     'name' => 'time0',
+                    'value' => $parameters['time0'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'options' => [
@@ -55,6 +56,7 @@ use yii\widgets\Pjax;
                 echo '<div style="margin: 5px; width: 100%">';
                 echo Slider::widget([
                     'name' => 'level0',
+                    'value' => $parameters['level0'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'pluginOptions' => [
@@ -72,6 +74,7 @@ use yii\widgets\Pjax;
                 echo '<div style="margin: 5px; width: 100%">';
                 echo Slider::widget([
                     'name' => 'time1',
+                    'value' => $parameters['time1'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'options' => [
@@ -91,6 +94,7 @@ use yii\widgets\Pjax;
                 echo '<div style="margin: 5px; width: 100%">';
                 echo Slider::widget([
                     'name' => 'level1',
+                    'value' => $parameters['level1'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'pluginOptions' => [
@@ -113,6 +117,7 @@ use yii\widgets\Pjax;
                 echo Html::hiddenInput('device', $device['uuid']);
                 echo Slider::widget([
                     'name' => 'time2',
+                    'value' => $parameters['time2'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'options' => [
@@ -132,6 +137,7 @@ use yii\widgets\Pjax;
                 echo '<div style="margin: 5px; width: 100%">';
                 echo Slider::widget([
                     'name' => 'level2',
+                    'value' => $parameters['level2'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'pluginOptions' => [
@@ -149,6 +155,7 @@ use yii\widgets\Pjax;
                 echo '<div style="margin: 5px; width: 100%">';
                 echo Slider::widget([
                     'name' => 'time3',
+                    'value' => $parameters['time3'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'options' => [
@@ -168,6 +175,7 @@ use yii\widgets\Pjax;
                 echo '<div style="margin: 5px; width: 100%">';
                 echo Slider::widget([
                     'name' => 'level3',
+                    'value' => $parameters['level3'],
                     'sliderColor' => Slider::TYPE_INFO,
                     'handleColor' => Slider::TYPE_INFO,
                     'pluginOptions' => [

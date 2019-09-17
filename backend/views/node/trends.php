@@ -1,6 +1,7 @@
 <?php
 
 use common\models\MeasureType;
+use yii\web\View;
 
 /* @var $node
  * @var $camera
@@ -11,7 +12,7 @@ use common\models\MeasureType;
  */
 
 $this->title = Yii::t('app', 'Контроллер');
-$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerJsFile('/js/vendor/video.min.js', ['position' => View::POS_BEGIN]);
 $this->registerCssFile('/css/vendor/video-js.min.css');
 
 ?>

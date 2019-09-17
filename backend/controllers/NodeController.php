@@ -268,20 +268,33 @@ class NodeController extends Controller
         }
 
         if ($coordinator) {
-            $measures = (Measure::find()
-                ->where(['type' => MeasureType::MEASURE_TYPE_CURRENT])
+            $measure = (Measure::find()
+                ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN1])
+                ->joinWith('sensorChannel')
                 ->orderBy('date DESC'))
-                ->limit(100)
-                ->all();
-            foreach ($measures as $measure) {
-                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN1 &&
-                    $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
-                        $parameters['control']['contact'] = $measure['value'];
-                }
-                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
-                    $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
-                    $parameters['control']['signal'] = $measure['value'];
-                }
+                ->one();
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN1 &&
+                $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                $parameters['control']['door'] = $measure['value'];
+            }
+
+            $measure = (Measure::find()
+                ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
+                ->joinWith('sensorChannel')
+                ->orderBy('date DESC'))
+                ->one();
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+                $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                $parameters['control']['contactor'] = $measure['value'];
+            }
+            $measure = (Measure::find()
+                ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_DIGI1])
+                ->joinWith('sensorChannel')
+                ->orderBy('date DESC'))
+                ->one();
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_DIGI1 &&
+                $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                $parameters['control']['relay'] = $measure['value'];
             }
         }
 

@@ -1,10 +1,12 @@
 <?php
+
+use yii\web\View;
+
 /* @var $model
  */
 
-
 $this->title = Yii::t('app', 'Камера');
-$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerJsFile('/js/vendor/video.min.js', ['position' => View::POS_BEGIN]);
 $this->registerCssFile('/css/vendor/video-js.min.css');
 ?>
 
@@ -24,7 +26,7 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
         <div class="row">
             <div class="col-md-12" style="width: 800px;">
                 <video
-                        id="my-player"
+                        id="my-player<?= $model["_id"] ?>"
                         class="video-js"
                         width='800'
                         controls
@@ -40,7 +42,7 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
                     </p>
                 </video>
                 <script>
-                    v = videojs('my-player');
+                    v = videojs('my-player<?= $model["_id"] ?>');
                     v.on('error', function () {
                         console.log('XXX');
                         console.log(this.error());

@@ -22,6 +22,9 @@ use yii\db\Expression;
  */
 class SensorConfig extends MtmActiveRecord
 {
+    // параметр который задаётся для типов измерений COORD_IN1 и COORD_IN2
+    public $threshold;
+
     /**
      * Behaviors
      *
@@ -82,6 +85,7 @@ class SensorConfig extends MtmActiveRecord
             [['createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['oid'], 'checkOrganizationOwn'],
+            [['threshold'], 'string'],
         ];
     }
 

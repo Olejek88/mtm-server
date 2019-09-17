@@ -133,19 +133,20 @@ class CameraController extends Controller
             }
         }
 
-        $items = $req->getBodyParam('items');
+        $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
             $model = Camera::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                throw new HttpException(404, 'The specified post cannot be found.');
+                $model = new Camera();
+                $model->uuid = $item['uuid'];
+                $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
-//            $model->uuid = $item['uuid'];
-//            $model->oid = $organisation->uuid;
             $model->title = $item['title'];
             $model->deviceStatusUuid = $item['deviceStatusUuid'];
             $model->address = $item['address'];
+            $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {

@@ -8,7 +8,7 @@
  */
 
 $this->title = Yii::t('app', 'Тренды');
-$this->registerJsFile('/js/vendor/video.min.js');
+$this->registerJsFile('/js/vendor/video.min.js', ['position' => View::POS_BEGIN]);
 $this->registerCssFile('/css/vendor/video-js.min.css');
 
 ?>

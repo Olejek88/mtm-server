@@ -1,16 +1,15 @@
 <?php
 
-use common\models\Device;
 use yii\helpers\Html;
-use common\models\DeviceProgram;
 
-/* @var $model Device */
-/* @var $program DeviceProgram */
+/* @var $this yii\web\View */
+/* @var $model common\models\DeviceProgram */
 
-$this->title = Yii::t('app', 'Создать оборудование');
+$this->title = 'Create Device Program';
+$this->params['breadcrumbs'][] = ['label' => 'Device Programs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="device-create box-padding">
-
+<div class="device-program-create box-padding">
     <div class="panel panel-default">
         <div class="panel-heading" style="background: #fff;">
             <h3 class="text-center" style="color: #333;">
@@ -26,7 +25,6 @@ $this->title = Yii::t('app', 'Создать оборудование');
                             '_form',
                             [
                                 'model' => $model,
-                                'program' => $program,
                             ]
                         ) ?>
                     </h6>
@@ -35,5 +33,4 @@ $this->title = Yii::t('app', 'Создать оборудование');
 
         </div>
     </div>
-
 </div>

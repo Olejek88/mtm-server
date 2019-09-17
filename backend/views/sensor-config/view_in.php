@@ -1,11 +1,10 @@
 <?php
 /* @var $model common\models\SensorConfig */
 
-/* @var $form string */
-
 use yii\helpers\Html;
+use yii\widgets\DetailView;
 
-$this->title = Yii::t('app', 'Обновить');
+$this->title = "";
 ?>
 <div class="order-status-view box-padding" style="width: 95%; min-height: 782px">
     <?php
@@ -21,9 +20,23 @@ $this->title = Yii::t('app', 'Обновить');
 
             <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="list">
+                    <p class="text-center">
+                        <?php
+                        echo $this->render('@backend/views/yii2-app/layouts/buttons.php',
+                            ['model' => $model]);
+                        ?>
+                    </p>
                     <h6>
-                        <?= $this->render($form, [
+                        <?= DetailView::widget([
                             'model' => $model,
+                            'attributes' => [
+                                '_id',
+                                'uuid',
+                                'threshold',
+                                'sensorChannelUuid',
+                                'createdAt',
+                                'changedAt',
+                            ],
                         ]) ?>
                     </h6>
                 </div>

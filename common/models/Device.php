@@ -33,9 +33,13 @@ use yii\db\Expression;
  * @property DeviceType $deviceType
  * @property string $fullTitle
  * @property Node $node
+ * @property SensorChannel[] $sensorChannels
+ * @property DeviceProgram $deviceProgram
  */
 class Device extends MtmActiveRecord
 {
+    public $lightProgram;
+
     /**
      * Behaviors.
      *
@@ -111,7 +115,8 @@ class Device extends MtmActiveRecord
                     'objectUuid',
                     'serial',
                     'interface',
-                    'port'
+                    'port',
+                    'lightProgram'
                 ],
                 'required'
             ],
@@ -232,5 +237,25 @@ class Device extends MtmActiveRecord
     public function getFullTitle()
     {
         return $this->object->getFullTitle() . ' [' . $this->name . ']';
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getSensorChannels()
+    {
+        return $this->hasMany(SensorChannel::class, ['deviceUuid' => 'uuid']);
+    }
+
+    public function getDeviceProgram()
+    {
+        $config = DeviceConfig::find()->where(['deviceUuid' => $this->uuid, 'parameter' => 'Программа'])->one();
+        if ($config != null) {
+            return DeviceProgram::find()->where(['title' => $config->value])->one();
+        } else {
+            return null;
+        }
     }
 }

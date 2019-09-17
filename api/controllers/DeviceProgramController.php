@@ -3,22 +3,22 @@
 namespace api\controllers;
 
 use common\components\MtmActiveRecord;
+use common\models\DeviceProgram;
 use common\models\Node;
 use common\models\Organisation;
-use common\models\SensorChannel;
 use common\models\User;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 //use yii\filters\auth\HttpBearerAuth;
 use yii\web\BadRequestHttpException;
-use yii\web\HttpException;
 use yii\rest\Controller;
+use yii\web\HttpException;
 use yii\web\Response;
-use yii\base\InvalidConfigException;
 
-class SensorChannelController extends Controller
+class DeviceProgramController extends Controller
 {
-    public $modelClass = SensorChannel::class;
+    public $modelClass = DeviceProgram::class;
 
     /**
      * @inheritdoc
@@ -27,7 +27,7 @@ class SensorChannelController extends Controller
     {
         $verbs = parent::verbs();
 //        $verbs['create'] = ['POST'];
-//        $verbs['index'] = ['GET'];
+        $verbs['index'] = ['GET'];
         $verbs['send'] = ['POST'];
         return $verbs;
     }
@@ -78,13 +78,16 @@ class SensorChannelController extends Controller
             $node = Node::findOne($nid);
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
+            } else {
+//                $query->joinWith('device');
+//                $query->andWhere(['device.nodeUuid' => $node->uuid]);
             }
         }
 
         // проверяем параметры запроса
         $changedAfter = $req->getQueryParam('changedAfter');
         if ($changedAfter != null) {
-            $query->andWhere(['>=', 'changedAt', $changedAfter]);
+            $query->andWhere(['>=', $class::tableName() . '.changedAt', $changedAfter]);
         }
 
         // проверяем что хоть какие-то условия были заданы
@@ -133,24 +136,34 @@ class SensorChannelController extends Controller
 
         $items = json_decode($req->getBodyParam('items'), true);
         foreach ($items as $item) {
-            $model = SensorChannel::find()->where(['uuid' => $item['uuid']])->one();
+            $model = DeviceProgram::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
-                $model = new SensorChannel();
-//                $model->_id = $item['_id'];
-                $model->uuid = $item['uuid'];
-                $model->oid = $organisation->uuid;
+                $model = new DeviceProgram();
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
+            $model->_id = $item['_id'];
+            $model->uuid = $item['uuid'];
+            $model->oid = $organisation->uuid;
             $model->title = $item['title'];
-            $model->register = $item['register'];
-            $model->deviceUuid = $item['deviceUuid'];
-            $model->measureTypeUuid = $item['measureTypeUuid'];
+            $model->period_title1 = $item['period_title1'];
+            $model->value1 = $item['value1'];
+            $model->period_title2 = $item['period_title2'];
+            $model->time2 = $item['time2'];
+            $model->value2 = $item['value2'];
+            $model->period_title3 = $item['period_title3'];
+            $model->time3 = $item['time3'];
+            $model->value3 = $item['value3'];
+            $model->period_title4 = $item['period_title4'];
+            $model->time4 = $item['time4'];
+            $model->value4 = $item['value4'];
+            $model->period_title5 = $item['period_title5'];
+            $model->value5 = $item['value5'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
 
             if (!$model->save()) {
-                throw new HttpException(401, 'sensor channel not saved.');
+                throw new HttpException(401, 'device_program not saved.');
             }
         }
 

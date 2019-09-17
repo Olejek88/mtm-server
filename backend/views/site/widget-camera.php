@@ -2,6 +2,10 @@
 /* @var $camera */
 
 use common\models\DeviceStatus;
+use yii\web\View;
+
+$this->registerJsFile('/js/vendor/video.min.js', ['position' => View::POS_BEGIN]);
+$this->registerCssFile('/css/vendor/video-js.min.css');
 
 ?>
 
@@ -21,7 +25,7 @@ use common\models\DeviceStatus;
             <div class="product-img">
                 <div>
                     <video
-                            id="my-player"
+                            id="my-player<?= $camera["_id"] ?>>"
                             class="video-js"
                             controls
                             preload="auto"
@@ -36,7 +40,7 @@ use common\models\DeviceStatus;
                         </p>
                     </video>
                     <script>
-                        v = videojs('my-player');
+                        v = videojs('my-player<?= $camera["_id"] ?>');
                         v.on('error', function () {
                             console.log('XXX');
                             console.log(this.error());

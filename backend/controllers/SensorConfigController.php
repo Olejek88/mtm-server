@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\SensorConfigSearch;
+use common\models\MeasureType;
 use common\models\SensorConfig;
 use common\models\User;
 use Throwable;
@@ -87,10 +88,18 @@ class SensorConfigController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $form = 'view';
+        if ($model != null && in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+            $value = json_decode($model->config, true);
+            $model->threshold = $value['threshold'];
+            $form = 'view_in';
+        }
+
         return $this->render(
-            'view',
+            $form,
             [
-                'model' => $this->findModel($id),
+                'model' => $model,
             ]
         );
     }
@@ -107,27 +116,57 @@ class SensorConfigController extends Controller
             return $this->redirect('/site/index');
         }
 
+        $form = '_form';
         $model = new SensorConfig();
         $searchModel = new SensorConfigSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 50;
 
+        $sensorChannelUuid = Yii::$app->request->get('sc');
+        if ($sensorChannelUuid != null) {
+            $model->sensorChannelUuid = $sensorChannelUuid;
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+                $model->threshold = 1024;
+                $form = '_form_in';
+            }
+        }
+
         if ($model->load(Yii::$app->request->post())) {
             // проверяем все поля, если что-то не так показываем форму с ошибками
             if (!$model->validate()) {
-                echo var_dump($model);
-                echo var_dump($model->errors);
-                return $this->render('create', ['model' => $model, 'dataProvider' => $dataProvider]);
+                return $this->render('create',
+                    [
+                        'model' => $model,
+                        'dataProvider' => $dataProvider,
+                        'form' => $form,
+                    ]
+                );
+            }
+
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+                $model->config = json_encode(['threshold' => $model->config]);
+                $form = '_form_in';
             }
 
             // сохраняем запись
             if ($model->save(false)) {
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
-                return $this->render('create', ['model' => $model, 'dataProvider' => $dataProvider]);
+                return $this->render('create',
+                    [
+                        'model' => $model,
+                        'dataProvider' => $dataProvider,
+                        'form' => $form,
+                    ]
+                );
             }
         } else {
-            return $this->render('create', ['model' => $model, 'dataProvider' => $dataProvider]);
+            return $this->render('create', [
+                    'model' => $model,
+                    'dataProvider' => $dataProvider,
+                    'form' => $form,
+                ]
+            );
         }
     }
 
@@ -146,8 +185,14 @@ class SensorConfigController extends Controller
             return $this->redirect('/site/index');
         }
 
+        $form = '_form';
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+                $model->config = json_encode(['threshold' => $model->threshold]);
+                $form = '_form_in';
+            }
+
             // сохраняем модель
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->_id]);
@@ -156,14 +201,22 @@ class SensorConfigController extends Controller
                     'update',
                     [
                         'model' => $model,
+                        'form' => $form,
                     ]
                 );
             }
         } else {
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+                $value = json_decode($model->config, true);
+                $model->threshold = isset($value['threshold']) ? $value['threshold'] : 1024;
+                $form = '_form_in';
+            }
+
             return $this->render(
                 'update',
                 [
                     'model' => $model,
+                    'form' => $form,
                 ]
             );
         }

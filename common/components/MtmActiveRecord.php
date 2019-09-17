@@ -21,11 +21,13 @@ class MtmActiveRecord extends ActiveRecord
      */
     public static function find()
     {
+        /** @var ActiveRecord $calledClass */
+        $calledClass = get_called_class();
         if (Yii::$app instanceof Application) {
-            $aq = Yii::createObject(MtmActiveQuery::class, [get_called_class()]);
-            $aq->andWhere(['oid' => User::getOid(Yii::$app->user->identity)]);
+            $aq = Yii::createObject(MtmActiveQuery::class, [$calledClass]);
+            $aq->andWhere([$calledClass::tableName() . '.oid' => User::getOid(Yii::$app->user->identity)]);
         } else {
-            $aq = Yii::createObject(ActiveQuery::class, [get_called_class()]);
+            $aq = Yii::createObject(ActiveQuery::class, [$calledClass]);
         }
 
         return $aq;
