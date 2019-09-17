@@ -14,9 +14,11 @@
 /* @var  $polylineList */
 /* @var  $camerasList */
 /* @var  $camerasGroup */
+/* @var  $define */
+/* @var  $postCode */
 
 $this->title = Yii::t('app', 'Карта объектов и светильников');
-
+$this->registerJs('$(window).on("resize", function () { $("#mapid").height($(window).height()-40); map.invalidateSize(); }).trigger("resize");');
 ?>
 <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
         integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
@@ -43,7 +45,7 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
 }
 </style>
 <div class="box-relative">
-    <div id="mapid" style="width: 100%; height: 800px"></div>
+    <div id="mapid" style="height: 800px; width: 100%"></div>
 
     <script>
         var houseIcon = L.icon({
@@ -58,9 +60,27 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
+        var nodeIconBad = L.icon({
+            iconUrl: '/images/router_marker_red.png',
+            iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
         var cameraIcon = L.icon({
             iconUrl: '/images/camera_marker_green.png',
             iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
+        var cameraIconBad = L.icon({
+            iconUrl: '/images/camera_marker_red.png',
+            iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
+        var cameraIconSelect = L.icon({
+            iconUrl: '/images/camera_marker_blue.png',
+            iconSize: [33, 51],
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
@@ -70,8 +90,22 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
+        var lightIconBad = L.icon({
+            iconUrl: '/images/light_marker_red.png',
+            iconSize: [32, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
+        var lightIconSelect = L.icon({
+            iconUrl: '/images/light_marker_blue.png',
+            iconSize: [33, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
 
         <?php
+        echo $define;
+
         echo $devicesList;
         echo $devicesGroup;
         echo $nodesList;
@@ -113,8 +147,18 @@ $this->title = Yii::t('app', 'Карта объектов и светильни�
             position: 'bottomleft'
         }).addTo(map);
 
+
         <?php
-        echo $polylineList;
+        //echo $polylineList;
+        echo $postCode;
         ?>
     </script>
+
+</div>
+
+<div class="modal remote fade" id="modalAddEquipment">
+    <div class="modal-dialog">
+        <div class="modal-content loader-lg" id="modalContentEquipment">
+        </div>
+    </div>
 </div>

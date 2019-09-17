@@ -3,7 +3,6 @@
 namespace common\models;
 
 use common\components\MtmActiveRecord;
-use common\models\mtm\MtmDevLightConfig;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;

@@ -3,6 +3,7 @@
  */
 
 use kartik\grid\GridView;
+
 $this->title = Yii::t('app', 'Журнал работы устройств');
 
 ?>

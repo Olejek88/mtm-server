@@ -116,6 +116,9 @@ class House extends MtmActiveRecord
 
     public function getFullTitle() {
 //        echo json_encode($this->houseType);
-        return 'ул.'.$this->street['title'].', д.'.$this->number;
+        if ($this->houseTypeUuid!=HouseType::HOUSE_TYPE_NO_NUMBER)
+            return 'ул.'.$this->street['title'].', д.'.$this->number;
+        else
+            return 'ул.'.$this->street['title'].' - без адреса';
     }
 }

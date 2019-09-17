@@ -1,8 +1,8 @@
 <?php
 
 use common\components\MainFunctions;
-use common\models\ObjectType;
 use common\models\House;
+use common\models\ObjectType;
 use common\models\User;
 use dosamigos\leaflet\layers\Marker;
 use dosamigos\leaflet\layers\TileLayer;

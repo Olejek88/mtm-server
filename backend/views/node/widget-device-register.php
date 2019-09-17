@@ -4,8 +4,6 @@
 
 use common\models\Device;
 use common\models\DeviceRegister;
-use common\models\Node;
-use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 

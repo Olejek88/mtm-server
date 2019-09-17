@@ -1,14 +1,10 @@
 <?php
 /* @var $searchModel backend\models\NodeSearch */
 
-use common\models\Device;
 use common\models\DeviceStatus;
-use common\models\DeviceType;
 use common\models\Operation;
-use kartik\datecontrol\DateControl;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Контроллера');
@@ -80,8 +76,8 @@ $gridColumns = [
                 if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
                     $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
                     $color = 'background-color: gray';
-                if ($stat['uuid'] == DeviceStatus::NOT_WORK)
-                    $color = 'background-color: lightred';
+                if ($stat['uuid'] == DeviceStatus::NOT_WORK || $stat['uuid'] == DeviceStatus::NO_CONNECT)
+                    $color = 'background-color: red';
                 if ($stat['uuid'] == DeviceStatus::WORK)
                     $color = 'background-color: green';
                 $list[$stat['uuid']] = $stat['title'];
@@ -138,6 +134,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
+        'template' => '{update}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];

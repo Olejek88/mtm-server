@@ -4,8 +4,6 @@
  * @var $device
  */
 
-use common\models\Measure;
-use common\models\MeasureType;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
@@ -65,17 +63,17 @@ use yii\widgets\Pjax;
             <tr data-key="2">
                 <td class="table_class kv-align-middle" data-col-seq="0">Контактор сети</td>
                 <?php
-                    if (isset($parameters['control']['contactor']) && $parameters['control']['contactor'])
-                        echo '<td class="kv-align-center kv-align-middle" style="background-color: red; color: white">Отключен</td>';
-                    else
-                        echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включен</td>';
+                if (isset($parameters['control']['contactor']) && $parameters['control']['contactor'])
+                    echo '<td class="kv-align-center kv-align-middle" style="background-color: red; color: white">Отключен</td>';
+                else
+                    echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включен</td>';
                 ?>
             </tr>
             <tr data-key="2">
                 <td class="table_class kv-align-middle" data-col-seq="0">Реле управления контактором</td>
                 <?php
-                    if (isset($parameters['control']['relay']) && $parameters['control']['relay'])
-                        echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включено</td>';
+                if (isset($parameters['control']['relay']) && $parameters['control']['relay'])
+                    echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включено</td>';
                     else
                         echo '<td class="kv-align-center kv-align-middle" style="background-color: gray; color: white">Отключено</td>';
                 ?>

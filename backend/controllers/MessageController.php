@@ -2,11 +2,14 @@
 
 namespace backend\controllers;
 
+use backend\models\MessageSearch;
+use common\models\Message;
 use common\models\Organisation;
 use common\models\User;
 use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -14,9 +17,6 @@ use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use common\models\Message;
-use backend\models\MessageSearch;
-use Throwable;
 use yii\web\UploadedFile;
 
 /**

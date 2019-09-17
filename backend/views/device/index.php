@@ -47,7 +47,7 @@ $gridColumns = [
         'width' => '180px',
         'mergeHeader' => true,
         'value' => function ($data) {
-            return Html::a($data['node']['object']->getAddress().' ['.$data['node']['address'].']',
+            return Html::a($data['object']->getFullTitle() . ' [' . $data['node']['address'] . ']',
                 ['/device/dashboard','uuid' => $data['uuid']]);
         },
         'header' => 'Адрес',
@@ -98,8 +98,8 @@ $gridColumns = [
                 if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
                     $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
                     $color = 'background-color: gray';
-                if ($stat['uuid'] == DeviceStatus::NOT_WORK)
-                    $color = 'background-color: lightred';
+                if ($stat['uuid'] == DeviceStatus::NOT_WORK || $stat['uuid'] == DeviceStatus::NO_CONNECT)
+                    $color = 'background-color: red';
                 if ($stat['uuid'] == DeviceStatus::WORK)
                     $color = 'background-color: green';
                 $list[$stat['uuid']] = $stat['title'];

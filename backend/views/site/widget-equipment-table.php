@@ -3,7 +3,6 @@
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
-use common\models\Measure;
 use common\models\ObjectContragent;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
@@ -235,6 +234,10 @@ use yii\helpers\Html;
                 'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Устройства',
                 'headingOptions' => ['style' => 'background: #337ab7']
             ],
+            'rowOptions' => function($model) {
+                if ($model['deviceStatusUuid']!=DeviceStatus::WORK)
+                    return ['class' => 'danger'];
+            }
         ]);
         ?>
     </div>

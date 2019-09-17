@@ -3,13 +3,6 @@
  * @var $parameters
  */
 
-use common\models\mtm\MtmDevLightConfig;
-use kartik\slider\Slider;
-use kartik\widgets\DatePicker;
-use kartik\widgets\Select2;
-use yii\helpers\Html;
-use yii\widgets\Pjax;
-
 ?>
 <div class="box box-success">
     <div class="box-header with-border">

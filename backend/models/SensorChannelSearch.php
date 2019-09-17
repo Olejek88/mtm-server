@@ -5,6 +5,7 @@ namespace backend\models;
 use common\models\Group;
 use common\models\RequestStatus;
 use common\models\SensorChannel;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -20,7 +21,7 @@ class SensorChannelSearch extends SensorChannel
     {
         return [
             [['_id'], 'integer'],
-            [['uuid', 'title', 'createdAt', 'changedAt'], 'safe'],
+            [['uuid', 'title', 'measureTypeUuid', 'createdAt', 'changedAt'], 'safe'],
         ];
     }
 
@@ -39,6 +40,7 @@ class SensorChannelSearch extends SensorChannel
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws InvalidConfigException
      */
     public function search($params)
     {
@@ -61,6 +63,7 @@ class SensorChannelSearch extends SensorChannel
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'measureTypeUuid' => $this->measureTypeUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);

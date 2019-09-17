@@ -3,15 +3,15 @@
  * @var $source
  * @var $streetUuid
  */
+
 use common\components\MainFunctions;
 use common\models\DocumentationType;
 use common\models\Equipment;
 use common\models\EquipmentStatus;
-use common\models\HouseStatus;use common\models\HouseType;
+use common\models\HouseStatus;
+use common\models\HouseType;
 use common\models\User;
 use common\models\Users;
-use kartik\select2\Select2;
-use kartik\widgets\FileInput;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;

@@ -1,6 +1,7 @@
 <?php
 
 use common\models\Measure;
+use common\models\MeasureType;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 
@@ -37,10 +38,25 @@ use yii\data\ActiveDataProvider;
                 'headerOptions' => ['class' => 'text-center'],
             ],
             [
-                'attribute' => 'sensorChannel.measureType.title',
                 'hAlign' => 'center',
                 'header' => 'Тип измерения',
                 'vAlign' => 'middle',
+                'value' => function ($data) {
+                    if ($data['type']== MeasureType::MEASURE_TYPE_CURRENT)
+                        return 'Текущее значение';
+                    if ($data['type']== MeasureType::MEASURE_TYPE_HOUSE)
+                        return 'Часовое значение';
+                    if ($data['type']== MeasureType::MEASURE_TYPE_DAYS)
+                        return 'Дневное значение';
+                    if ($data['type']== MeasureType::MEASURE_TYPE_MONTH)
+                        return 'Архив за месяц';
+                    if ($data['type']== MeasureType::MEASURE_TYPE_TOTAL)
+                        return 'Накопительное значение';
+                    if ($data['type']== MeasureType::MEASURE_TYPE_INTERVAL)
+                        return 'Интервальное значение';
+                    if ($data['type']== MeasureType::MEASURE_TYPE_TOTAL_CURRENT)
+                        return 'Текущее накопительное';
+                },
                 'contentOptions' => [
                     'class' => 'table_class'
                 ],
@@ -55,6 +71,7 @@ use yii\data\ActiveDataProvider;
                 'sort' =>false,
             ]
         );
+        $provider->pagination->pageSize = 8;
 
         echo GridView::widget(
             [

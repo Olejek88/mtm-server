@@ -1,8 +1,8 @@
 <?php
 
+use common\models\User;
 use yii\helpers\Html;
 use yii\web\View;
-use common\models\User;
 
 /* @var $this View */
 /* @var $content string */

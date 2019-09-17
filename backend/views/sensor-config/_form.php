@@ -1,7 +1,6 @@
 <?php
 
 use common\components\MainFunctions;
-use common\models\House;
 use common\models\SensorChannel;
 use common\models\User;
 use kartik\widgets\Select2;

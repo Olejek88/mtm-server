@@ -3,13 +3,6 @@
 /* @var $parameters
  */
 
-use common\models\Device;
-use common\models\DeviceType;
-use common\models\Measure;
-use common\models\MeasureType;
-use common\models\SensorChannel;
-use yii\helpers\Html;
-
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
 $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 

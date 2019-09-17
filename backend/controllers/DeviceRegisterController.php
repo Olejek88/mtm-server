@@ -5,13 +5,13 @@ namespace backend\controllers;
 use backend\models\DeviceRegisterSearch;
 use common\models\DeviceRegister;
 use common\models\User;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use Throwable;
 
 /**
  * DeviceRegisterController implements the CRUD actions for DeviceRegister model.
