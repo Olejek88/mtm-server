@@ -25,7 +25,7 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
             <div class="product-img">
                 <div>
                     <video
-                            id="my-player<?= $camera["_id"] ?>>"
+                            id="my-player<?= $camera["_id"] ?>">
                             class="video-js"
                             controls
                             preload="auto"
