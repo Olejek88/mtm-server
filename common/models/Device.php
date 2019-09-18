@@ -3,8 +3,8 @@
 namespace common\models;
 
 use common\components\MtmActiveRecord;
-use common\models\mtm\MtmDevLightConfig;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
@@ -250,6 +250,22 @@ class Device extends MtmActiveRecord
         return $this->hasMany(SensorChannel::class, ['deviceUuid' => 'uuid']);
     }
 
+    /**
+     * Объект связанного поля.
+     *
+     * @param $measureTypeUuid
+     * @return ActiveQuery
+     * @throws InvalidConfigException
+     */
+    public function getSensorChannel($measureTypeUuid)
+    {
+        return SensorChannel::find()->where(['deviceUuid' => $this->uuid, 'measureTypeUuid' => $measureTypeUuid]);
+    }
+
+    /**
+     * @return array|DeviceProgram|\yii\db\ActiveRecord|null
+     * @throws InvalidConfigException
+     */
     public function getDeviceProgram()
     {
         $config = DeviceConfig::find()->where(['deviceUuid' => $this->uuid, 'parameter' => 'Программа'])->one();

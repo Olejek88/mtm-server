@@ -18,6 +18,7 @@ use common\models\Journal;
 use common\models\LoginForm;
 use common\models\Measure;
 use common\models\MeasureType;
+use common\models\mtm\MtmDevLightConfig;
 use common\models\Node;
 use common\models\Objects;
 use common\models\SensorChannel;
@@ -466,7 +467,8 @@ class SiteController extends Controller
         $equipmentsList = '';
         $group='-';
         $dimming = '-';
-        $current_power = '-';
+        $nominal_power = '-';
+        $current_power = -1;
         $t = '-';
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
@@ -477,7 +479,24 @@ class SiteController extends Controller
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
                     if ($deviceGroup)
                         $group = $deviceGroup['group']['title'];
-                    $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                    $nominal_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                    $nominal_power = MtmDevLightConfig::getPowerString($nominal_power);
+                    if ($device->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
+                        /** @var SensorChannel $sChannel */
+                        $sChannel = $device->getSensorChannel(MeasureType::POWER)->one();
+                        if ($sChannel != null) {
+                            /** @var Measure $cMeasure */
+                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            if ($cMeasure != null) {
+                                $current_power = $cMeasure->value;
+                            } else {
+                                $current_power = 'Нет данных';
+                            }
+                        } else {
+                            $current_power = 'Нет данных';
+                        }
+                    }
+
                     $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                     $measure = Measure::find()
                         ->where(['sensorChannelUuid' => (SensorChannel::find()
@@ -500,7 +519,8 @@ class SiteController extends Controller
                     . '<br/>'
                     . 'Адрес: ' . $device['address'] . '<br/>'
                     . 'Группа: ' . $group . '<br/>'
-                    . 'Мощность: ' . $current_power . '<br/>'
+                    . 'Мощность: ' . $nominal_power . '<br/>'
+                    . 'Текущая мощность: ' . $current_power . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
                     . 'Температура: ' . $t . '<br/>\').openPopup();';
 

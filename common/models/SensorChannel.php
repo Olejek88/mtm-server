@@ -125,4 +125,12 @@ class SensorChannel extends MtmActiveRecord
     {
         return $this->hasOne(SensorConfig::class, ['sensorChannelUuid' => 'uuid']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getMeasureOne()
+    {
+        return $this->hasOne(Measure::class, ['sensorChannelUuid' => 'uuid']);
+    }
 }
