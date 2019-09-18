@@ -221,6 +221,7 @@ class DeviceController extends Controller
      * @param integer $id Id
      *
      * @return mixed
+     * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -415,7 +416,11 @@ class DeviceController extends Controller
                 $values .= ',';
             }
             $categories .= "'" . date_format(date_create($measure['date']), 'Y-m-d') . "'";
-            $values .= $measure->value;
+            // TODO важно! временно!
+            if ($measure->value < 1000)
+                $values .= $measure->value;
+            else
+                $values .= '0';
             $cnt++;
         }
 
@@ -649,7 +654,7 @@ class DeviceController extends Controller
             $measures = (Measure::find()
                 ->where(['sensorChannelUuid' => $sChannel['uuid']])
                 ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-                ->andWhere(['parameter' => 0])
+                ->andWhere(['parameter' => 1])
                 ->orderBy('date DESC'))->limit(200)->all();
         }
 
@@ -834,7 +839,7 @@ class DeviceController extends Controller
                 $data['trends']['month']['categories'] .= ',';
                 $data['trends']['month']['values'] .= ',';
             }
-            $data['trends']['month']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
+            $data['trends']['month']['categories'] .= "'" . date_format(date_create($measure['date']), 'm-Y') . "'";
             $data['trends']['month']['values'] .= $measure->value;
             $cnt++;
         }

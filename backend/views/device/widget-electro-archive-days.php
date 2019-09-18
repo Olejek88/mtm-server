@@ -42,21 +42,21 @@ use yii\helpers\Html;
                         else
                             echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
                         if (isset($data['w2']))
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="2">' . $data['w2'] . '</td>';
                         else
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="2">-</td>';
                         if (isset($data['w3']))
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="3">' . $data['w3'] . '</td>';
                         else
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="3">-</td>';
                         if (isset($data['w4']))
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="4">' . $data['w4'] . '</td>';
                         else
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="4">-</td>';
                         if (isset($data['ws']))
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="5">' . ($data["w1"] + $data["w2"] + $data["w3"] + $data["w4"]) . '</td>';
                         else
-                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
+                            echo '<td class="kv-align-center kv-align-middle" data-col-seq="5">-</td>';
                         echo '</tr>';
                     }
                 ?>
