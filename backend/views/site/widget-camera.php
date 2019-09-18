@@ -24,13 +24,12 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
         <div class="col-sm-7 invoice-col">
             <div class="product-img">
                 <div>
-                    <video
-                            id="my-player<?= $camera["_id"] ?>">
-                            class="video-js"
-                            controls
-                            preload="auto"
-                            poster="/images/camera_view.jpg"
-                            data-setup="{}">
+                    <video id="my-player<?= $camera["_id"] ?>"
+                           class="video-js"
+                           controls
+                           preload="auto"
+                           poster="/images/camera_view.jpg"
+                           data-setup="{}">
                         <source src="/lightcams/<?= $camera['uuid'] . '.m3u8' ?>" type="application/x-mpegURL"/>
                         <p class="vjs-no-js">
                             Для просмотра видео включите JavaScript и обновите браузер для поддержки
