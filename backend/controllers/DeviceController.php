@@ -7,6 +7,7 @@ use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceConfig;
 use common\models\DeviceGroup;
+use common\models\DeviceProgram;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -237,11 +238,13 @@ class DeviceController extends Controller
                 $deviceConfig->save();
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
+                $program = new DeviceProgram();
+                $program->title = $model->lightProgram;
                 return $this->render(
                     'update',
                     [
                         'model' => $model,
-                        'program' => $model->getDeviceProgram(),
+                        'program' => $program,
                     ]
                 );
             }
