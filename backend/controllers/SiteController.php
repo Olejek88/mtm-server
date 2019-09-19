@@ -466,15 +466,15 @@ class SiteController extends Controller
         $polylineList = '';
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
-        $group='-';
-        $dimming = '-';
-        $current_power = '-';
+        $group = '-';
         $t = '-';
         $define = '';
 
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
                 $warnings = '';
+                $dimming = '-';
+                $current_power = '-';
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
@@ -482,8 +482,6 @@ class SiteController extends Controller
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
                     if ($deviceGroup)
                         $group = $deviceGroup['group']['title'];
-                    $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
-                    $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                     $measure = Measure::find()
                         ->where(['sensorChannelUuid' => (SensorChannel::find()
                             ->select('uuid')
@@ -491,43 +489,62 @@ class SiteController extends Controller
                             ->andWhere(['deviceUuid' => $device['uuid']]))])->one();
                     if ($measure)
                         $t = $measure['value'];
+                    $coordinator = Device::find()
+                        ->where(['nodeUuid' => $device['node']['uuid']])
+                        ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                        ->one();
+                    if ($coordinator) {
+                        $measure = (Measure::find()
+                            ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
+                            ->joinWith('sensorChannel')
+                            ->orderBy('date DESC'))
+                            ->one();
+                        if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+                            $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                            $contactor = $measure['value'];
+                            if ($contactor) {
+                                $dimming = "-";
+                                $current_power = "-";
+                            } else {
+                                $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                                $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
+                            }
+                        }
+                    }
                 } else if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT_WITHOUT_ZB) {
                     $link = '<b>' . $device["name"] . '</b>';
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
                     if ($deviceGroup)
                         $group = $deviceGroup['group']['title'];
-                    $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
-                    $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                 } else {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
                         . '</b>';
                 }
 
-                if ($device['deviceStatusUuid']==DeviceStatus::WORK) {
+                if ($device['deviceStatusUuid'] == DeviceStatus::WORK) {
                     $icon = 'lightIcon';
-                }
-                else {
+                } else {
                     $icon = 'lightIconBad';
-                    $warnings = 'Статус: <span class="badge badge-green-red">'.$device['deviceStatus']['title'].'</span>';
+                    $t = "-";
+                    $warnings = 'Статус: <span class="badge badge-green-red">' . $device['deviceStatus']['title'] . '</span>';
                 }
-                $define .= 'var deviceIcon'. $device["_id"].'='.$icon.';';
-                $define .= 'var deviceStatus'. $device["_id"].'=1;';
+                $define .= 'var deviceIcon' . $device["_id"] . '=' . $icon . ';';
+                $define .= 'var deviceStatus' . $device["_id"] . '=1;';
 
                 $equipmentsList .= 'var device'
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
-                    . '], {icon: '.$icon.'}).bindPopup(\''
+                    . '], {icon: ' . $icon . '}).bindPopup(\''
                     . $link . '</span>'
                     . '<br/>'
-                    . 'Адрес: ' . $device['address'] . '<br/>'
-                    . 'Группа: ' . $group . '<br/>'
-                    . 'Мощность: ' . $current_power . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
+                    . 'Мощность: ' . $current_power . '<br/>'
+                    . '' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
                     . $warnings
-                    .'\').openPopup();';
+                    . '\').openPopup();';
 
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
@@ -550,17 +567,17 @@ class SiteController extends Controller
         foreach ($cameras as $camera) {
             if ($camera["object"]["latitude"] > 0) {
                 $warnings = '';
-                if ($camera['deviceStatusUuid']==DeviceStatus::WORK)
+                if ($camera['deviceStatusUuid'] == DeviceStatus::WORK)
                     $icon = 'cameraIcon';
                 else {
                     $icon = 'cameraIconBad';
-                    $warnings = 'Статус: <span class="badge badge-green-red">'.$camera['deviceStatus']['title'].'</span>';
+                    $warnings = 'Статус: <span class="badge badge-green-red">' . $camera['deviceStatus']['title'] . '</span>';
                 }
                 $camerasList .= 'var camera'
                     . $camera["_id"]
                     . '= L.marker([' . $camera["object"]["latitude"]
                     . ',' . $camera["object"]["longitude"]
-                    . '], {icon: '.$icon.'}).bindPopup(\'<b>'
+                    . '], {icon: ' . $icon . '}).bindPopup(\'<b>'
                     . Html::a($camera["title"],
                         ['/camera/dashboard', 'uuid' => $camera['uuid']]) . '</b><br/>'
                     . $camera["object"]->getAddress() . '<br/>'
@@ -591,9 +608,9 @@ class SiteController extends Controller
                 $power = '<span class="badge badge-green-small">в норме</span>';
                 $temperature = '<span class="badge badge-green-small">28.82(C)</span>';
                 $warnings = '';
-                if ($node['deviceStatusUuid']==DeviceStatus::NO_CONNECT)
+                if ($node['deviceStatusUuid'] == DeviceStatus::NO_CONNECT)
                     $link = '<span class="badge badge-red-small">нет</span>';
-                if ($node['deviceStatusUuid']==DeviceStatus::WORK)
+                if ($node['deviceStatusUuid'] == DeviceStatus::WORK)
                     $icon = 'nodeIcon';
                 else {
                     $icon = 'nodeIconBad';
@@ -612,8 +629,8 @@ class SiteController extends Controller
                     ->one();
                 //echo json_encode($device['uuid']);
                 if ($device) {
-                    if ($device['deviceStatusUuid']!=DeviceStatus::WORK) {
-                        $warnings .= 'Статус счетчика: <span class="badge badge-red-small">'.$device['deviceStatus']['title'].'</span></br>';
+                    if ($device['deviceStatusUuid'] != DeviceStatus::WORK) {
+                        $warnings .= 'Статус счетчика: <span class="badge badge-red-small">' . $device['deviceStatus']['title'] . '</span></br>';
                     }
 
                     $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
@@ -640,7 +657,7 @@ class SiteController extends Controller
                     . $node["_id"]
                     . '= L.marker([' . $node["object"]["latitude"]
                     . ',' . $node["object"]["longitude"]
-                    . '], {icon: '.$icon.'}).bindPopup(\'<b>'
+                    . '], {icon: ' . $icon . '}).bindPopup(\'<b>'
                     . Html::a($node["object"]->getAddress(),
                         ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
                     . '</b><br/>'
@@ -655,20 +672,20 @@ class SiteController extends Controller
                     . 'Версия ПО: ' . $software . '<br/>'
                     . 'Телефон/адрес: ' . $phone . '<br/>'
                     . $warnings
-                    .'\').openPopup();';
+                    . '\').openPopup();';
 
-                $nodesList .= 'node'.$node["_id"].'.on(\'click\', function(e) {';
-                    $devices = Device::find()
-                        ->where(['IN', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
-                        ->andWhere(['nodeUuid' => $node['uuid']])
-                        ->all();
-                    foreach ($devices as $device) {
-                        $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
-                        $nodesList .= 'if (deviceStatus'.$device["_id"].'==1) { device' . $device["_id"] . '.setIcon(deviceIcon'.$device["_id"].'); deviceStatus'.$device["_id"].'=0; }';
-                        $nodesList .= PHP_EOL;
-                        $nodesList .= ' else { device' . $device["_id"] . '.setIcon(lightIconSelect); deviceStatus'.$device["_id"].'=1; } ';
-                        $nodesList .= PHP_EOL;
-                    }
+                $nodesList .= 'node' . $node["_id"] . '.on(\'click\', function(e) {';
+                $devices = Device::find()
+                    ->where(['IN', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
+                    ->andWhere(['nodeUuid' => $node['uuid']])
+                    ->all();
+                foreach ($devices as $device) {
+                    $coords[] = [$device['object']['latitude'], $device['object']['longitude']];
+                    $nodesList .= 'if (deviceStatus' . $device["_id"] . '==1) { device' . $device["_id"] . '.setIcon(deviceIcon' . $device["_id"] . '); deviceStatus' . $device["_id"] . '=0; }';
+                    $nodesList .= PHP_EOL;
+                    $nodesList .= ' else { device' . $device["_id"] . '.setIcon(lightIconSelect); deviceStatus' . $device["_id"] . '=1; } ';
+                    $nodesList .= PHP_EOL;
+                }
                 $nodesList .= '});';
 
                 $coords[] = [$node['object']['latitude'], $node['object']['longitude']];

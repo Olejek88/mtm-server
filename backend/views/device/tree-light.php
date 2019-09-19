@@ -109,6 +109,7 @@ echo FancytreeWidget::widget([
                                       type: "post",
                                       data: {
                                            selected_node: data.key,
+                                           type: "device",
                                            uuid: data.data.uuid
                                       },
                                     error: function (result) {
