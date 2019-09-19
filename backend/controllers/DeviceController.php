@@ -168,6 +168,7 @@ class DeviceController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionCreate()
     {
@@ -222,6 +223,7 @@ class DeviceController extends Controller
      * @param integer $id Id
      *
      * @return mixed
+     * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -418,7 +420,11 @@ class DeviceController extends Controller
                 $values .= ',';
             }
             $categories .= "'" . date_format(date_create($measure['date']), 'Y-m-d') . "'";
-            $values .= $measure->value;
+            // TODO важно! временно!
+            if ($measure->value < 1000)
+                $values .= $measure->value;
+            else
+                $values .= '0';
             $cnt++;
         }
 
@@ -652,7 +658,7 @@ class DeviceController extends Controller
             $measures = (Measure::find()
                 ->where(['sensorChannelUuid' => $sChannel['uuid']])
                 ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-                ->andWhere(['parameter' => 0])
+                ->andWhere(['parameter' => 1])
                 ->orderBy('date DESC'))->limit(200)->all();
         }
 
@@ -837,7 +843,7 @@ class DeviceController extends Controller
                 $data['trends']['month']['categories'] .= ',';
                 $data['trends']['month']['values'] .= ',';
             }
-            $data['trends']['month']['categories'] .= "'" . date_format(date_create($measure['date']), 'd H:i') . "'";
+            $data['trends']['month']['categories'] .= "'" . date_format(date_create($measure['date']), 'm-Y') . "'";
             $data['trends']['month']['values'] .= $measure->value;
             $cnt++;
         }
@@ -1180,8 +1186,11 @@ class DeviceController extends Controller
                 'type' => 'street',
                 'folder' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
+            $houses = House::find()
+                ->where(['streetUuid' => $street['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->orderBy('number')
+                ->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
@@ -1191,7 +1200,10 @@ class DeviceController extends Controller
                     'title' => $house->getFullTitle(),
                     'folder' => true
                 ];
-                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                $objects = Objects::find()
+                    ->where(['houseUuid' => $house['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
@@ -1202,7 +1214,10 @@ class DeviceController extends Controller
                         'type' => 'object',
                         'folder' => true
                     ];
-                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $nodes = Node::find()
+                        ->where(['objectUuid' => $object['uuid']])
+                        ->andWhere(['deleted' => 0])
+                        ->all();
                     foreach ($nodes as $node) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
                         if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
@@ -1223,10 +1238,15 @@ class DeviceController extends Controller
                             'register' => $node['address'],
                             'folder' => true
                         ];
-                        $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        $devices = Device::find()
+                            ->where(['nodeUuid' => $node['uuid']])
+                            ->andWhere(['deleted' => 0])
+                            ->all();
                         if (isset($_GET['type']))
-                            $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                            $devices = Device::find()
+                                ->where(['nodeUuid' => $node['uuid']])
                                 ->andWhere(['deviceTypeUuid' => $_GET['type']])
+                                ->andWhere(['deleted' => 0])
                                 ->all();
                         foreach ($devices as $device) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
@@ -1311,10 +1331,16 @@ class DeviceController extends Controller
                 'type' => 'street',
                 'folder' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
+            $houses = House::find()
+                ->where(['streetUuid' => $street['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->orderBy('number')
+                ->all();
             foreach ($houses as $house) {
-                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                $objects = Objects::find()
+                    ->where(['houseUuid' => $house['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->all();
                 foreach ($objects as $object) {
                     $childIdx = count($fullTree['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][] = [
@@ -1328,6 +1354,7 @@ class DeviceController extends Controller
                     ];
                     $devices = Device::find()->where(['objectUuid' => $object['uuid']])
                         ->andWhere(['in', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
+                        ->andWhere(['deleted' => 0])
                         ->all();
                     foreach ($devices as $device) {
                         $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
@@ -1436,7 +1463,10 @@ class DeviceController extends Controller
             'type' => 'group',
             'folder' => true
         ];
-        $devices = Device::find()->where(['device.deviceTypeUuid' => DeviceType::DEVICE_LIGHT])->all();
+        $devices = Device::find()
+            ->where(['device.deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+            ->andWhere(['deleted' => 0])
+            ->all();
         foreach ($devices as $device) {
             $group = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
             if (!$group) {
@@ -2005,7 +2035,7 @@ class DeviceController extends Controller
                 if ($type == 'house') {
                     $house = House::find()->where(['uuid' => $uuid])->one();
                     if ($house) {
-                        $house['deleted'] = true;
+                        $house['deleted'] = 1;
                         $house->save();
                         return 'ok';
                     }
@@ -2013,7 +2043,7 @@ class DeviceController extends Controller
                 if ($type == 'object') {
                     $object = Objects::find()->where(['uuid' => $uuid])->one();
                     if ($object) {
-                        $object['deleted'] = true;
+                        $object['deleted'] = 1;
                         $object->save();
                         return 'ok';
                     }
@@ -2022,9 +2052,14 @@ class DeviceController extends Controller
                 if ($type == 'device') {
                     $device = Device::find()->where(['uuid' => $uuid])->one();
                     if ($device) {
-                        $device['deleted'] = true;
+                        if (!$device->lightProgram) {
+                            $program = DeviceProgram::find()->one();
+                            if ($program)
+                                $device->lightProgram = $program['uuid'];
+                        }
+                        $device['deleted'] = 1;
                         $device->save();
-                        return 'ok';
+                        return json_encode($device->errors);
                     }
                 }
             }

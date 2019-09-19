@@ -102,7 +102,7 @@ if (isset($_GET['uuid'])) {
                             else
                                 echo '<td class="text-center kv-align-center kv-align-middle" data-col-seq="1">-</td>';
                             if (isset($data['ws']))
-                                echo '<td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>';
+                                echo '<td class="text-center kv-align-center kv-align-middle" data-col-seq="1">' . ($data['w1'] + $data['w2'] + $data['w3'] + $data['w4']) . '</td>';
                             else
                                 echo '<td class="text-center kv-align-center kv-align-middle" data-col-seq="1">-</td>';
                             echo '</tr>';

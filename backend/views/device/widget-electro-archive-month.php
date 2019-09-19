@@ -44,7 +44,7 @@ use yii\helpers\Html;
                               <td class="text-center kv-align-center kv-align-middle" data-col-seq="2">'.$data['w2'].'</td>
                               <td class="text-center kv-align-center kv-align-middle" data-col-seq="3">'.$data['w3'].'</td>
                               <td class="text-center kv-align-center kv-align-middle" data-col-seq="4">'.$data['w4'].'</td>
-                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="5">'.$data['ws'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="5">' . ($data['w1'] + $data['w2'] + $data['w3'] + $data['w4']) . '</td>
                               </tr>';
                     }
                 ?>
