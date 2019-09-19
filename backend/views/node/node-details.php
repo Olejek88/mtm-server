@@ -62,7 +62,7 @@ $gridColumns = [
                 $data['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED)
                 $color = 'background-color: gray';
             if ($data['deviceStatusUuid'] == DeviceStatus::NOT_WORK ||
-                $data['deviceStatusUuid'] == DeviceStatus::NO_CONNECT)
+                $data['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
                 $color = 'background-color: red';
             if ($data['deviceStatusUuid'] == DeviceStatus::WORK)
                 $color = 'background-color: green';

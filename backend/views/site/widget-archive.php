@@ -42,19 +42,19 @@ use yii\data\ActiveDataProvider;
                 'header' => 'Тип измерения',
                 'vAlign' => 'middle',
                 'value' => function ($data) {
-                    if ($data['type']== MeasureType::MEASURE_TYPE_CURRENT)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_CURRENT)
                         return 'Текущее значение';
-                    if ($data['type']== MeasureType::MEASURE_TYPE_HOUSE)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_HOUSE)
                         return 'Часовое значение';
-                    if ($data['type']== MeasureType::MEASURE_TYPE_DAYS)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_DAYS)
                         return 'Дневное значение';
-                    if ($data['type']== MeasureType::MEASURE_TYPE_MONTH)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_MONTH)
                         return 'Архив за месяц';
-                    if ($data['type']== MeasureType::MEASURE_TYPE_TOTAL)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_TOTAL)
                         return 'Накопительное значение';
-                    if ($data['type']== MeasureType::MEASURE_TYPE_INTERVAL)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_INTERVAL)
                         return 'Интервальное значение';
-                    if ($data['type']== MeasureType::MEASURE_TYPE_TOTAL_CURRENT)
+                    if ($data['type'] == MeasureType::MEASURE_TYPE_TOTAL_CURRENT)
                         return 'Текущее накопительное';
                 },
                 'contentOptions' => [

@@ -107,4 +107,19 @@ class MtmDevLightConfig extends MtmPktHeader
         return $this->validate();
     }
 
+    public static function getPowerString($index)
+    {
+        $levels = [self::$LIGHT_POWER_12 => '12Вт',
+            self::$LIGHT_POWER_40 => '40Вт',
+            self::$LIGHT_POWER_60 => '60Вт',
+            self::$LIGHT_POWER_80 => '80Вт',
+            self::$LIGHT_POWER_100 => '100Вт',
+            self::$LIGHT_POWER_120 => '120Вт'];
+
+        if (array_key_exists($index, $levels)) {
+            return $levels[$index];
+        } else {
+            return 'Не указана';
+        }
+    }
 }

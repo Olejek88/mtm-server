@@ -234,8 +234,8 @@ use yii\helpers\Html;
                 'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Устройства',
                 'headingOptions' => ['style' => 'background: #337ab7']
             ],
-            'rowOptions' => function($model) {
-                if ($model['deviceStatusUuid']!=DeviceStatus::WORK)
+            'rowOptions' => function ($model) {
+                if ($model['deviceStatusUuid'] != DeviceStatus::WORK)
                     return ['class' => 'danger'];
             }
         ]);
