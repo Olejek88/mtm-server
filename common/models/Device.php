@@ -275,4 +275,9 @@ class Device extends MtmActiveRecord
             return null;
         }
     }
+
+    public function setDeviceProgram($program)
+    {
+        $this->lightProgram = $program;
+    }
 }
