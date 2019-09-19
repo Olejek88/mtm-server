@@ -51,17 +51,17 @@ use yii\helpers\Html;
         return $model['title'];
     });
     echo Select2::widget([
-            'id' => 'street',
-            'name' => 'street',
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Улица..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
+        'id' => 'street',
+        'name' => 'street',
+        'data' => $items,
+        'language' => 'ru',
+        'options' => [
+            'placeholder' => 'Улица..'
+        ],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+    ]);
 
     echo $form->field($object, 'latitude')->hiddenInput(['value' => $latitude])->label(false);
     echo $form->field($object, 'longitude')->hiddenInput(['value' => $longitude])->label(false);

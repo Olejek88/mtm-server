@@ -53,7 +53,7 @@ use yii\helpers\Html;
                         $data['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED)
                         $color = 'background-color: gray';
                     if ($data['deviceStatusUuid'] == DeviceStatus::NOT_WORK ||
-                        $data['deviceStatusUuid'] == DeviceStatus::NO_CONNECT)
+                        $data['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
                         $color = 'background-color: red';
                     if ($data['deviceStatusUuid'] == DeviceStatus::WORK)
                         $color = 'background-color: green';
@@ -108,8 +108,8 @@ use yii\helpers\Html;
                     'heading' => '<i class="glyphicon glyphicons-spade"></i>&nbsp; Подключенные устройства',
                     'headingOptions' => ['style' => 'background: #337ab7']
                 ],
-                'rowOptions' => function($model) {
-                    if ($model['deviceStatusUuid']!=DeviceStatus::WORK)
+                'rowOptions' => function ($model) {
+                    if ($model['deviceStatusUuid'] != DeviceStatus::WORK)
                         return ['class' => 'danger'];
                 }
             ]

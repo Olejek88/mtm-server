@@ -60,7 +60,7 @@ class Threads extends MtmActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'title', 'deviceTypeUuid'], 'required'],
+            [['uuid', 'title', 'deviceTypeUuid', 'deviceUuid', 'nodeUuid', 'oid'], 'required'],
             [['c_time', 'message', 'createdAt', 'changedAt'], 'safe'],
             [['speed', 'status', 'work'], 'integer'],
             [['uuid', 'title', 'deviceTypeUuid', 'nodeUuid', 'deviceUuid', 'port', 'oid'], 'string', 'max' => 50],

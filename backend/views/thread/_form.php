@@ -1,6 +1,7 @@
 <?php
 
 use common\components\MainFunctions;
+use common\models\Device;
 use common\models\DeviceType;
 use common\models\Node;
 use common\models\User;
@@ -51,15 +52,15 @@ use yii\widgets\ActiveForm;
         ]);
     ?>
     <?php
-    $deviceType = DeviceType::find()->all();
-    $items = ArrayHelper::map($deviceType, 'uuid', 'title');
-    echo $form->field($model, 'deviceTypeUuid',
+    $devices = Device::find()->where(['deviceTypeUuid' => [DeviceType::DEVICE_COUNTER, DeviceType::DEVICE_ZB_COORDINATOR]])->all();
+    $items = ArrayHelper::map($devices, 'uuid', 'name');
+    echo $form->field($model, 'deviceUuid',
         ['template' => MainFunctions::getAddButton("/device-type/create")])->widget(Select2::class,
         [
             'data' => $items,
             'language' => 'ru',
             'options' => [
-                'placeholder' => 'Выберите тип..'
+                'placeholder' => 'Выберите устройство...'
             ],
             'pluginOptions' => [
                 'allowClear' => true

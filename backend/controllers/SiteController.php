@@ -18,6 +18,7 @@ use common\models\Journal;
 use common\models\LoginForm;
 use common\models\Measure;
 use common\models\MeasureType;
+use common\models\mtm\MtmDevLightConfig;
 use common\models\Node;
 use common\models\Objects;
 use common\models\SensorChannel;
@@ -467,6 +468,10 @@ class SiteController extends Controller
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
         $group = '-';
+        $dimming = '-';
+        $nominal_power = '-';
+        $current_power = -1;
+        $group = '-';
         $t = '-';
         $define = '';
 
@@ -482,6 +487,25 @@ class SiteController extends Controller
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
                     if ($deviceGroup)
                         $group = $deviceGroup['group']['title'];
+                    $nominal_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                    $nominal_power = MtmDevLightConfig::getPowerString($nominal_power);
+                    if ($device->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
+                        /** @var SensorChannel $sChannel */
+                        $sChannel = $device->getSensorChannel(MeasureType::POWER)->one();
+                        if ($sChannel != null) {
+                            /** @var Measure $cMeasure */
+                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            if ($cMeasure != null) {
+                                $current_power = $cMeasure->value;
+                            } else {
+                                $current_power = 'Нет данных';
+                            }
+                        } else {
+                            $current_power = 'Нет данных';
+                        }
+                    }
+
+                    $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                     $measure = Measure::find()
                         ->where(['sensorChannelUuid' => (SensorChannel::find()
                             ->select('uuid')
@@ -540,7 +564,7 @@ class SiteController extends Controller
                     . $link . '</span>'
                     . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
-                    . 'Мощность: ' . $current_power . '<br/>'
+                    . 'Мощность: ' . $nominal_power . '<br/>'
                     . '' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
                     . $warnings
@@ -608,7 +632,7 @@ class SiteController extends Controller
                 $power = '<span class="badge badge-green-small">в норме</span>';
                 $temperature = '<span class="badge badge-green-small">28.82(C)</span>';
                 $warnings = '';
-                if ($node['deviceStatusUuid'] == DeviceStatus::NO_CONNECT)
+                if ($node['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
                     $link = '<span class="badge badge-red-small">нет</span>';
                 if ($node['deviceStatusUuid'] == DeviceStatus::WORK)
                     $icon = 'nodeIcon';

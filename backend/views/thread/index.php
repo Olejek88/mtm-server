@@ -1,10 +1,8 @@
 <?php
 /* @var $searchModel backend\models\DeviceSearch */
 
-use common\models\DeviceType;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Потоки');
@@ -48,7 +46,6 @@ $gridColumns = [
         'format' => 'raw',
     ],
     [
-        'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'deviceTypeUuid',
         'hAlign' => 'center',
         'vAlign' => 'middle',
@@ -58,19 +55,6 @@ $gridColumns = [
         'filterType' => GridView::FILTER_SELECT2,
         'header' => 'Тип',
         'format' => 'raw',
-        'contentOptions' => [
-            'class' => 'table_class'
-        ],
-        'editableOptions' => function ($model, $key, $index, $widget) {
-            $models = ArrayHelper::map(DeviceType::find()->orderBy('title')->all(), 'uuid', 'title');
-            return [
-                'header' => 'Тип оборудования',
-                'size' => 'lg',
-                'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'displayValueConfig' => $models,
-                'data' => $models
-            ];
-        },
     ],
     [
         'attribute' => 'deviceUuid',

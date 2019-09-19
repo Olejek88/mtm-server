@@ -2,6 +2,8 @@
 
 namespace console\workers;
 
+use common\models\DeviceStatus;
+use common\models\DeviceType;
 use inpassor\daemon\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -84,6 +86,9 @@ class MtmServerAmqpWorker extends Worker
      */
     public function run()
     {
+        $checkNodes = 0;
+        $checkNodesRate = 30;
+
         $this->log('run...');
         while ($this->run) {
 //            $this->log('tick...');
@@ -101,6 +106,53 @@ class MtmServerAmqpWorker extends Worker
             } catch (Exception $e) {
                 $this->log($e->getMessage());
                 return;
+            }
+
+            // изменяем статус шкафа если от координатора давно не поступали данные
+            // это не верно, т.к. шкаф может быть доступен, но все потоки в том числе и координатора на нём остановлены
+            // пока сделаю так
+            $linkTimeOut = 60;
+            $currentTime = time();
+            if ($checkNodes + $checkNodesRate < $currentTime) {
+                $checkNodes = $currentTime;
+                // для всех шкафов от которых не было пакетов состояния координатора более $timeOut секунд,
+                // а статус был "В порядке", устанавливаем статус "Нет связи"
+                $db = Yii::$app->db;
+                $params = [
+                    ':timeOut' => $linkTimeOut,
+                    ':noLinkUuid' => DeviceStatus::NOT_LINK,
+                    ':workUuid' => DeviceStatus::WORK,
+                    ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                ];
+                $command = $db->createCommand("UPDATE mtm.node AS nt SET nt.deviceStatusUuid=:noLinkUuid, changedAt=current_timestamp()
+WHERE nt.uuid IN (
+SELECT dt.nodeUuid FROM mtm.device AS dt
+LEFT JOIN mtm.sensor_channel AS sct ON sct.deviceUuid=dt.uuid
+LEFT JOIN mtm.measure AS mt ON mt.sensorChannelUuid=sct.uuid
+WHERE dt.deviceTypeUuid=:deviceType
+AND (timestampdiff(second,  mt.changedAt, current_timestamp()) > :timeOut OR mt.changedAt IS NULL)
+GROUP BY dt.uuid
+ORDER BY mt.changedAt DESC
+)
+AND nt.deviceStatusUuid=:workUuid", $params);
+//                $this->log('upd query: ' . $command->rawSql);
+                $command->execute();
+
+                // для всех шкафов от которых были получены пакеты со статусом координатора менее 30 секунд назад,
+                // а статус был "Нет связи", устанавливаем статус "В порядке"
+                $command = $db->createCommand("UPDATE mtm.node AS nt SET nt.deviceStatusUuid=:workUuid, changedAt=current_timestamp()
+WHERE nt.uuid IN (
+SELECT dt.nodeUuid FROM mtm.device AS dt
+LEFT JOIN mtm.sensor_channel AS sct ON sct.deviceUuid=dt.uuid
+LEFT JOIN mtm.measure AS mt ON mt.sensorChannelUuid=sct.uuid
+WHERE dt.deviceTypeUuid=:deviceType
+AND (timestampdiff(second,  mt.changedAt, current_timestamp()) < :timeOut)
+GROUP BY dt.uuid
+ORDER BY mt.changedAt DESC
+)
+AND nt.deviceStatusUuid=:noLinkUuid", $params);
+//                $this->log('upd query: ' . $command->rawSql);
+                $command->execute();
             }
 
             pcntl_signal_dispatch();
