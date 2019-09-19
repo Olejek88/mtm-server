@@ -3,7 +3,6 @@
  * @var $threadDataProvider
  */
 
-use common\models\DeviceStatus;
 use common\models\Threads;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;

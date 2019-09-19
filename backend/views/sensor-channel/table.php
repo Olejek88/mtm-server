@@ -1,9 +1,7 @@
 <?php
 /* @var $searchModel backend\models\SensorChannelSearch */
 
-use common\models\DeviceStatus;
 use common\models\MeasureType;
-use common\models\SensorChannel;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
@@ -29,7 +27,6 @@ $gridColumns = [
     [
         'attribute' => 'deviceUuid',
         'vAlign' => 'middle',
-        'hAlign' => 'center',
         'header' => 'Устройство',
         'mergeHeader' => true,
         'contentOptions' => [
@@ -112,7 +109,7 @@ echo GridView::widget([
     ],
     'toolbar' => [
         ['content' =>
-            Html::a('Новая', ['/sensor-channel/create'], ['class' => 'btn btn-success'])
+            Html::a('Новый', ['/sensor-channel/create'], ['class' => 'btn btn-success'])
         ],
         '{export}',
     ],

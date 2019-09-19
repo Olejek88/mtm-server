@@ -3,11 +3,7 @@
  * @var $device
  */
 
-use common\models\Device;
-use common\models\DeviceRegister;
-use common\models\Node;
 use kartik\grid\GridView;
-use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 
 ?>

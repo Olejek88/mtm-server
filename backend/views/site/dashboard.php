@@ -85,7 +85,7 @@ $this->title = Yii::t('app', 'Сводная');
 
 <footer class="main-footer" style="margin-left: 0 !important;">
     <div class="pull-right hidden-xs" style="vertical-align: middle; text-align: center;">
-        <b>Version</b> 0.1.3
+        <b>Version</b> 1.0.2
     </div>
     <?php echo Html::a('<img src="images/mtm.png">', 'http://www.mtm-smart.com'); ?>
     <strong>Copyright &copy; 2019 <a href="http://www.mtm-smart.com">MTM Смарт</a>.</strong> Все права на

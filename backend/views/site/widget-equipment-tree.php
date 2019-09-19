@@ -1,4 +1,5 @@
 <?php
+
 use wbraganca\fancytree\FancytreeWidget;
 use yii\helpers\Html;
 use yii\web\JsExpression;

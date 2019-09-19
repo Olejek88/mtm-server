@@ -88,6 +88,9 @@ class NodeController extends Controller
             if ($_POST['editableAttribute'] == 'software') {
                 $model['software'] = $_POST['Node'][$_POST['editableIndex']]['software'];
             }
+            if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
+                $model['deviceStatusUuid'] = $_POST['Node'][$_POST['editableIndex']]['deviceStatusUuid'];
+            }
             if ($_POST['editableAttribute'] == 'phone') {
                 $model['phone'] = $_POST['Node'][$_POST['editableIndex']]['phone'];
             }
@@ -272,7 +275,7 @@ class NodeController extends Controller
                 ->one();
             if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN1 &&
                 $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
-                    $parameters['control']['door'] = $measure['value'];
+                $parameters['control']['door'] = $measure['value'];
             }
 
             $measure = (Measure::find()
@@ -282,17 +285,17 @@ class NodeController extends Controller
                 ->one();
             if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
                 $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
-                    $parameters['control']['contactor'] = $measure['value'];
+                $parameters['control']['contactor'] = $measure['value'];
             }
             $measure = (Measure::find()
                 ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_DIGI1])
                 ->joinWith('sensorChannel')
                 ->orderBy('date DESC'))
                 ->one();
-                if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_DIGI1 &&
-                    $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
-                        $parameters['control']['relay'] = $measure['value'];
-                }
+            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_DIGI1 &&
+                $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                $parameters['control']['relay'] = $measure['value'];
+            }
         }
 
         $parameters['u1'] = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE, $node['uuid'],

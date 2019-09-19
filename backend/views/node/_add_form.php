@@ -5,17 +5,14 @@
 /* @var $objectUuid */
 
 use common\components\MainFunctions;
-use common\models\Device;
 use common\models\DeviceStatus;
-use common\models\DeviceType;use common\models\Equipment;
+use common\models\Equipment;
 use common\models\EquipmentStatus;
 use common\models\EquipmentType;
-use common\models\Node;use common\models\Objects;
+use common\models\Objects;
 use common\models\User;
 use common\models\Users;
-use kartik\date\DatePicker;
 use kartik\select2\Select2;
-use kartik\widgets\FileInput;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;

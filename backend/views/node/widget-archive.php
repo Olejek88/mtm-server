@@ -1,12 +1,12 @@
 <?php
 
 use common\models\Device;
+use common\models\DeviceType;
 use common\models\Measure;
+use common\models\MeasureType;
 use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
-use common\models\DeviceType;
-use common\models\MeasureType;
 
 /* @var $node
  */

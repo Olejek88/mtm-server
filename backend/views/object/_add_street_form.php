@@ -2,15 +2,13 @@
 /*  @var $street
  *  @var $source
  */
+
 use common\components\MainFunctions;
 use common\models\DocumentationType;
 use common\models\Equipment;
 use common\models\EquipmentStatus;
 use common\models\Users;
-use kartik\select2\Select2;
-use kartik\widgets\FileInput;
 use yii\bootstrap\ActiveForm;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 ?>

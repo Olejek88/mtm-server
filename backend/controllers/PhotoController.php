@@ -4,12 +4,12 @@ namespace backend\controllers;
 
 use backend\models\PhotoSearch;
 use common\models\Photo;
+use Throwable;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use Throwable;
 
 /**
  * Photo implements the CRUD actions for Photo model.

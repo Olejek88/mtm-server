@@ -2,9 +2,13 @@
 
 namespace backend\controllers;
 
+use backend\models\User as NewUser;
 use backend\models\UserSearch;
 use common\components\MainFunctions;
 use common\models\Journal;
+use common\models\User;
+use Exception;
+use Throwable;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
@@ -14,10 +18,6 @@ use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use Throwable;
-use Exception;
-use backend\models\User as NewUser;
-use common\models\User;
 
 /**
  * UsersController implements the CRUD actions for Users model.

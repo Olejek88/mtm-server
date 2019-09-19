@@ -5,13 +5,13 @@ namespace backend\controllers;
 use backend\models\DeviceSearchType;
 use common\models\DeviceType;
 use common\models\User;
+use Throwable;
 use Yii;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use Throwable;
 
 /**
  * DeviceTypeController implements the CRUD actions for DeviceType model.
@@ -22,6 +22,7 @@ class DeviceTypeController extends Controller
         DeviceType::DEVICE_COUNTER,
         DeviceType::DEVICE_ZB_COORDINATOR,
         DeviceType::DEVICE_LIGHT,
+        DeviceType::DEVICE_LIGHT_WITHOUT_ZB
     ];
 
 

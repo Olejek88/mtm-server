@@ -28,8 +28,6 @@ use yii\helpers\Html;
                 }
             ],
             [
-                'hAlign' => 'center',
-                'vAlign' => 'middle',
                 'width' => '180px',
                 'value' => function ($data) {
                     return Html::a($data['node']['object']->getAddress().' ['.$data['name'].']',
@@ -50,43 +48,19 @@ use yii\helpers\Html;
                 'vAlign' => 'middle',
                 'width' => '130px',
                 'content' => function ($data) {
-                    $color = 'background-color: white';
+                    $color = 'background-color: gray';
                     if ($data['deviceStatusUuid'] == DeviceStatus::UNKNOWN ||
                         $data['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED)
                         $color = 'background-color: gray';
-                    if ($data['deviceStatusUuid'] == DeviceStatus::NOT_WORK)
-                        $color = 'background-color: lightred';
+                    if ($data['deviceStatusUuid'] == DeviceStatus::NOT_WORK ||
+                        $data['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
+                        $color = 'background-color: red';
                     if ($data['deviceStatusUuid'] == DeviceStatus::WORK)
                         $color = 'background-color: green';
                     $status = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;" .
                         $data['deviceStatus']['title'];
                     return $status;
                 },
-            ],
-            [
-                'attribute' => 'interface',
-                'hAlign' => 'center',
-                'vAlign' => 'middle',
-                'contentOptions' => [
-                    'class' => 'table_class'
-                ],
-                'headerOptions' => ['class' => 'text-center'],
-                'content' => function ($data) {
-                    $interfaces = [
-                        '0' => 'не указан',
-                        '1' => 'Последовательный порт',
-                        '2' => 'Zigbee',
-                        '3' => 'Ethernet'
-                    ];
-                    return $interfaces[$data["interface"]];
-                },
-            ],
-            [
-                'attribute' => 'port',
-                'vAlign' => 'middle',
-                'width' => '110px',
-                'header' => 'Порт',
-                'format' => 'raw',
             ],
             [
                 'attribute' => 'address',
@@ -134,6 +108,10 @@ use yii\helpers\Html;
                     'heading' => '<i class="glyphicon glyphicons-spade"></i>&nbsp; Подключенные устройства',
                     'headingOptions' => ['style' => 'background: #337ab7']
                 ],
+                'rowOptions' => function ($model) {
+                    if ($model['deviceStatusUuid'] != DeviceStatus::WORK)
+                        return ['class' => 'danger'];
+                }
             ]
         );
         ?>

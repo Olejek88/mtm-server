@@ -4,14 +4,9 @@
 
 use common\models\Device;
 use common\models\Measure;
-use common\models\MeasureType;
-use common\models\Node;
 use common\models\SensorChannel;
-use common\models\User;
-use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 
 ?>
 <div class="info-box">

@@ -6,14 +6,14 @@ use backend\models\SensorConfigSearch;
 use common\models\MeasureType;
 use common\models\SensorConfig;
 use common\models\User;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\base\InvalidConfigException;
-use Throwable;
 
 /**
  * SensorConfigController implements the CRUD actions for SensorConfig model.

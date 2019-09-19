@@ -2,9 +2,8 @@
 /* @var $provider
  */
 
-use common\models\DeviceRegister;
 use kartik\grid\GridView;
-use yii\data\ActiveDataProvider;
+
 $this->title = Yii::t('app', 'Журнал работы устройств');
 
 ?>

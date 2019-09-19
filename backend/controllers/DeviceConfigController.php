@@ -4,14 +4,14 @@ namespace backend\controllers;
 
 use backend\models\DeviceConfigSearch;
 use common\models\DeviceConfig;
+use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\base\InvalidConfigException;
-use Throwable;
 
 /**
  * DeviceConfigController implements the CRUD actions for DeviceConfig model.

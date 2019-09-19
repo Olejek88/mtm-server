@@ -3,12 +3,6 @@
  * @var $dataAll
  */
 
-use common\models\mtm\MtmDevLightConfig;
-use kartik\slider\Slider;
-use kartik\widgets\Select2;
-use yii\helpers\Html;
-use yii\widgets\Pjax;
-
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
 $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 
