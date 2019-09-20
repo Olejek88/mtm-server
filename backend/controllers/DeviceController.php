@@ -235,9 +235,11 @@ class DeviceController extends Controller
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
-                $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
-                $deviceConfig->value = $model->lightProgram;
-                $deviceConfig->save();
+                if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
+                    $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
+                    $deviceConfig->value = $model->lightProgram;
+                    $deviceConfig->save();
+                }
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
                 $program = new DeviceProgram();
