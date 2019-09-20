@@ -6,7 +6,6 @@ use common\models\DeviceType;
 use common\models\Node;
 use common\models\Objects;
 use common\models\User;
-use common\models\Users;
 use kartik\widgets\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -55,6 +54,20 @@ use common\models\DeviceProgram;
                 'allowClear' => true
             ],
         ]);
+    $this->registerJs("
+$(function(){
+   $('#device-devicetypeuuid').change(function(){
+        changeDeviceType(this.value); 
+    }).trigger('change');
+   function changeDeviceType(value) {
+      if(value == '" . DeviceType::DEVICE_LIGHT . "'){
+        $('.field-device-lightprogram').show();
+      } else {
+        $('.field-device-lightprogram').hide();
+      }
+  }
+  });
+");
     ?>
 
     <?php

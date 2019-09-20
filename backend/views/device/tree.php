@@ -76,7 +76,7 @@ echo FancytreeWidget::widget([
         'id' => 'tree',
         'source' => $device,
         'checkbox' => true,
-        'selectMode' => 3,
+        'selectMode' => 2,
         'extensions' => ['dnd', "glyph", "table", "contextMenu"],
         'glyph' => 'glyph_opts',
         'dnd' => [

@@ -467,16 +467,19 @@ class SiteController extends Controller
         $polylineList = '';
         $equipmentsGroup = 'var devices=L.layerGroup([';
         $equipmentsList = '';
-        $group='-';
+        $group = '-';
         $dimming = '-';
         $nominal_power = '-';
         $current_power = -1;
+        $group = '-';
         $t = '-';
         $define = '';
 
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
                 $warnings = '';
+                $dimming = '-';
+                $current_power = '-';
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
@@ -510,13 +513,33 @@ class SiteController extends Controller
                             ->andWhere(['deviceUuid' => $device['uuid']]))])->one();
                     if ($measure)
                         $t = $measure['value'];
+                    $coordinator = Device::find()
+                        ->where(['nodeUuid' => $device['node']['uuid']])
+                        ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                        ->one();
+                    if ($coordinator) {
+                        $measure = (Measure::find()
+                            ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
+                            ->joinWith('sensorChannel')
+                            ->orderBy('date DESC'))
+                            ->one();
+                        if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+                            $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
+                            $contactor = $measure['value'];
+                            if ($contactor) {
+                                $dimming = "-";
+                                $current_power = "-";
+                            } else {
+                                $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                                $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
+                            }
+                        }
+                    }
                 } else if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT_WITHOUT_ZB) {
                     $link = '<b>' . $device["name"] . '</b>';
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
                     if ($deviceGroup)
                         $group = $deviceGroup['group']['title'];
-                    $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
-                    $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                 } else {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
@@ -527,6 +550,7 @@ class SiteController extends Controller
                     $icon = 'lightIcon';
                 } else {
                     $icon = 'lightIconBad';
+                    $t = "-";
                     $warnings = 'Статус: <span class="badge badge-green-red">' . $device['deviceStatus']['title'] . '</span>';
                 }
                 $define .= 'var deviceIcon' . $device["_id"] . '=' . $icon . ';';
@@ -539,11 +563,9 @@ class SiteController extends Controller
                     . '], {icon: ' . $icon . '}).bindPopup(\''
                     . $link . '</span>'
                     . '<br/>'
-                    . 'Адрес: ' . $device['address'] . '<br/>'
-                    . 'Группа: ' . $group . '<br/>'
-                    . 'Мощность: ' . $nominal_power . '<br/>'
-                    . 'Текущая мощность: ' . $current_power . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
+                    . 'Мощность: ' . $nominal_power . '<br/>'
+                    . '' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
                     . $warnings
                     . '\').openPopup();';

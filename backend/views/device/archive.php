@@ -49,7 +49,7 @@ $this->title = Yii::t('app', 'Архив по устройству');
                             else
                                 echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
                             if (isset($data['ws']))
-                                echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>';
+                                echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">' . ($data['w1'] + $data['w2'] + $data['w3'] + $data['w4']) . '</td>';
                             else
                                 echo '<td class="kv-align-center kv-align-middle" data-col-seq="1">-</td>';
                             echo '</tr>';
@@ -88,7 +88,7 @@ $this->title = Yii::t('app', 'Архив по устройству');
                               <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w2'].'</td>
                               <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w3'].'</td>
                               <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['w4'].'</td>
-                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">'.$data['ws'].'</td>
+                              <td class="text-center kv-align-center kv-align-middle" data-col-seq="1">' . ($data['w1'] + $data['w2'] + $data['w3'] + $data['w4']) . '</td>
                               </tr>';
                         }
                         ?>
