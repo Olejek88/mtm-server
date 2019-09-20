@@ -78,9 +78,13 @@ console.log('contact click...');
     if($(this).hasClass('btn-success')) {
         $(this).removeClass('btn-success').addClass('btn-danger');
         $('#contact-button').html('Выключить');
+        $('#contact-status').css('background-color', 'red').css('color', 'white').html('Включен');
+        $('#contact-relay').css('background-color', 'green').css('color', 'white').html('Включено');
     } else {
         $(this).removeClass('btn-danger').addClass('btn-success');
         $('#contact-button').html('Включить');
+        $('#contact-status').css('background-color', 'green').css('color', 'white').html('Выключен');
+        $('#contact-relay').css('background-color', 'gray').css('color', 'white').html('Отключено');
     }
 });
                     ", View::POS_END);
@@ -91,18 +95,18 @@ console.log('contact click...');
                 <td class="table_class kv-align-middle" data-col-seq="0">Контактор сети</td>
                 <?php
                 if (isset($parameters['control']['contactor']) && $parameters['control']['contactor'])
-                    echo '<td class="kv-align-center kv-align-middle" style="background-color: red; color: white">Отключен</td>';
+                    echo '<td id="contact-status" class="kv-align-center kv-align-middle" style="background-color: red; color: white">Отключен</td>';
                 else
-                    echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включен</td>';
+                    echo '<td id="contact-status" class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включен</td>';
                 ?>
             </tr>
             <tr data-key="2">
                 <td class="table_class kv-align-middle" data-col-seq="0">Реле управления контактором</td>
                 <?php
                 if (isset($parameters['control']['relay']) && $parameters['control']['relay'])
-                    echo '<td class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включено</td>';
+                    echo '<td id="contact-relay" class="kv-align-center kv-align-middle" style="background-color: green; color: white">Включено</td>';
                     else
-                        echo '<td class="kv-align-center kv-align-middle" style="background-color: gray; color: white">Отключено</td>';
+                        echo '<td id="contact-relay" class="kv-align-center kv-align-middle" style="background-color: gray; color: white">Отключено</td>';
                 ?>
             </tr>
             <tr data-key="3">
