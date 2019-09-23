@@ -459,7 +459,7 @@ class SiteController extends Controller
      */
     public function getLayers()
     {
-        $devices = Device::find()->all();
+        $devices = Device::find()->where(['!=', 'deviceTypeUuid', DeviceType::DEVICE_COUNTER])->all();
 
         $cnt = 0;
         $default_coordinates = "[55.54,61.36]";
@@ -528,9 +528,7 @@ class SiteController extends Controller
                             $contactor = $measure['value'];
                             if ($contactor) {
                                 $dimming = "-";
-                                $current_power = "-";
                             } else {
-                                $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
                                 $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                             }
                         }
@@ -565,6 +563,7 @@ class SiteController extends Controller
                     . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
                     . 'Мощность: ' . $nominal_power . '<br/>'
+                    . 'Текущая мощность: ' . $current_power . '<br/>'
                     . '' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
                     . $warnings
@@ -695,6 +694,7 @@ class SiteController extends Controller
                     . 'Сумма,кВт: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
                     . 'Телефон/адрес: ' . $phone . '<br/>'
+                    . 'IP: ' . $node->phone . '<br/>'
                     . $warnings
                     . '\').openPopup();';
 
