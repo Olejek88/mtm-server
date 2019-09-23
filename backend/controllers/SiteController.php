@@ -459,7 +459,7 @@ class SiteController extends Controller
      */
     public function getLayers()
     {
-        $devices = Device::find()->all();
+        $devices = Device::find()->where(['!=', 'deviceTypeUuid', DeviceType::DEVICE_COUNTER])->all();
 
         $cnt = 0;
         $default_coordinates = "[55.54,61.36]";
@@ -694,6 +694,7 @@ class SiteController extends Controller
                     . 'Сумма,кВт: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
                     . 'Телефон/адрес: ' . $phone . '<br/>'
+                    . 'IP: ' . $_SERVER['REMOTE_ADDR'] . '<br/>'
                     . $warnings
                     . '\').openPopup();';
 
