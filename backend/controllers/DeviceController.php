@@ -233,6 +233,7 @@ class DeviceController extends Controller
         }
 
         $model = $this->findModel($id);
+        $model->scenario = Device::SCENARIO_CUSTOM_UPDATE;
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
