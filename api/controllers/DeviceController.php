@@ -138,11 +138,11 @@ class DeviceController extends Controller
             $model = Device::find()->where(['uuid' => $item['uuid']])->one();
             if ($model == null) {
                 $model = new Device();
-                $model->uuid = $item['uuid'];
-                $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
+            $model->uuid = $item['uuid'];
+            $model->oid = $organisation->uuid;
             $model->address = $item['address'];
             $model->name = $item['name'];
             $model->serial = $item['serial'];
@@ -155,6 +155,11 @@ class DeviceController extends Controller
 //            $model->deviceProgram = '{}'; // костыль т.к. пока нет времени разбираться как сделать по другому
 
             if (!$model->save()) {
+                foreach ($model->errors as $error) {
+                    $error = array_values($error);
+                    Yii::error('Device:(_id=' . $model->_id . ')' . array_shift($error));
+                }
+
                 throw new HttpException(401, 'device not saved.');
             }
         }
