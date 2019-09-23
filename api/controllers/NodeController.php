@@ -125,11 +125,12 @@ class NodeController extends Controller
      */
     public function actionAddress()
     {
+
         Yii::$app->response->format = Response::FORMAT_JSON;
         $req = Yii::$app->request;
 
         // проверяем параметры запроса
-        $oid = $req->getQueryParam('oid');
+        $oid = $req->getBodyParam('oid');
         if ($oid == null) {
             throw new HttpException(404, 'The specified post cannot be found.');
         } else {
@@ -148,7 +149,7 @@ class NodeController extends Controller
         $query = $class::find();
 
         // проверяем параметры запроса
-        $nid = $req->getQueryParam('nid');
+        $nid = $req->getBodyParam('nid');
         if ($nid == null) {
             throw new HttpException(404, 'The specified post cannot be found.');
         } else {
@@ -161,10 +162,8 @@ class NodeController extends Controller
         }
 
 
-        $addr = $req->getRawBody(); //  Param('addr');
+        $addr = $req->getBodyParam('addr');
         if ($addr != null) {
-            $addr = json_decode($addr, true);
-            $addr = $addr['addr'];
             $node->phone = $addr;
             $node->save();
             return null;
