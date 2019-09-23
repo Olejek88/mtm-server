@@ -694,7 +694,7 @@ class SiteController extends Controller
                     . 'Сумма,кВт: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
                     . 'Телефон/адрес: ' . $phone . '<br/>'
-                    . 'IP: ' . $_SERVER['REMOTE_ADDR'] . '<br/>'
+                    . 'IP: ' . $node->phone . '<br/>'
                     . $warnings
                     . '\').openPopup();';
 
