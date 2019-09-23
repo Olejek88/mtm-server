@@ -528,9 +528,7 @@ class SiteController extends Controller
                             $contactor = $measure['value'];
                             if ($contactor) {
                                 $dimming = "-";
-                                $current_power = "-";
                             } else {
-                                $current_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
                                 $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
                             }
                         }
@@ -565,6 +563,7 @@ class SiteController extends Controller
                     . '<br/>'
                     . 'Уровень освещения: ' . $dimming . '<br/>'
                     . 'Мощность: ' . $nominal_power . '<br/>'
+                    . 'Текущая мощность: ' . $current_power . '<br/>'
                     . '' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
                     . $warnings
