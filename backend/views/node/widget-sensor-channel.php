@@ -30,7 +30,6 @@ use yii\data\ActiveDataProvider;
             [
                 'attribute' => 'deviceUuid',
                 'vAlign' => 'middle',
-                'hAlign' => 'center',
                 'header' => 'Устройство',
                 'mergeHeader' => true,
                 'contentOptions' => [

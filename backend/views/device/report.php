@@ -85,7 +85,7 @@ $gridColumns = [
         'value' => function ($data) {
             return $data['node']['phone'];
         },
-        'header' => 'Тел.номер',
+        'header' => 'Адрес',
         'format' => 'raw',
     ],
     [

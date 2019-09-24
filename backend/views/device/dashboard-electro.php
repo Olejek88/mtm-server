@@ -4,7 +4,7 @@
  * @var $dataAll
  */
 
-$this->title = Yii::t('app', 'Устройство');
+$this->title = Yii::t('app', 'Электросчетчик');
 ?>
 
 <br/>
