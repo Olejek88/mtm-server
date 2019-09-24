@@ -484,9 +484,18 @@ class SiteController extends Controller
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
+                    // реальные группы
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
-                    if ($deviceGroup)
+                    if ($deviceGroup) {
                         $group = $deviceGroup['group']['title'];
+                    }
+
+                    // не реальные группы, на самом деле идентификаторы программ по которым работают светильники
+                    $group = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_GROUP);
+                    if ($group == null) {
+                        $group = '-';
+                    }
+
                     $nominal_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
                     $nominal_power = MtmDevLightConfig::getPowerString($nominal_power);
                     if ($device->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
@@ -535,9 +544,11 @@ class SiteController extends Controller
                     }
                 } else if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT_WITHOUT_ZB) {
                     $link = '<b>' . $device["name"] . '</b>';
+                    // реальные группы
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
-                    if ($deviceGroup)
+                    if ($deviceGroup) {
                         $group = $deviceGroup['group']['title'];
+                    }
                 } else {
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
@@ -564,7 +575,7 @@ class SiteController extends Controller
                     . 'Уровень освещения: ' . $dimming . '<br/>'
                     . 'Мощность: ' . $nominal_power . '<br/>'
                     . 'Текущая мощность: ' . $current_power . '<br/>'
-                    . '' . $group . '<br/>'
+                    . 'Группа ' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
                     . $warnings
                     . '\').openPopup();';
@@ -620,7 +631,7 @@ class SiteController extends Controller
         }
         $camerasGroup .= ']);' . PHP_EOL;
 
-        $nodes = Node::find()->all();
+        $nodes = Node::find()->where(['deleted' => '0'])->all();
         $cnt = 0;
         $nodesGroup = 'var nodes=L.layerGroup([';
         $nodesList = '';
@@ -693,8 +704,7 @@ class SiteController extends Controller
                     . 'Мощность,кВт/ч: ' . $w . '<br/>'
                     . 'Сумма,кВт: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
-                    . 'Телефон/адрес: ' . $phone . '<br/>'
-                    . 'IP: ' . $node->phone . '<br/>'
+                    . 'Адрес: ' . $node->address . '<br/>'
                     . $warnings
                     . '\').openPopup();';
 

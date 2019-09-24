@@ -164,7 +164,7 @@ class NodeController extends Controller
 
         $addr = $req->getBodyParam('addr');
         if ($addr != null) {
-            $node->phone = $addr;
+            $node->address = $addr;
             $node->save();
             return null;
         } else {

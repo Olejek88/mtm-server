@@ -86,6 +86,7 @@ console.log('contact click...');
         $('#contact-status').css('background-color', 'green').css('color', 'white').html('Выключен');
         $('#contact-relay').css('background-color', 'gray').css('color', 'white').html('Отключено');
     }
+    $(this).submit();
 });
                     ", View::POS_END);
                     ?>
@@ -158,6 +159,7 @@ console.log('contact click...');
 $('#reset-button').on('click', function() {
 console.log('reset click...');
     $(this).prop('disabled', true).addClass('disabled');
+    $(this).submit();
 });
                     ", View::POS_END);
                     ?>
