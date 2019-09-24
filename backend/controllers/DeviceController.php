@@ -108,6 +108,9 @@ class DeviceController extends Controller
             if ($_POST['editableAttribute'] == 'date') {
                 $model['date'] = date("Y-m-d H:i:s", $_POST['Device'][$_POST['editableIndex']]['date']);
             }
+            if ($_POST['editableAttribute'] == 'address') {
+                $model['address'] = $_POST['Device'][$_POST['editableIndex']]['address'];
+            }
             $model->save();
             return json_encode('');
         }
@@ -186,17 +189,19 @@ class DeviceController extends Controller
             }
             // сохраняем запись
             if ($model->save(false)) {
-                $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
-                if ($deviceConfig == null) {
-                    $deviceConfig = new DeviceConfig();
-                    $deviceConfig->uuid = MainFunctions::GUID();
-                    $deviceConfig->oid = User::getOid(Yii::$app->user->identity);
-                    $deviceConfig->parameter = 'Программа';
-                    $deviceConfig->deviceUuid = $model->uuid;
-                }
+                if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
+                    $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
+                    if ($deviceConfig == null) {
+                        $deviceConfig = new DeviceConfig();
+                        $deviceConfig->uuid = MainFunctions::GUID();
+                        $deviceConfig->oid = User::getOid(Yii::$app->user->identity);
+                        $deviceConfig->parameter = 'Программа';
+                        $deviceConfig->deviceUuid = $model->uuid;
+                    }
 
-                $deviceConfig->value = $model->lightProgram;
-                $deviceConfig->save();
+                    $deviceConfig->value = $model->lightProgram;
+                    $deviceConfig->save();
+                }
 
                 MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                     $model->node->object->getAddress() . ' [' . $model->node->address . ']');
@@ -207,9 +212,11 @@ class DeviceController extends Controller
                     self::createChannel($model->uuid, MeasureType::VOLTAGE, "Напряжение");
                     self::createChannel($model->uuid, MeasureType::FREQUENCY, "Частота");
                 }
+
                 if ($model['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура воздуха");
                 }
+
                 return $this->redirect(['view', 'id' => $model->_id]);
             }
             echo json_encode($model->errors);
@@ -234,7 +241,6 @@ class DeviceController extends Controller
         }
 
         $model = $this->findModel($id);
-        $model->scenario = Device::SCENARIO_CUSTOM_UPDATE;
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
@@ -242,6 +248,7 @@ class DeviceController extends Controller
                     $deviceConfig->value = $model->lightProgram;
                     $deviceConfig->save();
                 }
+
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
                 $program = new DeviceProgram();
@@ -1813,6 +1820,7 @@ class DeviceController extends Controller
                     }
                 }
             }
+
             if ($type == 'house') {
                 if (isset($_POST['houseUuid']))
                     $model = House::find()->where(['uuid' => $_POST['houseUuid']])->one();
@@ -1824,6 +1832,7 @@ class DeviceController extends Controller
                     }
                 }
             }
+
             if ($type == 'object') {
                 if (isset($_POST['objectUuid']))
                     $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->one();
@@ -1835,6 +1844,7 @@ class DeviceController extends Controller
                     }
                 }
             }
+
             if ($type == 'node') {
                 if (isset($_POST['nodeUuid']))
                     $model = Node::find()->where(['uuid' => $_POST['nodeUuid']])->one();
@@ -1846,15 +1856,19 @@ class DeviceController extends Controller
                     }
                 }
             }
+
             if ($type == 'device') {
-                if (isset($_POST['deviceUuid']))
+                if (isset($_POST['deviceUuid'])) {
                     $model = Device::find()->where(['uuid' => $_POST['deviceUuid']])->one();
-                else
+                } else {
                     $model = new Device();
+                }
+
                 if ($model->load(Yii::$app->request->post())) {
                     if ($model->save(false) && isset($_POST['deviceUuid'])) {
                         //return $this->redirect($source);
                     }
+
                     MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                         $model->node->object->getAddress() . ' [' . $model->node->address . ']');
 
@@ -1864,12 +1878,14 @@ class DeviceController extends Controller
                         self::createChannel($model->uuid, MeasureType::VOLTAGE, "Напряжение");
                         self::createChannel($model->uuid, MeasureType::FREQUENCY, "Частота");
                     }
+
                     if ($model['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                         self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура");
                     }
                 }
             }
         }
+
         return $this->redirect($source);
     }
 

@@ -488,7 +488,6 @@ class SiteController extends Controller
         $group = '-';
         $dimming = '-';
         $nominal_power = '-';
-        $current_power = -1;
         $group = '-';
         $t = '-';
         $define = '';
@@ -497,8 +496,9 @@ class SiteController extends Controller
             if ($device["object"]["latitude"] > 0) {
                 $warnings = '';
                 $dimming = '-';
-                $current_power = '-';
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
+                    $current_power = '-';
+                    $rssi = '-';
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
@@ -524,11 +524,16 @@ class SiteController extends Controller
                             $cMeasure = $sChannel->getMeasureOne()->one();
                             if ($cMeasure != null) {
                                 $current_power = $cMeasure->value;
-                            } else {
-                                $current_power = 'Нет данных';
                             }
-                        } else {
-                            $current_power = 'Нет данных';
+                        }
+
+                        $sChannel = $device->getSensorChannel(MeasureType::RSSI)->one();
+                        if ($sChannel != null) {
+                            /** @var Measure $cMeasure */
+                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            if ($cMeasure != null) {
+                                $rssi = $cMeasure->value;
+                            }
                         }
                     }
 
@@ -596,6 +601,7 @@ class SiteController extends Controller
                     . 'Текущая мощность: ' . $current_power . '<br/>'
                     . 'Группа ' . $group . '<br/>'
                     . 'Температура: ' . $t . '<br/>'
+                    . 'RSSI: ' . $rssi . '<br/>'
                     . $warnings
                     . '\').openPopup();';
 

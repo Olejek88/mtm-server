@@ -8,7 +8,7 @@ use kartik\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Оборудование');
+$this->title = 'Оборудование';
 
 $gridColumns = [
     [
