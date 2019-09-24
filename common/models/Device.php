@@ -168,6 +168,14 @@ class Device extends MtmActiveRecord
                         return false;
                     }
                 }, 'on' => self::SCENARIO_CUSTOM_UPDATE],
+            ['address', 'filter', 'filter' => 'strtoupper', 'when' => function ($model) {
+                /** @var Device $model */
+                if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }],
             [['interface'], 'integer'],
             [['oid'], 'checkOrganizationOwn'],
         ];
