@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use common\models\Device;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -38,6 +39,7 @@ class DeviceSearch extends Device
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws InvalidConfigException
      */
     public function search($params)
     {
@@ -60,6 +62,7 @@ class DeviceSearch extends Device
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'deleted' => 0,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);

@@ -415,6 +415,7 @@ class NodeController extends Controller
             $equipments = Node::find()
                 ->select('*')
                 ->where(['equipmentTypeUuid' => $type['uuid']])
+                ->andWhere(['deleted' => 0])
                 ->orderBy('serial')
                 ->all();
             $oCnt1 = 0;

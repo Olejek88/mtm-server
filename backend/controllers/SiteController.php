@@ -161,13 +161,17 @@ class SiteController extends Controller
             ->one();
 
         $counts['city'] = City::find()->count();
-        $counts['street'] = Street::find()->count();
-        $counts['objects'] = Objects::find()->count();
-        $counts['device'] = Device::find()->count();
-        $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_COUNTER])->count();
-        $counts['light'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])->count();
+        $counts['street'] = Street::find()->where(['deleted' => 0])->count();
+        $counts['objects'] = Objects::find()->where(['deleted' => 0])->count();
+        $counts['device'] = Device::find()->where(['deleted' => 0])->count();
+        $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_COUNTER])
+            ->andWhere(['deleted' => 0])
+            ->count();
+        $counts['light'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
+            ->andWhere(['deleted' => 0])
+            ->count();
         $counts['channel'] = SensorChannel::find()->count();
-        $counts['node'] = Node::find()->count();
+        $counts['node'] = Node::find()->where(['deleted' => 0])->count();
         $counts['deviceType'] = DeviceType::find()->count();
 
         $last_measures = Measure::find()
@@ -192,6 +196,7 @@ class SiteController extends Controller
         $fullTree = array();
         $streets = Street::find()
             ->select('*')
+            ->andWhere(['deleted' => 0])
             ->orderBy('title')
             ->all();
         foreach ($streets as $street) {
@@ -200,8 +205,11 @@ class SiteController extends Controller
                 'folder' => true,
                 'expanded' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
+            $houses = House::find()
+                ->where(['streetUuid' => $street['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->orderBy('number')
+                ->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
@@ -209,7 +217,10 @@ class SiteController extends Controller
                     'folder' => true,
                     'expanded' => true
                 ];
-                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                $objects = Objects::find()
+                    ->where(['houseUuid' => $house['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
@@ -217,7 +228,10 @@ class SiteController extends Controller
                         'folder' => true,
                         'expanded' => true
                     ];
-                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $nodes = Node::find()
+                        ->where(['objectUuid' => $object['uuid']])
+                        ->andWhere(['deleted' => 0])
+                        ->all();
                     foreach ($nodes as $node) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
                         if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
@@ -236,8 +250,10 @@ class SiteController extends Controller
                         ];
                         $devices = Device::find()->where(['nodeUuid' => $node['uuid']])->all();
                         if (isset($_GET['type']))
-                            $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
+                            $devices = Device::find()
+                                ->where(['nodeUuid' => $node['uuid']])
                                 ->andWhere(['deviceTypeUuid' => $_GET['type']])
+                                ->andWhere(['deleted' => 0])
                                 ->all();
                         foreach ($devices as $device) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
@@ -459,7 +475,7 @@ class SiteController extends Controller
      */
     public function getLayers()
     {
-        $devices = Device::find()->all();
+        $devices = Device::find()->where(['deleted' => 0])->all();
 
         $cnt = 0;
         $default_coordinates = "[55.54,61.36]";
@@ -515,6 +531,7 @@ class SiteController extends Controller
                         $t = $measure['value'];
                     $coordinator = Device::find()
                         ->where(['nodeUuid' => $device['node']['uuid']])
+                        ->andWhere(['deleted' => 0])
                         ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
                         ->one();
                     if ($coordinator) {
@@ -584,7 +601,7 @@ class SiteController extends Controller
         }
         $equipmentsGroup .= ']);' . PHP_EOL;
 
-        $cameras = Camera::find()->all();
+        $cameras = Camera::find()->where(['deleted' => 0])->all();
         $cnt = 0;
         $camerasGroup = 'var cameras=L.layerGroup([';
         $camerasList = '';
@@ -621,7 +638,7 @@ class SiteController extends Controller
         }
         $camerasGroup .= ']);' . PHP_EOL;
 
-        $nodes = Node::find()->all();
+        $nodes = Node::find()->where(['deleted' => 0])->all();
         $cnt = 0;
         $nodesGroup = 'var nodes=L.layerGroup([';
         $nodesList = '';
@@ -701,6 +718,7 @@ class SiteController extends Controller
                 $nodesList .= 'node' . $node["_id"] . '.on(\'click\', function(e) {';
                 $devices = Device::find()
                     ->where(['IN', 'deviceTypeUuid', [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_LIGHT_WITHOUT_ZB]])
+                    ->andWhere(['deleted' => 0])
                     ->andWhere(['nodeUuid' => $node['uuid']])
                     ->all();
                 foreach ($devices as $device) {

@@ -129,6 +129,7 @@ class DeviceController extends Controller
      * Lists all Device models.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndexSmall()
     {
