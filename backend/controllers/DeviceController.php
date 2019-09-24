@@ -132,6 +132,7 @@ class DeviceController extends Controller
      * Lists all Device models.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndexSmall()
     {
@@ -464,6 +465,7 @@ class DeviceController extends Controller
                 $data['days'][$cnt]['w4'] = $measure['value'];
             if ($measure['parameter'] == 0)
                 $data['days'][$cnt]['ws'] = $measure['value'];
+            if ($cnt > 25) break;
         }
 
         // archive month
@@ -789,7 +791,7 @@ class DeviceController extends Controller
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-            ->andWhere(['parameter' => 0])
+            ->andWhere(['parameter' => 1])
             ->orderBy('date DESC'))
             ->limit(100)
             ->all();
@@ -1516,6 +1518,7 @@ class DeviceController extends Controller
      * Build tree of device by user
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public
     function actionReport()
@@ -1866,6 +1869,9 @@ class DeviceController extends Controller
                         //return $this->redirect($source);
                     }
 
+                    MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
+                        $model->node->object->getAddress() . ' [' . $model->node->address . ']');
+
                     if ($model['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO) {
                         self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
                         self::createChannel($model->uuid, MeasureType::CURRENT, "Ток");
@@ -2078,6 +2084,9 @@ class DeviceController extends Controller
                         }
                         $device['deleted'] = 1;
                         $device->save();
+                        MainFunctions::register("Удалено оборудование " . $device['deviceType']['title'] . ' ' .
+                            $device->node->object->getAddress() . ' [' . $device->node->address . ']');
+
                         return json_encode($device->errors);
                     }
                 }
@@ -2447,7 +2456,7 @@ class DeviceController extends Controller
                                     $data['group'][$group_num]['month'][$mon]['w3'] += $value;
                                 if ($measure['parameter'] == 4)
                                     $data['group'][$group_num]['month'][$mon]['w4'] += $value;
-                                if ($measure['parameter'] == 0)
+                                if ($measure['parameter'] > 0)
                                     $data['group'][$group_num]['month'][$mon]['ws'] += $value;
                             }
                         }

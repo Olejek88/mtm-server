@@ -48,6 +48,7 @@ class ObjectController extends Controller
     /**
      * Lists all Object models.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -57,6 +58,7 @@ class ObjectController extends Controller
     /**
      * Lists all Object models.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionTable()
     {
@@ -87,6 +89,7 @@ class ObjectController extends Controller
      * Creates a new Flat model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionCreate()
     {
@@ -186,6 +189,7 @@ class ObjectController extends Controller
         $fullTree = array();
         $streets = Street::find()
             ->select('*')
+            ->andWhere(['deleted' => 0])
             ->orderBy('title')
             ->all();
         foreach ($streets as $street) {
@@ -193,15 +197,21 @@ class ObjectController extends Controller
                 'title' => $street['title'],
                 'folder' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
+            $houses = House::find()
+                ->where(['streetUuid' => $street['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->orderBy('number')
+                ->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
                     'title' => $house->getFullTitle(),
                     'folder' => true
                 ];
-                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                $objects = Objects::find()
+                    ->where(['houseUuid' => $house['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [

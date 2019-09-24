@@ -109,6 +109,7 @@ class CameraController extends Controller
      * Creates a new Camera model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionCreate()
     {
@@ -222,6 +223,7 @@ class CameraController extends Controller
         $fullTree = array();
         $streets = Street::find()
             ->select('*')
+            ->where(['deleted' => 0])
             ->orderBy('title')
             ->all();
         foreach ($streets as $street) {
@@ -230,8 +232,11 @@ class CameraController extends Controller
                 'expanded' => true,
                 'folder' => true
             ];
-            $houses = House::find()->where(['streetUuid' => $street['uuid']])->
-            orderBy('number')->all();
+            $houses = House::find()
+                ->where(['streetUuid' => $street['uuid']])
+                ->andWhere(['deleted' => 0])
+                ->orderBy('number')
+                ->all();
             foreach ($houses as $house) {
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
@@ -239,7 +244,10 @@ class CameraController extends Controller
                     'expanded' => true,
                     'folder' => true
                 ];
-                $objects = Objects::find()->where(['houseUuid' => $house['uuid']])->all();
+                $objects = Objects::find()
+                    ->where(['houseUuid' => $house['uuid']])
+                    ->andWhere(['deleted' => 0])
+                    ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
                     $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
@@ -247,7 +255,10 @@ class CameraController extends Controller
                         'expanded' => true,
                         'folder' => true
                     ];
-                    $nodes = Node::find()->where(['objectUuid' => $object['uuid']])->all();
+                    $nodes = Node::find()
+                        ->where(['objectUuid' => $object['uuid']])
+                        ->andWhere(['deleted' => 0])
+                        ->all();
                     foreach ($nodes as $node) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
                         if ($node['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
@@ -264,7 +275,10 @@ class CameraController extends Controller
                             'expanded' => true,
                             'folder' => true
                         ];
-                        $cameras = Camera::find()->where(['nodeUuid' => $node['uuid']])->all();
+                        $cameras = Camera::find()
+                            ->where(['nodeUuid' => $node['uuid']])
+                            ->andWhere(['deleted' => 0])
+                            ->all();
                         foreach ($cameras as $camera) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
                             if ($camera['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {

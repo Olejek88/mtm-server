@@ -7,6 +7,7 @@ use common\models\House;
 use common\models\User;
 use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -45,6 +46,7 @@ class HouseController extends Controller
     /**
      * Lists all House models.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -75,6 +77,7 @@ class HouseController extends Controller
      * Creates a new House model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionCreate()
     {

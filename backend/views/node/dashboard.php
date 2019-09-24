@@ -19,7 +19,7 @@ $this->registerCssFile('/css/vendor/video-js.min.css');
 $sensorChannelUuid = 0;
 $deviceElectro = Device::find()->where(['nodeUuid' => $node['uuid']])->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])->one();
 if ($deviceElectro) {
-    $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])->andWhere(['measureTypeUuid' => MeasureType::POWER])->one();
+    $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])->andWhere(['measureTypeUuid' => MeasureType::VOLTAGE])->one();
     if ($sensorChannel)
         $sensorChannelUuid = $sensorChannel['uuid'];
 }
