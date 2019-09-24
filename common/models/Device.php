@@ -120,11 +120,11 @@ class Device extends MtmActiveRecord
                 ],
                 'required'
             ],
-            [['lightProgram'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
+            [['lightProgram'], 'string'],
             [['lightProgram'], 'required',
                 'when' => function ($model) {
                     /** @var Device $model */
-                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT])) {
+                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT]) && $model->isNewRecord) {
                         return true;
                     } else {
                         return false;
@@ -150,15 +150,6 @@ class Device extends MtmActiveRecord
                 ],
                 'string', 'max' => 50
             ],
-            [['address'], 'unique', 'targetClass' => '\common\models\Device', 'message' => 'Этот адрес уже занят.',
-                'when' => function ($model) {
-                    /** @var Device $model */
-                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }, 'on' => self::SCENARIO_DEFAULT],
             [['address'], 'checkUniqueAddress',
                 'when' => function ($model) {
                     /** @var Device $model */
@@ -167,7 +158,7 @@ class Device extends MtmActiveRecord
                     } else {
                         return false;
                     }
-                }, 'on' => self::SCENARIO_CUSTOM_UPDATE],
+                }],
             ['address', 'filter', 'filter' => 'strtoupper', 'when' => function ($model) {
                 /** @var Device $model */
                 if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
@@ -321,14 +312,21 @@ class Device extends MtmActiveRecord
 
     public function checkUniqueAddress($attr, $param)
     {
-        $dirtyValue = $this->getDirtyAttributes([$attr]);
-        if (count($dirtyValue) == 0) {
-            return;
+        if (!$this->isNewRecord) {
+            $dirtyValue = $this->getDirtyAttributes([$attr]);
+            if (count($dirtyValue) == 0) {
+                return;
+            }
+
+            $oldValue = $this->getOldAttribute($attr);
+            if ($oldValue === $dirtyValue[$attr]) {
+                return;
+            }
         }
 
-        $oldValue = $this->getOldAttribute($attr);
-        if ($oldValue == $dirtyValue[$attr]) {
-            return;
+        $existDevices = Device::find()->where([$attr => $this->$attr, 'deviceTypeUuid' => [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR]])->all();
+        if (count($existDevices) > 0) {
+            $this->addError($attr, 'Это адрес уже занят.');
         }
     }
 }
