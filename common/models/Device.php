@@ -117,10 +117,22 @@ class Device extends MtmActiveRecord
                     'serial',
                     'interface',
                     'port',
-                    'lightProgram'
                 ],
                 'required'
             ],
+            [['lightProgram'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
+            [['lightProgram'], 'required',
+                'when' => function ($model) {
+                    /** @var Device $model */
+                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT])) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }, 'whenClient' => "function (attribute, value) {
+                    result = $('#device-devicetypeuuid').val() == '" . DeviceType::DEVICE_LIGHT . "'; 
+                    return result;
+                }"],
             [['date', 'oid', 'createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['deleted'], 'boolean'],
@@ -138,6 +150,32 @@ class Device extends MtmActiveRecord
                 ],
                 'string', 'max' => 50
             ],
+            [['address'], 'unique', 'targetClass' => '\common\models\Device', 'message' => 'Этот адрес уже занят.',
+                'when' => function ($model) {
+                    /** @var Device $model */
+                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }, 'on' => self::SCENARIO_DEFAULT],
+            [['address'], 'checkUniqueAddress',
+                'when' => function ($model) {
+                    /** @var Device $model */
+                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }, 'on' => self::SCENARIO_CUSTOM_UPDATE],
+            ['address', 'filter', 'filter' => 'strtoupper', 'when' => function ($model) {
+                /** @var Device $model */
+                if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }],
             [['interface'], 'integer'],
             [['oid'], 'checkOrganizationOwn'],
         ];
@@ -279,5 +317,18 @@ class Device extends MtmActiveRecord
     public function setDeviceProgram($program)
     {
         $this->lightProgram = $program;
+    }
+
+    public function checkUniqueAddress($attr, $param)
+    {
+        $dirtyValue = $this->getDirtyAttributes([$attr]);
+        if (count($dirtyValue) == 0) {
+            return;
+        }
+
+        $oldValue = $this->getOldAttribute($attr);
+        if ($oldValue == $dirtyValue[$attr]) {
+            return;
+        }
     }
 }

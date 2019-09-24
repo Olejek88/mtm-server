@@ -124,11 +124,11 @@ class MtmServerAmqpWorker extends Worker
                     ':workUuid' => DeviceStatus::WORK,
                     ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
                 ];
-                $command = $db->createCommand("UPDATE mtm.node AS nt SET nt.deviceStatusUuid=:noLinkUuid, changedAt=current_timestamp()
+                $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:noLinkUuid, changedAt=current_timestamp()
 WHERE nt.uuid IN (
-SELECT dt.nodeUuid FROM mtm.device AS dt
-LEFT JOIN mtm.sensor_channel AS sct ON sct.deviceUuid=dt.uuid
-LEFT JOIN mtm.measure AS mt ON mt.sensorChannelUuid=sct.uuid
+SELECT dt.nodeUuid FROM device AS dt
+LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
+LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) > :timeOut OR mt.changedAt IS NULL)
 GROUP BY dt.uuid
@@ -140,17 +140,30 @@ AND nt.deviceStatusUuid=:workUuid", $params);
 
                 // для всех шкафов от которых были получены пакеты со статусом координатора менее 30 секунд назад,
                 // а статус был "Нет связи", устанавливаем статус "В порядке"
-                $command = $db->createCommand("UPDATE mtm.node AS nt SET nt.deviceStatusUuid=:workUuid, changedAt=current_timestamp()
+                $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:workUuid, changedAt=current_timestamp()
 WHERE nt.uuid IN (
-SELECT dt.nodeUuid FROM mtm.device AS dt
-LEFT JOIN mtm.sensor_channel AS sct ON sct.deviceUuid=dt.uuid
-LEFT JOIN mtm.measure AS mt ON mt.sensorChannelUuid=sct.uuid
+SELECT dt.nodeUuid FROM device AS dt
+LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
+LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) < :timeOut)
 GROUP BY dt.uuid
 ORDER BY mt.changedAt DESC
 )
 AND nt.deviceStatusUuid=:noLinkUuid", $params);
+//                $this->log('upd query: ' . $command->rawSql);
+                $command->execute();
+
+                // для всех шкафов у которых нет координаторов и каналов измерения для них, ставим нет связи
+                unset($params[':timeOut']);
+                $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:noLinkUuid
+WHERE nt.uuid NOT IN (
+SELECT dt.nodeUuid FROM device AS dt
+LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
+WHERE dt.deviceTypeUuid=:deviceType
+GROUP BY dt.uuid
+)
+AND nt.deviceStatusUuid=:workUuid", $params);
 //                $this->log('upd query: ' . $command->rawSql);
                 $command->execute();
             }

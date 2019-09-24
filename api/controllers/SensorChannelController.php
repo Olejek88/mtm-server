@@ -78,13 +78,16 @@ class SensorChannelController extends Controller
             $node = Node::findOne($nid);
             if ($node == null) {
                 throw new HttpException(404, 'The specified post cannot be found.');
+            } else {
+                $query->leftJoin('{{%device}}', '{{%device}}.uuid = {{%sensor_channel}}.deviceUuid');
+                $query->andWhere(['device.nodeUuid' => $node->uuid]);
             }
         }
 
         // проверяем параметры запроса
         $changedAfter = $req->getQueryParam('changedAfter');
         if ($changedAfter != null) {
-            $query->andWhere(['>=', 'changedAt', $changedAfter]);
+            $query->andWhere(['>=', '{{%sensor_channel}}.changedAt', $changedAfter]);
         }
 
         // проверяем что хоть какие-то условия были заданы
@@ -137,11 +140,11 @@ class SensorChannelController extends Controller
             if ($model == null) {
                 $model = new SensorChannel();
 //                $model->_id = $item['_id'];
-                $model->uuid = $item['uuid'];
-                $model->oid = $organisation->uuid;
             }
 
             $model->scenario = MtmActiveRecord::SCENARIO_CUSTOM_UPDATE;
+            $model->uuid = $item['uuid'];
+            $model->oid = $organisation->uuid;
             $model->title = $item['title'];
             $model->register = $item['register'];
             $model->deviceUuid = $item['deviceUuid'];

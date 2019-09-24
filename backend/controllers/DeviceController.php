@@ -234,18 +234,23 @@ class DeviceController extends Controller
         }
 
         $model = $this->findModel($id);
+        $model->scenario = Device::SCENARIO_CUSTOM_UPDATE;
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
-                $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
-                $deviceConfig->value = $model->lightProgram;
-                $deviceConfig->save();
+                if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
+                    $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
+                    $deviceConfig->value = $model->lightProgram;
+                    $deviceConfig->save();
+                }
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
+                $program = new DeviceProgram();
+                $program->title = $model->lightProgram;
                 return $this->render(
                     'update',
                     [
                         'model' => $model,
-                        'program' => $model->getDeviceProgram(),
+                        'program' => $program,
                     ]
                 );
             }
