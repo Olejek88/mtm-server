@@ -37,6 +37,7 @@ class HouseSearch extends House
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws \yii\base\InvalidConfigException
      */
     public function search($params)
     {
@@ -59,6 +60,7 @@ class HouseSearch extends House
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'deleted' => 0,
             'streetUuid' => $this->streetUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,

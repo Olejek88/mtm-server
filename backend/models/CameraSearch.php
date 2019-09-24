@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use common\models\Camera;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -37,6 +38,7 @@ class CameraSearch extends Camera
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws InvalidConfigException
      */
     public function search($params)
     {
@@ -59,6 +61,7 @@ class CameraSearch extends Camera
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'deleted' => 0,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,
         ]);

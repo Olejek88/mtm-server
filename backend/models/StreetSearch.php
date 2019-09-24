@@ -37,6 +37,7 @@ class StreetSearch extends Street
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws \yii\base\InvalidConfigException
      */
     public function search($params)
     {
@@ -59,6 +60,7 @@ class StreetSearch extends Street
         // grid filtering conditions
         $query->andFilterWhere([
             '_id' => $this->_id,
+            'deleted' => 0,
             'cityUuid' => $this->cityUuid,
             'createdAt' => $this->createdAt,
             'changedAt' => $this->changedAt,

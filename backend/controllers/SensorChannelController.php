@@ -7,6 +7,7 @@ use common\models\User;
 use Exception;
 use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -61,6 +62,7 @@ class SensorChannelController extends Controller
      * Lists all StageOperation models.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -79,6 +81,7 @@ class SensorChannelController extends Controller
      * Lists all models.
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionTable()
     {

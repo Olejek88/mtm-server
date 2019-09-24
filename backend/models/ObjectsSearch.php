@@ -37,6 +37,7 @@ class ObjectsSearch extends Objects
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws \yii\base\InvalidConfigException
      */
     public function search($params)
     {
@@ -60,6 +61,7 @@ class ObjectsSearch extends Objects
         $query->andFilterWhere([
             '_id' => $this->_id,
             'title' => $this->title,
+            'deleted' => 0,
             'houseUuid' => $this->houseUuid,
             'objectTypeUuid' => $this->objectTypeUuid,
             'createdAt' => $this->createdAt,
