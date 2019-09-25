@@ -23,9 +23,14 @@ class MeasureType extends ActiveRecord
     const CURRENT = 'E38C561F-9E88-407E-A465-83803A625627';
     const STATUS = 'E45EA488-DB97-4D38-9067-6B4E29B965F8';
     const RSSI = '06F2D619-CB5A-4561-82DF-4C87DF06C6FE';
+    // состояние двери шкафа (0 - закрыта, 1 - открыта)
     const COORD_IN1 = '5D8A3557-6DB1-401B-9326-388F03714E48';
+    const DOOR_STATE = self::COORD_IN1;
+    // состояние контактора (0 - включен, 1 - выключен)
     const COORD_IN2 = '066C4553-EA7A-4DB9-8E25-98192EF659A3';
+    const CONTACTOR_STATE = self::COORD_IN2;
     const COORD_DIGI1 = '3D597483-F547-438C-A284-85E0F2C5C480';
+    const HOP_COUNT = '74656AFD-F536-49AE-A71A-83F0EEE9C912';
 
     const MEASURE_TYPE_CURRENT = 0;
     const MEASURE_TYPE_HOUSE = 1;

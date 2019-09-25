@@ -23,6 +23,7 @@ use yii\db\Expression;
  *
  * @property MeasureType $measureType
  * @property Device $device
+ * @property ActiveQuery $measureOne
  * @property SensorConfig $sensorConfig
  */
 class SensorChannel extends MtmActiveRecord
