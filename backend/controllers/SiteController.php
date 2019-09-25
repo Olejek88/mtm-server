@@ -663,7 +663,6 @@ class SiteController extends Controller
         foreach ($nodes as $node) {
             if ($node["object"]["latitude"] > 0) {
                 $link = '<span class="badge badge-green-small">есть</span>';
-                $security = '<span class="badge badge-green-small">в норме</span>';
                 $power = '<span class="badge badge-green-small">в норме</span>';
                 $temperature = '<span class="badge badge-green-small">28.82(C)</span>';
                 $warnings = '';
@@ -678,6 +677,34 @@ class SiteController extends Controller
                 }
 
                 $contactors = "-";
+                $security = '-';
+                $coordinator = Device::find()
+                    ->where(['nodeUuid' => $node->uuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])->one();
+                if ($coordinator != null) {
+                    /** @var @var SensorChannel $sChannel */
+                    // состояние контактора
+                    $sChannel = $coordinator->getSensorChannel(MeasureType::CONTACTOR_STATE)->one();
+                    if ($sChannel != null) {
+                        $value = $sChannel->getMeasureOne()->one();
+                        if ($value != null) {
+                            $contactors = $value->value == 0 ? 'Выключен' : 'Включен';
+                            $contState = $value->value == 0 ? 'badge-red-small' : 'badge-green-small';
+                            $contactors = '<span class="badge ' . $contState . '">' . $contactors . '</span>';
+                        }
+                    }
+
+                    // состояние двери шкафа
+                    $sChannel = $coordinator->getSensorChannel(MeasureType::DOOR_STATE)->one();
+                    if ($sChannel != null) {
+                        $value = $sChannel->getMeasureOne()->one();
+                        if ($value != null) {
+                            $security = $value->value == 0 ? 'в норме' : 'сработала';
+                            $doorState = $value->value == 0 ? 'badge-green-small' : 'badge-red-small';
+                            $security = '<span class="badge ' . $doorState . '">' . $security . '</span>';
+                        }
+                    }
+                }
+
                 $u = "-";
                 $w = "-";
                 $w_total = "-";
@@ -723,11 +750,11 @@ class SiteController extends Controller
                     . 'Связь: ' . $link . '<br/>'
                     . 'Охрана: ' . $security . '<br/>'
                     . 'Питание: ' . $power . '<br/>'
-                    . 'Контакторы: ' . $contactors . '<br/>'
+                    . 'Контактор: ' . $contactors . '<br/>'
                     . 'Температура: ' . $temperature . '<br/>'
                     . 'Напряжение,В: ' . $u . '<br/>'
-                    . 'Мощность,кВт/ч: ' . $w . '<br/>'
-                    . 'Сумма,кВт: ' . $w_total . '<br/>'
+                    . 'Мощность,кВт: ' . $w . '<br/>'
+                    . 'Энергия,кВт/ч: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
                     . 'Адрес: ' . $node->address . '<br/>'
                     . $warnings
