@@ -66,7 +66,7 @@ use yii\widgets\Pjax;
                     }
                     echo Html::hiddenInput('device', $device['uuid']);
                     echo Html::hiddenInput('type', 'node');
-                    echo Html::hiddenInput('on', 0);
+                    echo Html::hiddenInput('on', $value);
                     echo Html::submitButton(Yii::t('app', $title), $options);
                     echo Html::endForm();
                     Pjax::end();
