@@ -491,6 +491,8 @@ class SiteController extends Controller
         $group = '-';
         $t = '-';
         $define = '';
+        $current_power = '-';
+        $rssi = '-';
 
         foreach ($devices as $device) {
             if ($device["object"]["latitude"] > 0) {
