@@ -501,6 +501,7 @@ class SiteController extends Controller
                 if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                     $current_power = '-';
                     $rssi = '-';
+                    $hops = '-';
                     $link = '<b>' . Html::a($device["deviceType"]["title"],
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
@@ -537,6 +538,17 @@ class SiteController extends Controller
                                 $rssi = $cMeasure->value;
                             }
                         }
+
+                        $sChannel = $device->getSensorChannel(MeasureType::HOP_COUNT)->one();
+                        if ($sChannel != null) {
+                            /** @var Measure $cMeasure */
+                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            if ($cMeasure != null) {
+                                $hops = $cMeasure->value;
+                            }
+                        }
+
+                        $rssi = $rssi . ' / ' . $hops;
                     }
 
                     $dimming = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
