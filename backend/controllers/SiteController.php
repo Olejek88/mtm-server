@@ -701,8 +701,8 @@ class SiteController extends Controller
                     if ($sChannel != null) {
                         $value = $sChannel->getMeasureOne()->one();
                         if ($value != null) {
-                            $contactors = $value->value == 0 ? 'Выключен' : 'Включен';
-                            $contState = $value->value == 0 ? 'badge-red-small' : 'badge-green-small';
+                            $contactors = $value->value == 0 ? 'Включен' : 'Выключен';
+                            $contState = $value->value == 0 ? 'badge-green-small' : 'badge-red-small';
                             $contactors = '<span class="badge ' . $contState . '">' . $contactors . '</span>';
                         }
                     }
