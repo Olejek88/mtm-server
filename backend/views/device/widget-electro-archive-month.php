@@ -56,7 +56,7 @@ use yii\helpers\Html;
                             echo '<td class="kv-align-center kv-align-middle" data-col-seq="4">' . $data['w4'] . '</td>';
                         else
                             echo '<td class="kv-align-center kv-align-middle" data-col-seq="4">-</td>';
-                        if (isset($data['ws']))
+                        if (isset($data['w1']) && isset($data['w2']) && isset($data['w3']) && isset($data['w4']))
                             echo '<td class="kv-align-center kv-align-middle" data-col-seq="5">' . ($data["w1"] + $data["w2"] + $data["w3"] + $data["w4"]) . '</td>';
                         else
                             echo '<td class="kv-align-center kv-align-middle" data-col-seq="5">-</td>';
