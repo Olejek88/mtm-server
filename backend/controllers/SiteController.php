@@ -678,7 +678,6 @@ class SiteController extends Controller
             if ($node["object"]["latitude"] > 0) {
                 $link = '<span class="badge badge-green-small">есть</span>';
                 $power = '<span class="badge badge-green-small">в норме</span>';
-                $temperature = '<span class="badge badge-green-small">28.82(C)</span>';
                 $warnings = '';
                 if ($node['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
                     $link = '<span class="badge badge-red-small">нет</span>';
@@ -692,6 +691,7 @@ class SiteController extends Controller
 
                 $contactors = "-";
                 $security = '-';
+                $temperature = '-';
                 $coordinator = Device::find()
                     ->where(['nodeUuid' => $node->uuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])->one();
                 if ($coordinator != null) {
@@ -715,6 +715,15 @@ class SiteController extends Controller
                             $security = $value->value == 0 ? 'в норме' : 'сработала';
                             $doorState = $value->value == 0 ? 'badge-green-small' : 'badge-red-small';
                             $security = '<span class="badge ' . $doorState . '">' . $security . '</span>';
+                        }
+                    }
+
+                    // температура
+                    $sChannel = $coordinator->getSensorChannel(MeasureType::TEMPERATURE)->one();
+                    if ($sChannel != null) {
+                        $value = $sChannel->getMeasureOne()->one();
+                        if ($value != null) {
+                            $temperature = '<span class="badge badge-green-small">' . $value->value . '&deg;C</span>';
                         }
                     }
                 }
