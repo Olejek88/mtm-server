@@ -94,7 +94,7 @@ $gridColumns = [
             $list = [];
             $statuses = DeviceStatus::find()->orderBy('title')->all();
             foreach ($statuses as $stat) {
-                $color = 'background-color: white';
+                $color = 'background-color: gray';
                 if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
                     $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
                     $color = 'background-color: gray';

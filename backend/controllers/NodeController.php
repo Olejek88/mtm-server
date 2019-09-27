@@ -336,7 +336,7 @@ class NodeController extends Controller
         $parameters['power'] = "<span style='color: darkgreen'>" . $parameters['w'] . "</span>";
 
         $w = Measure::getLastMeasureNodeByType(MeasureType::POWER, $node['uuid'],
-            MeasureType::MEASURE_TYPE_TOTAL, 0);
+            MeasureType::MEASURE_TYPE_TOTAL_CURRENT, 0);
         if (!$w) $w = '-';
         else $w = $w['value'];
         $parameters['total'] = "<span style='color: darkgreen'>" . $w . "</span>";

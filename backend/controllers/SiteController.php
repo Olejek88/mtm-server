@@ -751,11 +751,18 @@ class SiteController extends Controller
                             ->one();
                         if ($measure) {
                             if ($channel['measureTypeUuid'] == MeasureType::POWER)
-                                $w = $measure['value'];
+                                $w = number_format($measure['value'], 3);
                             if ($channel['measureTypeUuid'] == MeasureType::VOLTAGE)
-                                $u = $measure['value'];
-                            if ($channel['measureTypeUuid'] == MeasureType::CURRENT)
-                                $w_total = $measure['value'];
+                                $u = number_format($measure['value'], 2);
+                        }
+                        $measure = Measure::find()
+                            ->where(['sensorChannelUuid' => $channel['uuid']])
+                            ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL_CURRENT])
+                            ->orderBy('date DESC')
+                            ->one();
+                        if ($measure) {
+                            if ($channel['measureTypeUuid'] == MeasureType::POWER)
+                                $w_total = number_format($measure['value'], 2);
                         }
                     }
                 }

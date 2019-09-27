@@ -214,7 +214,7 @@ class DeviceController extends Controller
                 }
 
                 if ($model['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
-                    self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура воздуха");
+                    //self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура воздуха");
                 }
 
                 return $this->redirect(['view', 'id' => $model->_id]);
@@ -1880,7 +1880,7 @@ class DeviceController extends Controller
                     }
 
                     if ($model['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
-                        self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура");
+                        //self::createChannel($model->uuid, MeasureType::TEMPERATURE, "Температура");
                     }
                 }
             }
