@@ -134,8 +134,6 @@ class HouseController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
-     * @throws Throwable
-     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -143,7 +141,11 @@ class HouseController extends Controller
             return $this->redirect('/site/index');
         }
 
-        $this->findModel($id)->delete();
+        $house = $this->findModel($id);
+        if ($house) {
+            $house->deleted = 0;
+            $house->save();
+        }
 
         return $this->redirect(['index']);
     }

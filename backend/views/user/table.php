@@ -13,6 +13,7 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'name' => '#',
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
@@ -26,6 +27,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'name',
+        'name' => 'Название',
         'vAlign' => 'middle',
         'contentOptions' => [
             'class' => 'table_class'

@@ -269,12 +269,17 @@ class UserController extends Controller
                     $journal['description'], $text)];
             }
 
+            $am = Yii::$app->getAuthManager();
+            $roles = $am->getRoles();
+            $roleList = ArrayHelper::map($roles, 'name', 'description');
+
             $sort_events = MainFunctions::array_msort($events, ['date' => SORT_DESC]);
             return $this->render(
                 'view',
                 [
                     'model' => $user,
                     'events' => $sort_events,
+                    'roleList' => $roleList
                 ]
             );
         } else {
