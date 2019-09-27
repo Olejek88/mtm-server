@@ -39,20 +39,24 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?php
-    $type = MeasureType::find()->all();
-    $items = ArrayHelper::map($type, 'uuid', 'title');
-    echo $form->field($model, 'measureTypeUuid',
-        ['template' => MainFunctions::getAddButton("/measure-type/create")])->widget(Select2::class,
-        [
-            'data' => $items,
-            'language' => 'ru',
-            'options' => [
-                'placeholder' => 'Выберите тип..'
-            ],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ]);
+    if (!$model->isNewRecord) {
+        echo $form->field($model, 'measureTypeUuid')->hiddenInput(['value' => $model['measureTypeUuid']])->label(false);
+    } else {
+        $type = MeasureType::find()->all();
+        $items = ArrayHelper::map($type, 'uuid', 'title');
+        echo $form->field($model, 'measureTypeUuid',
+            ['template' => MainFunctions::getAddButton("/measure-type/create")])->widget(Select2::class,
+            [
+                'data' => $items,
+                'language' => 'ru',
+                'options' => [
+                    'placeholder' => 'Выберите тип..'
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
+    }
     ?>
 
     <?php

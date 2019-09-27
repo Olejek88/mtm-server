@@ -81,7 +81,7 @@ $this->title = Yii::t('app', 'Каналы измерения');
                                     'contentOptions' =>[
                                         'class' => 'text-center'
                                     ],
-                                    'template' => '{view} {update} {delete}{link}',
+                                    'template' => '{view} {delete}{link}',
                                 ],
                             ],
                         ]); ?>

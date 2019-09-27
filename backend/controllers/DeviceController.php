@@ -2204,7 +2204,7 @@ class DeviceController extends Controller
     public
     function actionRegister($uuid)
     {
-        $deviceRegisters = DeviceRegister::find()->where(['deviceUuid' => $uuid]);
+        $deviceRegisters = DeviceRegister::find()->where(['deviceUuid' => $uuid])->orderBy('date DESC');
         $provider = new ActiveDataProvider(
             [
                 'query' => $deviceRegisters,
