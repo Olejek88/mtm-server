@@ -7,8 +7,17 @@
 /* @var $coordinates */
 /* @var $objectsList */
 /* @var $objectsGroup */
-/* @var $devicesList */
-/* @var $devicesGroup */
+
+/* @var $lightList */
+/* @var $lightGoodList */
+/* @var $lightBadList */
+/* @var $sensorCO2List */
+
+/* @var $lightGroup */
+/* @var $lightGoodGroup */
+/* @var $lightBadGroup */
+/* @var $sensorCO2Group */
+
 /* @var  $nodesList */
 /* @var  $nodesGroup */
 /* @var  $polylineList */
@@ -102,12 +111,25 @@ $this->registerJs('$(window).on("resize", function () { $("#mapid").height($(win
             iconAnchor: [14, 51],
             popupAnchor: [-3, -76]
         });
+        var sensorCO2Icon = L.icon({
+            iconUrl: '/images/co2_marker.png',
+            iconSize: [33, 51],
+            iconAnchor: [14, 51],
+            popupAnchor: [-3, -76]
+        });
 
         <?php
         echo $define;
 
-        echo $devicesList;
-        echo $devicesGroup;
+        //echo $lightList;
+        echo $lightGoodList;
+        echo $lightBadList;
+        echo $sensorCO2List;
+        //echo $lightGroup;
+        echo $lightGoodGroup;
+        echo $lightBadGroup;
+        echo $sensorCO2Group;
+
         echo $nodesList;
         echo $nodesGroup;
         if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '2')) {
@@ -118,13 +140,15 @@ $this->registerJs('$(window).on("resize", function () { $("#mapid").height($(win
 
         var overlayMapsA = {};
         var overlayMapsB = {
-            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Светильники": devices,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Светильники в работе": lights_good,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Светильники неисправные": lights_bad,'; ?>
             <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '2')) echo '"Камеры": cameras,'; ?>
+            <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '2')) echo '"Датчики CO2": sensor1,'; ?>
             <?php if (!isset($_GET['view']) || (isset($_GET['view']) && $_GET['view'] == '1')) echo '"Шкафы:": nodes'; ?>        };
 
         <?php
             if (!isset($_GET['view'])) {
-                echo "var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(".$coordinates.", 13);";
+                echo "var map = L.map('mapid', {zoomControl: false, layers: [lights_good, lights_bad, cameras, sensor1, nodes]}).setView(" . $coordinates . ", 13);";
             } else {
                 if ($_GET['view']=='4')
                     echo "var map = L.map('mapid', {zoomControl: false, layers: []}).setView(".$coordinates.", 13);";

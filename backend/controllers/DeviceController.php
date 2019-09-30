@@ -1778,7 +1778,7 @@ class DeviceController extends Controller
                     'source' => $source
                 ]);
             }
-            if ($type == 'sensor-channel') {
+            if ($type == 'channel') {
                 $sensorChannel = SensorChannel::find()->where(['uuid' => $uuid])->one();
                 return $this->renderAjax('../sensor-channel/_add_sensor_channel', [
                     'model' => $sensorChannel,
@@ -1884,9 +1884,19 @@ class DeviceController extends Controller
                     }
                 }
             }
+            if ($type == 'channel') {
+                if (isset($_POST['sensorUuid']))
+                    $model = SensorChannel::find()->where(['uuid' => $_POST['sensorUuid']])->one();
+                else
+                    $model = new SensorChannel();
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save(false)) {
+                        return $this->redirect($source);
+                    }
+                }
+            }
         }
-
-        return $this->redirect($source);
+        //return $this->redirect($source);
     }
 
     /**
@@ -2072,8 +2082,15 @@ class DeviceController extends Controller
                         $object->save();
                         return 'ok';
                     }
-
                 }
+                if ($type == 'channel') {
+                    $channel = SensorChannel::find()->where(['uuid' => $uuid])->one();
+                    if ($channel) {
+                        $channel->delete();
+                        return 'ok';
+                    }
+                }
+
                 if ($type == 'device') {
                     $device = Device::find()->where(['uuid' => $uuid])->one();
                     if ($device) {
