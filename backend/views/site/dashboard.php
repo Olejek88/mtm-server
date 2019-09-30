@@ -25,8 +25,14 @@
  * @var $usersList
  * @var $last_measures
  * @var $complete
- * @var $devicesGroup
- * @var $devicesList
+ * @var $lightList
+ * @var $lightGoodList
+ * @var $lightBadList
+ * @var $sensorCO2List
+ * @var $lightGroup
+ * @var $lightGoodGroup
+ * @var $lightBadGroup
+ * @var $sensorCO2Group
  * @var $camerasGroup
  * @var $camerasList
  * @var $nodesGroup
@@ -45,7 +51,10 @@ $this->title = Yii::t('app', 'Сводная');
 <div class="row">
     <div class="col-md-8">
         <?= $this->render('widget-map', ['coordinates' => $coordinates,
-            'devicesGroup' => $devicesGroup, 'devicesList' => $devicesList,
+            'lightList' => $lightList, 'lightGoodList' => $lightGoodList,
+            'lightBadList' => $lightBadList, 'sensorCO2List' => $sensorCO2List,
+            'lightGroup' => $lightGroup, 'lightGoodGroup' => $lightGoodGroup,
+            'lightBadGroup' => $lightBadGroup, 'sensorCO2Group' => $sensorCO2Group,
             'nodesGroup' => $nodesGroup, 'nodesList' => $nodesList,
             'camerasGroup' => $camerasGroup, 'camerasList' => $camerasList]); ?>
     </div>
