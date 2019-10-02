@@ -12,6 +12,7 @@ use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\Group;
+use common\models\GroupControl;
 use common\models\House;
 use common\models\HouseType;
 use common\models\Measure;
@@ -247,6 +248,7 @@ class DeviceController extends Controller
                     $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
                     $deviceConfig->value = $model->lightProgram;
                     $deviceConfig->save();
+                    MainFunctions::deviceRegister($deviceConfig['deviceUuid'], "Обновлена конфигурация устройства");
                 }
 
                 return $this->redirect(['view', 'id' => $model->_id]);
@@ -294,6 +296,7 @@ class DeviceController extends Controller
                 $device = Device::find()->where(['uuid' => $_POST['device']])->one();
                 if (isset($_POST['value'])) {
                     $this->set($device, $_POST['value']);
+                    MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства");
                     self::updateConfig($device['uuid'], DeviceConfig::PARAM_SET_VALUE, $_POST['value']);
                 }
             }
@@ -326,6 +329,8 @@ class DeviceController extends Controller
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_POWER, $_POST['power']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_GROUP, $_POST['group']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_REGIME, $_POST['mode']);
+
+                MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства");
             }
         }
 
@@ -1448,11 +1453,11 @@ class DeviceController extends Controller
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']->getFullTitle(),
+                    'title' => $deviceGroup['device']['name'] . ' [' . $deviceGroup['device']['serial'] . ']',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
-                    'address' => $deviceGroup['device']['address'],
+                    'address' => $deviceGroup['device']['object']->getFullTitle(),
                     'uuid' => $deviceGroup['device']['uuid'],
                     'source' => '../device/tree-group',
                     'nodes' => $deviceGroup['device']['address'],
@@ -1493,11 +1498,11 @@ class DeviceController extends Controller
                 $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $device->getFullTitle(),
+                    'title' => $deviceGroup['device']['name'] . ' [' . $deviceGroup['device']['serial'] . ']',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                     'register' => $device['port'] . ' [' . $device['address'] . ']',
-                    'address' => $device['address'],
+                    'address' => $device['object']->getFullTitle(),
                     'uuid' => $device['uuid'],
                     'source' => '../device/tree-group',
                     'type' => 'device',
@@ -1871,6 +1876,7 @@ class DeviceController extends Controller
 
                     MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                         $model->node->object->getAddress() . ' [' . $model->node->address . ']');
+                    MainFunctions::deviceRegister($model->uuid, "Изменены параметры устройства " . $model['name']);
 
                     if ($model['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO) {
                         self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
@@ -1896,7 +1902,7 @@ class DeviceController extends Controller
                 }
             }
         }
-        //return $this->redirect($source);
+        return $this->redirect($source);
     }
 
     /**
@@ -1996,6 +2002,12 @@ class DeviceController extends Controller
             $deviceConfig->parameter = $parameter;
             $deviceConfig->oid = User::getOid(Yii::$app->user->identity);
             $deviceConfig->save();
+            $parameter_name = '';
+            if ($parameter == DeviceConfig::PARAM_SET_VALUE) $parameter_name = "Уровень освещения";
+            if ($parameter == DeviceConfig::PARAM_FREQUENCY) $parameter_name = "Частота выдачи датчиком статуса";
+            if ($parameter == DeviceConfig::PARAM_REGIME) $parameter_name = "Режим работы светильника";
+            if ($parameter == DeviceConfig::PARAM_POWER) $parameter_name = "Мощность светильника";
+            MainFunctions::deviceRegister($deviceUuid, "Изменена конфигурация светильника " . $parameter_name . " " . $value);
             //echo json_encode($deviceConfig->errors);
             //exit(0);
         }
@@ -2086,6 +2098,7 @@ class DeviceController extends Controller
                 if ($type == 'channel') {
                     $channel = SensorChannel::find()->where(['uuid' => $uuid])->one();
                     if ($channel) {
+                        MainFunctions::register("Удален канал измерения " . $channel['title']);
                         $channel->delete();
                         return 'ok';
                     }
@@ -2103,6 +2116,7 @@ class DeviceController extends Controller
                         $device->save();
                         MainFunctions::register("Удалено оборудование " . $device['deviceType']['title'] . ' ' .
                             $device->node->object->getAddress() . ' [' . $device->node->address . ']');
+                        MainFunctions::deviceRegister($device['uuid'], "Устройство удалено");
 
                         return json_encode($device->errors);
                     }
@@ -2262,6 +2276,7 @@ class DeviceController extends Controller
         $model = new Group();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save(false)) {
+                MainFunctions::register("Добавлена новая группа светильников " . $model['title']);
                 return $this->redirect($source);
             }
         }
@@ -2295,6 +2310,8 @@ class DeviceController extends Controller
                         $modelGroup->deviceUuid = $_POST["from"];
                         $modelGroup->groupUuid = $_POST["to"];
                         $modelGroup->save();
+                        MainFunctions::deviceRegister($modelGroup->deviceUuid,
+                            "Светильник перенесен в " . $modelGroup['group']['title']);
                     }
                 } else {
                     $model->delete();
@@ -2307,6 +2324,8 @@ class DeviceController extends Controller
                 $modelGroup->deviceUuid = $_POST["from"];
                 $modelGroup->groupUuid = $_POST["to"];
                 $modelGroup->save();
+                MainFunctions::deviceRegister($modelGroup->deviceUuid,
+                    "Светильник перенесен в " . $modelGroup['group']['title']);
             }
         }
         return self::actionTreeGroup();
@@ -2330,6 +2349,10 @@ class DeviceController extends Controller
         $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
         $node_id = $device->node->_id;
         self::sendConfig($pkt, $org_id, $node_id);
+        if ($state == 0)
+            MainFunctions::register("В шкафу " . $device['node']['object']->getFullTitle() . " ВЫКЛЮЧЕН контактор");
+        else
+            MainFunctions::register("В шкафу " . $device['node']['object']->getFullTitle() . " ВКЛЮЧЕН контактор");
     }
 
     /**
@@ -2348,6 +2371,8 @@ class DeviceController extends Controller
         $org_id = Organisation::find()->where(['uuid' => $org_oid])->one()->_id;
         $node_id = $node->_id;
         self::sendConfig($pkt, $org_id, $node_id);
+
+        MainFunctions::register("В шкафу " . $node['object']->getFullTitle() . " сброшен координатор");
     }
 
     /**
@@ -2552,10 +2577,44 @@ class DeviceController extends Controller
                     if ($model->load(Yii::$app->request->post())) {
                         $model->objectUuid = $object['uuid'];
                         $model->save(false);
+                        MainFunctions::deviceRegister($model->uuid, "Добавлен новый светильник по адресу " . $object->getAddress());
                     }
                 }
             }
         }
         return $this->redirect("../site/index");
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public
+    function actionDate()
+    {
+        if (isset($_POST["group"]) || isset($_POST["event_start"])
+            || isset($_POST["event_end"]) || isset($_POST["type"])) {
+            $date = date("Y-m-d H:i:00", strtotime($_POST["event_start"]));
+            $groupControl = GroupControl::find()
+                ->where(['groupUuid' => $_POST["group"]])
+                ->andWhere(['date' => $date])
+                ->andWhere(['type' => $_POST["type"]])
+                ->one();
+            if ($groupControl) {
+                $groupControl['date'] = date("Y-m-d H:i:00", strtotime($_POST["event_end"]));
+                $groupControl->save();
+                MainFunctions::register("Изменено расписание для " . $groupControl['group']['title'] . "
+                    (" . $_POST["event_start"] . ") > (" . $_POST["event_end"] . ")");
+            } else {
+                $groupControl = new GroupControl();
+                $groupControl->groupUuid = $_POST["group"];
+                $groupControl->oid = User::getOid(Yii::$app->user->identity);
+                $groupControl->uuid = MainFunctions::GUID();
+                $groupControl->type = $_POST["type"];
+                $groupControl->date = date("Y-m-d H:i:00", strtotime($_POST["event_end"]));
+                $groupControl->save();
+                MainFunctions::register("Изменено расписание для " . $groupControl['group']['title'] . "
+                    (" . $_POST["event_start"] . ") > (" . $_POST["event_end"] . ")");
+            }
+        }
     }
 }

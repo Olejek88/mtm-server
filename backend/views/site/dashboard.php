@@ -10,6 +10,7 @@
  * @var $measures
  * @var $devices
  * @var $cameras
+ * @var $dataProviderSearch
  * @var $tree
  * @var $coordinates
  * @var $categories
@@ -65,7 +66,7 @@ $this->title = Yii::t('app', 'Сводная');
 </div>
 <div class="row">
     <div class="col-md-7">
-        <?= $this->render('widget-archive'); ?>
+        <?= $this->render('widget-device-register', ['dataProviderSearch' => $dataProviderSearch]); ?>
     </div>
 
     <div class="col-md-5">

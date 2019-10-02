@@ -2,12 +2,10 @@
 
 namespace common\components;
 
+use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\Journal;
-use common\models\TaskVerdict;
 use common\models\User;
-use common\models\Users;
-use common\models\WorkStatus;
 use Yii;
 
 class MainFunctions
@@ -77,8 +75,30 @@ class MainFunctions
         $journal = new Journal();
         $journal->userUuid = $currentUser['uuid'];
         $journal->description = $description;
+        $journal->oid = User::getOid(Yii::$app->user->identity);
         $journal->date = date('Y-m-d H:i:s');
         if ($journal->save())
+            return Errors::OK;
+        else {
+            return Errors::ERROR_SAVE;
+        }
+    }
+
+    /**
+     * Logs message to device register in db
+     * @param string $description сообщение в журнал
+     * @param $deviceUuid
+     * @return integer код ошибки
+     */
+    public static function deviceRegister($deviceUuid, $description)
+    {
+        $register = new DeviceRegister();
+        $register->uuid = MainFunctions::GUID();
+        $register->oid = User::getOid(Yii::$app->user->identity);
+        $register->deviceUuid = $deviceUuid;
+        $register->description = $description;
+        $register->date = date('Y-m-d H:i:s');
+        if ($register->save())
             return Errors::OK;
         else {
             return Errors::ERROR_SAVE;
@@ -163,21 +183,6 @@ class MainFunctions
     public static function getColorLabelByStatus($status, $type)
     {
         $label = '<div class="progress"><div class="critical3">' . $status['title'] . '</div></div>';
-        if ($type == 'task_status') {
-            if ($status["uuid"] == WorkStatus::NEW_OPERATION ||
-                $status["uuid"] == WorkStatus::IN_WORK)
-                $label = '<div class="progress"><div class="critical5">' . $status['title'] . '</div></div>';
-            if ($status["uuid"] == WorkStatus::CANCELED)
-                $label = '<div class="progress"><div class="critical2">' . $status['title'] . '</div></div>';
-            if ($status["uuid"] == WorkStatus::UN_COMPLETE)
-                $label = '<div class="progress"><div class="critical1">' . $status['title'] . '</div></div>';
-        }
-        if ($type == 'task_verdict') {
-            if ($status["uuid"] == TaskVerdict::NOT_DEFINED)
-                $label = '<div class="progress"><div class="critical5">' . $status['title'] . '</div></div>';
-            if ($status["uuid"] == TaskVerdict::INSPECTED)
-                $label = '<div class="progress"><div class="critical1">' . $status['title'] . '</div></div>';
-        }
         if ($type == 'equipment_status') {
             if ($status['uuid'] == DeviceStatus::NOT_MOUNTED) {
                 $label = 'critical1';

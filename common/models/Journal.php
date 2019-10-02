@@ -2,8 +2,8 @@
 
 namespace common\models;
 
+use common\components\MtmActiveRecord;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "journal".
@@ -16,7 +16,7 @@ use yii\db\ActiveRecord;
  *
  * @property User $user
  */
-class Journal extends ActiveRecord
+class Journal extends MtmActiveRecord
 {
     /**
      * @inheritdoc
@@ -36,6 +36,8 @@ class Journal extends ActiveRecord
             [['description'], 'string'],
             [['date'], 'safe'],
             [['userUuid'], 'string', 'max' => 50],
+            [['oid'], 'safe'],
+            [['oid'], 'checkOrganizationOwn'],
         ];
     }
 

@@ -2,9 +2,13 @@
 
 namespace backend\controllers;
 
+use common\components\MainFunctions;
+use common\models\GroupControl;
+use common\models\Objects;
 use common\models\User;
 use Yii;
 use common\models\DeviceProgram;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -12,6 +16,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use Throwable;
 use yii\db\StaleObjectException;
+use yii2fullcalendar\models\Event;
 
 /**
  * DeviceProgramController implements the CRUD actions for DeviceProgram model.
@@ -45,6 +50,7 @@ class DeviceProgramController extends Controller
     /**
      * Lists all DeviceProgram models.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {
@@ -117,6 +123,7 @@ class DeviceProgramController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            MainFunctions::deviceRegister($model->uuid, "Изменена программа работы");
             return $this->redirect(['view', 'id' => $model->_id]);
         }
 
@@ -139,5 +146,96 @@ class DeviceProgramController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionCalendar()
+    {
+        $events = [];
+        $sum_latitude = 0;
+        $sum_longitude = 0;
+        $count = 0;
+        $objects = Objects::find()
+            ->where('latitude > 0')
+            ->andWhere('longitude > 0')
+            ->all();
+        foreach ($objects as $object) {
+            $sum_latitude += $object['latitude'];
+            $sum_longitude += $object['longitude'];
+            $count++;
+        }
+        if ($count > 0) {
+            $sum_longitude /= $count;
+            $sum_latitude /= $count;
+        }
+
+        $groupControls = GroupControl::find()->all();
+        $today = strtotime("2019-01-01 00:00:00");
+        //$today = time();
+        for ($count = 0; $count < 365; $count++) {
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $sum_latitude, $sum_longitude, 90, 5) + 3600 * 5;
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $sum_latitude, $sum_longitude, 90, 5) + 3600 * 5;
+            //$sunrise = date_sunrise($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
+            //$sunset = date_sunset($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
+
+            $on = 0;
+            $off = 0;
+            foreach ($groupControls as $groupControl) {
+                $date = date("Y-m-d", strtotime($groupControl['date']));
+                $currentDate = date("Y-m-d", $today);
+                if ($date == $currentDate) {
+                    if ($groupControl['type'] == 0) {
+                        $off = 1;
+                        $event = new Event();
+                        $event->id = $count * 2;
+                        $event->title = "выключение";
+                        $event->backgroundColor = 'orange';
+                        $event->start = $groupControl['date'];
+                        $event->color = '#ffffff';
+                        $events[] = $event;
+                    }
+                    if ($groupControl['type'] == 1) {
+                        $on = 1;
+                        $event = new Event();
+                        $event->id = $count * 2 + 1;
+                        $event->title = "включение";
+                        $event->backgroundColor = 'green';
+                        $event->start = $groupControl['date'];
+                        $event->color = '#ffffff';
+                        $events[] = $event;
+                    }
+                }
+
+            }
+
+            if ($off == 0) {
+                $event = new Event();
+                $event->id = $count * 2;
+                $event->title = "выключение";
+                $event->backgroundColor = 'orange';
+                $event->start = date("Y-m-d H:i:s", $sunrise_time);
+                $event->color = '#ffffff';
+                $events[] = $event;
+            }
+
+            if ($on == 0) {
+                $event = new Event();
+                $event->id = $count * 2 + 1;
+                $event->title = "включение";
+                $event->backgroundColor = 'green';
+                $event->start = date("Y-m-d H:i:s", $sunset_time);
+                $event->color = '#ffffff';
+                $events[] = $event;
+            }
+            //echo date("Y-m-d H:i",$event->start).PHP_EOL;
+            $today += 24 * 3600;
+        }
+
+        return $this->render('calendar', [
+            'events' => $events
+        ]);
     }
 }
