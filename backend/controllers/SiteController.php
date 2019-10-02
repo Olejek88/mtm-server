@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\DeviceRegisterSearch;
 use backend\models\DeviceSearch;
 use backend\models\SignupForm;
 use backend\models\UserSearch;
@@ -11,6 +12,7 @@ use common\models\City;
 use common\models\Device;
 use common\models\DeviceConfig;
 use common\models\DeviceGroup;
+use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
@@ -310,6 +312,10 @@ class SiteController extends Controller
         $devices = Device::find()->all();
         $cameras = Camera::find()->all();
 
+        $registerSearch = new DeviceRegisterSearch();
+        $dataProviderSearch = $registerSearch->search(Yii::$app->request->queryParams);
+        $dataProviderSearch->pagination->pageSize = 15;
+
         foreach ($cameras as $camera) {
             $camera->startTranslation();
         }
@@ -327,6 +333,7 @@ class SiteController extends Controller
                 'cameras' => $cameras,
                 'users' => $users,
                 'tree' => $fullTree,
+                'dataProviderSearch' => $dataProviderSearch,
                 'lightList' => $layers['lightList'],
                 'lightGoodList' => $layers['lightGoodList'],
                 'lightBadList' => $layers['lightBadList'],
