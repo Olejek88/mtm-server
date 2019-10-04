@@ -8,7 +8,7 @@ use yii\web\YiiAsset;
 /* @var $model common\models\DeviceProgram */
 
 $this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Device Programs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Программы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
@@ -17,11 +17,11 @@ YiiAsset::register($this);
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->_id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->_id], [
+        <?= Html::a('Изменить', ['update', 'id' => $model->_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->_id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Вы уверены что хотите удалить эту программу?',
                 'method' => 'post',
             ],
         ]) ?>

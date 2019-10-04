@@ -1452,8 +1452,10 @@ class DeviceController extends Controller
                 $channels = SensorChannel::find()->where(['deviceUuid' => $deviceGroup['device']['uuid']])->count();
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
+                $programTitle = $deviceGroup->device->getDeviceProgram();
+                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']['name'] . ' [' . $deviceGroup['device']['serial'] . ']',
+                    'title' => $deviceGroup->device->name . ' [' . $deviceGroup->device->serial . ']' . ' (' . $programTitle . ')',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
@@ -1497,8 +1499,10 @@ class DeviceController extends Controller
                 }
                 $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
+                $programTitle = $device->getDeviceProgram();
+                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']['name'] . ' [' . $deviceGroup['device']['serial'] . ']',
+                    'title' => $device->name . ' [' . $device->serial . ']' . ' (' . $programTitle . ')',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                     'register' => $device['port'] . ' [' . $device['address'] . ']',

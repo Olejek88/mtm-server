@@ -17,7 +17,6 @@ use yii\helpers\Html;
 
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => false,
-    'action' => '../message/save',
     'options' => [
         'id' => 'form',
         'enctype' => 'multipart/form-data'
@@ -68,9 +67,7 @@ use yii\helpers\Html;
         e.preventDefault();
         $.ajax({
             type: "post",
-            data: new FormData(this),
-            processData: false,
-            contentType: false
+            data: $('form').serialize(),
             url: "../message/save",
             success: function () {
                 $('#modalAdd').modal('hide');

@@ -494,7 +494,7 @@ class SiteController extends Controller
     public function getLayers()
     {
         $devices = Device::find()
-            ->where(['!=', 'deviceTypeUuid', DeviceType::DEVICE_COUNTER])
+            ->where(['NOT IN', 'deviceTypeUuid', [DeviceType::DEVICE_COUNTER, DeviceType::DEVICE_ZB_COORDINATOR]])
             ->andWhere(['deleted' => 0])
             ->all();
 
