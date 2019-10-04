@@ -136,8 +136,8 @@ LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND nt.deviceStatusUuid=:workUuid
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) > :timeOut OR mt.changedAt IS NULL)
-GROUP BY dt.uuid
-ORDER BY mt.changedAt DESC", $params);
+GROUP BY dt.uuid", $params);
+//ORDER BY mt.changedAt DESC", $params);
                 $result = $command->query()->readAll();
 //                $this->log('sel query: ' . $command->rawSql);
 
@@ -179,8 +179,8 @@ LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND nt.deviceStatusUuid=:noLinkUuid
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) < :timeOut)
-GROUP BY dt.uuid
-ORDER BY mt.changedAt DESC ", $params);
+GROUP BY dt.uuid", $params);
+//ORDER BY mt.changedAt DESC ", $params);
 //                $this->log('upd query: ' . $command->rawSql);
                 $result = $command->query()->readAll();
 
