@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\components\MtmActiveRecord;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
@@ -79,6 +80,7 @@ class DeviceProgram extends MtmActiveRecord
                 ],
                 'string', 'max' => 45
             ],
+            [['title'], 'checkUseProgram'],
             [['uuid'], 'unique'],
             [
                 ['oid', 'title'],
@@ -117,4 +119,31 @@ class DeviceProgram extends MtmActiveRecord
             'changedAt' => 'Changed At',
         ];
     }
+
+    /**
+     * @param $attr
+     * @param $param
+     * @throws InvalidConfigException
+     * @throws InvalidConfigException
+     */
+    public function checkUseProgram($attr, $param)
+    {
+        $oldValue = $this->getOldAttribute($attr);
+        if (!$this->isNewRecord) {
+            $dirtyValue = $this->getDirtyAttributes([$attr]);
+            if (count($dirtyValue) == 0) {
+                return;
+            }
+
+            if ($oldValue === $dirtyValue[$attr]) {
+                return;
+            }
+        }
+
+        $lights = DeviceConfig::find()->where(['parameter' => DeviceConfig::PARAM_LIGHT_PROGRAM, 'value' => $oldValue])->all();
+        if (count($lights) > 0) {
+            $this->addError($attr, 'Программу нельзя переименовать, она используется светильниками.');
+        }
+    }
+
 }

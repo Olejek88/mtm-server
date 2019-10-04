@@ -64,9 +64,16 @@ class DeviceConfigController extends Controller
             if ($_POST['editableAttribute'] == 'value') {
                 $model['value'] = $_POST['DeviceConfig'][$_POST['editableIndex']]['value'];
             }
-            if ($model->save())
+            if ($model->save()) {
                 return json_encode('success');
-            return json_encode('failed');
+            } else {
+                $message = '';
+                foreach ($model->errors as $key => $error) {
+                    $message .= $error[0] . '</br>';
+                }
+
+                return json_encode(['message' => $message]);
+            }
         }
 
         $searchModel = new DeviceConfigSearch();
