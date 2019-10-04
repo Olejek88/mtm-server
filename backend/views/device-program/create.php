@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\DeviceProgram */
 
-$this->title = 'Create Device Program';
-$this->params['breadcrumbs'][] = ['label' => 'Device Programs', 'url' => ['index']];
+$this->title = 'Новая программа';
+$this->params['breadcrumbs'][] = ['label' => 'Программы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="device-program-create box-padding">

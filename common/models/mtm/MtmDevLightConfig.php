@@ -79,10 +79,10 @@ class MtmDevLightConfig extends MtmPktHeader
         $binary[0] = $this->type;
         $binary[1] = $this->protoVersion;
         $binary[2] = $this->device;
-        $power = ord($this->power) << 4;
-        $mode = ord($this->mode) & 0x0f;
+        $power = ((0 + $this->power) << 4) & 0xF0;
+        $mode = (0 + $this->mode) & 0x0F;
         $binary[3] = $power | $mode;
-        $binary[4] = ord($this->group);
+        $binary[4] = 0xFF & (0 + $this->group);
         $hi = $this->frequency >> 8;
         $low = $this->frequency & 0x00ff;
         $binary[5] = $low;

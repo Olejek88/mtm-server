@@ -6,7 +6,7 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Device Programs';
+$this->title = 'Программы управления светильниками';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="device-program-index">
@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Device Program', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Новая', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -22,9 +22,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            '_id',
-            'uuid',
-            'oid',
+//            '_id',
+//            'uuid',
+//            'oid',
             'title',
             //'period_title1',
             //'value1',

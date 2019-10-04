@@ -1452,8 +1452,10 @@ class DeviceController extends Controller
                 $channels = SensorChannel::find()->where(['deviceUuid' => $deviceGroup['device']['uuid']])->count();
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
+                $programTitle = $deviceGroup->device->getDeviceProgram();
+                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']['name'] . ' [' . $deviceGroup['device']['serial'] . ']',
+                    'title' => $deviceGroup->device->name . ' [' . $deviceGroup->device->serial . ']' . ' (' . $programTitle . ')',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
@@ -1497,8 +1499,10 @@ class DeviceController extends Controller
                 }
                 $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
+                $programTitle = $device->getDeviceProgram();
+                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup['device']['name'] . ' [' . $deviceGroup['device']['serial'] . ']',
+                    'title' => $device->name . ' [' . $device->serial . ']' . ' (' . $programTitle . ')',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                     'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1870,13 +1874,14 @@ class DeviceController extends Controller
                 }
 
                 if ($model->load(Yii::$app->request->post())) {
+
                     if ($model->save(false) && isset($_POST['deviceUuid'])) {
-                        //return $this->redirect($source);
+                        MainFunctions::deviceRegister($model->uuid, "Изменены параметры устройства " . $model['name']);
+                        return $this->redirect($source);
                     }
 
                     MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                         $model->node->object->getAddress() . ' [' . $model->node->address . ']');
-                    MainFunctions::deviceRegister($model->uuid, "Изменены параметры устройства " . $model['name']);
 
                     if ($model['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO) {
                         self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
@@ -1902,7 +1907,7 @@ class DeviceController extends Controller
                 }
             }
         }
-        return $this->redirect($source);
+        //return $this->redirect($source);
     }
 
     /**

@@ -89,18 +89,16 @@ echo FancytreeWidget::widget([
                     'icon' => 'add',
                     'callback' => new JsExpression('function(key, opt) {
                         var node = $.ui.fancytree.getNode(opt.$trigger);
-                        if (node.folder==false) {
-                            $.ajax({
-                                url: "group-add",
-                                type: "post",
-                                data: {
-                                },
-                                success: function (data) { 
-                                    $(\'#modalNewGroup\').modal(\'show\');
-                                    $(\'#modalContentNewGroup\').html(data);
-                                }
-                            });
-                        }
+                        $.ajax({
+                            url: "group-add",
+                            type: "post",
+                            data: {
+                            },
+                            success: function (data) { 
+                                $(\'#modalNewGroup\').modal(\'show\');
+                                $(\'#modalContentNewGroup\').html(data);
+                            }
+                        });
                     }')
                 ],
                 'edit' => [

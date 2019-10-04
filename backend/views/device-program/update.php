@@ -5,10 +5,10 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\DeviceProgram */
 
-$this->title = 'Update Device Program: ' . $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Device Programs', 'url' => ['index']];
+$this->title = 'Изменение программы: ' . $model->title;
+$this->params['breadcrumbs'][] = ['label' => 'Программы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->_id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Изменение';
 ?>
 <div class="device-program-update box-padding">
     <div class="panel panel-default">

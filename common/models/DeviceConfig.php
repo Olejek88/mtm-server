@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\components\MtmActiveRecord;
@@ -37,6 +38,8 @@ class DeviceConfig extends MtmActiveRecord
     const PARAM_LEVEL2 = 'Уровень освещения #3';
     const PARAM_TIME3 = 'Время с начала суток #4';
     const PARAM_LEVEL3 = 'Уровень освещения #4';
+
+    const PARAM_LIGHT_PROGRAM = 'Программа';
 
     /**
      * Behaviors
@@ -88,7 +91,12 @@ class DeviceConfig extends MtmActiveRecord
                 ],
                 'required'
             ],
-            [['oid','createdAt', 'changedAt'], 'safe'],
+            [['value'], 'exist', 'targetClass' => DeviceProgram::class, 'targetAttribute' => ['value' => 'title'],
+                'when' => function ($model) {
+                    /** @var DeviceConfig $model */
+                    return $model->parameter === DeviceConfig::PARAM_LIGHT_PROGRAM;
+                }, 'message' => 'Такой программы не существует.'],
+            [['oid', 'createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [
                 [

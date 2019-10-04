@@ -11,7 +11,6 @@ use yii\helpers\Html;
 
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => false,
-    'action' => '/device/group-save',
     'options' => [
         'id' => 'form',
         'enctype' => 'multipart/form-data'
@@ -43,9 +42,7 @@ use yii\helpers\Html;
         e.preventDefault();
         $.ajax({
             type: "post",
-            data: new FormData( this ),
-            processData: false,
-            contentType: false
+            data: $('form').serialize(),
             url: "../device/group-save",
             success: function () {
                 $('#modalAddGroup').modal('hide');

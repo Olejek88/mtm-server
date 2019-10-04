@@ -200,7 +200,7 @@ function () {
 })');
 ?>
 
-<div class="modal remote fade" id="modalAddEquipment">
+<div class="modal remote" id="modalAddEquipment">
     <div class="modal-dialog">
         <div class="modal-content loader-lg" id="modalContentEquipment">
         </div>
