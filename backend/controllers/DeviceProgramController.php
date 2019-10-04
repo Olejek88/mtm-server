@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use common\components\MainFunctions;
+use common\models\DeviceConfig;
 use common\models\GroupControl;
 use common\models\Objects;
 use common\models\User;
@@ -143,8 +144,17 @@ class DeviceProgramController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
 
+        $model = $this->findModel($id);
+        $used = DeviceConfig::find()->where(['parameter' => DeviceConfig::PARAM_LIGHT_PROGRAM, 'value' => $model->title])->all();
+        if (count($used) > 0) {
+            Yii::$app->session->setFlash('error', '<h3>Эту программу нельзя удалить, так как она используется.</h3>');
+            return $this->render('view', [
+                'model' => $model,
+            ]);
+        }
+
+        $model->delete();
         return $this->redirect(['index']);
     }
 
