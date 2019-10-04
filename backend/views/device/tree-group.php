@@ -15,7 +15,7 @@ $this->title = 'Группы светильников';
         <col width="120px">
         <col width="140px">
         <col width="150px">
-        <col width="100px">
+        <col width="*">
         <col width="150px">
     </colgroup>
     <thead style="background-color: #337ab7; color: white">
@@ -24,7 +24,7 @@ $this->title = 'Группы светильников';
     </tr>
     <tr style="background-color: #3c8dbc; color: whitesmoke">
         <th align="center">Название</th>
-        <th>Контроллер</th>
+        <th>Адрес</th>
         <th>Статус</th>
         <th>Дата</th>
         <th>Адрес</th>
@@ -122,6 +122,9 @@ echo FancytreeWidget::widget([
                                     $(\'#modalContentConfig\').html(data);
                                 }
                             });
+                        }
+                        else {
+                            window.location.replace("../device-program/calendar?group="+node.data.uuid);
                         }
                     }')
                 ]

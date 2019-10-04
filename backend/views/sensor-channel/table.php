@@ -38,8 +38,7 @@ $gridColumns = [
         }
     ],
     [
-        'class' => 'kartik\grid\EditableColumn',
-        'attribute' => 'measureTypeUuid',
+        'attribute' => 'measureType.title',
         'vAlign' => 'middle',
         'width' => '150px',
         'header' => 'Тип измерения',
@@ -47,15 +46,6 @@ $gridColumns = [
         'contentOptions' => [
             'class' => 'table_class'
         ],
-        'editableOptions' => function () {
-            $types = ArrayHelper::map(MeasureType::find()->orderBy('title')->all(), 'uuid', 'title');
-            return [
-                'size' => 'md',
-                'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                'displayValueConfig' => $types,
-                'data' => $types
-            ];
-        },
         'filterType' => GridView::FILTER_SELECT2,
         'filter' => ArrayHelper::map(MeasureType::find()->orderBy('title')->all(),
             'uuid', 'title'),

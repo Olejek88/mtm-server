@@ -13,6 +13,8 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'header' => '#',
+        'mergeHeader' => true,
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 40px; text-align: center'
@@ -26,6 +28,7 @@ $gridColumns = [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
         'width' => '180px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             return Html::a($data['object']->getAddress(),
                 ['/node/dashboard', 'uuid' => $data['uuid'], 'type' => 0]);
@@ -38,6 +41,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '60px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             if (strtotime($data['lastDate'])+50000>time())
                 return "<span class='badge badge-green'>есть</span>";
@@ -52,6 +56,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '60px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             if ($data['security'])
                 return "<span class='badge badge-green'>Закрыт</span>";
@@ -66,6 +71,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '60px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             $u1 = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,0);
             if ($u1['value'] && $u1['value']>200 && $u1['value']<251)
@@ -81,16 +87,17 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '80px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             $u1 = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,1);
             $u2 = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,2);
             $u3 = Measure::getLastMeasureNodeByType(MeasureType::VOLTAGE,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,3);
             if (!$u1) $u1 = '-';
-            else $u1 = $u1['value'];
+            else $u1 = number_format($u1['value'], 3);
             if (!$u2) $u2 = '-';
-            else $u2 = $u2['value'];
+            else $u2 = number_format($u2['value'], 3);
             if (!$u3) $u3 = '-';
-            else $u3 = $u3['value'];
+            else $u3 = number_format($u3['value'], 3);
 
             return "<span style='color: darkgreen'>".$u1.",".$u2.",".$u3."</span>";
         },
@@ -102,6 +109,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '80px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             $i1 = Measure::getLastMeasureNodeByType(MeasureType::CURRENT,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT, 1);
             $i2 = Measure::getLastMeasureNodeByType(MeasureType::CURRENT,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,2);
@@ -123,6 +131,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '80px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             $w = Measure::getLastMeasureNodeByType(MeasureType::POWER,$data['uuid'],MeasureType::MEASURE_TYPE_CURRENT,0);
             if (!$w) $w = '-';
@@ -137,8 +146,9 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '80px',
+        'mergeHeader' => true,
         'value' => function ($data) {
-            $w = Measure::getLastMeasureNodeByType(MeasureType::POWER, $data['uuid'],MeasureType::MEASURE_TYPE_TOTAL,0);
+            $w = Measure::getLastMeasureNodeByType(MeasureType::POWER, $data['uuid'], MeasureType::MEASURE_TYPE_TOTAL_CURRENT, 0);
             if (!$w) $w = '-';
             else $w = $w['value'];
             return "<span style='color: darkgreen'>".$w."</span>";
@@ -151,6 +161,7 @@ $gridColumns = [
         'vAlign' => 'middle',
         'hAlign' => 'center',
         'width' => '80px',
+        'mergeHeader' => true,
         'value' => function ($data) {
             return $data['software'];
         },

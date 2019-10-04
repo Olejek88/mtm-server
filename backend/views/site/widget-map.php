@@ -1,7 +1,11 @@
 <?php
-/* @var $coordinates
- * @var $devicesGroup
- * @var $devicesList
+/* @var $coordinates */
+/* @var $lightGoodList */
+/* @var $lightBadList */
+/* @var $sensorCO2List */
+/* @var $lightGoodGroup */
+/* @var $lightBadGroup */
+/* @var $sensorCO2Group
  * @var $nodesGroup
  * @var $nodesList
  * @var $camerasGroup
@@ -96,11 +100,21 @@
         iconAnchor: [14, 51],
         popupAnchor: [-3, -76]
     });
+    var sensorCO2Icon = L.icon({
+        iconUrl: '/images/co2_marker.png',
+        iconSize: [33, 51],
+        iconAnchor: [14, 51],
+        popupAnchor: [-3, -76]
+    });
 
 
     <?php
-    echo $devicesList;
-    echo $devicesGroup;
+    echo $lightGoodList;
+    echo $lightBadList;
+    echo $sensorCO2List;
+    echo $lightGoodGroup;
+    echo $lightBadGroup;
+    echo $sensorCO2Group;
     echo $nodesList;
     echo $nodesGroup;
     echo $camerasList;
@@ -109,12 +123,17 @@
 
     var overlayMapsA = {};
     var overlayMapsB = {
-        "Светильники": devices,
+        "Светильники в работе": lights_good,
+        "Светильники неисправные": lights_bad,
         "Камеры": cameras,
+        "Датчики CO2": sensor1,
         "Шкафы:": nodes
     };
 
-    var map = L.map('mapid', {zoomControl: false, layers: [devices, cameras, nodes]}).setView(<?= $coordinates ?>, 13);
+    var map = L.map('mapid', {
+        zoomControl: false,
+        layers: [lights_good, lights_bad, cameras, sensor1, nodes]
+    }).setView(<?= $coordinates ?>, 13);
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         maxZoom: 18,
         id: 'mapbox.streets'

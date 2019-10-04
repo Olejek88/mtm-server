@@ -31,7 +31,7 @@ use yii\helpers\Html;
 
     <?php echo $form->field($model, 'name')->textInput(['maxlength' => true, 'value' => $model->name]); ?>
 
-    <?= $form->field($model, 'password', $fieldOptionsLock)->passwordInput() ?>
+    <!--    --><? /*= $form->field($model, 'password', $fieldOptionsLock)->passwordInput() */ ?>
 
     <?php echo $form->field($model, 'role')
         ->label(Yii::t('app', 'Права пользователя в системе'))

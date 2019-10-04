@@ -136,7 +136,6 @@ class StreetController extends Controller
      * @return mixed
      * @throws NotFoundHttpException
      * @throws Throwable
-     * @throws StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -144,7 +143,11 @@ class StreetController extends Controller
             return $this->redirect('/site/index');
         }
 
-        $this->findModel($id)->delete();
+        $street = $this->findModel($id);
+        if ($street) {
+            $street->deleted = 0;
+            $street->save();
+        }
 
         return $this->redirect(['index']);
     }

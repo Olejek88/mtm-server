@@ -96,7 +96,7 @@ $userImage = Yii::$app->view->params['userImage'];
                         "label" => "Справочники",
                         'icon' => 'glyphicon glyphicon-equalizer',
                         "items" => [
-                            ["label" => "Пользователи", 'icon' => 'fa fa-user', "url" => ["/user"]],
+                            ["label" => "Пользователи", 'icon' => 'fa fa-user', "url" => ["/user/table"]],
                             ["label" => "Тип устройств", 'icon' => 'fa fa-table', "url" => ["/device-type"]],
                         ],
                     ],

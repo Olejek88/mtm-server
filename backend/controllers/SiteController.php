@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\DeviceRegisterSearch;
 use backend\models\DeviceSearch;
 use backend\models\SignupForm;
 use backend\models\UserSearch;
@@ -11,6 +12,7 @@ use common\models\City;
 use common\models\Device;
 use common\models\DeviceConfig;
 use common\models\DeviceGroup;
+use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use common\models\House;
@@ -128,8 +130,14 @@ class SiteController extends Controller
         return $this->render(
             'index',
             [
-                'devicesList' => $layers['devicesList'],
-                'devicesGroup' => $layers['devicesGroup'],
+                'lightList' => $layers['lightList'],
+                'lightGoodList' => $layers['lightGoodList'],
+                'lightBadList' => $layers['lightBadList'],
+                'sensorCO2List' => $layers['sensorCO2List'],
+                'lightGroup' => $layers['lightGroup'],
+                'lightGoodGroup' => $layers['lightGoodGroup'],
+                'lightBadGroup' => $layers['lightBadGroup'],
+                'sensorCO2Group' => $layers['sensorCO2Group'],
                 'camerasList' => $layers['camerasList'],
                 'camerasGroup' => $layers['camerasGroup'],
                 'polylineList' => $layers['polylineList'],
@@ -304,6 +312,10 @@ class SiteController extends Controller
         $devices = Device::find()->all();
         $cameras = Camera::find()->all();
 
+        $registerSearch = new DeviceRegisterSearch();
+        $dataProviderSearch = $registerSearch->search(Yii::$app->request->queryParams);
+        $dataProviderSearch->pagination->pageSize = 15;
+
         foreach ($cameras as $camera) {
             $camera->startTranslation();
         }
@@ -321,8 +333,15 @@ class SiteController extends Controller
                 'cameras' => $cameras,
                 'users' => $users,
                 'tree' => $fullTree,
-                'devicesList' => $layers['devicesList'],
-                'devicesGroup' => $layers['devicesGroup'],
+                'dataProviderSearch' => $dataProviderSearch,
+                'lightList' => $layers['lightList'],
+                'lightGoodList' => $layers['lightGoodList'],
+                'lightBadList' => $layers['lightBadList'],
+                'sensorCO2List' => $layers['sensorCO2List'],
+                'lightGroup' => $layers['lightGroup'],
+                'lightGoodGroup' => $layers['lightGoodGroup'],
+                'lightBadGroup' => $layers['lightBadGroup'],
+                'sensorCO2Group' => $layers['sensorCO2Group'],
                 'camerasList' => $layers['camerasList'],
                 'camerasGroup' => $layers['camerasGroup'],
                 'nodesList' => $layers['nodesList'],
@@ -480,13 +499,24 @@ class SiteController extends Controller
             ->all();
 
         $cnt = 0;
+        $cntGood = 0;
+        $cntBad = 0;
+        $cntCO2 = 0;
+
         $default_coordinates = "[55.54,61.36]";
         $coordinates = $default_coordinates;
         $polylineList = '';
-        $equipmentsGroup = 'var devices=L.layerGroup([';
-        $equipmentsList = '';
-        $group = '-';
-        $dimming = '-';
+
+        $lightGroup = 'var lights=L.layerGroup([';
+        $lightGoodGroup = 'var lights_good=L.layerGroup([';
+        $lightBadGroup = 'var lights_bad=L.layerGroup([';
+        $sensorCO2Group = 'var sensor1=L.layerGroup([';
+
+        $lightList = '';
+        $lightGoodList = '';
+        $lightBadList = '';
+        $sensorCO2List = '';
+
         $nominal_power = '-';
         $group = '-';
         $t = '-';
@@ -548,6 +578,29 @@ class SiteController extends Controller
                             }
                         }
 
+                        $sChannel = $device->getSensorChannel(MeasureType::SENSOR_CO2)->one();
+                        if ($sChannel != null) {
+                            /** @var Measure $cMeasure */
+                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            $sensorValue = '-';
+                            if ($cMeasure != null) {
+                                $sensorValue = $cMeasure->value;
+                            }
+
+                            $dev = 'var sensor'
+                                . $sChannel["_id"]
+                                . '= L.marker([' . $device["object"]["latitude"]
+                                . ',' . $device["object"]["longitude"]
+                                . '], {icon: sensorCO2Icon}).bindPopup(\''
+                                . $sChannel["title"] . '</span>'
+                                . '<br/>'
+                                . 'Значение: ' . $sensorValue . '<br/>'
+                                . '\').openPopup();';
+                            $sensorCO2List .= $dev;
+                            if ($cntCO2 > 0) $sensorCO2Group .= ',';
+                            $cntCO2++;
+                            $sensorCO2Group .= 'sensor' . $sChannel["_id"];
+                        }
                         $rssi = $rssi . ' / ' . $hops;
                     }
 
@@ -603,7 +656,7 @@ class SiteController extends Controller
                 $define .= 'var deviceIcon' . $device["_id"] . '=' . $icon . ';';
                 $define .= 'var deviceStatus' . $device["_id"] . '=1;';
 
-                $equipmentsList .= 'var device'
+                $dev = 'var device'
                     . $device["_id"]
                     . '= L.marker([' . $device["object"]["latitude"]
                     . ',' . $device["object"]["longitude"]
@@ -618,20 +671,34 @@ class SiteController extends Controller
                     . 'RSSI: ' . $rssi . '<br/>'
                     . $warnings
                     . '\').openPopup();';
+                $lightList .= $dev;
+                if ($device['deviceStatusUuid'] == DeviceStatus::WORK) {
+                    $lightGoodList .= $dev;
+                    if ($cntGood > 0) $lightGoodGroup .= ',';
+                    $lightGoodGroup .= 'device' . $device["_id"];
+                    $cntGood++;
+                } else {
+                    $lightBadList .= $dev;
+                    if ($cntBad > 0) $lightBadGroup .= ',';
+                    $lightBadGroup .= 'device' . $device["_id"];
+                    $cntBad++;
+                }
 
                 $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 if ($coordinates == $default_coordinates && $device["object"]["latitude"] > 0) {
                     $coordinates = "[" . $device["object"]["latitude"] . "," . $device["object"]["longitude"] . "]";
                 }
                 if ($cnt > 0) {
-                    $equipmentsGroup .= ',';
+                    $lightGroup .= ',';
                 }
-
-                $equipmentsGroup .= 'device' . $device["_id"];
+                $lightGroup .= 'device' . $device["_id"];
                 $cnt++;
             }
         }
-        $equipmentsGroup .= ']);' . PHP_EOL;
+        $lightGroup .= ']);' . PHP_EOL;
+        $lightGoodGroup .= ']);' . PHP_EOL;
+        $lightBadGroup .= ']);' . PHP_EOL;
+        $sensorCO2Group .= ']);' . PHP_EOL;
 
         $cameras = Camera::find()->where(['deleted' => 0])->all();
         $cnt = 0;
@@ -751,11 +818,18 @@ class SiteController extends Controller
                             ->one();
                         if ($measure) {
                             if ($channel['measureTypeUuid'] == MeasureType::POWER)
-                                $w = $measure['value'];
+                                $w = number_format($measure['value'], 3);
                             if ($channel['measureTypeUuid'] == MeasureType::VOLTAGE)
-                                $u = $measure['value'];
-                            if ($channel['measureTypeUuid'] == MeasureType::CURRENT)
-                                $w_total = $measure['value'];
+                                $u = number_format($measure['value'], 2);
+                        }
+                        $measure = Measure::find()
+                            ->where(['sensorChannelUuid' => $channel['uuid']])
+                            ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL_CURRENT])
+                            ->orderBy('date DESC')
+                            ->one();
+                        if ($measure) {
+                            if ($channel['measureTypeUuid'] == MeasureType::POWER)
+                                $w_total = number_format($measure['value'], 2);
                         }
                     }
                 }
@@ -838,8 +912,17 @@ class SiteController extends Controller
         $layer['coordinates'] = $coordinates;
         $layer['nodesList'] = $nodesList;
         $layer['nodesGroup'] = $nodesGroup;
-        $layer['devicesList'] = $equipmentsList;
-        $layer['devicesGroup'] = $equipmentsGroup;
+
+        $layer['lightList'] = $lightList;
+        $layer['lightGoodList'] = $lightGoodList;
+        $layer['lightBadList'] = $lightBadList;
+        $layer['sensorCO2List'] = $sensorCO2List;
+
+        $layer['lightGroup'] = $lightGroup;
+        $layer['lightGoodGroup'] = $lightGoodGroup;
+        $layer['lightBadGroup'] = $lightBadGroup;
+        $layer['sensorCO2Group'] = $sensorCO2Group;
+
         $layer['camerasList'] = $camerasList;
         $layer['camerasGroup'] = $camerasGroup;
         $layer['polylineList'] = $polylineList;

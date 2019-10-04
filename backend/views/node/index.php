@@ -15,6 +15,7 @@ $gridColumns = [
         'hAlign' => 'center',
         'vAlign' => 'middle',
         'mergeHeader' => true,
+        'header' => '#',
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
@@ -29,6 +30,7 @@ $gridColumns = [
         'width' => '50px',
         'hAlign' => 'center',
         'vAlign' => 'middle',
+        'mergeHeader' => true,
         'value' => function ($model, $key, $index, $column) {
             return GridView::ROW_COLLAPSED;
         },

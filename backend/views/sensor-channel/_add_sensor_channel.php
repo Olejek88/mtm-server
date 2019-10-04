@@ -13,6 +13,7 @@ use yii\helpers\Html;
 ?>
 <?php $form = ActiveForm::begin([
     'enableAjaxValidation' => false,
+    'action' => '/device/save',
     'options' => [
         'id' => 'form'
     ]]);
@@ -23,11 +24,15 @@ use yii\helpers\Html;
 </div>
 <div class="modal-body">
     <?php
-    echo $form->field($model, 'uuid')->hiddenInput(['value' => MainFunctions::GUID()])->label(false);
-    if (isset($_GET["deviceUuid"]))
-        echo $form->field($model, 'deviceUuid')->hiddenInput(['value' => $_GET["deviceUuid"]])->label(false);
+    if ($model['uuid']) {
+        echo Html::hiddenInput("sensorUuid", $model['uuid']);
+        echo $form->field($model, 'uuid')->hiddenInput(['value' => $model['uuid']])->label(false);
+    } else
+        echo $form->field($model, 'uuid')->hiddenInput(['value' => MainFunctions::GUID()])->label(false);
     ?>
     <?php
+    echo $form->field($model, 'title')->textInput(['maxlength' => true]);
+
     $type = MeasureType::find()->all();
     $items = ArrayHelper::map($type, 'uuid', 'title');
     echo $form->field($model, 'measureTypeUuid',
@@ -66,8 +71,10 @@ use yii\helpers\Html;
             ]);
     }
     ?>
+
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
     <?= $form->field($model, 'register')->textInput() ?>
+    <?php echo Html::hiddenInput("type", "channel"); ?>
 </div>
 <div class="modal-footer">
     <?php echo Html::submitButton(Yii::t('app', 'Отправить'), ['class' => 'btn btn-success']) ?>
@@ -76,7 +83,7 @@ use yii\helpers\Html;
 <script>
     $(document).on("beforeSubmit", "#form", function () {
         $.ajax({
-            url: "../device/new",
+            url: "../device/save",
             type: "post",
             data: $('form').serialize(),
             success: function () {

@@ -16,10 +16,6 @@ $this->title = 'Профиль пользователя :: ' . $model->name;
         <h1>
             Профиль пользователя
         </h1>
-        <ol class="breadcrumb">
-            <li><?php echo Html::a('Главная', '/') ?></li>
-            <li><?php echo Html::a('Пользователи', '/users/dashboard') ?></li>
-        </ol>
     </section>
 
     <!-- Main content -->
