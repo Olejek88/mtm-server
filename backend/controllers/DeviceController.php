@@ -330,7 +330,7 @@ class DeviceController extends Controller
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_GROUP, $_POST['group']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_REGIME, $_POST['mode']);
 
-                MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства");
+                MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства ('. $device->address .')");
             }
         }
 
@@ -1605,7 +1605,7 @@ class DeviceController extends Controller
 
     /**
      *
-     * @param $device
+     * @param $device Device
      * @param $value
      */
     function set($device, $value)
@@ -1626,6 +1626,7 @@ class DeviceController extends Controller
         $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
         $node_id = $device['node']['_id'];
         self::sendConfig($pkt, $org_id, $node_id);
+        MainFunctions::deviceRegister($device->uuid, "Отправлена команда установки яркости для светильника('.$device->address.') - %" . $value);
     }
 
     /**
