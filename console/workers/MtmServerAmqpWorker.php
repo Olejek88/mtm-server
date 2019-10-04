@@ -2,8 +2,11 @@
 
 namespace console\workers;
 
+use common\components\MainFunctions;
+use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Node;
 use inpassor\daemon\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -118,44 +121,96 @@ class MtmServerAmqpWorker extends Worker
                 // для всех шкафов от которых не было пакетов состояния координатора более $timeOut секунд,
                 // а статус был "В порядке", устанавливаем статус "Нет связи"
                 $db = Yii::$app->db;
+                // выбираем все шкафы которые будут менять статус с WORK на NOT_LINK
                 $params = [
-                    ':timeOut' => $linkTimeOut,
-                    ':noLinkUuid' => DeviceStatus::NOT_LINK,
-                    ':workUuid' => DeviceStatus::WORK,
                     ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                    ':timeOut' => $linkTimeOut,
+                    ':workUuid' => DeviceStatus::WORK
                 ];
-                $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:noLinkUuid, changedAt=current_timestamp()
-WHERE nt.uuid IN (
-SELECT dt.nodeUuid FROM device AS dt
+                $command = $db->createCommand("
+SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, dt.address, nt.oid
+FROM node AS nt
+LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
 LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
+AND nt.deviceStatusUuid=:workUuid
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) > :timeOut OR mt.changedAt IS NULL)
 GROUP BY dt.uuid
-ORDER BY mt.changedAt DESC
-)
-AND nt.deviceStatusUuid=:workUuid", $params);
+ORDER BY mt.changedAt DESC", $params);
+                $result = $command->query()->readAll();
+//                $this->log('sel query: ' . $command->rawSql);
+
+                // создаём записи в логах о смене статуса, составляем список для изменения статуса
+                $uuid2Update = [];
+                foreach ($result as $device) {
+                    $uuid2Update[] = $device['nodeUuid'];
+                    $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'Нет связи' (" . $device['address'] . ")", $device['oid']);
+                    $this->log('MainFunctions::deviceRegister: ' . $rc);
+                }
+
+                // изменяем статус
+                $params = [
+                    ':noLinkUuid' => DeviceStatus::NOT_LINK,
+                ];
+                $inParam = [];
+                $inParamSql = $db->getQueryBuilder()->buildCondition(['IN', 'nt.uuid', $uuid2Update], $inParam);
+                $params = array_merge($params, $inParam);
+                $command = $db->createCommand("
+UPDATE node AS nt SET nt.deviceStatusUuid=:noLinkUuid, changedAt=current_timestamp()
+WHERE $inParamSql", $params);
 //                $this->log('upd query: ' . $command->rawSql);
                 $command->execute();
 
                 // для всех шкафов от которых были получены пакеты со статусом координатора менее 30 секунд назад,
                 // а статус был "Нет связи", устанавливаем статус "В порядке"
-                $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:workUuid, changedAt=current_timestamp()
-WHERE nt.uuid IN (
-SELECT dt.nodeUuid FROM device AS dt
+                $params = [
+                    ':timeOut' => $linkTimeOut,
+                    ':noLinkUuid' => DeviceStatus::NOT_LINK,
+                    ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                ];
+
+                $command = $db->createCommand("
+SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, dt.address, nt.oid
+FROM node AS nt
+LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
 LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
+AND nt.deviceStatusUuid=:noLinkUuid
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) < :timeOut)
 GROUP BY dt.uuid
-ORDER BY mt.changedAt DESC
-)
-AND nt.deviceStatusUuid=:noLinkUuid", $params);
+ORDER BY mt.changedAt DESC ", $params);
+//                $this->log('upd query: ' . $command->rawSql);
+                $result = $command->query()->readAll();
+
+                // создаём записи в логах о смене статуса, составляем список для изменения статуса
+                $uuid2Update = [];
+                foreach ($result as $device) {
+                    $uuid2Update[] = $device['nodeUuid'];
+                    $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'В порядке' (" . $device['address'] . ")", $device['oid']);
+                    $this->log('MainFunctions::deviceRegister: ' . $rc);
+                }
+
+                $params = [
+                    ':workUuid' => DeviceStatus::WORK,
+                ];
+                $inParam = [];
+                $inParamSql = $db->getQueryBuilder()->buildCondition(['IN', 'nt.uuid', $uuid2Update], $inParam);
+                $params = array_merge($params, $inParam);
+                $command = $db->createCommand("
+UPDATE node AS nt SET nt.deviceStatusUuid=:workUuid, changedAt=current_timestamp()
+WHERE $inParamSql", $params);
 //                $this->log('upd query: ' . $command->rawSql);
                 $command->execute();
 
                 // для всех шкафов у которых нет координаторов и каналов измерения для них, ставим нет связи
-                unset($params[':timeOut']);
+                $params = [
+                    ':workUuid' => DeviceStatus::WORK,
+                    ':noLinkUuid' => DeviceStatus::NOT_LINK,
+                    ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                ];
+
                 $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:noLinkUuid
 WHERE nt.uuid NOT IN (
 SELECT dt.nodeUuid FROM device AS dt

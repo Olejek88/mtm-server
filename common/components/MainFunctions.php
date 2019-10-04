@@ -7,6 +7,7 @@ use common\models\DeviceStatus;
 use common\models\Journal;
 use common\models\User;
 use Yii;
+use yii\web\Application;
 
 class MainFunctions
 {
@@ -86,15 +87,21 @@ class MainFunctions
 
     /**
      * Logs message to device register in db
-     * @param string $description сообщение в журнал
      * @param $deviceUuid
+     * @param string $description сообщение в журнал
+     * @param null $oid указывается когда приложение работает в консоли
      * @return integer код ошибки
      */
-    public static function deviceRegister($deviceUuid, $description)
+    public static function deviceRegister($deviceUuid, $description, $oid = null)
     {
         $register = new DeviceRegister();
         $register->uuid = MainFunctions::GUID();
-        $register->oid = User::getOid(Yii::$app->user->identity);
+        if (Yii::$app instanceof Application) {
+            $register->oid = User::getOid(Yii::$app->user->identity);
+        } else {
+            $register->oid = $oid;
+        }
+
         $register->deviceUuid = $deviceUuid;
         $register->description = $description;
         $register->date = date('Y-m-d H:i:s');
