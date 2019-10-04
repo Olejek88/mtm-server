@@ -1870,13 +1870,14 @@ class DeviceController extends Controller
                 }
 
                 if ($model->load(Yii::$app->request->post())) {
+
                     if ($model->save(false) && isset($_POST['deviceUuid'])) {
-                        //return $this->redirect($source);
+                        MainFunctions::deviceRegister($model->uuid, "Изменены параметры устройства " . $model['name']);
+                        return $this->redirect($source);
                     }
 
                     MainFunctions::register("Добавлено новое оборудование " . $model['deviceType']['title'] . ' ' .
                         $model->node->object->getAddress() . ' [' . $model->node->address . ']');
-                    MainFunctions::deviceRegister($model->uuid, "Изменены параметры устройства " . $model['name']);
 
                     if ($model['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO) {
                         self::createChannel($model->uuid, MeasureType::POWER, "Мощность электроэнергии");
@@ -1902,7 +1903,7 @@ class DeviceController extends Controller
                 }
             }
         }
-        return $this->redirect($source);
+        //return $this->redirect($source);
     }
 
     /**
