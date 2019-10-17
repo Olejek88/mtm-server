@@ -147,10 +147,17 @@ class Device extends MtmActiveRecord
                     'serial',
                     'port',
                     'nodeUuid',
-                    'address'
                 ],
                 'string', 'max' => 50
             ],
+            [['address'], 'string', 'min' => 16, 'max' => 16, 'when' => function ($model) {
+                /** @var Device $model */
+                if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }],
             [['address'], 'checkUniqueAddress',
                 'when' => function ($model) {
                     /** @var Device $model */
