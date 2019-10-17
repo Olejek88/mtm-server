@@ -6,6 +6,7 @@ use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\MeasureType;
 use common\models\Node;
 use inpassor\daemon\Worker;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -125,16 +126,18 @@ class MtmServerAmqpWorker extends Worker
                 $params = [
                     ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
                     ':timeOut' => $linkTimeOut,
-                    ':workUuid' => DeviceStatus::WORK
+                    ':workUuid' => DeviceStatus::WORK,
+                    ':measureType' => MeasureType::COORD_DIGI1,
                 ];
                 $command = $db->createCommand("
-SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, dt.address, nt.oid
+SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, nt.address as nodeAddr, dt.deviceTypeUuid, dt.address as devAddr, nt.oid
 FROM node AS nt
 LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
 LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND nt.deviceStatusUuid=:workUuid
+AND sct.measureTypeUuid=:measureType
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) > :timeOut OR mt.changedAt IS NULL)
 GROUP BY dt.uuid
 ORDER BY mt.changedAt DESC", $params);
@@ -145,7 +148,8 @@ ORDER BY mt.changedAt DESC", $params);
                 $uuid2Update = [];
                 foreach ($result as $device) {
                     $uuid2Update[] = $device['nodeUuid'];
-                    $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'Нет связи' (" . $device['address'] . ")", $device['oid']);
+                    $address = $device['deviceTypeUuid'] == DeviceType::DEVICE_ZB_COORDINATOR ? $device['nodeAddr'] : $device['devAddr'];
+                    $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'Нет связи' (" . $address . ")", $device['oid']);
                     $this->log('MainFunctions::deviceRegister: ' . $rc);
                 }
 
@@ -168,16 +172,18 @@ WHERE $inParamSql", $params);
                     ':timeOut' => $linkTimeOut,
                     ':noLinkUuid' => DeviceStatus::NOT_LINK,
                     ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                    ':measureType' => MeasureType::COORD_DIGI1,
                 ];
 
                 $command = $db->createCommand("
-SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, dt.address, nt.oid
+SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, nt.address as nodeAddr, dt.deviceTypeUuid, dt.address as devAddr, nt.oid
 FROM node AS nt
 LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
 LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND nt.deviceStatusUuid=:noLinkUuid
+AND sct.measureTypeUuid=:measureType
 AND (timestampdiff(second,  mt.changedAt, current_timestamp()) < :timeOut)
 GROUP BY dt.uuid
 ORDER BY mt.changedAt DESC ", $params);
@@ -188,7 +194,8 @@ ORDER BY mt.changedAt DESC ", $params);
                 $uuid2Update = [];
                 foreach ($result as $device) {
                     $uuid2Update[] = $device['nodeUuid'];
-                    $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'В порядке' (" . $device['address'] . ")", $device['oid']);
+                    $address = $device['deviceTypeUuid'] == DeviceType::DEVICE_ZB_COORDINATOR ? $device['nodeAddr'] : $device['devAddr'];
+                    $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'В порядке' (" . $address . ")", $device['oid']);
                     $this->log('MainFunctions::deviceRegister: ' . $rc);
                 }
 
