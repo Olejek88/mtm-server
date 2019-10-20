@@ -15,6 +15,11 @@ class m191020_065324_add_calendar extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
         // удаляем настройки программ для всех устройств, так как программы теперь будут связанны с группами
         $this->delete('{{%device_config}}', ['parameter' => 'Программа']);
 
@@ -53,6 +58,9 @@ class m191020_065324_add_calendar extends Migration
         $this->createIndex('idx-device_group-oid-groupUuid-deviceUuid', '{{%device_group}}',
             ['oid', 'groupUuid', 'deviceUuid'], true);
 
+        // исправляем тип поля
+        $this->alterColumn('{{group_control}}', 'date',
+            $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'));
 
         // добавляем связь с программой управления для календаря групп
         $this->addColumn('{{group_control}}', 'deviceProgramUuid', $this->string(45)->null());
@@ -67,16 +75,12 @@ class m191020_065324_add_calendar extends Migration
         );
 
         // таблица для календарей шкафов
-        $tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-        }
         $this->createTable('{{%node_control}}', [
             '_id' => $this->primaryKey(),
             'uuid' => $this->string(45)->notNull()->unique(),
             'oid' => $this->string(45)->notNull(),
             'nodeUuid' => $this->string(45)->notNull(),
-            'date' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+            'date' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'type' => $this->integer(),
             'createdAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'changedAt' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -100,7 +104,7 @@ class m191020_065324_add_calendar extends Migration
 
         // связь со шкафом
         $this->addForeignKey(
-            'fk-node_control-nodeUuid-organization-uuid',
+            'fk-node_control-nodeUuid-node-uuid',
             '{{%node_control}}',
             'nodeUuid',
             '{{%node}}',
