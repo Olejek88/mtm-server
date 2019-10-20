@@ -5,6 +5,7 @@ namespace common\models;
 use common\components\MtmActiveRecord;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 
 /**
@@ -14,8 +15,13 @@ use yii\db\Expression;
  * @property string $uuid
  * @property string $oid идентификатор организации
  * @property string $title
+ * @property int $groupId
+ * @property string $deviceProgramUuid
  * @property string $createdAt
  * @property string $changedAt
+ *
+ * @property Organisation $organisation
+ * @property DeviceProgram $deviceProgram
  */
 class Group extends MtmActiveRecord
 {
@@ -48,6 +54,13 @@ class Group extends MtmActiveRecord
             [['uuid', 'title'], 'required'],
             [['createdAt', 'changedAt'], 'safe'],
             [['uuid', 'title', 'oid'], 'string', 'max' => 50],
+            [['groupId'], 'integer', 'min' => 0, 'max' => 15],
+            [
+                ['deviceProgramUuid'],
+                'exist', 'skipOnError' => true,
+                'targetClass' => DeviceProgram::class,
+                'targetAttribute' => ['deviceProgramUuid' => 'uuid']
+            ],
             [['oid'], 'checkOrganizationOwn'],
         ];
     }
@@ -75,5 +88,21 @@ class Group extends MtmActiveRecord
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDeviceProgram()
+    {
+        return $this->hasOne(DeviceProgram::class, ['uuid' => 'deviceProgramUuid']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getOrganisation()
+    {
+        return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
     }
 }
