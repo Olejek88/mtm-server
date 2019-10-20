@@ -17,9 +17,11 @@ use yii\db\Expression;
  * @property integer $type
  * @property string $date
  * @property string $groupUuid
+ * @property string $deviceProgramUuid
  * @property string $createdAt
  * @property string $changedAt
  *
+ * @property ActiveQuery $deviceProgram
  * @property Group $group
  */
 class GroupControl extends MtmActiveRecord
@@ -102,5 +104,13 @@ class GroupControl extends MtmActiveRecord
     public function getGroup()
     {
         return $this->hasOne(Group::class, ['uuid' => 'groupUuid']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getDeviceProgram()
+    {
+        return $this->hasOne(DeviceProgram::class, ['uuid' => 'deviceProgramUuid']);
     }
 }
