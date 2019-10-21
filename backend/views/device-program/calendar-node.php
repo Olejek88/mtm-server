@@ -2,29 +2,29 @@
 
 use yii\web\JsExpression;
 
-$this->title = 'Расписание работы светильников';
+$this->title = 'Расписание работы шкафов';
 
 /* @var $events */
 
-if (isset ($_GET["group"]))
-    $group = $_GET["group"];
+if (isset ($_GET["node"]))
+    $node = $_GET["node"];
 else
-    $group = "";
+    $node = "";
 ?>
 
 <script type="text/javascript">
     document.addEventListener("keydown", keyDownTextField, false);
     var start;
     var type = 0;
-    var group = '<?= $group ?>';
+    var node = '<?= $node ?>';
 
     function keyDownTextField(e) {
         window.keyCode = e.keyCode;
     }
 </script>
 
-<div class="modal remote fade" id="modalAddProgram">
-    <div class="modal-dialog" style="width: 500px">
+<div class="modal remote fade" id="modalTaskInfo">
+    <div class="modal-dialog" style="width: 800px">
         <div class="modal-content loader-lg" id="modalContent">
         </div>
     </div>
@@ -44,7 +44,7 @@ else
 EOF;
         $JSDropEvent = <<<EOF
     function( event, delta, revertFunc, jsEvent, ui, view ) {
-	        var st = $.post("/device/date",{ type: ""+type+"", group: ""+group+"", event_start: ""+start.format()+"", event_end: ""+event.start.format()+"" },	
+	        var st = $.post("/device/date-node",{ type: ""+type+"", node: ""+node+"", event_start: ""+start.format()+"", event_end: ""+event.start.format()+"" },	
 	        function() {
 	            //alert( "success" );
 	        })
@@ -61,20 +61,6 @@ EOF;
 	        });  
     }
 EOF;
-        $JSEventClick = <<<EOF
-function(calEvent, jsEvent, view) {
-        console.log(calEvent);
-        if (calEvent.id%2==1) {
-            $.post("/device/set-calendar",{ date: ""+calEvent.start.format()+"", group: ""+group+""},
-            function() {	})
-            .done(function(data) {
-                $('#modalAddProgram').modal('show');
-                $('#modalContent').html(data);
-    	    })
-    	}
-}
-EOF;
-
         ?>
 
         <?= yii2fullcalendar\yii2fullcalendar::widget(array(
@@ -91,7 +77,6 @@ EOF;
                 'selectHelper' => true,
                 'droppable' => true,
                 'editable' => true,
-                'eventClick' => new JsExpression($JSEventClick),
                 'eventDrop' => new JsExpression($JSDropEvent),
                 'eventDragStart' => new JsExpression($JSDragStartEvent),
                 'defaultDate' => date('Y-m-d'),

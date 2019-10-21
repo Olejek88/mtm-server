@@ -1,6 +1,6 @@
 <?php
 
-use common\models\EquipmentStatus;
+use common\models\DeviceProgram;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -8,10 +8,12 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $date */
+/* @var $group */
 ?>
 
-<div class="equipment-status-form">
-
+<div class="equipment-status-form" style="margin: 5px; padding: 5px">
+    <h4>Сменить программу</h4>
     <?php $form = ActiveForm::begin([
         'enableAjaxValidation' => false,
         'options' => [
@@ -21,37 +23,37 @@ use yii\widgets\ActiveForm;
     ?>
 
     <?php
-        echo $form->field($model, '_id')->hiddenInput(['value' => $model["_id"]])->label(false);
-        $equipmentStatus = EquipmentStatus::find()->all();
-        $items = ArrayHelper::map($equipmentStatus, 'uuid', 'title');
-        echo $form->field($model, 'equipmentStatusUuid')->widget(Select2::class,
+    echo Html::hiddenInput("date", $date);
+    echo Html::hiddenInput("group", $group);
+
+    $programs = DeviceProgram::find()->all();
+    $items = ArrayHelper::map($programs, 'uuid', 'title');
+    echo Select2::widget(
         [
-            'name' => 'status',
+            'id' => 'deviceProgram',
+            'name' => 'deviceProgram',
             'language' => 'ru',
-            'value' => $model["equipmentStatus"]["title"],
             'data' => $items,
-            'options' => ['placeholder' => 'Выберите статус ...'],
+            'options' => ['placeholder' => 'Выберите программу ...'],
             'pluginOptions' => [
                 'allowClear' => true
             ],
-        ])->label(false);
+        ]);
     ?>
-
+    <span>&nbsp;</span>
     <div class="form-group text-center">
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Сменить') : Yii::t('app', 'Сменить'), [
-            'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary'
-        ]) ?>
+        <?= Html::submitButton(Yii::t('app', 'Сменить'), ['class' => 'btn btn-success']) ?>
     </div>
     <script>
         $(document).on("beforeSubmit", "#dynamic-form", function () {
         }).on('submit', function(e){
             e.preventDefault();
             $.ajax({
-                url: "status",
+                url: "/device/set-program",
                 type: "post",
                 data: $('form').serialize(),
                 success: function () {
-                    $('#modalStatus').modal('hide');
+                    $('#modalAddProgram').modal('hide');
                 },
                 error: function () {
                 }
