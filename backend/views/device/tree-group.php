@@ -108,7 +108,7 @@ echo FancytreeWidget::widget([
                         var node = $.ui.fancytree.getNode(opt.$trigger);
                         if (node.folder==false) {
                             $.ajax({
-                                url: "set-config",
+                                url: "set-calendar",
                                 type: "post",
                                 data: {
                                     selected_node: node.key,

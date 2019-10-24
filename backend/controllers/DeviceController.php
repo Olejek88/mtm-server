@@ -24,6 +24,7 @@ use common\models\mtm\MtmDevLightConfigLight;
 use common\models\mtm\MtmPktHeader;
 use common\models\mtm\MtmResetCoordinator;
 use common\models\Node;
+use common\models\NodeControl;
 use common\models\Objects;
 use common\models\Organisation;
 use common\models\Photo;
@@ -200,7 +201,6 @@ class DeviceController extends Controller
                         $deviceConfig->deviceUuid = $model->uuid;
                     }
 
-                    $deviceConfig->value = $model->lightProgram;
                     $deviceConfig->save();
                 }
 
@@ -244,22 +244,12 @@ class DeviceController extends Controller
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
-                if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
-                    $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
-                    $deviceConfig->value = $model->lightProgram;
-                    $deviceConfig->save();
-                    MainFunctions::deviceRegister($deviceConfig['deviceUuid'], "Обновлена конфигурация устройства");
-                }
-
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {
-                $program = new DeviceProgram();
-                $program->title = $model->lightProgram;
                 return $this->render(
                     'update',
                     [
                         'model' => $model,
-                        'program' => $program,
                     ]
                 );
             }
@@ -268,7 +258,6 @@ class DeviceController extends Controller
                 'update',
                 [
                     'model' => $model,
-                    'program' => $model->getDeviceProgram(),
                 ]
             );
         }
@@ -1037,6 +1026,9 @@ class DeviceController extends Controller
                         } else {
                             $class = 'critical3';
                         }
+                        $light = "false";
+                        if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT)
+                            $light = "true";
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
                             'title' => $device['deviceType']['title'] . ' [' . $device['address'] . ']',
                             'status' => '<div class="progress"><div class="'
@@ -1048,6 +1040,7 @@ class DeviceController extends Controller
                             'measure' => '',
                             'source' => '../device/tree',
                             'type' => 'device',
+                            'light' => $light,
                             'date' => $device['date'],
                             'folder' => true
                         ];
@@ -1912,13 +1905,58 @@ class DeviceController extends Controller
     }
 
     /**
-     * функция отрабатывает сигналы от дерева и выполняет добавление нового оборудования
+     * функция отрабатывает сигналы от дерева и выполняет конфигурирование работы шкафа
      *
      * @return mixed
      * @throws InvalidConfigException
      */
     public
     function actionSetConfig()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+
+        if (isset($_POST["selected_node"])) {
+            if (isset($_POST["uuid"]))
+                $uuid = $_POST["uuid"];
+            else $uuid = 0;
+
+            if ($uuid) {
+                $device = Device::find()->where(['uuid' => $_POST['uuid']])->one();
+
+                $parameters['mode'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_REGIME);
+                $parameters['group'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_GROUP);
+                $parameters['power'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
+                $parameters['frequency'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_FREQUENCY);
+                $parameters['value'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_SET_VALUE);
+
+                $parameters['time0'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME0);
+                $parameters['level0'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL0);
+                $parameters['time1'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME1);
+                $parameters['level1'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL1);
+                $parameters['time2'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME2);
+                $parameters['level2'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL2);
+                $parameters['time3'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_TIME3);
+                $parameters['level3'] = self::getParameter($device['uuid'], DeviceConfig::PARAM_LEVEL3);
+
+                return $this->renderAjax('_edit_light_config', [
+                    'device' => $device,
+                    'parameters' => $parameters
+                ]);
+            }
+        }
+        return 'Нельзя сконфигурировать устройство';
+    }
+
+    /**
+     * функция отрабатывает сигналы от дерева и выполняет конфигурирование работы шкафа
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSetNodeConfig()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
@@ -2113,11 +2151,6 @@ class DeviceController extends Controller
                 if ($type == 'device') {
                     $device = Device::find()->where(['uuid' => $uuid])->one();
                     if ($device) {
-                        if (!$device->lightProgram) {
-                            $program = DeviceProgram::find()->one();
-                            if ($program)
-                                $device->lightProgram = $program['uuid'];
-                        }
                         $device['deleted'] = 1;
                         $device->save();
                         MainFunctions::register("Удалено оборудование " . $device['deviceType']['title'] . ' ' .
@@ -2621,6 +2654,112 @@ class DeviceController extends Controller
                 MainFunctions::register("Изменено расписание для " . $groupControl['group']['title'] . "
                     (" . $_POST["event_start"] . ") > (" . $_POST["event_end"] . ")");
             }
+        }
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public
+    function actionDateNode()
+    {
+        if (isset($_POST["group"]) || isset($_POST["event_start"])
+            || isset($_POST["event_end"]) || isset($_POST["type"])) {
+            $date = date("Y-m-d H:i:00", strtotime($_POST["event_start"]));
+            $nodeControl = NodeControl::find()
+                ->where(['nodeUuid' => $_POST["node"]])
+                ->andWhere(['date' => $date])
+                ->andWhere(['type' => $_POST["type"]])
+                ->one();
+            if ($nodeControl) {
+                $nodeControl['date'] = date("Y-m-d H:i:00", strtotime($_POST["event_end"]));
+                $nodeControl->save();
+                MainFunctions::register("Изменено расписание для " . $nodeControl['node']['title'] . "
+                    (" . $_POST["event_start"] . ") > (" . $_POST["event_end"] . ")");
+            } else {
+                $nodeControl = new NodeControl();
+                $nodeControl->nodeUuid = $_POST["node"];
+                $nodeControl->oid = User::getOid(Yii::$app->user->identity);
+                $nodeControl->uuid = MainFunctions::GUID();
+                $nodeControl->type = $_POST["type"];
+                $nodeControl->date = date("Y-m-d H:i:00", strtotime($_POST["event_end"]));
+                $nodeControl->save();
+                MainFunctions::register("Изменено расписание для " . $nodeControl['node']['object']['title'] . "
+                    (" . $_POST["event_start"] . ") > (" . $_POST["event_end"] . ")");
+            }
+        }
+    }
+
+    /**
+     *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSetCalendar()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+        if (isset($_POST["date"]))
+            $date = $_POST["date"];
+        else $date = 0;
+        if (isset($_POST["group"]))
+            $group = $_POST["group"];
+        else $group = 0;
+        $groupControl = GroupControl::find()
+            ->where(['groupUuid' => $group])
+            ->andWhere(['date' => $date])
+            ->one();
+        if ($groupControl) {
+            $program = $groupControl['deviceProgramUuid'];
+        } else {
+            $program = 0;
+        }
+        return $this->renderAjax('_change_program', [
+            'program' => $program,
+            'date' => $date,
+            'group' => $group
+        ]);
+    }
+
+    /**
+     *
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSetProgram()
+    {
+        if (isset($_POST["date"]))
+            $date = $_POST["date"];
+        else $date = 0;
+        if (isset($_POST["group"]))
+            $group = $_POST["group"];
+        else $group = 0;
+        if (isset($_POST["deviceProgram"]))
+            $deviceProgram = $_POST["deviceProgram"];
+        else $deviceProgram = 0;
+
+        $date_start = date("Y-m-d 00:00:00", strtotime($date));
+        $date_end = date("Y-m-d 23:59:59", strtotime($date));
+        $groupControl = GroupControl::find()
+            ->where(['groupUuid' => $group])
+            ->andWhere('date>="' . $date_start . '"')
+            ->andWhere('date<="' . $date_end . '"')
+            ->andWhere(['type' => 1])
+            ->one();
+        if ($groupControl) {
+            $groupControl['deviceProgramUuid'] = $deviceProgram;
+            $groupControl->save();
+        } else {
+            $groupControl = new GroupControl();
+            $groupControl->uuid = MainFunctions::GUID();
+            $groupControl->date = date("Y-m-d H:i:00", strtotime($date));
+            $groupControl->groupUuid = $group;
+            $groupControl->type = 1;
+            $groupControl->deviceProgramUuid = $deviceProgram;
+            $groupControl->oid = User::getOid(Yii::$app->user->identity);
+            $groupControl->save();
         }
     }
 }

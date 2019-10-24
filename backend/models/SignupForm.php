@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use common\components\CommonMigration;
 use common\components\MainFunctions;
 use common\models\Organisation;
 use common\models\User;
@@ -82,6 +83,8 @@ class SignupForm extends Model
                 $am = Yii::$app->getAuthManager();
                 $roleAdmin = $am->getRole(User::ROLE_ADMIN);
                 $am->assign($roleAdmin, $user->_id);
+                // создаём для организации группы
+                CommonMigration::createGroups(Yii::$app->db, $organisation->uuid);
                 return $user;
             } else {
                 $organisation->delete();

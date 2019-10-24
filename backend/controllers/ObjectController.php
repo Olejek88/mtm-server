@@ -437,4 +437,31 @@ class ObjectController extends Controller
         return $this->redirect(['/device/tree']);
     }
 
+    /**
+     * Return average coordinates around all objects
+     * @return array
+     * @throws InvalidConfigException
+     */
+    public static function getAverageCoordinates()
+    {
+        $sum_latitude = 0;
+        $sum_longitude = 0;
+        $count = 0;
+        $objects = Objects::find()
+            ->where('latitude > 0')
+            ->andWhere('longitude > 0')
+            ->all();
+        foreach ($objects as $object) {
+            $sum_latitude += $object['latitude'];
+            $sum_longitude += $object['longitude'];
+            $count++;
+        }
+        if ($count > 0) {
+            $sum_longitude /= $count;
+            $sum_latitude /= $count;
+        }
+        $av['latitude'] = $sum_latitude;
+        $av['longitude'] = $sum_longitude;
+        return $av;
+    }
 }

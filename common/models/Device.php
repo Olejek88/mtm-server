@@ -31,6 +31,7 @@ use yii\db\Expression;
  * @property boolean $deleted
  *
  * @property Objects $object
+ * @property int $num
  * @property DeviceStatus $deviceStatus
  * @property DeviceType $deviceType
  * @property string $fullTitle
@@ -40,8 +41,6 @@ use yii\db\Expression;
  */
 class Device extends MtmActiveRecord
 {
-    public $lightProgram;
-
     /**
      * Behaviors.
      *
@@ -121,19 +120,6 @@ class Device extends MtmActiveRecord
                 ],
                 'required'
             ],
-            [['lightProgram'], 'string'],
-            [['lightProgram'], 'required',
-                'when' => function ($model) {
-                    /** @var Device $model */
-                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT]) && $model->isNewRecord) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }, 'whenClient' => "function (attribute, value) {
-                    result = $('#device-devicetypeuuid').val() == '" . DeviceType::DEVICE_LIGHT . "'; 
-                    return result;
-                }"],
             [['date', 'oid', 'createdAt', 'changedAt'], 'safe'],
             [['changedAt'], 'string', 'on' => self::SCENARIO_CUSTOM_UPDATE],
             [['deleted'], 'boolean'],
@@ -313,11 +299,11 @@ class Device extends MtmActiveRecord
         }
     }
 
-    public function setDeviceProgram($program)
-    {
-        $this->lightProgram = $program;
-    }
-
+    /**
+     * @param $attr
+     * @param $param
+     * @throws InvalidConfigException
+     */
     public function checkUniqueAddress($attr, $param)
     {
         if (!$this->isNewRecord) {
