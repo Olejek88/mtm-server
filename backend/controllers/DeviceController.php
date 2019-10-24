@@ -1421,11 +1421,14 @@ class DeviceController extends Controller
             ->orderBy('title')
             ->all();
         foreach ($groups as $group) {
+            $program = 'программа не задана';
+            if ($group['deviceProgramUuid'])
+                $program = $group['deviceProgram']['title'];
             $fullTree['children'][] = [
                 'title' => $group['title'],
                 'expanded' => true,
                 'source' => '../device/tree-group',
-                'address' => '',
+                'address' => $program,
                 'status' => '',
                 'uuid' => $group['uuid'],
                 'type' => 'group',
@@ -2724,6 +2727,34 @@ class DeviceController extends Controller
 
     /**
      *
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSetDefault()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return 'Нет прав.';
+        }
+        if (isset($_POST["uuid"]))
+            $uuid = $_POST["uuid"];
+        else $uuid = 0;
+
+        if ($uuid) {
+            $group = Group::find()
+                ->where(['uuid' => $uuid])
+                ->one();
+            if ($group) {
+                return $this->renderAjax('_set_default_program', [
+                    'group' => $group['uuid']
+                ]);
+            }
+        }
+        return "Группа не существует";
+    }
+
+    /**
+     *
      * @throws InvalidConfigException
      */
     public
@@ -2764,5 +2795,30 @@ class DeviceController extends Controller
             $groupControl->save();
         }
         return $this->redirect(['/device-program/calendar', 'group' => $group]);
+    }
+
+    /**
+     *
+     * @throws InvalidConfigException
+     */
+    public
+    function actionSetDefaultProgram()
+    {
+        if (isset($_POST["group"]))
+            $groupUuid = $_POST["group"];
+        else $groupUuid = 0;
+        if (isset($_POST["deviceProgram"]))
+            $deviceProgram = $_POST["deviceProgram"];
+        else $deviceProgram = null;
+
+        $group = Group::find()
+            ->where(['uuid' => $groupUuid])
+            ->one();
+        if ($deviceProgram == '' || $deviceProgram == 0)
+            $deviceProgram = null;
+        if ($group) {
+            $group['deviceProgramUuid'] = $deviceProgram;
+            $group->save();
+        }
     }
 }

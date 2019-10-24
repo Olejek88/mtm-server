@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\components\MainFunctions;
 use common\models\DeviceConfig;
+use common\models\Group;
 use common\models\GroupControl;
 use common\models\Node;
 use common\models\NodeControl;
@@ -166,8 +167,19 @@ class DeviceProgramController extends Controller
     public function actionCalendar()
     {
         $events = [];
+        $program = "";
         $coordinates = ObjectController::getAverageCoordinates();
-        $groupControls = GroupControl::find()->all();
+        if (isset($_GET["group"]))
+            $group = $_GET["group"];
+        else $group = 0;
+        $groupControls = GroupControl::find()
+            ->where(['groupUuid' => $group])
+            ->all();
+        $group = Group::find()
+            ->where(['uuid' => $group])
+            ->one();
+        if ($group && $group['deviceProgramUuid'])
+            $program = $group['deviceProgram']['title'];
         //$today = strtotime("2019-01-01 00:00:00");
         $today = time();
         for ($count = 0; $count < 365; $count++) {
@@ -194,7 +206,7 @@ class DeviceProgramController extends Controller
                         $on = 1;
                         $event = new Event();
                         $event->id = $count * 2 + 1;
-                        $event->title = "включение";
+                        $event->title = "включение [" . $program . "]";
                         if ($groupControl['deviceProgramUuid'])
                             $event->title = "включение [" . $groupControl['deviceProgram']['title'] . "]";
                         $event->backgroundColor = 'green';
@@ -219,7 +231,7 @@ class DeviceProgramController extends Controller
             if ($on == 0) {
                 $event = new Event();
                 $event->id = $count * 2 + 1;
-                $event->title = "включение";
+                $event->title = "включение [" . $program . "]";
                 $event->backgroundColor = 'green';
                 $event->start = date("Y-m-d H:i:s", $sunset_time);
                 $event->color = '#ffffff';
