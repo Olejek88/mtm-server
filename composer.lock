@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-  "content-hash": "d3186b8ff7f2ea643de1e4a3982c23e8",
+    "content-hash": "e6b2a86768dcf50cfef573f6cb421776",
     "packages": [
         {
             "name": "2amigos/yii2-leaflet-extension",
@@ -129,16 +129,16 @@
         },
         {
             "name": "almasaeed2010/adminlte",
-          "version": "v2.4.18",
+            "version": "v2.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ColorlibHQ/AdminLTE.git",
-              "reference": "e7ffa67a4649dc08d2018708a38604a6c0a02ab6"
+                "reference": "e7ffa67a4649dc08d2018708a38604a6c0a02ab6"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/ColorlibHQ/AdminLTE/zipball/e7ffa67a4649dc08d2018708a38604a6c0a02ab6",
-              "reference": "e7ffa67a4649dc08d2018708a38604a6c0a02ab6",
+                "url": "https://api.github.com/repos/ColorlibHQ/AdminLTE/zipball/e7ffa67a4649dc08d2018708a38604a6c0a02ab6",
+                "reference": "e7ffa67a4649dc08d2018708a38604a6c0a02ab6",
                 "shasum": ""
             },
             "require": {
@@ -168,7 +168,7 @@
                 "theme",
                 "web"
             ],
-          "time": "2019-08-29T08:20:20+00:00"
+            "time": "2019-08-29T08:20:20+00:00"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -222,16 +222,16 @@
         },
         {
             "name": "bower-asset/fancytree",
-          "version": "v2.32.0",
+            "version": "v2.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mar10/fancytree.git",
-              "reference": "d04a36d7d5e410910ef93f3a6a16f6d01ac3302a"
+                "reference": "d04a36d7d5e410910ef93f3a6a16f6d01ac3302a"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/mar10/fancytree/zipball/d04a36d7d5e410910ef93f3a6a16f6d01ac3302a",
-              "reference": "d04a36d7d5e410910ef93f3a6a16f6d01ac3302a",
+                "url": "https://api.github.com/repos/mar10/fancytree/zipball/d04a36d7d5e410910ef93f3a6a16f6d01ac3302a",
+                "reference": "d04a36d7d5e410910ef93f3a6a16f6d01ac3302a",
                 "shasum": ""
             },
             "require": {
@@ -273,39 +273,94 @@
                 "tree",
                 "treegrid"
             ],
-          "time": "2019-09-10T07:42:22+00:00"
+            "time": "2019-09-10T07:42:22+00:00"
         },
-      {
-        "name": "bower-asset/fullcalendar",
-        "version": "v4.3.1",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/fullcalendar/fullcalendar.git",
-          "reference": "ac20b8a1acb79c50c9f5a108bb92d2f54575b700"
+        {
+            "name": "bower-asset/fullcalendar",
+            "version": "v3.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fullcalendar/fullcalendar.git",
+                "reference": "3ddb3c8d1461c6b841aed3487ba07d8ba338adb6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fullcalendar/fullcalendar/zipball/3ddb3c8d1461c6b841aed3487ba07d8ba338adb6",
+                "reference": "3ddb3c8d1461c6b841aed3487ba07d8ba338adb6",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=2,<4.0",
+                "bower-asset/moment": ">=2.20.1,<3.0.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/fullcalendar.js",
+                    "dist/fullcalendar.css"
+                ],
+                "bower-asset-ignore": [
+                    "*",
+                    "**/.*",
+                    "!/dist/**",
+                    "!/README.*",
+                    "!/LICENSE.*",
+                    "!/CHANGELOG.*",
+                    "!/CONTRIBUTING.*"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Full-sized drag & drop event calendar",
+            "keywords": [
+                "calendar",
+                "event",
+                "full-sized",
+                "jquery-plugin"
+            ],
+            "time": "2018-03-05T03:08:31+00:00"
         },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/fullcalendar/fullcalendar/zipball/ac20b8a1acb79c50c9f5a108bb92d2f54575b700",
-          "reference": "ac20b8a1acb79c50c9f5a108bb92d2f54575b700",
-          "shasum": ""
-        },
-        "type": "bower-asset-library"
-      },
-      {
-        "name": "bower-asset/fullcalendar-scheduler",
-        "version": "v4.3.1",
-        "source": {
-          "type": "git",
-          "url": "https://github.com/fullcalendar/fullcalendar-scheduler.git",
-          "reference": "e9c7a8c92595c632be676fdf4b55051c0c2a937f"
-        },
-        "dist": {
-          "type": "zip",
-          "url": "https://api.github.com/repos/fullcalendar/fullcalendar-scheduler/zipball/e9c7a8c92595c632be676fdf4b55051c0c2a937f",
-          "reference": "e9c7a8c92595c632be676fdf4b55051c0c2a937f",
-          "shasum": ""
-        },
-        "type": "bower-asset-library"
+        {
+            "name": "bower-asset/fullcalendar-scheduler",
+            "version": "v1.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fullcalendar/fullcalendar-scheduler.git",
+                "reference": "b2c545d12c7b26492610777ee7fd7108d4dd057c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fullcalendar/fullcalendar-scheduler/zipball/b2c545d12c7b26492610777ee7fd7108d4dd057c",
+                "reference": "b2c545d12c7b26492610777ee7fd7108d4dd057c",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/fullcalendar": "~3.9.0",
+                "bower-asset/jquery": ">=2,<4.0",
+                "bower-asset/moment": ">=2.20.1,<3.0.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/scheduler.js",
+                    "dist/scheduler.css"
+                ],
+                "bower-asset-ignore": [
+                    "*",
+                    "**/.*",
+                    "!/dist/**",
+                    "!/README.*",
+                    "!/LICENSE.*",
+                    "!/CHANGELOG.*",
+                    "!/CONTRIBUTING.*"
+                ]
+            },
+            "license": [
+                "SEE LICENSE IN LICENSE.md"
+            ],
+            "description": "A premium add-on to FullCalendar for displaying events and resources",
+            "time": "2019-08-10T15:53:02+00:00"
         },
         {
             "name": "bower-asset/inputmask",
@@ -364,7 +419,8 @@
                 "jquery",
                 "mask",
                 "plugins"
-            ]
+            ],
+            "time": "2017-11-21T11:46:23+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -424,7 +480,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "bower-asset/leaflet",
@@ -441,6 +498,50 @@
                 "shasum": ""
             },
             "type": "bower-asset-library"
+        },
+        {
+            "name": "bower-asset/moment",
+            "version": "2.24.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moment/moment.git",
+                "reference": "96d0d6791ab495859d09a868803d31a55c917de1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moment/moment/zipball/96d0d6791ab495859d09a868803d31a55c917de1",
+                "reference": "96d0d6791ab495859d09a868803d31a55c917de1",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "moment.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "benchmarks",
+                    "bower_components",
+                    "meteor",
+                    "node_modules",
+                    "scripts",
+                    "tasks",
+                    "test",
+                    "component.json",
+                    "composer.json",
+                    "CONTRIBUTING.md",
+                    "ender.js",
+                    "Gruntfile.js",
+                    "Moment.js.nuspec",
+                    "package.js",
+                    "package.json",
+                    "ISSUE_TEMPLATE.md",
+                    "typing-tests",
+                    "min/tests.js"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "time": "2019-01-21T20:59:53+00:00"
         },
         {
             "name": "bower-asset/punycode",
@@ -468,7 +569,8 @@
                     "node_modules",
                     "package.json"
                 ]
-            }
+            },
+            "time": "2014-10-22T12:02:42+00:00"
         },
         {
             "name": "bower-asset/yii2-pjax",
@@ -502,7 +604,8 @@
             },
             "license": [
                 "MIT"
-            ]
+            ],
+            "time": "2017-10-12T10:11:14+00:00"
         },
         {
             "name": "cebe/markdown",
@@ -669,23 +772,23 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-          "version": "v4.11.0",
+            "version": "v4.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-              "reference": "83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7"
+                "reference": "83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7",
-              "reference": "83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7",
+                "reference": "83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2"
             },
             "require-dev": {
-              "simpletest/simpletest": "dev-master#72de02a7b80c6bb8864ef9bf66d41d2f58f826bd"
+                "simpletest/simpletest": "dev-master#72de02a7b80c6bb8864ef9bf66d41d2f58f826bd"
             },
             "type": "library",
             "autoload": {
@@ -698,7 +801,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-              "LGPL-2.1-or-later"
+                "LGPL-2.1-or-later"
             ],
             "authors": [
                 {
@@ -712,7 +815,7 @@
             "keywords": [
                 "html"
             ],
-          "time": "2019-07-14T18:58:38+00:00"
+            "time": "2019-07-14T18:58:38+00:00"
         },
         {
             "name": "fortawesome/font-awesome",
@@ -2364,21 +2467,21 @@
         },
         {
             "name": "kartik-v/yii2-widget-select2",
-          "version": "v2.1.4",
+            "version": "v2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-select2.git",
-              "reference": "798dcea12997d806da14c5affde2f166338a6d54"
+                "reference": "798dcea12997d806da14c5affde2f166338a6d54"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/798dcea12997d806da14c5affde2f166338a6d54",
-              "reference": "798dcea12997d806da14c5affde2f166338a6d54",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/798dcea12997d806da14c5affde2f166338a6d54",
+                "reference": "798dcea12997d806da14c5affde2f166338a6d54",
                 "shasum": ""
             },
             "require": {
-              "kartik-v/yii2-krajee-base": ">=1.9",
-              "select2/select2": ">=4.0"
+                "kartik-v/yii2-krajee-base": ">=1.9",
+                "select2/select2": ">=4.0"
             },
             "type": "yii2-extension",
             "extra": {
@@ -2414,7 +2517,7 @@
                 "widget",
                 "yii2"
             ],
-          "time": "2019-09-02T12:53:16+00:00"
+            "time": "2019-09-02T12:53:16+00:00"
         },
         {
             "name": "kartik-v/yii2-widget-sidenav",
@@ -3074,16 +3177,16 @@
         },
         {
             "name": "myclabs/deep-copy",
-          "version": "1.9.3",
+            "version": "1.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-              "reference": "007c053ae6f31bba39dfa19a7726f56e9763bbea"
+                "reference": "007c053ae6f31bba39dfa19a7726f56e9763bbea"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/007c053ae6f31bba39dfa19a7726f56e9763bbea",
-              "reference": "007c053ae6f31bba39dfa19a7726f56e9763bbea",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/007c053ae6f31bba39dfa19a7726f56e9763bbea",
+                "reference": "007c053ae6f31bba39dfa19a7726f56e9763bbea",
                 "shasum": ""
             },
             "require": {
@@ -3118,7 +3221,7 @@
                 "object",
                 "object graph"
             ],
-          "time": "2019-08-09T12:45:53+00:00"
+            "time": "2019-08-09T12:45:53+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -3166,73 +3269,73 @@
             "time": "2018-07-02T15:55:56+00:00"
         },
         {
-          "name": "philippfrenzel/yii2fullcalendar",
-          "version": "4.0.2",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/philippfrenzel/yii2fullcalendar.git",
-            "reference": "53c8b2f524c5f5d85bd30f6ed7ba34b563479782"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/philippfrenzel/yii2fullcalendar/zipball/53c8b2f524c5f5d85bd30f6ed7ba34b563479782",
-            "reference": "53c8b2f524c5f5d85bd30f6ed7ba34b563479782",
-            "shasum": ""
-          },
-          "require": {
-            "bower-asset/fullcalendar": "^4.0.2@stable",
-            "bower-asset/fullcalendar-scheduler": "^4.0.2@stable",
-            "yiisoft/yii2": "*",
-            "yiisoft/yii2-jui": "*"
-          },
-          "require-dev": {
-            "codeception/codeception": "*"
-          },
-          "type": "yii2-extension",
-          "autoload": {
-            "psr-4": {
-              "yii2fullcalendar\\": ""
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "authors": [
-            {
-              "name": "Philipp Frenzel",
-              "email": "philipp@frenzel.net",
-              "homepage": "http://www.frenzel.net/",
-              "role": "Developer"
-            }
-          ],
-          "description": "Yii2 fullcalendar Widgets",
-          "homepage": "http://www.frenzel.net/",
-          "keywords": [
-            "fullcalendar",
-            "widget",
-            "yii2"
-          ],
-          "time": "2019-04-17T13:42:59+00:00"
-        },
-      {
-            "name": "php-amqplib/php-amqplib",
-        "version": "v2.10.0",
+            "name": "philippfrenzel/yii2fullcalendar",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-amqplib/php-amqplib.git",
-              "reference": "04e5366f032906d5f716890427e425e71307d3a8"
+                "url": "https://github.com/philippfrenzel/yii2fullcalendar.git",
+                "reference": "0b56a80486fa01b874dda5072ffb9b2cf06210ed"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/04e5366f032906d5f716890427e425e71307d3a8",
-              "reference": "04e5366f032906d5f716890427e425e71307d3a8",
+                "url": "https://api.github.com/repos/philippfrenzel/yii2fullcalendar/zipball/0b56a80486fa01b874dda5072ffb9b2cf06210ed",
+                "reference": "0b56a80486fa01b874dda5072ffb9b2cf06210ed",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/fullcalendar": "^3.9.0@stable",
+                "bower-asset/fullcalendar-scheduler": "^1.9.2@stable",
+                "yiisoft/yii2": "*",
+                "yiisoft/yii2-jui": "*"
+            },
+            "require-dev": {
+                "codeception/codeception": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "yii2fullcalendar\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Philipp Frenzel",
+                    "email": "philipp@frenzel.net",
+                    "homepage": "http://www.frenzel.net/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Yii2 fullcalendar Widgets",
+            "homepage": "http://www.frenzel.net/",
+            "keywords": [
+                "fullcalendar",
+                "widget",
+                "yii2"
+            ],
+            "time": "2018-05-04T09:06:24+00:00"
+        },
+        {
+            "name": "php-amqplib/php-amqplib",
+            "version": "v2.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-amqplib/php-amqplib.git",
+                "reference": "04e5366f032906d5f716890427e425e71307d3a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/04e5366f032906d5f716890427e425e71307d3a8",
+                "reference": "04e5366f032906d5f716890427e425e71307d3a8",
                 "shasum": ""
             },
             "require": {
                 "ext-bcmath": "*",
                 "ext-sockets": "*",
-              "php": ">=5.6"
+                "php": ">=5.6"
             },
             "replace": {
                 "videlalvaro/php-amqplib": "self.version"
@@ -3240,14 +3343,14 @@
             "require-dev": {
                 "ext-curl": "*",
                 "nategood/httpful": "^0.2.20",
-              "phpdocumentor/phpdocumentor": "dev-master",
-              "phpunit/phpunit": "^5.7|^6.5|^7.0",
+                "phpdocumentor/phpdocumentor": "dev-master",
+                "phpunit/phpunit": "^5.7|^6.5|^7.0",
                 "squizlabs/php_codesniffer": "^2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                  "dev-master": "2.10-dev"
+                    "dev-master": "2.10-dev"
                 }
             },
             "autoload": {
@@ -3287,20 +3390,20 @@
                 "queue",
                 "rabbitmq"
             ],
-        "time": "2019-08-08T18:28:18+00:00"
+            "time": "2019-08-08T18:28:18+00:00"
         },
         {
             "name": "phpoffice/phpspreadsheet",
-          "version": "1.9.0",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-              "reference": "8dea03eaf60a349b6097e4bcad11f894668280df"
+                "reference": "8dea03eaf60a349b6097e4bcad11f894668280df"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/8dea03eaf60a349b6097e4bcad11f894668280df",
-              "reference": "8dea03eaf60a349b6097e4bcad11f894668280df",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/8dea03eaf60a349b6097e4bcad11f894668280df",
+                "reference": "8dea03eaf60a349b6097e4bcad11f894668280df",
                 "shasum": ""
             },
             "require": {
@@ -3319,7 +3422,7 @@
                 "ext-zlib": "*",
                 "markbaker/complex": "^1.4",
                 "markbaker/matrix": "^1.1",
-              "php": "^7.1",
+                "php": "^7.1",
                 "psr/simple-cache": "^1.0"
             },
             "require-dev": {
@@ -3328,7 +3431,7 @@
                 "jpgraph/jpgraph": "^4.0",
                 "mpdf/mpdf": "^7.0.0",
                 "phpcompatibility/php-compatibility": "^8.0",
-              "phpunit/phpunit": "^7.5",
+                "phpunit/phpunit": "^7.5",
                 "squizlabs/php_codesniffer": "^3.3",
                 "tecnickcom/tcpdf": "^6.2"
             },
@@ -3361,11 +3464,11 @@
                     "name": "Franck Lefevre",
                     "homepage": "https://rootslabs.net"
                 },
-              {
-                "name": "Erik Tilt"
-              },
-              {
-                "name": "Adrien Crivelli"
+                {
+                    "name": "Erik Tilt"
+                },
+                {
+                    "name": "Adrien Crivelli"
                 }
             ],
             "description": "PHPSpreadsheet - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine",
@@ -3380,7 +3483,7 @@
                 "xls",
                 "xlsx"
             ],
-          "time": "2019-08-17T22:24:35+00:00"
+            "time": "2019-08-17T22:24:35+00:00"
         },
         {
             "name": "psr/log",
@@ -3530,44 +3633,44 @@
             "time": "2017-01-11T14:05:47+00:00"
         },
         {
-          "name": "select2/select2",
-          "version": "4.0.10",
-          "source": {
-            "type": "git",
-            "url": "https://github.com/select2/select2.git",
-            "reference": "c4b730a0a014ea38641bfbcb245e4b7aa0ca5657"
-          },
-          "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/select2/select2/zipball/c4b730a0a014ea38641bfbcb245e4b7aa0ca5657",
-            "reference": "c4b730a0a014ea38641bfbcb245e4b7aa0ca5657",
-            "shasum": ""
-          },
-          "type": "component",
-          "extra": {
-            "component": {
-              "scripts": [
-                "dist/js/select2.js"
-              ],
-              "styles": [
-                "dist/css/select2.css"
-              ],
-              "files": [
-                "dist/js/select2.js",
-                "dist/js/i18n/*.js",
-                "dist/css/select2.css"
-              ]
-            }
-          },
-          "notification-url": "https://packagist.org/downloads/",
-          "license": [
-            "MIT"
-          ],
-          "description": "Select2 is a jQuery based replacement for select boxes.",
-          "homepage": "https://select2.org/",
-          "time": "2019-08-28T03:09:32+00:00"
+            "name": "select2/select2",
+            "version": "4.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/select2/select2.git",
+                "reference": "c4b730a0a014ea38641bfbcb245e4b7aa0ca5657"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/select2/select2/zipball/c4b730a0a014ea38641bfbcb245e4b7aa0ca5657",
+                "reference": "c4b730a0a014ea38641bfbcb245e4b7aa0ca5657",
+                "shasum": ""
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "scripts": [
+                        "dist/js/select2.js"
+                    ],
+                    "styles": [
+                        "dist/css/select2.css"
+                    ],
+                    "files": [
+                        "dist/js/select2.js",
+                        "dist/js/i18n/*.js",
+                        "dist/css/select2.css"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Select2 is a jQuery based replacement for select boxes.",
+            "homepage": "https://select2.org/",
+            "time": "2019-08-28T03:09:32+00:00"
         },
-      {
+        {
             "name": "setasign/fpdi",
             "version": "1.6.2",
             "source": {
@@ -3618,16 +3721,16 @@
         },
         {
             "name": "symfony/process",
-          "version": "v4.3.4",
+            "version": "v4.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-              "reference": "e89969c00d762349f078db1128506f7f3dcc0d4a"
+                "reference": "e89969c00d762349f078db1128506f7f3dcc0d4a"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/symfony/process/zipball/e89969c00d762349f078db1128506f7f3dcc0d4a",
-              "reference": "e89969c00d762349f078db1128506f7f3dcc0d4a",
+                "url": "https://api.github.com/repos/symfony/process/zipball/e89969c00d762349f078db1128506f7f3dcc0d4a",
+                "reference": "e89969c00d762349f078db1128506f7f3dcc0d4a",
                 "shasum": ""
             },
             "require": {
@@ -3663,7 +3766,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-          "time": "2019-08-26T08:26:39+00:00"
+            "time": "2019-08-26T08:26:39+00:00"
         },
         {
             "name": "wbraganca/yii2-fancytree-widget",
@@ -3718,16 +3821,16 @@
         },
         {
             "name": "yiisoft/yii2",
-          "version": "2.0.27",
+            "version": "2.0.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-              "reference": "6793f8f9b4cd891dbf475cfbb88cf480f74eaa85"
+                "reference": "6793f8f9b4cd891dbf475cfbb88cf480f74eaa85"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/6793f8f9b4cd891dbf475cfbb88cf480f74eaa85",
-              "reference": "6793f8f9b4cd891dbf475cfbb88cf480f74eaa85",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/6793f8f9b4cd891dbf475cfbb88cf480f74eaa85",
+                "reference": "6793f8f9b4cd891dbf475cfbb88cf480f74eaa85",
                 "shasum": ""
             },
             "require": {
@@ -3814,7 +3917,7 @@
                 "framework",
                 "yii2"
             ],
-          "time": "2019-09-18T13:04:16+00:00"
+            "time": "2019-09-18T13:04:16+00:00"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -3881,24 +3984,24 @@
         },
         {
             "name": "yiisoft/yii2-composer",
-          "version": "2.0.8",
+            "version": "2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-composer.git",
-              "reference": "5c7ca9836cf80b34db265332a7f2f8438eb469b9"
+                "reference": "5c7ca9836cf80b34db265332a7f2f8438eb469b9"
             },
             "dist": {
                 "type": "zip",
-              "url": "https://api.github.com/repos/yiisoft/yii2-composer/zipball/5c7ca9836cf80b34db265332a7f2f8438eb469b9",
-              "reference": "5c7ca9836cf80b34db265332a7f2f8438eb469b9",
+                "url": "https://api.github.com/repos/yiisoft/yii2-composer/zipball/5c7ca9836cf80b34db265332a7f2f8438eb469b9",
+                "reference": "5c7ca9836cf80b34db265332a7f2f8438eb469b9",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.0"
             },
             "require-dev": {
-              "composer/composer": "^1.0",
-              "phpunit/phpunit": "<7"
+                "composer/composer": "^1.0",
+                "phpunit/phpunit": "<7"
             },
             "type": "composer-plugin",
             "extra": {
@@ -3932,7 +4035,7 @@
                 "extension installer",
                 "yii2"
             ],
-          "time": "2019-07-16T13:22:30+00:00"
+            "time": "2019-07-16T13:22:30+00:00"
         },
         {
             "name": "yiisoft/yii2-httpclient",
@@ -4136,15 +4239,11 @@
             "require": {
                 "bower-asset/jquery": ">=1.7"
             },
-            "require-dev": {
-                "bower-asset/jasmine-ajax": "~1.3.1",
-                "bower-asset/jasmine-jquery": "~1.5.2",
-                "bower-asset/jquery": "~1.7"
-            },
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": "dist/typeahead.bundle.js"
-            }
+            },
+            "time": "2015-04-27T04:02:14+00:00"
         },
         {
             "name": "fzaninotto/faker",
@@ -4381,7 +4480,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "kartik-v/yii2-slider": 20
+        "kartik-v/yii2-slider": 20,
+        "philippfrenzel/yii2fullcalendar": 0
     },
     "prefer-stable": false,
     "prefer-lowest": false,

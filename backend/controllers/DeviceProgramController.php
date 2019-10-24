@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\components\MainFunctions;
 use common\models\DeviceConfig;
 use common\models\GroupControl;
+use common\models\Node;
 use common\models\NodeControl;
 use common\models\User;
 use Yii;
@@ -170,10 +171,8 @@ class DeviceProgramController extends Controller
         //$today = strtotime("2019-01-01 00:00:00");
         $today = time();
         for ($count = 0; $count < 365; $count++) {
-            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
-            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
-            //$sunrise = date_sunrise($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
-            //$sunset = date_sunset($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
 
             $on = 0;
             $off = 0;
@@ -236,20 +235,23 @@ class DeviceProgramController extends Controller
     }
 
     /**
+     * @param string $node
      * @return string
      * @throws InvalidConfigException
+     * @throws NotFoundHttpException
      */
-    public function actionCalendarNode()
+    public function actionCalendarNode($node)
     {
         $events = [];
-        $coordinates = ObjectController::getAverageCoordinates();
+        if (($nodeObj = Node::find()->where(['uuid' => $node])->one()) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
         $nodeControls = NodeControl::find()->all();
         $today = time();
         for ($count = 0; $count < 365; $count++) {
-            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
-            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
-            //$sunrise = date_sunrise($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
-            //$sunset = date_sunset($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
 
             $on = 0;
             $off = 0;
