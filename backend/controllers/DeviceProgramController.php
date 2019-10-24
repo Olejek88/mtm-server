@@ -170,8 +170,8 @@ class DeviceProgramController extends Controller
         //$today = strtotime("2019-01-01 00:00:00");
         $today = time();
         for ($count = 0; $count < 365; $count++) {
-            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 5) + 3600 * 5;
-            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 5) + 3600 * 5;
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
             //$sunrise = date_sunrise($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
             //$sunset = date_sunset($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
 
@@ -246,8 +246,8 @@ class DeviceProgramController extends Controller
         $nodeControls = NodeControl::find()->all();
         $today = time();
         for ($count = 0; $count < 365; $count++) {
-            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 5) + 3600 * 5;
-            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 5) + 3600 * 5;
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude'], 90, 0);
             //$sunrise = date_sunrise($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
             //$sunset = date_sunset($today, SUNFUNCS_RET_STRING, $sum_latitude, $sum_longitude, 90, 5);
 
