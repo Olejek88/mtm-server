@@ -27,7 +27,7 @@ $this->title = 'Группы светильников';
         <th>Адрес</th>
         <th>Статус</th>
         <th>Дата</th>
-        <th>Адрес</th>
+        <th>Адрес/Программа</th>
         <th>Каналов</th>
     </tr>
     </thead>
@@ -108,6 +108,28 @@ echo FancytreeWidget::widget([
                             window.location.replace("../device-program/calendar?group="+node.data.uuid);
                         }
                     }')
+                ],
+                'default' => [
+                    'name' => 'Задать программу по-умолчанию',
+                    'icon' => 'edit',
+                    'callback' => new JsExpression('function(key, opt) {
+                        var node = $.ui.fancytree.getNode(opt.$trigger);
+                        if (node.folder==true) {
+                            $.ajax({
+                                url: "set-default",
+                                type: "post",
+                                data: {
+                                    selected_node: node.key,
+                                    uuid: node.data.uuid,
+                                    type: node.data.type                                    
+                                },
+                                success: function (data) { 
+                                    $(\'#modalAddProgram\').modal(\'show\');
+                                    $(\'#modalContent\').html(data);
+                                }
+                            });
+                        }
+                    }')
                 ]
             ]
         ],
@@ -147,6 +169,13 @@ function () {
 <div class="modal remote fade" id="modalNewGroup">
     <div class="modal-dialog"  style="width: 300px">
         <div class="modal-content loader-lg" id="modalContentNewGroup">
+        </div>
+    </div>
+</div>
+
+<div class="modal remote fade" id="modalAddProgram">
+    <div class="modal-dialog" style="width: 500px">
+        <div class="modal-content loader-lg" id="modalContent">
         </div>
     </div>
 </div>
