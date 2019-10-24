@@ -1,6 +1,7 @@
 <?php
 
 use common\models\DeviceProgram;
+use common\models\GroupControl;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -26,15 +27,22 @@ use yii\widgets\ActiveForm;
     echo Html::hiddenInput("date", $date);
     echo Html::hiddenInput("group", $group);
 
+    $program = 0;
+    $groupControl = GroupControl::find()
+        ->where(['groupUuid' => $group])
+        ->one();
+    if ($groupControl)
+        $program = 0;
     $programs = DeviceProgram::find()->all();
     $items = ArrayHelper::map($programs, 'uuid', 'title');
     echo Select2::widget(
         [
             'id' => 'deviceProgram',
             'name' => 'deviceProgram',
+            'value' => $program,
             'language' => 'ru',
             'data' => $items,
-            'options' => ['placeholder' => 'Выберите программу ...'],
+            'options' => ['placeholder' => 'Программа по-умолчанию ...'],
             'pluginOptions' => [
                 'allowClear' => true
             ],
