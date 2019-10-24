@@ -11,6 +11,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 /* @var $date */
 /* @var $group */
+/* @var $program */
 ?>
 
 <div class="equipment-status-form" style="margin: 5px; padding: 5px">
@@ -27,12 +28,9 @@ use yii\widgets\ActiveForm;
     echo Html::hiddenInput("date", $date);
     echo Html::hiddenInput("group", $group);
 
-    $program = 0;
     $groupControl = GroupControl::find()
         ->where(['groupUuid' => $group])
         ->one();
-    if ($groupControl)
-        $program = 0;
     $programs = DeviceProgram::find()->all();
     $items = ArrayHelper::map($programs, 'uuid', 'title');
     echo Select2::widget(
