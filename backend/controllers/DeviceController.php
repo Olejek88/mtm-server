@@ -1447,10 +1447,8 @@ class DeviceController extends Controller
                 $channels = SensorChannel::find()->where(['deviceUuid' => $deviceGroup['device']['uuid']])->count();
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
-                $programTitle = $deviceGroup->device->getDeviceProgram();
-                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup->device->name . ' [' . $deviceGroup->device->serial . ']' . ' (' . $programTitle . ')',
+                    'title' => $deviceGroup->device->name . ' [' . $deviceGroup->device->serial . ']',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
@@ -1494,10 +1492,8 @@ class DeviceController extends Controller
                 }
                 $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
-                $programTitle = $device->getDeviceProgram();
-                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $device->name . ' [' . $device->serial . ']' . ' (' . $programTitle . ')',
+                    'title' => $device->name . ' [' . $device->serial . ']',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                     'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -2716,7 +2712,7 @@ class DeviceController extends Controller
         if ($groupControl) {
             $program = $groupControl['deviceProgramUuid'];
         } else {
-            $program = 0;
+            $program = '';
         }
         return $this->renderAjax('_change_program', [
             'program' => $program,
@@ -2730,17 +2726,16 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionSetDefault()
+    public function actionSetDefault()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
         }
         if (isset($_POST["uuid"]))
             $uuid = $_POST["uuid"];
-        else $uuid = 0;
+        else $uuid = '';
 
-        if ($uuid) {
+        if ($uuid != '') {
             $group = Group::find()
                 ->where(['uuid' => $uuid])
                 ->one();
@@ -2778,7 +2773,7 @@ class DeviceController extends Controller
             ->andWhere('date<="' . $date_end . '"')
             ->andWhere(['type' => 1])
             ->one();
-        if ($deviceProgram == '' || $deviceProgram == 0)
+        if ($deviceProgram == '' || $deviceProgram == null)
             $deviceProgram = null;
         if ($groupControl) {
             $groupControl['deviceProgramUuid'] = $deviceProgram;
@@ -2801,12 +2796,11 @@ class DeviceController extends Controller
      *
      * @throws InvalidConfigException
      */
-    public
-    function actionSetDefaultProgram()
+    public function actionSetDefaultProgram()
     {
         if (isset($_POST["group"]))
             $groupUuid = $_POST["group"];
-        else $groupUuid = 0;
+        else $groupUuid = '';
         if (isset($_POST["deviceProgram"]))
             $deviceProgram = $_POST["deviceProgram"];
         else $deviceProgram = null;
@@ -2814,7 +2808,7 @@ class DeviceController extends Controller
         $group = Group::find()
             ->where(['uuid' => $groupUuid])
             ->one();
-        if ($deviceProgram == '' || $deviceProgram == 0)
+        if ($deviceProgram == '')
             $deviceProgram = null;
         if ($group) {
             $group['deviceProgramUuid'] = $deviceProgram;
