@@ -7,7 +7,6 @@ use common\components\MainFunctions;
 use common\models\Device;
 use common\models\DeviceConfig;
 use common\models\DeviceGroup;
-use common\models\DeviceProgram;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -2738,7 +2737,7 @@ class DeviceController extends Controller
         else $group = 0;
         if (isset($_POST["deviceProgram"]))
             $deviceProgram = $_POST["deviceProgram"];
-        else $deviceProgram = 0;
+        else $deviceProgram = null;
 
         $date_start = date("Y-m-d 00:00:00", strtotime($date));
         $date_end = date("Y-m-d 23:59:59", strtotime($date));
@@ -2748,9 +2747,12 @@ class DeviceController extends Controller
             ->andWhere('date<="' . $date_end . '"')
             ->andWhere(['type' => 1])
             ->one();
+        if ($deviceProgram == '' || $deviceProgram == 0)
+            $deviceProgram = null;
         if ($groupControl) {
             $groupControl['deviceProgramUuid'] = $deviceProgram;
             $groupControl->save();
+            //echo json_encode($groupControl->errors);
         } else {
             $groupControl = new GroupControl();
             $groupControl->uuid = MainFunctions::GUID();
@@ -2761,5 +2763,6 @@ class DeviceController extends Controller
             $groupControl->oid = User::getOid(Yii::$app->user->identity);
             $groupControl->save();
         }
+        return $this->redirect(['/device-program/calendar', 'group' => $group]);
     }
 }

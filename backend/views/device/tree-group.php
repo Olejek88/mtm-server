@@ -84,23 +84,6 @@ echo FancytreeWidget::widget([
         ],
         'contextMenu' => [
             'menu' => [
-                'add' => [
-                    'name' => 'Новая группа',
-                    'icon' => 'add',
-                    'callback' => new JsExpression('function(key, opt) {
-                        var node = $.ui.fancytree.getNode(opt.$trigger);
-                        $.ajax({
-                            url: "group-add",
-                            type: "post",
-                            data: {
-                            },
-                            success: function (data) { 
-                                $(\'#modalNewGroup\').modal(\'show\');
-                                $(\'#modalContentNewGroup\').html(data);
-                            }
-                        });
-                    }')
-                ],
                 'edit' => [
                     'name' => 'Задать конфигурацию',
                     'icon' => 'edit',
