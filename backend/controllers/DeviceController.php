@@ -1029,7 +1029,7 @@ class DeviceController extends Controller
                         if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT)
                             $light = "true";
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'title' => $device['deviceType']['title'] . ' [' . $device['address'] . ']',
+                            'title' => $device->name . ' [' . $device->serial . ']',
                             'status' => '<div class="progress"><div class="'
                                 . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                             'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1378,7 +1378,7 @@ class DeviceController extends Controller
                         //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                         $config = 'конфигурация';
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
-                            'title' => $device['deviceType']['title'],
+                            'title' => $device->name . '[' . $device->serial . ']',
                             'status' => '<div class="progress"><div class="'
                                 . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                             'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1502,7 +1502,7 @@ class DeviceController extends Controller
                     'source' => '../device/tree-group',
                     'type' => 'device',
                     'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
-                    'nodes' => $device['node']['address'],
+                    'nodes' => $device->address,
                     'channels' => $channels,
                     'config' => $config,
                     'date' => $device['date'],
