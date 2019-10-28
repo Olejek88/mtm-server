@@ -127,23 +127,21 @@ echo FancytreeWidget::widget([
                     'icon' => 'edit',
                     'callback' => new JsExpression('function(key, opt) {
                         var node = $.ui.fancytree.getNode(opt.$trigger);
-                        if (node.folder==false) {
-                            $.ajax({
-                                url: "edit",
-                                type: "post",
-                                data: {
-                                    selected_node: node.key,
-                                    uuid: node.data.uuid,
-                                    deviceTypeUuid: node.data.deviceTypeUuid,
-                                    type: node.type,
-                                    source: node.data.source                                                                   
-                                },
-                                success: function (data) { 
-                                    $(\'#modalAddEquipment\').modal(\'show\');
-                                    $(\'#modalContentEquipment\').html(data);
-                                }
-                           }); 
-                        }
+                        $.ajax({
+                            url: "edit",
+                            type: "post",
+                            data: {
+                                selected_node: node.key,
+                                uuid: node.data.uuid,
+                                deviceTypeUuid: node.data.deviceTypeUuid,
+                                type: node.type,
+                                source: node.data.source                                                                   
+                            },
+                            success: function (data) { 
+                                $(\'#modalAddEquipment\').modal(\'show\');
+                                $(\'#modalContentEquipment\').html(data);
+                            }
+                       }); 
                     }')
                 ],
                 'defect' => [
@@ -200,13 +198,13 @@ function () {
 })');
 ?>
 
-<div class="modal remote fade" id="modalAddEquipment">
+<div class="modal remote" id="modalAddEquipment">
     <div class="modal-dialog">
         <div class="modal-content loader-lg" id="modalContentEquipment">
         </div>
     </div>
 </div>
-<div class="modal remote fade" id="modalAddConfig">
+<div class="modal remote" id="modalAddConfig">
     <div class="modal-dialog"  style="width: 90%">
         <div class="modal-content loader-lg" id="modalContentConfig">
         </div>
