@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Class m191029_125053_add
  */
-class m191029_125053_add extends Migration
+class m191029_125053_addDevicetimeout extends Migration
 {
     /**
      * {@inheritdoc}
