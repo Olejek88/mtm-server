@@ -29,6 +29,7 @@ use yii\db\Expression;
  * @property string $createdAt
  * @property string $changedAt
  * @property boolean $deleted
+ * @property integer $linkTimeout
  *
  * @property Objects $object
  * @property int $num
@@ -163,6 +164,7 @@ class Device extends MtmActiveRecord
             }],
             [['interface'], 'integer'],
             [['oid'], 'checkOrganizationOwn'],
+            [['linkTimeout'], 'integer'],
         ];
     }
 
@@ -190,6 +192,7 @@ class Device extends MtmActiveRecord
             'port' => Yii::t('app', 'Порт'),
             'serial' => Yii::t('app', 'Серийный номер'),
             'address' => Yii::t('app', 'Адрес'),
+            'linkTimeout' => Yii::t('app', 'Таймаут до потери связи'),
             'createdAt' => Yii::t('app', 'Создан'),
             'changedAt' => Yii::t('app', 'Изменен'),
         ];
