@@ -136,6 +136,12 @@ use yii\widgets\ActiveForm;
 
     ?>
 
+    <?php
+    $linkTimeoutValue = empty($model->linkTimeout) ? 600 : $model->linkTimeout;
+    echo $form->field($model, 'linkTimeout')->textInput(['maxlength' => true, 'value' => $linkTimeoutValue])
+        ->label($model->getAttributeLabel('linkTimeout') . '(сек.)');
+    ?>
+
     <div class="form-group text-center">
 
         <?php
