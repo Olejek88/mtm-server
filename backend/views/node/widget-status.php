@@ -135,6 +135,12 @@ console.log('contact click...');
                 <td class="table_class kv-align-middle" data-col-seq="0">Энергия, кВт/ч</td>
                 <td class="table_class kv-align-middle" data-col-seq="1"><?php echo $parameters['total'] ?></td>
             </tr>
+            <tr data-key="7">
+                <td class="table_class kv-align-middle" data-col-seq="0"> Настроить программу</td>
+                <td class="table_class kv-align-middle" data-col-seq="1">
+                    <?= Html::a("<button class='btn-success'>Настроить</button>",
+                        "../device-program/calendar-node?node=" . $node['uuid']) ?>
+            </tr>
             <tr data-key="1">
                 <td class="table_class kv-align-middle" data-col-seq="0">Сбросить координатор</td>
                 <td class="kv-align-center kv-align-middle" data-col-seq="1">

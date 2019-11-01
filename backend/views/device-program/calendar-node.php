@@ -94,6 +94,7 @@ EOF;
             function () {
                 window.location.reload();
         })');
+        $this->registerJs("$('#calendar').fullCalendar('option', 'height', $(window).height()-50)");
         ?>
     </div>
 </div>

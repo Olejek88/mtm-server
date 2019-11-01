@@ -59,6 +59,7 @@ class CameraController extends Controller
 
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
+                ->andWhere(['deleted' => 0])
                 ->one();
 
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {

@@ -461,6 +461,7 @@ class SiteController extends Controller
      * Displays a timeline
      *
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionTimeline()
     {
