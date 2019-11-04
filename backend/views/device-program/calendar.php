@@ -18,6 +18,7 @@ else
     var type = 0;
     var group = '<?= $group ?>';
 
+    //$('#calendar').setOption('contentHeight', 450);
     function keyDownTextField(e) {
         window.keyCode = e.keyCode;
     }
@@ -74,7 +75,6 @@ function(calEvent, jsEvent, view) {
     	}
 }
 EOF;
-
         ?>
 
         <?= yii2fullcalendar\yii2fullcalendar::widget(array(
@@ -82,18 +82,16 @@ EOF;
             'options' => [
                 'lang' => 'ru',
                 'plugins' => ['bootstrap'],
-                'themeSystem' => 'bootstrap',
-                //'height' => 550
+                'themeSystem' => 'bootstrap'
             ],
             'clientOptions' => [
                 'selectable' => true,
-                //'height' => 550,
                 'selectHelper' => true,
                 'droppable' => true,
                 'editable' => true,
                 'eventClick' => new JsExpression($JSEventClick),
-                'eventDrop' => new JsExpression($JSDropEvent),
-                'eventDragStart' => new JsExpression($JSDragStartEvent),
+//                'eventDrop' => new JsExpression($JSDropEvent),
+//                'eventDragStart' => new JsExpression($JSDragStartEvent),
                 'defaultDate' => date('Y-m-d'),
                 'defaultView' => 'month',
                 'columnFormat' => 'ddd',
@@ -109,6 +107,7 @@ EOF;
             function () {
                 window.location.reload();
         })');
+        $this->registerJs("$('#calendar').fullCalendar('option', 'height', $(window).height()-50)");
         ?>
     </div>
 </div>

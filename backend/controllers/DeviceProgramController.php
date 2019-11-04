@@ -181,7 +181,7 @@ class DeviceProgramController extends Controller
         if ($group && $group['deviceProgramUuid'])
             $program = $group['deviceProgram']['title'];
         //$today = strtotime("2019-01-01 00:00:00");
-        $today = time();
+        $today = time() - 3600 * 24 * 30;
         for ($count = 0; $count < 365; $count++) {
             $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
             $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
@@ -260,7 +260,7 @@ class DeviceProgramController extends Controller
         }
 
         $nodeControls = NodeControl::find()->all();
-        $today = time();
+        $today = time() - 3600 * 24 * 30;
         for ($count = 0; $count < 365; $count++) {
             $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
             $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);

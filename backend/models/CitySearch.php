@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use common\models\City;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -37,6 +38,7 @@ class CitySearch extends City
      * @param array $params
      *
      * @return ActiveDataProvider
+     * @throws InvalidConfigException
      */
     public function search($params)
     {
