@@ -7,8 +7,8 @@ use common\models\Measure;
 use common\models\Node;
 use common\models\SensorChannel;
 
-$cameraCount = Camera::find()->where(['nodeUuid' => $node['uuid']])->count();
-$deviceCount = Device::find()->where(['nodeUuid' => $node['uuid']])->count();
+$cameraCount = Camera::find()->where(['nodeUuid' => $node['uuid']])->andWhere(['deleted' => 0])->count();
+$deviceCount = Device::find()->where(['nodeUuid' => $node['uuid']])->andWhere(['deleted' => 0])->count();
 $channelCount = SensorChannel::find()->where(['deviceUuid' => (Node::find()->where(['uuid' => $node['uuid']])->one())])->count();
 $measureCount = Measure::find()->count();
 

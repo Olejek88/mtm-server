@@ -84,7 +84,10 @@ use yii\data\ActiveDataProvider;
             ]
         ];
 
-        $devices = Device::find()->select('uuid')->where(['nodeUuid' => $node['uuid']])->all();
+        $devices = Device::find()->select('uuid')
+            ->where(['nodeUuid' => $node['uuid']])
+            ->andWhere(['deleted' => 0])
+            ->all();
         $devicesList2 = [];
         foreach ($devices as $device) {
             $devicesList2[] = $device['uuid'];

@@ -26,18 +26,16 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Город'), 'url' 
                             ['model' => $model]);
                         ?>
                     </p>
-                    <h6>
-                        <?php echo DetailView::widget([
-                            'model' => $model,
-                            'attributes' => [
-                                '_id',
-                                'uuid',
-                                'title',
-                                'createdAt',
-                                'changedAt',
-                            ],
-                        ]) ?>
-                    </h6>
+                    <?php echo DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            '_id',
+                            'uuid',
+                            'title',
+                            'createdAt',
+                            'changedAt',
+                        ],
+                    ]) ?>
                 </div>
             </div>
 

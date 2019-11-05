@@ -72,7 +72,7 @@ use yii\helpers\Html;
             ]
         ];
 
-        $devices = Device::find()->where(['nodeUuid' => $node['uuid']]);
+        $devices = Device::find()->where(['deleted' => 0])->andWhere(['nodeUuid' => $node['uuid']]);
         $provider = new ActiveDataProvider(
             [
                 'query' => $devices,
