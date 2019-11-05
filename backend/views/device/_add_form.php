@@ -67,7 +67,7 @@ use yii\helpers\Html;
     if (isset($objectUuid)) {
         echo $form->field($device, 'objectUuid')->hiddenInput(['value' => $objectUuid])->label(false);
     } else {
-        $object = Objects::find()->all();
+        $object = Objects::find()->where(['deleted' => 0])->all();
         $items = ArrayHelper::map($object, 'uuid', function ($model) {
             return $model['house']['street']->title . ', ' . $model['house']->number . ', ' . $model['title'];
         });
@@ -87,7 +87,7 @@ use yii\helpers\Html;
     if (isset($nodeUuid)) {
         echo $form->field($device, 'nodeUuid')->hiddenInput(['value' => $nodeUuid])->label(false);
     } else {
-        $nodes = Node::find()->all();
+        $nodes = Node::find()->where(['deleted' => 0])->all();
         $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
             return $model['object']['address'] . ' [' . $model['address'] . ']';
         });

@@ -38,7 +38,7 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?php
-    $object = Objects::find()->all();
+    $object = Objects::find()->where(['deleted' => 0])->all();
     $items = ArrayHelper::map($object, 'uuid', function ($model) {
         return $model->getAddress();
     });

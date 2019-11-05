@@ -31,31 +31,29 @@ $this->title = "Камеры";
                             ['model' => $model]);
                         ?>
                     </p>
-                    <h6>
-                        <?php echo DetailView::widget(
-                            [
-                                'model' => $model,
-                                'attributes' => [
-                                    'uuid',
-                                    'title',
-                                    [
-                                        'label' => 'Статус',
-                                        'value' => $model['deviceStatus']->title
-                                    ],
-                                    [
-                                        'label' => 'Контроллер',
-                                        'value' => $model['node']->address
-                                    ],
-                                    [
-                                        'label' => 'Объект',
-                                        'value' => $model['node']['object']->getAddress()
-                                    ],
-                                    'createdAt',
-                                    'changedAt',
+                    <?php echo DetailView::widget(
+                        [
+                            'model' => $model,
+                            'attributes' => [
+                                'uuid',
+                                'title',
+                                [
+                                    'label' => 'Статус',
+                                    'value' => $model['deviceStatus']->title
                                 ],
-                            ]
-                        ) ?>
-                    </h6>
+                                [
+                                    'label' => 'Контроллер',
+                                    'value' => $model['node']->address
+                                ],
+                                [
+                                    'label' => 'Объект',
+                                    'value' => $model['node']['object']->getAddress()
+                                ],
+                                'createdAt',
+                                'changedAt',
+                            ],
+                        ]
+                    ) ?>
                 </div>
                 <div>
                     <video

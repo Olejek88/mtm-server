@@ -26,7 +26,7 @@ use yii\widgets\ActiveForm;
     }
     ?>
     <?php
-    $device = Device::find()->all();
+    $device = Device::find()->where(['deleted' => 0])->all();
     $items = ArrayHelper::map($sensorChannel, 'uuid', 'title');
     echo $form->field($model, 'sensorChannelUuid')->widget(Select2::class,
         [

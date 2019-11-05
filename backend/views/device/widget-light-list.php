@@ -101,6 +101,7 @@ use yii\helpers\Html;
 
         $devices = Device::find()
             ->where(['nodeUuid' => $device['nodeUuid']])
+            ->andWhere(['deleted' => 0])
             ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT]);
         $provider = new ActiveDataProvider(
             [

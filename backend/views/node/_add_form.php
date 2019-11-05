@@ -55,7 +55,7 @@ use yii\helpers\Html;
     if (isset($objectUuid)) {
         echo $form->field($node, 'objectUuid')->hiddenInput(['value' => $objectUuid])->label(false);
     } else {
-        $object = Objects::find()->all();
+        $object = Objects::find()->where(['deleted' => 0])->all();
         $items = ArrayHelper::map($object, 'uuid', function ($model) {
             return $model['house']['street']->title . ', ' . $model['house']->number . ', ' . $model['title'];
         });

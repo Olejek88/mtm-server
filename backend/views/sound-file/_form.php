@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?php
-    $nodes = Node::find()->all();
+    $nodes = Node::find()->where(['deleted' => 0])->all();
     $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
         return $model['object']['address'] . ' [' . $model['address'] . ']';
     });

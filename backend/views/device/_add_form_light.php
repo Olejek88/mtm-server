@@ -67,7 +67,7 @@ use yii\helpers\Html;
     echo $form->field($object, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false);
     echo $form->field($object, 'objectTypeUuid')->hiddenInput(['value' => ObjectType::OBJECT_TYPE_PILLAR])->label(false);
 
-    $nodes = Node::find()->all();
+    $nodes = Node::find()->where(['deleted' => 0])->all();
     $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
         return $model['object']['address'] . ' [' . $model['address'] . ']';
     });

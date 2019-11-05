@@ -19,14 +19,12 @@ $this->title = 'Обновить камеру';
 
             <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="list">
-                    <h6>
-                        <?php echo $this->render(
-                            '_form',
-                            [
-                                'model' => $model,
-                            ]
-                        ) ?>
-                    </h6>
+                    <?php echo $this->render(
+                        '_form',
+                        [
+                            'model' => $model,
+                        ]
+                    ) ?>
                 </div>
             </div>
 

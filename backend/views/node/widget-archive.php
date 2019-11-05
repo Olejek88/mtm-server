@@ -53,8 +53,8 @@ use yii\data\ActiveDataProvider;
         ];
 
         $measures = [];
-        $device = (Device::find()->select('uuid')
-            ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
+        $device = (Device::find()->select('uuid')->where(['deleted' => 0])
+            ->andWhere(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
         if ($device) {
             $sChannel = (SensorChannel::find()->select('uuid')
                 ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
