@@ -5,6 +5,7 @@ use yii\web\JsExpression;
 $this->title = 'Расписание работы светильников';
 
 /* @var $events */
+/* @var $groupTitle */
 
 if (isset ($_GET["group"]))
     $group = $_GET["group"];
@@ -76,7 +77,9 @@ function(calEvent, jsEvent, view) {
 }
 EOF;
         ?>
-
+        <div width="100%" align="center">
+            <h4><?php echo $groupTitle ?></h4>
+        </div>
         <?= yii2fullcalendar\yii2fullcalendar::widget(array(
             'id' => 'calendar',
             'options' => [
@@ -97,7 +100,7 @@ EOF;
                 'columnFormat' => 'ddd',
                 'header' => [
                     'left' => 'prev,next today month',
-                    'center' => 'title'
+                    'center' => 'title',
                 ],
             ],
             'ajaxEvents' => $events,

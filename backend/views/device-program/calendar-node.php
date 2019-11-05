@@ -5,6 +5,7 @@ use yii\web\JsExpression;
 $this->title = 'Расписание работы шкафов';
 
 /* @var $events */
+/* @var $nodeTitle */
 
 if (isset ($_GET["node"]))
     $node = $_GET["node"];
@@ -62,7 +63,9 @@ EOF;
     }
 EOF;
         ?>
-
+        <div width="100%" align="center">
+            <h4><?php echo $nodeTitle ?></h4>
+        </div>
         <?= yii2fullcalendar\yii2fullcalendar::widget(array(
             'id' => 'calendar',
             'options' => [
