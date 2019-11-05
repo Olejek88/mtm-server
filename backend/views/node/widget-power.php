@@ -14,8 +14,8 @@ use common\models\SensorChannel;
 $this->registerJsFile('/js/vendor/lib/HighCharts/highcharts.js');
 $this->registerJsFile('/js/vendor/lib/HighCharts/modules/exporting.js');
 
-$device = (Device::find()->select('uuid')
-    ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
+$device = (Device::find()->select('uuid')->where(['deleted' => 0])
+    ->andWhere(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
 $sChannel = (SensorChannel::find()->select('uuid')
     ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
 $last_measures = (Measure::find()

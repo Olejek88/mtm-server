@@ -126,7 +126,7 @@ $gridColumns = [
     ]
 ];
 
-$devices = Device::find()->where(['nodeUuid' => $model['uuid']]);
+$devices = Device::find()->where(['deleted' => 0])->andWhere(['nodeUuid' => $model['uuid']]);
 $provider = new ActiveDataProvider(
     [
         'query' => $devices,

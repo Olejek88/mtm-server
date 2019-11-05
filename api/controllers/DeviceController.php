@@ -152,7 +152,6 @@ class DeviceController extends Controller
             $model->date = $item['last_date'];
             $model->createdAt = $item['createdAt'];
             $model->changedAt = $item['changedAt'];
-            $model->deviceProgram = '{}'; // костыль т.к. пока нет времени разбираться как сделать по другому
 
             if (!$model->save()) {
                 foreach ($model->errors as $error) {

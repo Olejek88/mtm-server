@@ -7,6 +7,7 @@ use common\models\DeviceRegister;
 use common\models\User;
 use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -45,6 +46,7 @@ class DeviceRegisterController extends Controller
     /**
      * Lists all DeviceRegister models.
      * @return mixed
+     * @throws InvalidConfigException
      */
     public function actionIndex()
     {

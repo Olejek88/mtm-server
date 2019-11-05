@@ -53,7 +53,7 @@ use yii\helpers\Html;
     if (isset($deviceUuid)) {
         echo $form->field($model, 'deviceUuid')->hiddenInput(['value' => $deviceUuid])->label(false);
     } else {
-        $device = Device::find()->all();
+        $device = Device::find()->where(['deleted' => 0])->all();
         $items = ArrayHelper::map($device, 'uuid', function ($data) {
             return $data->getFullTitle();
         });

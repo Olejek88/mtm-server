@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
-    $streets = Street::find()->orderBy('cityUuid')->all();
+    $streets = Street::find()->where(['deleted' => 0])->orderBy('cityUuid')->all();
     $items = ArrayHelper::map($streets, 'uuid', function ($model) {
         return $model['city']['title'].', ул.'.$model['title'];
     });

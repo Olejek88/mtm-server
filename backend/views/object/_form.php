@@ -41,7 +41,7 @@ $lngDefault = 61.402738;
     <?php echo $form->field($model, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false); ?>
 
     <?php
-    $houses = House::find()->all();
+    $houses = House::find()->where(['deleted' => 0])->all();
     $items = ArrayHelper::map($houses, 'uuid', function ($model) {
         return $model['street']['city']['title'].','.$model->getFullTitle();
     });

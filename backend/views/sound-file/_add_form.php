@@ -36,7 +36,7 @@ use yii\helpers\Html;
 
     echo $form->field($model, 'title')->textInput(['maxlength' => true]);
 
-    $nodes = Node::find()->all();
+    $nodes = Node::find()->where(['deleted' => 0])->all();
     $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
         return $model['object']['address'] . ' [' . $model['address'] . ']';
     });

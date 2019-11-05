@@ -1429,10 +1429,7 @@ class DeviceController extends Controller
     {
         ini_set('memory_limit', '-1');
         $fullTree = array();
-        $groups = Group::find()
-            ->select('*')
-            ->orderBy('title')
-            ->all();
+        $groups = Group::find()->orderBy('groupId')->all();
         foreach ($groups as $group) {
             $program = 'программа не задана';
             if ($group['deviceProgramUuid'])
