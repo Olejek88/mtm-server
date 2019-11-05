@@ -167,55 +167,66 @@ class DeviceProgramController extends Controller
     public function actionCalendar()
     {
         $events = [];
-        $program = "";
+        $defProgram = "";
         $coordinates = ObjectController::getAverageCoordinates();
         if (isset($_GET["group"]))
             $group = $_GET["group"];
         else $group = 0;
+        $range = 365;
+        $shift = 30;
+
+        $today = time() - 3600 * 24 * $shift;
         $groupControls = GroupControl::find()
             ->where(['groupUuid' => $group])
+            ->where(['between', 'date', date('Y-m-d', $today),
+                date('Y-m-d', $today + 86400 * ($range + $shift))])
             ->all();
-        $group = Group::find()
-            ->where(['uuid' => $group])
-            ->one();
-        if ($group && $group['deviceProgramUuid'])
-            $program = $group['deviceProgram']['title'];
-        //$today = strtotime("2019-01-01 00:00:00");
-        $today = time() - 3600 * 24 * 30;
-        for ($count = 0; $count < 365; $count++) {
+        $group = Group::find()->where(['uuid' => $group])->one();
+        if ($group && $group['deviceProgramUuid']) {
+            $defProgram = $group['deviceProgram']['title'];
+        }
+
+        $groupControlArray = [];
+        foreach ($groupControls as $groupControl) {
+            $grpCtlTimestamp = strtotime($groupControl->date);
+            $groupControlArray[date("Y-m-d", $grpCtlTimestamp)][$groupControl->type] = $groupControl;
+        }
+
+        unset($groupControls);
+
+        for ($count = 0; $count < $range; $count++) {
             $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
             $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
 
             $on = 0;
             $off = 0;
-            foreach ($groupControls as $groupControl) {
-                $date = date("Y-m-d", strtotime($groupControl['date']));
-                $currentDate = date("Y-m-d", $today);
-                if ($date == $currentDate) {
-                    if ($groupControl['type'] == 0) {
-                        $off = 1;
-                        $event = new Event();
-                        $event->id = $count * 2;
-                        $event->title = "выключение";
-                        $event->backgroundColor = 'orange';
-                        $event->start = $groupControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
-                    if ($groupControl['type'] == 1) {
-                        $on = 1;
-                        $event = new Event();
-                        $event->id = $count * 2 + 1;
-                        $event->title = "включение [" . $program . "]";
-                        if ($groupControl['deviceProgramUuid'])
-                            $event->title = "включение [" . $groupControl['deviceProgram']['title'] . "]";
-                        $event->backgroundColor = 'green';
-                        $event->start = $groupControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
+            $currentDate = date("Y-m-d", $today);
+            if (isset($groupControlArray[$currentDate])) {
+                if (isset($groupControlArray[$currentDate][0])) {
+                    $elem = $groupControlArray[$currentDate][0];
+                    $off = 1;
+                    $event = new Event();
+                    $event->id = $count * 2;
+                    $event->title = "выключение";
+                    $event->backgroundColor = 'orange';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
                 }
 
+                if (isset($groupControlArray[$currentDate][1])) {
+                    $elem = $groupControlArray[$currentDate][1];
+                    $on = 1;
+                    $event = new Event();
+                    $event->id = $count * 2 + 1;
+                    $event->title = "включение [" . $defProgram . "]";
+                    if ($elem['deviceProgramUuid'])
+                        $event->title = "включение [" . $elem['deviceProgram']['title'] . "]";
+                    $event->backgroundColor = 'green';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
+                }
             }
 
             if ($off == 0) {
@@ -231,18 +242,19 @@ class DeviceProgramController extends Controller
             if ($on == 0) {
                 $event = new Event();
                 $event->id = $count * 2 + 1;
-                $event->title = "включение [" . $program . "]";
+                $event->title = "включение [" . $defProgram . "]";
                 $event->backgroundColor = 'green';
                 $event->start = date("Y-m-d H:i:s", $sunset_time);
                 $event->color = '#ffffff';
                 $events[] = $event;
             }
-            //echo date("Y-m-d H:i",$event->start).PHP_EOL;
+
             $today += 24 * 3600;
         }
 
         return $this->render('calendar', [
-            'events' => $events
+            'events' => $events,
+            'groupTitle' => $group->title,
         ]);
     }
 
