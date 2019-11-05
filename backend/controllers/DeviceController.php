@@ -316,6 +316,19 @@ class DeviceController extends Controller
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_FREQUENCY, $_POST['frequency']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_POWER, $_POST['power']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_GROUP, $_POST['group']);
+                // перемещаем устройство в новую группу
+                $devGrp = DeviceGroup::findOne(['deviceUuid' => $device->uuid]);
+                if ($devGrp == null) {
+                    $devGrp = new DeviceGroup();
+                    $devGrp->uuid = MainFunctions::GUID();
+                    $devGrp->oid = User::getOid(Yii::$app->user->identity);
+                    $devGrp->deviceUuid = $device->uuid;
+                }
+
+                $newGroup = Group::findOne(['groupId' => $_POST['group']]);
+                $devGrp->groupUuid = $newGroup->uuid;
+                $devGrp->save();
+
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_REGIME, $_POST['mode']);
 
                 MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства ('. $device->address .')");
@@ -2327,41 +2340,84 @@ class DeviceController extends Controller
     public
     function actionGroupMove()
     {
-        if (isset($_POST["from"]) && isset($_POST["to"])) {
-            $model = DeviceGroup::find()
-                ->where(['deviceUuid' => $_POST['from']])
-                ->one();
-            if ($model) {
-                if ($_POST['to']) {
-                    $model = DeviceGroup::find()
-                        ->where(['deviceUuid' => $_POST['from']])
-                        ->andWhere(['groupUuid' => $_POST['to']])
-                        ->one();
-                    if (!$model) {
-                        $modelGroup = new DeviceGroup();
-                        $modelGroup->uuid = MainFunctions::GUID();
-                        $modelGroup->oid = User::getOid(Yii::$app->user->identity);
-                        $modelGroup->deviceUuid = $_POST["from"];
-                        $modelGroup->groupUuid = $_POST["to"];
-                        $modelGroup->save();
-                        MainFunctions::deviceRegister($modelGroup->deviceUuid,
-                            "Светильник перенесен в " . $modelGroup['group']['title']);
-                    }
-                } else {
-                    $model->delete();
+        if (isset($_POST['dev']) && isset($_POST['grp'])) {
+            $changed = false;
+            $devUuid = $_POST['dev'];
+            $grpUuid = $_POST['grp'];
+            $devGrp = DeviceGroup::find()->where(['deviceUuid' => $devUuid])->one();
+
+            if ($devGrp == null && $grpUuid != '0') {
+                // создаём связь
+                $devGrp = new DeviceGroup();
+                $devGrp->uuid = MainFunctions::GUID();
+                $devGrp->oid = User::getOid(Yii::$app->user->identity);
+                $devGrp->deviceUuid = $devUuid;
+                $devGrp->groupUuid = $grpUuid;
+                $devGrp->save();
+                MainFunctions::deviceRegister($devGrp->deviceUuid,
+                    "Светильник перенесен в " . $devGrp->group->title);
+                $changed = true;
+            } else if ($devGrp != null && $grpUuid != '0') {
+                // обновляем связь
+                $devGrp->groupUuid = $grpUuid;
+                $devGrp->save();
+                MainFunctions::deviceRegister($devGrp->deviceUuid,
+                    "Светильник перенесен в " . $devGrp->group->title);
+                $changed = true;
+            }
+//            else if ($devGrp != null && $grpUuid == '0') {
+//                // удаляем связь
+//                $devGrp->delete();
+//            }
+
+
+            // отправка команды с параметрами на светильник
+            // если есть в базе параметры вытащить их и отправить по новой. если нет, значения по умолчанию.
+            if ($changed) {
+                $parameters['frequency'] = self::getParameter($devUuid, DeviceConfig::PARAM_FREQUENCY);
+                if ($parameters['frequency'] == null) {
+                    $parameters['frequency'] = 600; // 10 минут
                 }
 
-            } else {
-                $modelGroup = new DeviceGroup();
-                $modelGroup->uuid = MainFunctions::GUID();
-                $modelGroup->oid = User::getOid(Yii::$app->user->identity);
-                $modelGroup->deviceUuid = $_POST["from"];
-                $modelGroup->groupUuid = $_POST["to"];
-                $modelGroup->save();
-                MainFunctions::deviceRegister($modelGroup->deviceUuid,
-                    "Светильник перенесен в " . $modelGroup['group']['title']);
+                $parameters['mode'] = self::getParameter($devUuid, DeviceConfig::PARAM_REGIME);
+                if ($parameters['mode'] == null) {
+                    $parameters['mode'] = 2; // астрособытия
+                }
+
+                $parameters['power'] = self::getParameter($devUuid, DeviceConfig::PARAM_POWER);
+                if ($parameters['power'] == null) {
+                    $parameters['power'] = 2; // 60Вт
+                }
+
+                $newGrp = Group::findOne(['uuid' => $grpUuid]);
+                $parameters['group'] = $newGrp->groupId;
+
+                $lightConfig = new MtmDevLightConfig();
+                $lightConfig->mode = $parameters['mode'];
+                $lightConfig->power = $parameters['power'];
+                $lightConfig->group = $parameters['group'];
+                $lightConfig->frequency = $parameters['frequency'];
+
+                $lightConfig->type = 2;
+                $lightConfig->protoVersion = 0;
+                $lightConfig->device = MtmPktHeader::$MTM_DEVICE_LIGHT;
+
+                $device = Device::findOne(['uuid' => $devUuid]);
+
+                $pkt = [
+                    'type' => 'light',
+                    'address' => $device->address, // 16 байт мак адрес в шестнадцатиричном представлении
+                    'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
+                ];
+                $org_id = User::getOid(Yii::$app->user->identity);
+                $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                $node_id = $device->node->_id;
+                self::sendConfig($pkt, $org_id, $node_id);
             }
+
+
         }
+
         return self::actionTreeGroup();
     }
 

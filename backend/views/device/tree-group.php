@@ -76,8 +76,8 @@ echo FancytreeWidget::widget([
                      url: "group-move",
                      type: "post",
                      data: {
-				        from: data.otherNode.data.uuid,
-				        to: node.data.uuid                        
+				        dev: data.otherNode.data.uuid,
+				        grp: node.data.uuid                        
                      }
                 });				
 			}'),
