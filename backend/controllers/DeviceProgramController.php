@@ -271,40 +271,56 @@ class DeviceProgramController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
-        $nodeControls = NodeControl::find()->all();
-        $today = time() - 3600 * 24 * 30;
-        for ($count = 0; $count < 365; $count++) {
+        $range = 365;
+        $shift = 30;
+        $today = time() - 3600 * 24 * $shift;
+
+        $nodeControls = NodeControl::find()
+            ->where(['nodeUuid' => $node])
+            ->where(['between', 'date', date('Y-m-d', $today),
+                date('Y-m-d', $today + 86400 * ($range + $shift))])
+            ->all();
+
+        $nodeControlArray = [];
+        foreach ($nodeControls as $nodeControl) {
+            $nodeCtlTimestamp = strtotime($nodeControl->date);
+            $nodeControlArray[date("Y-m-d", $nodeCtlTimestamp)][$nodeControl->type] = $nodeControl;
+        }
+
+        unset($nodeControls);
+
+
+        for ($count = 0; $count < $range; $count++) {
             $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
             $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
 
             $on = 0;
             $off = 0;
-            foreach ($nodeControls as $nodeControl) {
-                $date = date("Y-m-d", strtotime($nodeControl['date']));
-                $currentDate = date("Y-m-d", $today);
-                if ($date == $currentDate) {
-                    if ($nodeControl['type'] == 0) {
-                        $off = 1;
-                        $event = new Event();
-                        $event->id = $count * 2;
-                        $event->title = "выключение";
-                        $event->backgroundColor = 'orange';
-                        $event->start = $nodeControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
-                    if ($nodeControl['type'] == 1) {
-                        $on = 1;
-                        $event = new Event();
-                        $event->id = $count * 2 + 1;
-                        $event->title = "включение";
-                        $event->backgroundColor = 'green';
-                        $event->start = $nodeControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
+            $currentDate = date("Y-m-d", $today);
+            if (isset($nodeControlArray[$currentDate])) {
+                if (isset($nodeControlArray[$currentDate][0])) {
+                    $elem = $nodeControlArray[$currentDate][0];
+                    $off = 1;
+                    $event = new Event();
+                    $event->id = $count * 2;
+                    $event->title = "выключение";
+                    $event->backgroundColor = 'orange';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
                 }
 
+                if (isset($nodeControlArray[$currentDate][1])) {
+                    $elem = $nodeControlArray[$currentDate][1];
+                    $on = 1;
+                    $event = new Event();
+                    $event->id = $count * 2 + 1;
+                    $event->title = "включение";
+                    $event->backgroundColor = 'green';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
+                }
             }
 
             if ($off == 0) {
@@ -331,7 +347,8 @@ class DeviceProgramController extends Controller
         }
 
         return $this->render('calendar-node', [
-            'events' => $events
+            'events' => $events,
+            'nodeTitle' => $nodeObj->address,
         ]);
     }
 }
