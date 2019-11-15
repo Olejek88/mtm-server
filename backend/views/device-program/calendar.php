@@ -66,13 +66,17 @@ EOF;
         $JSEventClick = <<<EOF
 function(calEvent, jsEvent, view) {
         console.log(calEvent);
-        if (calEvent.id%2==1) {
-            $.post("/device/set-calendar",{ date: ""+calEvent.start.format()+"", group: ""+group+""},
-            function() {	})
+        if (calEvent.id % 2 == 1) {
+            $.post("/device/set-calendar",
+                {
+                    date: "" + calEvent.start.format() + "",
+                    group: "" + group + ""
+                },
+                function() {console.log("мутная функция");})
             .done(function(data) {
-                $('#modalAddProgram').modal('show');
-                $('#modalContent').html(data);
-    	    })
+                  $('#modalAddProgram').modal('show');
+                  $('#modalContent').html(data);
+    	    });
     	}
 }
 EOF;
@@ -91,7 +95,7 @@ EOF;
                 'selectable' => true,
                 'selectHelper' => true,
                 'droppable' => true,
-                'editable' => true,
+                'editable' => false,
                 'eventClick' => new JsExpression($JSEventClick),
 //                'eventDrop' => new JsExpression($JSDropEvent),
 //                'eventDragStart' => new JsExpression($JSDragStartEvent),
@@ -100,6 +104,7 @@ EOF;
                 'columnFormat' => 'ddd',
                 'header' => [
                     'left' => 'prev,next today month',
+                    'right' => 'month',
                     'center' => 'title',
                 ],
             ],
@@ -114,3 +119,11 @@ EOF;
         ?>
     </div>
 </div>
+<style>
+    .fc-time {
+        display: none;
+    }
+    .fc-title {
+        cursor: pointer;
+    }
+</style>
