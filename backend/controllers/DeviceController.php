@@ -44,6 +44,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * DeviceController implements the CRUD actions for Device model.
@@ -231,7 +232,6 @@ class DeviceController extends Controller
      * @param integer $id Id
      *
      * @return mixed
-     * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -2103,13 +2103,17 @@ class DeviceController extends Controller
      *
      * @return mixed
      * @throws StaleObjectException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public
     function actionRemove()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return 'Нет прав.';
+            if (Yii::$app->request->isAjax) {
+                throw new UnauthorizedHttpException('Нет прав!');
+            } else {
+                return 'Нет прав!';
+            }
         }
 
         if (isset($_POST["selected_node"])) {
@@ -2415,7 +2419,7 @@ class DeviceController extends Controller
                 self::sendConfig($pkt, $org_id, $node_id);
             }
 
-
+            return json_encode(['changed' => $changed]);
         }
 
         return self::actionTreeGroup();
