@@ -352,4 +352,50 @@ class DeviceProgramController extends Controller
             'nodeTitle' => $nodeObj->address,
         ]);
     }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionCalendarAll()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $events = [];
+        $range = 365;
+        $shift = 30;
+        $today = time() - 3600 * 24 * $shift;
+
+        $averageCoord = ObjectController::getAverageCoordinates();
+
+        for ($count = 0; $count < $range; $count++) {
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $averageCoord['latitude'], $averageCoord['longitude']);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $averageCoord['latitude'], $averageCoord['longitude']);
+
+            $event = new Event();
+            $event->id = $count * 2;
+            $event->title = "выключение";
+            $event->backgroundColor = 'orange';
+            $event->start = date("Y-m-d H:i:s", $sunrise_time);
+            $event->color = '#ffffff';
+            $events[] = $event;
+
+            $event = new Event();
+            $event->id = $count * 2 + 1;
+            $event->title = "включение";
+            $event->backgroundColor = 'green';
+            $event->start = date("Y-m-d H:i:s", $sunset_time);
+            $event->color = '#ffffff';
+            $events[] = $event;
+
+            //echo date("Y-m-d H:i",$event->start).PHP_EOL;
+            $today += 24 * 3600;
+        }
+
+        return $this->render('calendar-all', [
+            'events' => $events,
+        ]);
+    }
 }
