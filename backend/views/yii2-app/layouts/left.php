@@ -34,6 +34,20 @@ $userImage = Yii::$app->view->params['userImage'];
 
         <?= dmstr\widgets\Menu::widget(
             [
+                'options' => ['class' => 'sidebar-menu'],
+                'items' => [
+                    ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
+                    [
+                        'label' => 'Расписание',
+                        'icon' => 'fa fa-clock-o',
+                        'url' => '/device-program/calendar-all',
+                    ],
+                ],
+            ]
+        ) ?>
+
+        <?= dmstr\widgets\Menu::widget(
+            [
                 'options' => ['class' => 'sidebar-menu', 'data-widget' => 'tree'],
                 'items' => [
                     [

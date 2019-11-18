@@ -44,6 +44,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * DeviceController implements the CRUD actions for Device model.
@@ -231,7 +232,6 @@ class DeviceController extends Controller
      * @param integer $id Id
      *
      * @return mixed
-     * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -2103,13 +2103,17 @@ class DeviceController extends Controller
      *
      * @return mixed
      * @throws StaleObjectException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public
     function actionRemove()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return 'Нет прав.';
+            if (Yii::$app->request->isAjax) {
+                throw new UnauthorizedHttpException('Нет прав!');
+            } else {
+                return 'Нет прав!';
+            }
         }
 
         if (isset($_POST["selected_node"])) {
@@ -2415,7 +2419,7 @@ class DeviceController extends Controller
                 self::sendConfig($pkt, $org_id, $node_id);
             }
 
-
+            return json_encode(['changed' => $changed]);
         }
 
         return self::actionTreeGroup();
@@ -2737,6 +2741,43 @@ class DeviceController extends Controller
                 $nodeControl->save();
                 MainFunctions::register("Изменено расписание для " . $nodeControl['node']['object']['title'] . "
                     (" . $_POST["event_start"] . ") > (" . $_POST["event_end"] . ")");
+            }
+        }
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws UnauthorizedHttpException
+     */
+    public function actionDateAll()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            throw new UnauthorizedHttpException();
+        }
+
+        if (isset($_POST['old_date']) && isset($_POST['new_date']) && isset($_POST['type'])) {
+            $nodes = Node::find()->all();
+            foreach ($nodes as $node) {
+                $control = NodeControl::find()
+                    ->where(['nodeUuid' => $node->uuid])
+                    ->andWhere(['DATE(date)' => date('Y-m-d', strtotime($_POST['old_date']))])
+                    ->andWhere(['type' => $_POST['type']])
+                    ->one();
+                $tmpDate = $_POST['old_date'];
+                if ($control == null) {
+                    $control = new NodeControl();
+                    $control->uuid = MainFunctions::GUID();
+                    $control->oid = User::getOid(Yii::$app->user->identity);
+                    $control->nodeUuid = $node->uuid;
+                    $control->type = $_POST['type'];
+                } else {
+                    $tmpDate = $control->date;
+                }
+
+                $control->date = date('Y-m-d H:i:00', strtotime($_POST['new_date']));
+                $control->save();
+                MainFunctions::register('Изменено расписание для ' . $control->node->object->title
+                    . '(' . $tmpDate . ') > (' . $_POST['new_date'] . ')');
             }
         }
     }

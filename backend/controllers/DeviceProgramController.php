@@ -176,6 +176,7 @@ class DeviceProgramController extends Controller
         $shift = 30;
 
         $today = time() - 3600 * 24 * $shift;
+        $today = strtotime(date('Y-m-d', $today));
         $groupControls = GroupControl::find()
             ->where(['groupUuid' => $group])
             ->where(['between', 'date', date('Y-m-d', $today),
@@ -195,24 +196,24 @@ class DeviceProgramController extends Controller
         unset($groupControls);
 
         for ($count = 0; $count < $range; $count++) {
-            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
-            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+//            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+//            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
 
             $on = 0;
             $off = 0;
             $currentDate = date("Y-m-d", $today);
             if (isset($groupControlArray[$currentDate])) {
-                if (isset($groupControlArray[$currentDate][0])) {
-                    $elem = $groupControlArray[$currentDate][0];
-                    $off = 1;
-                    $event = new Event();
-                    $event->id = $count * 2;
-                    $event->title = "выключение";
-                    $event->backgroundColor = 'orange';
-                    $event->start = $elem['date'];
-                    $event->color = '#ffffff';
-                    $events[] = $event;
-                }
+//                if (isset($groupControlArray[$currentDate][0])) {
+//                    $elem = $groupControlArray[$currentDate][0];
+//                    $off = 1;
+//                    $event = new Event();
+//                    $event->id = $count * 2;
+//                    $event->title = "выключение";
+//                    $event->backgroundColor = 'orange';
+//                    $event->start = $elem['date'];
+//                    $event->color = '#ffffff';
+//                    $events[] = $event;
+//                }
 
                 if (isset($groupControlArray[$currentDate][1])) {
                     $elem = $groupControlArray[$currentDate][1];
@@ -221,7 +222,7 @@ class DeviceProgramController extends Controller
                     $event->id = $count * 2 + 1;
                     $event->title = "включение [" . $defProgram . "]";
                     if ($elem['deviceProgramUuid'])
-                        $event->title = "включение [" . $elem['deviceProgram']['title'] . "]";
+                        $event->title = "Программа [" . $elem['deviceProgram']['title'] . "]";
                     $event->backgroundColor = 'green';
                     $event->start = $elem['date'];
                     $event->color = '#ffffff';
@@ -229,22 +230,22 @@ class DeviceProgramController extends Controller
                 }
             }
 
-            if ($off == 0) {
-                $event = new Event();
-                $event->id = $count * 2;
-                $event->title = "выключение";
-                $event->backgroundColor = 'orange';
-                $event->start = date("Y-m-d H:i:s", $sunrise_time);
-                $event->color = '#ffffff';
-                $events[] = $event;
-            }
+//            if ($off == 0) {
+//                $event = new Event();
+//                $event->id = $count * 2;
+//                $event->title = "выключение";
+//                $event->backgroundColor = 'orange';
+//                $event->start = date("Y-m-d H:i:s", $today);
+//                $event->color = '#ffffff';
+//                $events[] = $event;
+//            }
 
             if ($on == 0) {
                 $event = new Event();
                 $event->id = $count * 2 + 1;
-                $event->title = "включение [" . $defProgram . "]";
+                $event->title = "Программа [" . $defProgram . "]";
                 $event->backgroundColor = 'green';
-                $event->start = date("Y-m-d H:i:s", $sunset_time);
+                $event->start = date("Y-m-d H:i:s", $today);
                 $event->color = '#ffffff';
                 $events[] = $event;
             }
@@ -349,6 +350,52 @@ class DeviceProgramController extends Controller
         return $this->render('calendar-node', [
             'events' => $events,
             'nodeTitle' => $nodeObj->address,
+        ]);
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionCalendarAll()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $events = [];
+        $range = 365;
+        $shift = 30;
+        $today = time() - 3600 * 24 * $shift;
+
+        $averageCoord = ObjectController::getAverageCoordinates();
+
+        for ($count = 0; $count < $range; $count++) {
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $averageCoord['latitude'], $averageCoord['longitude']);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $averageCoord['latitude'], $averageCoord['longitude']);
+
+            $event = new Event();
+            $event->id = $count * 2;
+            $event->title = "выключение";
+            $event->backgroundColor = 'orange';
+            $event->start = date("Y-m-d H:i:s", $sunrise_time);
+            $event->color = '#ffffff';
+            $events[] = $event;
+
+            $event = new Event();
+            $event->id = $count * 2 + 1;
+            $event->title = "включение";
+            $event->backgroundColor = 'green';
+            $event->start = date("Y-m-d H:i:s", $sunset_time);
+            $event->color = '#ffffff';
+            $events[] = $event;
+
+            //echo date("Y-m-d H:i",$event->start).PHP_EOL;
+            $today += 24 * 3600;
+        }
+
+        return $this->render('calendar-all', [
+            'events' => $events,
         ]);
     }
 }
