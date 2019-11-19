@@ -154,9 +154,9 @@ echo FancytreeWidget::widget([
                                           url: "remove",
                                           type: "post",
                                           data: {
-                                                type: data.type,
-                                                selected_node: data.key,
-                                                uuid: data.data.uuid
+                                               type: data.type,
+                                               selected_node: data.key,
+                                               uuid: data.data.uuid
                                           },
                                         error: function (result) {
                                             console.log(result);

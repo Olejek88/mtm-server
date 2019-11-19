@@ -1444,7 +1444,11 @@ class DeviceController extends Controller
                 'type' => 'group',
                 'folder' => true
             ];
-            $devices = DeviceGroup::find()->where(['groupUuid' => $group['uuid']])->all();
+            $devices = DeviceGroup::find()
+                ->leftJoin('{{%device}}', '{{%device_group}}.deviceUuid = {{%device}}.uuid')
+                ->where(['groupUuid' => $group['uuid']])
+                ->andWhere(['{{%device}}.deleted' => 0])
+                ->all();
             foreach ($devices as $deviceGroup) {
                 $childIdx = count($fullTree['children']) - 1;
                 if ($deviceGroup['device']['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {

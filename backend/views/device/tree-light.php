@@ -103,23 +103,48 @@ echo FancytreeWidget::widget([
                     'icon' => 'delete',
                     'callback' => new JsExpression('function(key, opt) {
                             var sel = $.ui.fancytree.getTree().getSelectedNodes();
-                            $.each(sel, function (event, data) {
-                                 $.ajax({
-                                      url: "remove",
-                                      type: "post",
-                                      data: {
-                                           selected_node: data.key,
-                                           type: "device",
-                                           uuid: data.data.uuid
-                                      },
-                                    error: function (result) {
-                                        console.log(result);                                 
-                                    },
-                                    success: function (result) {
-                                        data.remove();            
-                                    }                                    
-                                 });
-                            });
+                            if (sel.length > 0) {
+                                $.each(sel, function (event, data) {
+                                    if (data.type == "device") {
+                                        $.ajax({
+                                             url: "remove",
+                                             type: "post",
+                                             data: {
+                                                  type: data.type,
+                                                  selected_node: data.key,
+                                                  uuid: data.data.uuid
+                                             },
+                                             error: function (result) {
+                                                 console.log(result);
+                                                 alert(result.statusText);
+                                             },
+                                             success: function (result) {
+                                                 data.remove();
+                                             }
+                                        });
+                                    }
+                                });
+                            } else {
+                                var node = $.ui.fancytree.getNode(opt.$trigger);
+                                if (node.type == "device") {
+                                    $.ajax({
+                                        url: "remove",
+                                        type: "post",
+                                        data: {
+                                            type: node.type,
+                                            selected_node: node.key,
+                                            uuid: node.data.uuid
+                                        },
+                                        error: function (result) {
+                                            console.log(result);
+                                            alert(result.statusText);                                 
+                                        },
+                                        success: function (result) {
+                                            node.remove();            
+                                        }                                    
+                                    });
+                                }
+                            }
                     }')
                 ],
                 'edit' => [
