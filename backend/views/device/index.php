@@ -54,6 +54,11 @@ $gridColumns = [
         'format' => 'raw',
     ],
     [
+        'attribute' => 'name',
+        'label' => 'Название',
+        'hAlign' => 'center',
+    ],
+    [
         'class' => 'kartik\grid\DataColumn',
         'attribute' => 'deviceTypeUuid',
         'hAlign' => 'center',
