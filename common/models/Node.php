@@ -27,6 +27,7 @@ use yii\db\Expression;
  * @property ActiveQuery $deviceStatus
  * @property Organisation $organisation
  * @property Objects $object
+ * @property ActiveQuery $nodeControls
  */
 class Node extends MtmActiveRecord
 {
@@ -172,5 +173,15 @@ class Node extends MtmActiveRecord
     public function getOrganisation()
     {
         return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getNodeControls()
+    {
+        return $this->hasMany(NodeControl::class, ['nodeUuid' => 'uuid']);
     }
 }

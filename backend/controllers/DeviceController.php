@@ -37,6 +37,7 @@ use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -2760,27 +2761,35 @@ class DeviceController extends Controller
         }
 
         if (isset($_POST['old_date']) && isset($_POST['new_date']) && isset($_POST['type'])) {
-            $nodes = Node::find()->all();
-            foreach ($nodes as $node) {
-                $control = NodeControl::find()
-                    ->where(['nodeUuid' => $node->uuid])
-                    ->andWhere(['DATE(date)' => date('Y-m-d', strtotime($_POST['old_date']))])
-                    ->andWhere(['type' => $_POST['type']])
-                    ->one();
+            $query = Node::find()->joinWith(['nodeControls' => function (ActiveQuery $query) {
+                $query->andOnCondition([
+                    'DATE({{%node_control}}.date)' => date('Y-m-d', strtotime($_POST['old_date'])),
+                    '{{%node_control}}.type' => $_POST['type'],
+                ])
+                    // это условие нужно для того чтобы не отсекались ноды с отсутсвующими событиями в node_control
+                    // так как в запрос добавляется условие 'AND node_control.oid='SOME OID', а в выборке oid=null
+                    ->orWhere('{{%node_control}}.oid IS NULL');
+            }])
+                ->joinWith('object');
+            $items = $query->all();
+            $oid = User::getOid(Yii::$app->user->identity);
+            foreach ($items as $item) {
                 $tmpDate = $_POST['old_date'];
-                if ($control == null) {
+                if (empty($item->relatedRecords['nodeControls'])) {
                     $control = new NodeControl();
                     $control->uuid = MainFunctions::GUID();
-                    $control->oid = User::getOid(Yii::$app->user->identity);
-                    $control->nodeUuid = $node->uuid;
+                    $control->oid = $oid;
+                    $control->nodeUuid = $item->uuid;
                     $control->type = $_POST['type'];
                 } else {
+                    /** @var NodeControl $control */
+                    $control = $item->relatedRecords['nodeControls'][0];
                     $tmpDate = $control->date;
                 }
 
                 $control->date = date('Y-m-d H:i:00', strtotime($_POST['new_date']));
                 $control->save();
-                MainFunctions::register('Изменено расписание для ' . $control->node->object->title
+                MainFunctions::register('Изменено расписание для ' . $item->relatedRecords['object']->title
                     . '(' . $tmpDate . ') > (' . $_POST['new_date'] . ')');
             }
         }
