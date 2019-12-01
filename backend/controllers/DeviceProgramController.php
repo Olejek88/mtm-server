@@ -167,82 +167,95 @@ class DeviceProgramController extends Controller
     public function actionCalendar()
     {
         $events = [];
-        $program = "";
+        $defProgram = "";
         $coordinates = ObjectController::getAverageCoordinates();
         if (isset($_GET["group"]))
             $group = $_GET["group"];
         else $group = 0;
+        $range = 365;
+        $shift = 30;
+
+        $today = time() - 3600 * 24 * $shift;
+        $today = strtotime(date('Y-m-d', $today));
         $groupControls = GroupControl::find()
             ->where(['groupUuid' => $group])
+            ->where(['between', 'date', date('Y-m-d', $today),
+                date('Y-m-d', $today + 86400 * ($range + $shift))])
             ->all();
-        $group = Group::find()
-            ->where(['uuid' => $group])
-            ->one();
-        if ($group && $group['deviceProgramUuid'])
-            $program = $group['deviceProgram']['title'];
-        //$today = strtotime("2019-01-01 00:00:00");
-        $today = time() - 3600 * 24 * 30;
-        for ($count = 0; $count < 365; $count++) {
-            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
-            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+        $group = Group::find()->where(['uuid' => $group])->one();
+        if ($group && $group['deviceProgramUuid']) {
+            $defProgram = $group['deviceProgram']['title'];
+        }
+
+        $groupControlArray = [];
+        foreach ($groupControls as $groupControl) {
+            $grpCtlTimestamp = strtotime($groupControl->date);
+            $groupControlArray[date("Y-m-d", $grpCtlTimestamp)][$groupControl->type] = $groupControl;
+        }
+
+        unset($groupControls);
+
+        for ($count = 0; $count < $range; $count++) {
+//            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+//            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
 
             $on = 0;
             $off = 0;
-            foreach ($groupControls as $groupControl) {
-                $date = date("Y-m-d", strtotime($groupControl['date']));
-                $currentDate = date("Y-m-d", $today);
-                if ($date == $currentDate) {
-                    if ($groupControl['type'] == 0) {
-                        $off = 1;
-                        $event = new Event();
-                        $event->id = $count * 2;
-                        $event->title = "выключение";
-                        $event->backgroundColor = 'orange';
-                        $event->start = $groupControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
-                    if ($groupControl['type'] == 1) {
-                        $on = 1;
-                        $event = new Event();
-                        $event->id = $count * 2 + 1;
-                        $event->title = "включение [" . $program . "]";
-                        if ($groupControl['deviceProgramUuid'])
-                            $event->title = "включение [" . $groupControl['deviceProgram']['title'] . "]";
-                        $event->backgroundColor = 'green';
-                        $event->start = $groupControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
+            $currentDate = date("Y-m-d", $today);
+            if (isset($groupControlArray[$currentDate])) {
+//                if (isset($groupControlArray[$currentDate][0])) {
+//                    $elem = $groupControlArray[$currentDate][0];
+//                    $off = 1;
+//                    $event = new Event();
+//                    $event->id = $count * 2;
+//                    $event->title = "выключение";
+//                    $event->backgroundColor = 'orange';
+//                    $event->start = $elem['date'];
+//                    $event->color = '#ffffff';
+//                    $events[] = $event;
+//                }
+
+                if (isset($groupControlArray[$currentDate][1])) {
+                    $elem = $groupControlArray[$currentDate][1];
+                    $on = 1;
+                    $event = new Event();
+                    $event->id = $count * 2 + 1;
+                    $event->title = "включение [" . $defProgram . "]";
+                    if ($elem['deviceProgramUuid'])
+                        $event->title = "Программа [" . $elem['deviceProgram']['title'] . "]";
+                    $event->backgroundColor = 'green';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
                 }
-
             }
 
-            if ($off == 0) {
-                $event = new Event();
-                $event->id = $count * 2;
-                $event->title = "выключение";
-                $event->backgroundColor = 'orange';
-                $event->start = date("Y-m-d H:i:s", $sunrise_time);
-                $event->color = '#ffffff';
-                $events[] = $event;
-            }
+//            if ($off == 0) {
+//                $event = new Event();
+//                $event->id = $count * 2;
+//                $event->title = "выключение";
+//                $event->backgroundColor = 'orange';
+//                $event->start = date("Y-m-d H:i:s", $today);
+//                $event->color = '#ffffff';
+//                $events[] = $event;
+//            }
 
             if ($on == 0) {
                 $event = new Event();
                 $event->id = $count * 2 + 1;
-                $event->title = "включение [" . $program . "]";
+                $event->title = "Программа [" . $defProgram . "]";
                 $event->backgroundColor = 'green';
-                $event->start = date("Y-m-d H:i:s", $sunset_time);
+                $event->start = date("Y-m-d H:i:s", $today);
                 $event->color = '#ffffff';
                 $events[] = $event;
             }
-            //echo date("Y-m-d H:i",$event->start).PHP_EOL;
+
             $today += 24 * 3600;
         }
 
         return $this->render('calendar', [
-            'events' => $events
+            'events' => $events,
+            'groupTitle' => $group->title,
         ]);
     }
 
@@ -259,40 +272,56 @@ class DeviceProgramController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
-        $nodeControls = NodeControl::find()->all();
-        $today = time() - 3600 * 24 * 30;
-        for ($count = 0; $count < 365; $count++) {
+        $range = 365;
+        $shift = 30;
+        $today = time() - 3600 * 24 * $shift;
+
+        $nodeControls = NodeControl::find()
+            ->where(['nodeUuid' => $node])
+            ->where(['between', 'date', date('Y-m-d', $today),
+                date('Y-m-d', $today + 86400 * ($range + $shift))])
+            ->all();
+
+        $nodeControlArray = [];
+        foreach ($nodeControls as $nodeControl) {
+            $nodeCtlTimestamp = strtotime($nodeControl->date);
+            $nodeControlArray[date("Y-m-d", $nodeCtlTimestamp)][$nodeControl->type] = $nodeControl;
+        }
+
+        unset($nodeControls);
+
+
+        for ($count = 0; $count < $range; $count++) {
             $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
             $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $nodeObj->object->latitude, $nodeObj->object->longitude);
 
             $on = 0;
             $off = 0;
-            foreach ($nodeControls as $nodeControl) {
-                $date = date("Y-m-d", strtotime($nodeControl['date']));
-                $currentDate = date("Y-m-d", $today);
-                if ($date == $currentDate) {
-                    if ($nodeControl['type'] == 0) {
-                        $off = 1;
-                        $event = new Event();
-                        $event->id = $count * 2;
-                        $event->title = "выключение";
-                        $event->backgroundColor = 'orange';
-                        $event->start = $nodeControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
-                    if ($nodeControl['type'] == 1) {
-                        $on = 1;
-                        $event = new Event();
-                        $event->id = $count * 2 + 1;
-                        $event->title = "включение";
-                        $event->backgroundColor = 'green';
-                        $event->start = $nodeControl['date'];
-                        $event->color = '#ffffff';
-                        $events[] = $event;
-                    }
+            $currentDate = date("Y-m-d", $today);
+            if (isset($nodeControlArray[$currentDate])) {
+                if (isset($nodeControlArray[$currentDate][0])) {
+                    $elem = $nodeControlArray[$currentDate][0];
+                    $off = 1;
+                    $event = new Event();
+                    $event->id = $count * 2;
+                    $event->title = "выключение";
+                    $event->backgroundColor = 'orange';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
                 }
 
+                if (isset($nodeControlArray[$currentDate][1])) {
+                    $elem = $nodeControlArray[$currentDate][1];
+                    $on = 1;
+                    $event = new Event();
+                    $event->id = $count * 2 + 1;
+                    $event->title = "включение";
+                    $event->backgroundColor = 'green';
+                    $event->start = $elem['date'];
+                    $event->color = '#ffffff';
+                    $events[] = $event;
+                }
             }
 
             if ($off == 0) {
@@ -319,7 +348,54 @@ class DeviceProgramController extends Controller
         }
 
         return $this->render('calendar-node', [
-            'events' => $events
+            'events' => $events,
+            'nodeTitle' => $nodeObj->address,
+        ]);
+    }
+
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
+    public function actionCalendarAll()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $events = [];
+        $range = 365;
+        $shift = 30;
+        $today = time() - 3600 * 24 * $shift;
+
+        $averageCoord = ObjectController::getAverageCoordinates();
+
+        for ($count = 0; $count < $range; $count++) {
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $averageCoord['latitude'], $averageCoord['longitude']);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $averageCoord['latitude'], $averageCoord['longitude']);
+
+            $event = new Event();
+            $event->id = $count * 2;
+            $event->title = "выключение";
+            $event->backgroundColor = 'orange';
+            $event->start = date("Y-m-d H:i:s", $sunrise_time);
+            $event->color = '#ffffff';
+            $events[] = $event;
+
+            $event = new Event();
+            $event->id = $count * 2 + 1;
+            $event->title = "включение";
+            $event->backgroundColor = 'green';
+            $event->start = date("Y-m-d H:i:s", $sunset_time);
+            $event->color = '#ffffff';
+            $events[] = $event;
+
+            //echo date("Y-m-d H:i",$event->start).PHP_EOL;
+            $today += 24 * 3600;
+        }
+
+        return $this->render('calendar-all', [
+            'events' => $events,
         ]);
     }
 }

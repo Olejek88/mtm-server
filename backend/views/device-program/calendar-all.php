@@ -5,19 +5,12 @@ use yii\web\JsExpression;
 $this->title = 'Расписание работы шкафов';
 
 /* @var $events */
-/* @var $nodeTitle */
-
-if (isset ($_GET["node"]))
-    $node = $_GET["node"];
-else
-    $node = "";
 ?>
 
 <script type="text/javascript">
     document.addEventListener("keydown", keyDownTextField, false);
-    var start;
+    var old;
     var type = 0;
-    var node = '<?= $node ?>';
 
     function keyDownTextField(e) {
         window.keyCode = e.keyCode;
@@ -36,36 +29,39 @@ else
         <?php
         $JSDragStartEvent = <<<EOF
     function( event, jsEvent, ui, view ) {
-        start = event.start;
+        old = event.start;
         console.log(event);
-        if (event.title == "выключение")
+        if (event.title == "выключение") {
             type = 0;
-        else type = 1;
+        } else {
+            type = 1;
+        }
     }
 EOF;
         $JSDropEvent = <<<EOF
     function( event, delta, revertFunc, jsEvent, ui, view ) {
-	        var st = $.post("/device/date-node",{ type: ""+type+"", node: ""+node+"", event_start: ""+start.format()+"", event_end: ""+event.start.format()+"" },	
-	        function() {
-	            //alert( "success" );
-	        })
-	        .done(function() {
-	            //alert( "second success" );
-	        })
-	        .fail(function() {
-	            //alert( "error" );
-	        })
-	        .always(function() {
-	            //$('#calendar').fullCalendar('refetchEvents');
-	            //$('#calendar').fullCalendar('rerenderEvents');
-	            //window.location.replace("calendar");
-	        });  
+        var st = $.post("/device/date-all", {
+            type: "" + type + "",
+            old_date: "" + old.format() + "",
+            new_date: "" + event.start.format() + ""
+        },	
+        function() {
+            //alert( "success" );
+        })
+        .done(function() {
+            //alert( "second success" );
+        })
+        .fail(function(result) {
+            alert(result.statusText);
+        })
+        .always(function() {
+            //$('#calendar').fullCalendar('refetchEvents');
+            //$('#calendar').fullCalendar('rerenderEvents');
+            //window.location.replace("calendar");
+        });  
     }
 EOF;
         ?>
-        <div width="100%" align="center">
-            <h4><?php echo $nodeTitle ?></h4>
-        </div>
         <?= yii2fullcalendar\yii2fullcalendar::widget(array(
             'id' => 'calendar',
             'options' => [
@@ -93,10 +89,6 @@ EOF;
             'ajaxEvents' => $events,
         ));
 
-        $this->registerJs('$("#modalTask").on("hidden.bs.modal",
-            function () {
-                window.location.reload();
-        })');
         $this->registerJs("$('#calendar').fullCalendar('option', 'height', $(window).height()-50)");
         ?>
     </div>

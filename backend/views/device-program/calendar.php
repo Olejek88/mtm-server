@@ -5,6 +5,7 @@ use yii\web\JsExpression;
 $this->title = 'Расписание работы светильников';
 
 /* @var $events */
+/* @var $groupTitle */
 
 if (isset ($_GET["group"]))
     $group = $_GET["group"];
@@ -65,18 +66,24 @@ EOF;
         $JSEventClick = <<<EOF
 function(calEvent, jsEvent, view) {
         console.log(calEvent);
-        if (calEvent.id%2==1) {
-            $.post("/device/set-calendar",{ date: ""+calEvent.start.format()+"", group: ""+group+""},
-            function() {	})
+        if (calEvent.id % 2 == 1) {
+            $.post("/device/set-calendar",
+                {
+                    date: "" + calEvent.start.format() + "",
+                    group: "" + group + ""
+                },
+                function() {console.log("мутная функция");})
             .done(function(data) {
-                $('#modalAddProgram').modal('show');
-                $('#modalContent').html(data);
-    	    })
+                  $('#modalAddProgram').modal('show');
+                  $('#modalContent').html(data);
+    	    });
     	}
 }
 EOF;
         ?>
-
+        <div width="100%" align="center">
+            <h4><?php echo $groupTitle ?></h4>
+        </div>
         <?= yii2fullcalendar\yii2fullcalendar::widget(array(
             'id' => 'calendar',
             'options' => [
@@ -88,7 +95,7 @@ EOF;
                 'selectable' => true,
                 'selectHelper' => true,
                 'droppable' => true,
-                'editable' => true,
+                'editable' => false,
                 'eventClick' => new JsExpression($JSEventClick),
 //                'eventDrop' => new JsExpression($JSDropEvent),
 //                'eventDragStart' => new JsExpression($JSDragStartEvent),
@@ -97,7 +104,8 @@ EOF;
                 'columnFormat' => 'ddd',
                 'header' => [
                     'left' => 'prev,next today month',
-                    'center' => 'title'
+                    'right' => 'month',
+                    'center' => 'title',
                 ],
             ],
             'ajaxEvents' => $events,
@@ -111,3 +119,11 @@ EOF;
         ?>
     </div>
 </div>
+<style>
+    .fc-time {
+        display: none;
+    }
+    .fc-title {
+        cursor: pointer;
+    }
+</style>

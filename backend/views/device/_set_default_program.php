@@ -32,7 +32,7 @@ use yii\widgets\ActiveForm;
         ->where(['uuid' => $group])
         ->one();
     if ($group)
-        $program = 0;
+        $program = $group->deviceProgramUuid;
     $programs = DeviceProgram::find()->all();
     $items = ArrayHelper::map($programs, 'uuid', 'title');
     echo Select2::widget(

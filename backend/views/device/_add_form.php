@@ -128,6 +128,10 @@ use yii\helpers\Html;
     echo $form->field($device, 'oid')->hiddenInput(['value' => User::getOid(Yii::$app->user->identity)])->label(false);
     echo $form->field($device, 'deviceStatusUuid')->hiddenInput(['value' => DeviceStatus::WORK])->label(false);
 
+    $linkTimeoutValue = empty($device->linkTimeout) ? 600 : $device->linkTimeout;
+    echo $form->field($device, 'linkTimeout')->textInput(['maxlength' => true, 'value' => $linkTimeoutValue])
+        ->label($device->getAttributeLabel('linkTimeout') . '(сек.)');
+
     echo Html::hiddenInput("source", $source);
     echo Html::hiddenInput("type", "device");
     ?>

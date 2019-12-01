@@ -69,15 +69,18 @@ echo FancytreeWidget::widget([
 				return true;
 			}'),
             'dragDrop' => new JsExpression('function(node, data) {
-				data.otherNode. copyTo(node, data.hitMode);
-				console.log(data.otherNode.data.uuid);
-				console.log(node.data.uuid);
 				$.ajax({
                      url: "group-move",
                      type: "post",
                      data: {
-				        from: data.otherNode.data.uuid,
-				        to: node.data.uuid                        
+				        dev: data.otherNode.data.uuid,
+				        grp: node.data.uuid                        
+                     },
+                     success: function(result){
+                        var resObj = $.parseJSON(result);
+                        if (resObj.changed == true) {
+                            data.otherNode.moveTo(node, data.hitMode);
+                        }
                      }
                 });				
 			}'),

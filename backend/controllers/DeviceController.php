@@ -37,6 +37,7 @@ use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -44,6 +45,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * DeviceController implements the CRUD actions for Device model.
@@ -231,7 +233,6 @@ class DeviceController extends Controller
      * @param integer $id Id
      *
      * @return mixed
-     * @throws InvalidConfigException
      * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
@@ -316,6 +317,19 @@ class DeviceController extends Controller
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_FREQUENCY, $_POST['frequency']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_POWER, $_POST['power']);
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_GROUP, $_POST['group']);
+                // перемещаем устройство в новую группу
+                $devGrp = DeviceGroup::findOne(['deviceUuid' => $device->uuid]);
+                if ($devGrp == null) {
+                    $devGrp = new DeviceGroup();
+                    $devGrp->uuid = MainFunctions::GUID();
+                    $devGrp->oid = User::getOid(Yii::$app->user->identity);
+                    $devGrp->deviceUuid = $device->uuid;
+                }
+
+                $newGroup = Group::findOne(['groupId' => $_POST['group']]);
+                $devGrp->groupUuid = $newGroup->uuid;
+                $devGrp->save();
+
                 self::updateConfig($device['uuid'], DeviceConfig::PARAM_REGIME, $_POST['mode']);
 
                 MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства ('. $device->address .')");
@@ -1029,7 +1043,7 @@ class DeviceController extends Controller
                         if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT)
                             $light = "true";
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'title' => $device['deviceType']['title'] . ' [' . $device['address'] . ']',
+                            'title' => $device->name . ' [' . $device->serial . ']',
                             'status' => '<div class="progress"><div class="'
                                 . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                             'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1378,7 +1392,7 @@ class DeviceController extends Controller
                         //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                         $config = 'конфигурация';
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][] = [
-                            'title' => $device['deviceType']['title'],
+                            'title' => $device->name . '[' . $device->serial . ']',
                             'status' => '<div class="progress"><div class="'
                                 . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                             'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1431,7 +1445,11 @@ class DeviceController extends Controller
                 'type' => 'group',
                 'folder' => true
             ];
-            $devices = DeviceGroup::find()->where(['groupUuid' => $group['uuid']])->all();
+            $devices = DeviceGroup::find()
+                ->leftJoin('{{%device}}', '{{%device_group}}.deviceUuid = {{%device}}.uuid')
+                ->where(['groupUuid' => $group['uuid']])
+                ->andWhere(['{{%device}}.deleted' => 0])
+                ->all();
             foreach ($devices as $deviceGroup) {
                 $childIdx = count($fullTree['children']) - 1;
                 if ($deviceGroup['device']['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED) {
@@ -1444,10 +1462,8 @@ class DeviceController extends Controller
                 $channels = SensorChannel::find()->where(['deviceUuid' => $deviceGroup['device']['uuid']])->count();
                 //$config = SensorConfig::find()->where(['sUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
-                $programTitle = $deviceGroup->device->getDeviceProgram();
-                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $deviceGroup->device->name . ' [' . $deviceGroup->device->serial . ']' . ' (' . $programTitle . ')',
+                    'title' => $deviceGroup->device->name . ' [' . $deviceGroup->device->serial . ']',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $deviceGroup['device']['deviceStatus']->title . '</div></div>',
                     'register' => $deviceGroup['device']['port'] . ' [' . $deviceGroup['device']['address'] . ']',
@@ -1491,10 +1507,8 @@ class DeviceController extends Controller
                 }
                 $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->count();
                 $config = 'конфигурация';
-                $programTitle = $device->getDeviceProgram();
-                $programTitle = $programTitle != null ? $programTitle->title : 'не назначена';
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $device->name . ' [' . $device->serial . ']' . ' (' . $programTitle . ')',
+                    'title' => $device->name . ' [' . $device->serial . ']',
                     'status' => '<div class="progress"><div class="'
                         . $class . '">' . $device['deviceStatus']->title . '</div></div>',
                     'register' => $device['port'] . ' [' . $device['address'] . ']',
@@ -1503,7 +1517,7 @@ class DeviceController extends Controller
                     'source' => '../device/tree-group',
                     'type' => 'device',
                     'deviceTypeUuid' => DeviceType::DEVICE_LIGHT,
-                    'nodes' => $device['node']['address'],
+                    'nodes' => $device->address,
                     'channels' => $channels,
                     'config' => $config,
                     'date' => $device['date'],
@@ -2094,13 +2108,17 @@ class DeviceController extends Controller
      *
      * @return mixed
      * @throws StaleObjectException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public
     function actionRemove()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
-            return 'Нет прав.';
+            if (Yii::$app->request->isAjax) {
+                throw new UnauthorizedHttpException('Нет прав!');
+            } else {
+                return 'Нет прав!';
+            }
         }
 
         if (isset($_POST["selected_node"])) {
@@ -2331,41 +2349,84 @@ class DeviceController extends Controller
     public
     function actionGroupMove()
     {
-        if (isset($_POST["from"]) && isset($_POST["to"])) {
-            $model = DeviceGroup::find()
-                ->where(['deviceUuid' => $_POST['from']])
-                ->one();
-            if ($model) {
-                if ($_POST['to']) {
-                    $model = DeviceGroup::find()
-                        ->where(['deviceUuid' => $_POST['from']])
-                        ->andWhere(['groupUuid' => $_POST['to']])
-                        ->one();
-                    if (!$model) {
-                        $modelGroup = new DeviceGroup();
-                        $modelGroup->uuid = MainFunctions::GUID();
-                        $modelGroup->oid = User::getOid(Yii::$app->user->identity);
-                        $modelGroup->deviceUuid = $_POST["from"];
-                        $modelGroup->groupUuid = $_POST["to"];
-                        $modelGroup->save();
-                        MainFunctions::deviceRegister($modelGroup->deviceUuid,
-                            "Светильник перенесен в " . $modelGroup['group']['title']);
-                    }
-                } else {
-                    $model->delete();
+        if (isset($_POST['dev']) && isset($_POST['grp'])) {
+            $changed = false;
+            $devUuid = $_POST['dev'];
+            $grpUuid = $_POST['grp'];
+            $devGrp = DeviceGroup::find()->where(['deviceUuid' => $devUuid])->one();
+
+            if ($devGrp == null && $grpUuid != '0') {
+                // создаём связь
+                $devGrp = new DeviceGroup();
+                $devGrp->uuid = MainFunctions::GUID();
+                $devGrp->oid = User::getOid(Yii::$app->user->identity);
+                $devGrp->deviceUuid = $devUuid;
+                $devGrp->groupUuid = $grpUuid;
+                $devGrp->save();
+                MainFunctions::deviceRegister($devGrp->deviceUuid,
+                    "Светильник перенесен в " . $devGrp->group->title);
+                $changed = true;
+            } else if ($devGrp != null && $grpUuid != '0') {
+                // обновляем связь
+                $devGrp->groupUuid = $grpUuid;
+                $devGrp->save();
+                MainFunctions::deviceRegister($devGrp->deviceUuid,
+                    "Светильник перенесен в " . $devGrp->group->title);
+                $changed = true;
+            }
+//            else if ($devGrp != null && $grpUuid == '0') {
+//                // удаляем связь
+//                $devGrp->delete();
+//            }
+
+
+            // отправка команды с параметрами на светильник
+            // если есть в базе параметры вытащить их и отправить по новой. если нет, значения по умолчанию.
+            if ($changed) {
+                $parameters['frequency'] = self::getParameter($devUuid, DeviceConfig::PARAM_FREQUENCY);
+                if ($parameters['frequency'] == null) {
+                    $parameters['frequency'] = 600; // 10 минут
                 }
 
-            } else {
-                $modelGroup = new DeviceGroup();
-                $modelGroup->uuid = MainFunctions::GUID();
-                $modelGroup->oid = User::getOid(Yii::$app->user->identity);
-                $modelGroup->deviceUuid = $_POST["from"];
-                $modelGroup->groupUuid = $_POST["to"];
-                $modelGroup->save();
-                MainFunctions::deviceRegister($modelGroup->deviceUuid,
-                    "Светильник перенесен в " . $modelGroup['group']['title']);
+                $parameters['mode'] = self::getParameter($devUuid, DeviceConfig::PARAM_REGIME);
+                if ($parameters['mode'] == null) {
+                    $parameters['mode'] = 2; // астрособытия
+                }
+
+                $parameters['power'] = self::getParameter($devUuid, DeviceConfig::PARAM_POWER);
+                if ($parameters['power'] == null) {
+                    $parameters['power'] = 2; // 60Вт
+                }
+
+                $newGrp = Group::findOne(['uuid' => $grpUuid]);
+                $parameters['group'] = $newGrp->groupId;
+
+                $lightConfig = new MtmDevLightConfig();
+                $lightConfig->mode = $parameters['mode'];
+                $lightConfig->power = $parameters['power'];
+                $lightConfig->group = $parameters['group'];
+                $lightConfig->frequency = $parameters['frequency'];
+
+                $lightConfig->type = 2;
+                $lightConfig->protoVersion = 0;
+                $lightConfig->device = MtmPktHeader::$MTM_DEVICE_LIGHT;
+
+                $device = Device::findOne(['uuid' => $devUuid]);
+
+                $pkt = [
+                    'type' => 'light',
+                    'address' => $device->address, // 16 байт мак адрес в шестнадцатиричном представлении
+                    'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
+                ];
+                $org_id = User::getOid(Yii::$app->user->identity);
+                $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                $node_id = $device->node->_id;
+                self::sendConfig($pkt, $org_id, $node_id);
             }
+
+            return json_encode(['changed' => $changed]);
         }
+
         return self::actionTreeGroup();
     }
 
@@ -2690,6 +2751,51 @@ class DeviceController extends Controller
     }
 
     /**
+     * @throws InvalidConfigException
+     * @throws UnauthorizedHttpException
+     */
+    public function actionDateAll()
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            throw new UnauthorizedHttpException();
+        }
+
+        if (isset($_POST['old_date']) && isset($_POST['new_date']) && isset($_POST['type'])) {
+            $query = Node::find()->joinWith(['nodeControls' => function (ActiveQuery $query) {
+                $query->andOnCondition([
+                    'DATE({{%node_control}}.date)' => date('Y-m-d', strtotime($_POST['old_date'])),
+                    '{{%node_control}}.type' => $_POST['type'],
+                ])
+                    // это условие нужно для того чтобы не отсекались ноды с отсутсвующими событиями в node_control
+                    // так как в запрос добавляется условие 'AND node_control.oid='SOME OID', а в выборке oid=null
+                    ->orWhere('{{%node_control}}.oid IS NULL');
+            }])
+                ->joinWith('object');
+            $items = $query->all();
+            $oid = User::getOid(Yii::$app->user->identity);
+            foreach ($items as $item) {
+                $tmpDate = $_POST['old_date'];
+                if (empty($item->relatedRecords['nodeControls'])) {
+                    $control = new NodeControl();
+                    $control->uuid = MainFunctions::GUID();
+                    $control->oid = $oid;
+                    $control->nodeUuid = $item->uuid;
+                    $control->type = $_POST['type'];
+                } else {
+                    /** @var NodeControl $control */
+                    $control = $item->relatedRecords['nodeControls'][0];
+                    $tmpDate = $control->date;
+                }
+
+                $control->date = date('Y-m-d H:i:00', strtotime($_POST['new_date']));
+                $control->save();
+                MainFunctions::register('Изменено расписание для ' . $item->relatedRecords['object']->title
+                    . '(' . $tmpDate . ') > (' . $_POST['new_date'] . ')');
+            }
+        }
+    }
+
+    /**
      *
      * @return mixed
      * @throws InvalidConfigException
@@ -2713,7 +2819,7 @@ class DeviceController extends Controller
         if ($groupControl) {
             $program = $groupControl['deviceProgramUuid'];
         } else {
-            $program = 0;
+            $program = '';
         }
         return $this->renderAjax('_change_program', [
             'program' => $program,
@@ -2727,17 +2833,16 @@ class DeviceController extends Controller
      * @return mixed
      * @throws InvalidConfigException
      */
-    public
-    function actionSetDefault()
+    public function actionSetDefault()
     {
         if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
             return 'Нет прав.';
         }
         if (isset($_POST["uuid"]))
             $uuid = $_POST["uuid"];
-        else $uuid = 0;
+        else $uuid = '';
 
-        if ($uuid) {
+        if ($uuid != '') {
             $group = Group::find()
                 ->where(['uuid' => $uuid])
                 ->one();
@@ -2775,7 +2880,7 @@ class DeviceController extends Controller
             ->andWhere('date<="' . $date_end . '"')
             ->andWhere(['type' => 1])
             ->one();
-        if ($deviceProgram == '' || $deviceProgram == 0)
+        if ($deviceProgram == '' || $deviceProgram == null)
             $deviceProgram = null;
         if ($groupControl) {
             $groupControl['deviceProgramUuid'] = $deviceProgram;
@@ -2798,12 +2903,11 @@ class DeviceController extends Controller
      *
      * @throws InvalidConfigException
      */
-    public
-    function actionSetDefaultProgram()
+    public function actionSetDefaultProgram()
     {
         if (isset($_POST["group"]))
             $groupUuid = $_POST["group"];
-        else $groupUuid = 0;
+        else $groupUuid = '';
         if (isset($_POST["deviceProgram"]))
             $deviceProgram = $_POST["deviceProgram"];
         else $deviceProgram = null;
@@ -2811,7 +2915,7 @@ class DeviceController extends Controller
         $group = Group::find()
             ->where(['uuid' => $groupUuid])
             ->one();
-        if ($deviceProgram == '' || $deviceProgram == 0)
+        if ($deviceProgram == '')
             $deviceProgram = null;
         if ($group) {
             $group['deviceProgramUuid'] = $deviceProgram;
