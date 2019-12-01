@@ -3,6 +3,9 @@
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Measure;
+use common\models\MeasureType;
+use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -28,68 +31,88 @@ use yii\helpers\Html;
         <?php
         $gridColumns = [
             [
-                'class' => 'kartik\grid\DataColumn',
-                'attribute' => 'nodeUuid',
+                'attribute' => 'deviceUuid',
                 'vAlign' => 'middle',
-                'value' => function ($data) {
-                    return $data['node']['object']->getAddress() . ' [' . $data['node']['address'] . ']';
-                },
-                'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Адрес',
-                'filterInputOptions' => ['placeholder' => 'Любой'],
-                'format' => 'raw',
-            ],
-            [
-                'attribute' => 'deviceTypeUuid',
-                'hAlign' => 'center',
-                'vAlign' => 'middle',
-                'value' => 'deviceType.title',
-                'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Тип',
-                'filter' => ArrayHelper::map(DeviceType::find()->orderBy('title')->all(),
-                    'uuid', 'title'),
-                'filterWidgetOptions' => [
-                    'pluginOptions' => ['allowClear' => true],
-                ],
-                'filterInputOptions' => ['placeholder' => 'Любой'],
-                'format' => 'raw',
-                'contentOptions' => [
-                    'class' => 'table_class'
-                ],
-            ],
-            [
-                'attribute' => 'deviceStatusUuid',
-                'header' => 'Статус',
-                'format' => 'raw',
+                'header' => 'Устройство',
+                'mergeHeader' => true,
                 'contentOptions' => [
                     'class' => 'table_class'
                 ],
                 'headerOptions' => ['class' => 'text-center'],
+                'content' => function ($data) {
+                    return $data['device']->getFullTitle();
+                }
+            ],
+            [
+                'attribute' => 'measureType.title',
+                'vAlign' => 'middle',
+                'hAlign' => 'center',
+                'width' => '150px',
+                'header' => 'Тип измерения',
+                'format' => 'raw',
+                'contentOptions' => [
+                    'class' => 'table_class'
+                ],
+            ],
+            [
+                'attribute' => 'register',
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
-                'value' => function ($model) {
-                    $color = 'background-color: white';
-                    if ($model['deviceStatusUuid'] == DeviceStatus::UNKNOWN ||
-                        $model['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED)
-                        $color = 'background-color: gray';
-                    if ($model['deviceStatusUuid'] == DeviceStatus::NOT_WORK)
-                        $color = 'background-color: red';
-                    if ($model['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
-                        $color = 'background-color: red';
-                    if ($model['deviceStatusUuid'] == DeviceStatus::WORK)
-                        $color = 'background-color: green';
-                    $status = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;" .
-                        $model->deviceStatus->title;
-                    return $status;
+                'header' => 'Регистр',
+                'format' => 'raw',
+                'headerOptions' => ['class' => 'kartik-sheet-style'],
+                'mergeHeader' => true,
+                'contentOptions' => [
+                    'class' => 'table_class'
+                ],
+            ],
+            [
+                'hAlign' => 'center',
+                'vAlign' => 'middle',
+                'header' => 'Значение',
+                'format' => 'raw',
+                'value' => function ($data) {
+                    $measure = Measure::find()
+                        ->where(['sensorChannelUuid' => $data['uuid']])
+                        ->orderBy('date DESC')
+                        ->one();
+                    $value = "-";
+                    if ($measure)
+                        $value = $measure->value;
+                    return $value;
                 },
+                'headerOptions' => ['class' => 'kartik-sheet-style'],
+                'mergeHeader' => true,
+                'contentOptions' => [
+                    'class' => 'table_class'
+                ],
+            ],
+            [
+                'attribute' => 'changedAt',
+                'hAlign' => 'center',
+                'vAlign' => 'middle',
+                'header' => 'Измерение',
+                'value' => function ($data) {
+                    $measure = Measure::find()
+                        ->where(['sensorChannelUuid' => $data['uuid']])
+                        ->orderBy('date DESC')
+                        ->one();
+                    $value = "-";
+                    if ($measure)
+                        $value = $measure->date;
+                    return $value;
+                },
+                'format' => 'raw',
+                'headerOptions' => ['class' => 'kartik-sheet-style'],
+                'mergeHeader' => true,
+                'contentOptions' => [
+                    'class' => 'table_class'
+                ],
             ],
         ];
 
-        $devices = Device::find()->where(['OR',
-            ['deviceTypeUuid' => DeviceType::DEVICE_LIGHT_WITHOUT_ZB],
-            ['deviceTypeUuid' => DeviceType::DEVICE_LIGHT],
-            ['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO],
-            ['deviceTypeUuid' => DeviceType::DEVICE_COUNTER]]);
+        $devices = SensorChannel::find()->where(['OR',
+            ['measureTypeUuid' => MeasureType::SENSOR_CO2]]);
         $provider = new ActiveDataProvider(
             [
                 'query' => $devices,
@@ -118,7 +141,7 @@ use yii\helpers\Html;
             'persistResize' => false,
             'hover' => true,
             'rowOptions' => function ($model) {
-                if ($model['deviceStatusUuid'] != DeviceStatus::WORK)
+                if ($model->device->deviceStatusUuid != DeviceStatus::WORK)
                     return ['class' => 'danger'];
             }
         ]);

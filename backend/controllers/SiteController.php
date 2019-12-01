@@ -12,9 +12,10 @@ use common\models\City;
 use common\models\Device;
 use common\models\DeviceConfig;
 use common\models\DeviceGroup;
-use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
+use common\models\Group;
+use common\models\GroupControl;
 use common\models\House;
 use common\models\Journal;
 use common\models\LoginForm;
@@ -34,6 +35,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
+use yii2fullcalendar\models\Event;
 
 /**
  * Site controller
@@ -309,12 +311,13 @@ class SiteController extends Controller
                 }
             }
         }
-        $devices = Device::find()->all();
+        $devices = Device::find();
         $cameras = Camera::find()->all();
+        $sensorsCO = SensorChannel::find()->where(['measureTypeUuid' => MeasureType::SENSOR_CO2]);
 
         $registerSearch = new DeviceRegisterSearch();
-        $dataProviderSearch = $registerSearch->search(Yii::$app->request->queryParams);
-        $dataProviderSearch->pagination->pageSize = 15;
+        $dataProviderRegister = $registerSearch->search(Yii::$app->request->queryParams);
+        $dataProviderRegister->pagination->pageSize = 15;
 
         foreach ($cameras as $camera) {
             $camera->startTranslation();
@@ -324,21 +327,130 @@ class SiteController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->pagination->pageSize = 15;
 
+        $events = [];
+        $program = "";
+        $coordinates = ObjectController::getAverageCoordinates();
+        if (isset($_GET["group"]))
+            $group = $_GET["group"];
+        else $group = 0;
+        $groupControls = GroupControl::find()
+            ->where(['groupUuid' => $group])
+            ->all();
+        $group = Group::find()
+            ->where(['uuid' => $group])
+            ->one();
+        if ($group && $group['deviceProgramUuid'])
+            $program = $group['deviceProgram']['title'];
+        //$today = strtotime("2019-01-01 00:00:00");
+        $today = time() - 3600 * 24 * 30;
+        for ($count = 0; $count < 365; $count++) {
+            $sunrise_time = date_sunrise($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+            $sunset_time = date_sunset($today, SUNFUNCS_RET_TIMESTAMP, $coordinates['latitude'], $coordinates['longitude']);
+
+            $on = 0;
+            $off = 0;
+            foreach ($groupControls as $groupControl) {
+                $date = date("Y-m-d", strtotime($groupControl['date']));
+                $currentDate = date("Y-m-d", $today);
+                if ($date == $currentDate) {
+                    if ($groupControl['type'] == 0) {
+                        $off = 1;
+                        $event = new Event();
+                        $event->id = $count * 2;
+                        $event->title = "выключение";
+                        $event->backgroundColor = 'orange';
+                        $event->start = $groupControl['date'];
+                        $event->color = '#ffffff';
+                        $events[] = $event;
+                    }
+                    if ($groupControl['type'] == 1) {
+                        $on = 1;
+                        $event = new Event();
+                        $event->id = $count * 2 + 1;
+                        $event->title = "включение [" . $program . "]";
+                        if ($groupControl['deviceProgramUuid'])
+                            $event->title = "включение [" . $groupControl['deviceProgram']['title'] . "]";
+                        $event->backgroundColor = 'green';
+                        $event->start = $groupControl['date'];
+                        $event->color = '#ffffff';
+                        $events[] = $event;
+                    }
+                }
+
+            }
+
+            if ($off == 0) {
+                $event = new Event();
+                $event->id = $count * 2;
+                $event->title = "выключение";
+                $event->backgroundColor = 'orange';
+                $event->start = date("Y-m-d H:i:s", $sunrise_time);
+                $event->color = '#ffffff';
+                $events[] = $event;
+            }
+
+            if ($on == 0) {
+                $event = new Event();
+                $event->id = $count * 2 + 1;
+                $event->title = "включение [" . $program . "]";
+                $event->backgroundColor = 'green';
+                $event->start = date("Y-m-d H:i:s", $sunset_time);
+                $event->color = '#ffffff';
+                $events[] = $event;
+            }
+            $today += 24 * 3600;
+        }
+        $reportDataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $reportDataProvider->query->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]);
+
+        $sensorsCOData = $sensorsCO->one();
+        /** @var SensorChannel $sensorsCOData */
+        /** @var Measure $measure */
+        $measureTitle = 'Нет датчиков экологии';
+        $measureChart['values'] = '';
+        $measureChart['dates'] = '';
+        if ($sensorsCOData) {
+            $measureTitle = $sensorsCOData->title;
+            $measures = Measure::find()
+                ->where(['sensorChannelUuid' => $sensorsCOData->uuid])
+                ->orderBy('date DESC')
+                ->limit(10)
+                ->all();
+            $count = 0;
+            foreach ($measures as $measure) {
+                if ($count > 0) {
+                    $measureChart['values'] .= ',';
+                    $measureChart['dates'] .= ',';
+                }
+                $measureChart['values'] .= $measure->value;
+                $measureChart['dates'] .= '\'' . $measure->date . '\'';
+                $count++;
+            }
+        }
+        if (Yii::$app->user->can(User::PERMISSION_ADMIN))
+            $view = 'dashboard-admin';
+        else
+            $view = 'dashboard';
+
         return $this->render(
-            'dashboard',
+            $view,
             [
                 'counts' => $counts,
-//                'measures' => $measures,
+                'events' => $events,
                 'devices' => $devices,
                 'cameras' => $cameras,
+                'measureChart' => $measureChart,
+                'measureTitle' => $measureTitle,
                 'users' => $users,
                 'tree' => $fullTree,
-                'dataProviderSearch' => $dataProviderSearch,
+                'reportDataProvider' => $reportDataProvider,
+                'dataProviderRegister' => $dataProviderRegister,
                 'lightList' => $layers['lightList'],
                 'lightGoodList' => $layers['lightGoodList'],
                 'lightBadList' => $layers['lightBadList'],
                 'sensorCO2List' => $layers['sensorCO2List'],
                 'lightGroup' => $layers['lightGroup'],
+                'sensorCO' => $sensorsCO,
                 'lightGoodGroup' => $layers['lightGoodGroup'],
                 'lightBadGroup' => $layers['lightBadGroup'],
                 'sensorCO2Group' => $layers['sensorCO2Group'],

@@ -1,21 +1,20 @@
 <?php
-/* @var $devices
+/* @var $measures
+ * @var $devices
  * @var $cameras
  * @var $dataProviderRegister
- * @var $measureChart
- * @var $measureTitle
  * @var $tree
  * @var $coordinates
  * @var $categories
+ * @var $equipments Device[]
  * @var $usersCount
  * @var $currentUser
  * @var $objectsCount
  * @var $objectsTypeCount
  * @var $events
- * @var $reportDataProvider
+ * @var $users User[]
  * @var $objectsList
  * @var $objectsGroup
- * @var $usersList
  * @var $lightList
  * @var $lightGoodList
  * @var $lightBadList
@@ -27,19 +26,14 @@
  * @var $camerasGroup
  * @var $camerasList
  * @var $nodesGroup
- * @var $sensorCO
  * @var $nodesList
  */
 
 use common\models\Device;
-use common\models\DeviceType;
 use common\models\User;
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Сводная');
-if (isset($_GET['type']))
-    $type = $_GET['type'];
-else $type = 1;
 ?>
 
 <!-- Main row -->
@@ -55,57 +49,33 @@ else $type = 1;
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-        <?php
-        if ($type == 1) {
-            echo $this->render('widget-equipment-table', ['devices' => $devices]);
-        }
-        if ($type == 2) {
-            echo $this->render('widget-equipment-camera');
-        }
-        if ($type == 3) {
-            echo $this->render('widget-sensor', ['sensors' => $sensorCO]);
-        }
-        ?>
+    <div class="col-md-7">
+        <?= $this->render('widget-device-register', ['dataProviderRegister' => $dataProviderRegister]); ?>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <?php
 
-        if ($type == 1) {
-            echo $this->render('widget-calendar', ['events' => $events]);
-        }
-        if ($type == 2) {
-            // Заглушка так как у нас нет событий по камерам
-            $dataProviderRegister->query->andWhere(['_id' => 0]);
-            echo $this->render('widget-register', ['dataProviderRegister' => $dataProviderRegister]);
-        }
-        if ($type == 3) {
-            // Заглушка так как у нас нет событий по датчикам
-            $dataProviderRegister->query->andWhere(['_id' => 0]);
-            echo $this->render('widget-register', ['dataProviderRegister' => $dataProviderRegister]);
-        }
-        ?>
-    </div>
-    <div class="col-md-6">
-        <?php
-        if ($type == 1) {
-            echo $this->render('widget-report', ['reportDataProvider' => $reportDataProvider]);
-        }
-        if ($type == 2) {
+    <div class="col-md-5">
+        <div class="row">
+            <?php
             foreach ($cameras as $camera) {
                 echo '<div class="col-md-12">';
                 echo $this->render('widget-camera', ['camera' => $camera]);
                 echo '</div>';
             }
-        }
-        if ($type == 3) {
-            echo $this->render('widget-measure', ['title' => $measureTitle, 'chart' => $measureChart]);
-        }
-        ?>
+            ?>
+        </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+        <?= $this->render('widget-equipment-tree', ['devices' => $tree]); ?>
+    </div>
+
+    <!--    <div class="col-md-4">
+        <? /*= $this->render('widget-stats', ['counts' => $counts]);
+        */ ?>
+    </div>
+--></div>
+<!-- /.content-wrapper -->
 
 <footer class="main-footer" style="margin-left: 0 !important;">
     <div class="pull-right hidden-xs" style="vertical-align: middle; text-align: center;">

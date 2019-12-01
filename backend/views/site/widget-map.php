@@ -1,4 +1,5 @@
 <?php
+/* @var $view */
 /* @var $coordinates */
 /* @var $lightGoodList */
 /* @var $lightBadList */
@@ -15,7 +16,7 @@
 // TODO переделать по уму
 //$this->registerJsFile('/js/custom/modules/map/leaflet.js', ['depends' => ['yii\jui\JuiAsset']]);
 //$this->registerCssFile('/css/custom/modules/map/leaflet.css');
-?>
+use yii\helpers\Html; ?>
 <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
         integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
         crossorigin=""></script>
@@ -24,9 +25,13 @@
       crossorigin=""/>
 
 <div class="box box-success">
-    <div class="box-header with-border">
+    <div class="box-header with-border box-success">
         <h3 class="box-title">Карта объектов и устройств</h3>
         <div class="box-tools pull-right">
+            <div class="btn-group">
+                <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
+                    <i class='fa fa-link'></i></button>", ['/site/index']); ?>
+            </div>
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
             </button>
             <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
@@ -109,30 +114,50 @@
 
 
     <?php
-    echo $lightGoodList;
-    echo $lightBadList;
-    echo $sensorCO2List;
-    echo $lightGoodGroup;
-    echo $lightBadGroup;
-    echo $sensorCO2Group;
+    $type = 1;
+    $layers = 'lights_good, lights_bad, nodes';
+    if (isset($_GET['type']) && $_GET['type'] == 2) {
+        $layers = 'cameras, nodes';
+        $type = 2;
+    }
+    if (isset($_GET['type']) && $_GET['type'] == 3) {
+        $layers = 'nodes';
+        $type = 3;
+    }
+
+    if ($type == 1) {
+        echo $lightGoodList;
+        echo $lightBadList;
+        echo $lightGoodGroup;
+        echo $lightBadGroup;
+    }
+    if ($type == 3) {
+        echo $sensorCO2List;
+        echo $sensorCO2Group;
+    }
     echo $nodesList;
     echo $nodesGroup;
-    echo $camerasList;
-    echo $camerasGroup;
+    if ($type == 2) {
+        echo $camerasList;
+        echo $camerasGroup;
+    }
+
     ?>
 
     var overlayMapsA = {};
     var overlayMapsB = {
-        "Светильники в работе": lights_good,
-        "Светильники неисправные": lights_bad,
-        "Камеры": cameras,
-        "Датчики CO2": sensor1,
-        "Шкафы:": nodes
+        <?php
+        if ($type == 1) echo '"Светильники в работе": lights_good,';
+        if ($type == 1) echo '"Светильники неисправные": lights_bad,';
+        if ($type == 2) echo '"Камеры": cameras,';
+        if ($type == 3) echo '"Датчики CO2": sensor1,';
+        echo '"Шкафы:": nodes';
+        ?>
     };
 
     var map = L.map('mapid', {
         zoomControl: false,
-        layers: [lights_good, lights_bad, cameras, sensor1, nodes]
+        layers: [<?= $layers ?>]
     }).setView(<?= $coordinates ?>, 13);
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         maxZoom: 18,

@@ -1,5 +1,5 @@
 <?php
-/* @var $searchModel backend\models\UsersSearch */
+/* @var $searchModel backend\models\UserSearch */
 
 /* @var $dataProvider */
 
