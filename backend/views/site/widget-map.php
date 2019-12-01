@@ -24,12 +24,12 @@ use yii\helpers\Html; ?>
       crossorigin=""/>
 
 <div class="box box-success">
-    <div class="box-header with-border">
+    <div class="box-header with-border box-success">
         <h3 class="box-title">Карта объектов и устройств</h3>
         <div class="box-tools pull-right">
             <div class="btn-group">
                 <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
-                    <i class='fa fa-link'></i></button>", ['/site/map']); ?>
+                    <i class='fa fa-link'></i></button>", ['/site/index']); ?>
             </div>
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
             </button>

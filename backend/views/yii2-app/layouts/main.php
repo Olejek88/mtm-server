@@ -6,6 +6,8 @@ use yii\web\View;
 
 /* @var $this View */
 /* @var $content string */
+/* @var $counts [] */
+/* @var $org */
 
 if (Yii::$app->controller->action->id === 'login' || Yii::$app->controller->action->id === 'error') {
     /**
@@ -64,6 +66,8 @@ if (Yii::$app->controller->action->id === 'login' || Yii::$app->controller->acti
             $left,
             [
                 'directoryAsset' => $directoryAsset,
+                'counts' => $counts,
+                'org' => $org
             ]
         ) ?>
         <?= $this->render(

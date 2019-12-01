@@ -1,0 +1,151 @@
+.pyramid {
+    position: relative;
+    /*background-color: rgba(154, 219, 206, 0.44);*/
+    /*background: #3c8dbc;*/
+    background: lightgrey;
+    z-index: 2;
+    color: #fff;
+    margin: 2px;
+    -webkit-clip-path: polygon(100% 100%, 0 100%, 50% 0);
+    clip-path: polygon(100% 100%, 0 100%, 50% 0);
+    align-items: center;
+    position: relative;
+}
+
+.content-wrapper,
+.right-side,
+.main-footer {
+    -webkit-transition: -webkit-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    margin-left: 300px;
+    z-index: 820;
+}
+
+.pyramid ul {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+.pyramid a {
+    width: 100%;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding: 3px !important;
+    margin: 0 !important;
+    outline: none;
+    font-size: 14px;
+    color: #fff;
+    border-bottom: 1px solid black;
+}
+
+.pyramid li a {
+    border-bottom: 1px solid grey;
+    color: #fff;
+}
+
+/*.pyramid li:last-child a {
+    border-bottom: none;
+}*/
+.pyramid li:first-child a {
+    border-bottom: none;
+    color: grey;
+}
+
+.pyramid a:hover {
+    background-color: #fefefe;
+}
+
+.pyramid a:hover span {
+    color: #fff;
+    border-bottom: 1px dashed #fff;
+}
+
+.pyramid a span {
+    color: #fff;
+    border-bottom: 1px dashed #423937;
+}
+
+#ac .abody {
+    display: none;
+    /*background: linear-gradient(#334556,#2C4257),#2A3F54;
+    background: #ededed;*/
+    background: #fff;
+    width: 100%;
+    border: none;
+}
+
+#ac .abody {
+    display: none;
+    /*background: linear-gradient(#334556,#2C4257),#2A3F54;
+    background: #ededed;*/
+    background: #fff;
+    width: 100%;
+    border: none;
+}
+
+#ac .ahead.active a {
+    background: white;
+    color: black;
+}
+
+#ac .abody.active a {
+    background: white;
+    color: black;
+}
+
+.skin-blue .sidebar a {
+    color: black;
+}
+
+.content-wrapper,
+.right-side,
+.main-footer {
+    -webkit-transition: -webkit-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    -moz-transition: -moz-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    -o-transition: -o-transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, margin 0.3s ease-in-out;
+    margin-left: 300px;
+    z-index: 820;
+}
+
+.main-sidebar {
+    width: 300px;
+    height: 100%;
+}
+
+.sidebar {
+    background-color: #3c8dbc;
+    height: 100%;
+}
+
+.org_title {
+    color: white;
+    margin-right: 5px;
+    font-size: medium;
+}
+
+.stat {
+    color: white;
+    font-size: small;
+    text-align: left;
+    margin-left: 10px;
+}
+
+.skin-blue .wrapper,
+.skin-blue .main-sidebar,
+.skin-blue .left-side {
+    background-color: white;
+}
+
+.xbtn {
+    background: white;
+    border-color: grey;
+}
+
+.main-sidebar .user-panel {
+    background-color: lightgrey;
+}

@@ -14,7 +14,7 @@ use yii\helpers\Html;
 
 <div class="box box-primary">
     <div class="box-header with-border">
-        <h3 class="box-title">Устройства системы</h3>
+        <h3 class="box-title">Таблица работоспособности</h3>
         <div class="box-tools pull-right">
             <div class="btn-group">
                 <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
@@ -75,7 +75,9 @@ use yii\helpers\Html;
                         $model['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED)
                         $color = 'background-color: gray';
                     if ($model['deviceStatusUuid'] == DeviceStatus::NOT_WORK)
-                        $color = 'background-color: lightred';
+                        $color = 'background-color: red';
+                    if ($model['deviceStatusUuid'] == DeviceStatus::NOT_LINK)
+                        $color = 'background-color: red';
                     if ($model['deviceStatusUuid'] == DeviceStatus::WORK)
                         $color = 'background-color: green';
                     $status = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;" .

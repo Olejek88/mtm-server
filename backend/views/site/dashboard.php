@@ -35,7 +35,6 @@ use yii\helpers\Html;
 $this->title = Yii::t('app', 'Сводная');
 ?>
 
-<br/>
 <!-- Main row -->
 <div class="row">
     <div class="col-md-12">
