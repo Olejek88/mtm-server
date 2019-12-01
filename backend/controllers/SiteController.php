@@ -313,10 +313,11 @@ class SiteController extends Controller
         }
         $devices = Device::find();
         $cameras = Camera::find()->all();
+        $sensorsCO = SensorChannel::find()->where(['measureTypeUuid' => MeasureType::SENSOR_CO2]);
 
         $registerSearch = new DeviceRegisterSearch();
-        $dataProviderSearch = $registerSearch->search(Yii::$app->request->queryParams);
-        $dataProviderSearch->pagination->pageSize = 15;
+        $dataProviderRegister = $registerSearch->search(Yii::$app->request->queryParams);
+        $dataProviderRegister->pagination->pageSize = 15;
 
         foreach ($cameras as $camera) {
             $camera->startTranslation();
@@ -402,22 +403,54 @@ class SiteController extends Controller
         $reportDataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $reportDataProvider->query->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]);
 
+        $sensorsCOData = $sensorsCO->one();
+        /** @var SensorChannel $sensorsCOData */
+        /** @var Measure $measure */
+        $measureTitle = 'Нет датчиков экологии';
+        $measureChart['values'] = '';
+        $measureChart['dates'] = '';
+        if ($sensorsCOData) {
+            $measureTitle = $sensorsCOData->title;
+            $measures = Measure::find()
+                ->where(['sensorChannelUuid' => $sensorsCOData->uuid])
+                ->orderBy('date DESC')
+                ->limit(10)
+                ->all();
+            $count = 0;
+            foreach ($measures as $measure) {
+                if ($count > 0) {
+                    $measureChart['values'] .= ',';
+                    $measureChart['dates'] .= ',';
+                }
+                $measureChart['values'] .= $measure->value;
+                $measureChart['dates'] .= '\'' . $measure->date . '\'';
+                $count++;
+            }
+        }
+        if (Yii::$app->user->can(User::PERMISSION_ADMIN))
+            $view = 'dashboard-admin';
+        else
+            $view = 'dashboard';
+
         return $this->render(
-            'dashboard',
+            $view,
             [
                 'counts' => $counts,
                 'events' => $events,
                 'devices' => $devices,
                 'cameras' => $cameras,
+                'measureChart' => $measureChart,
+                'measureTitle' => $measureTitle,
                 'users' => $users,
                 'tree' => $fullTree,
                 'reportDataProvider' => $reportDataProvider,
-                'dataProviderSearch' => $dataProviderSearch,
+                'dataProviderRegister' => $dataProviderRegister,
                 'lightList' => $layers['lightList'],
                 'lightGoodList' => $layers['lightGoodList'],
                 'lightBadList' => $layers['lightBadList'],
                 'sensorCO2List' => $layers['sensorCO2List'],
                 'lightGroup' => $layers['lightGroup'],
+                'sensorCO' => $sensorsCO,
                 'lightGoodGroup' => $layers['lightGoodGroup'],
                 'lightBadGroup' => $layers['lightBadGroup'],
                 'sensorCO2Group' => $layers['sensorCO2Group'],

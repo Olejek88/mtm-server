@@ -1,16 +1,8 @@
 <?php
-/* @var $cityCount
- * @var $streetCount
- * @var $objectCount
- * @var $nodesCount
- * @var $channelsCount
- * @var $deviceCount
- * @var $deviceTypeCount
- * @var $contragentCount
- * @var $measures
+/* @var $measures
  * @var $devices
  * @var $cameras
- * @var $dataProviderSearch
+ * @var $dataProviderRegister
  * @var $tree
  * @var $coordinates
  * @var $categories
@@ -23,9 +15,6 @@
  * @var $users User[]
  * @var $objectsList
  * @var $objectsGroup
- * @var $usersList
- * @var $last_measures
- * @var $complete
  * @var $lightList
  * @var $lightGoodList
  * @var $lightBadList
@@ -47,10 +36,9 @@ use yii\helpers\Html;
 $this->title = Yii::t('app', 'Сводная');
 ?>
 
-<br/>
 <!-- Main row -->
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <?= $this->render('widget-map', ['coordinates' => $coordinates,
             'lightList' => $lightList, 'lightGoodList' => $lightGoodList,
             'lightBadList' => $lightBadList, 'sensorCO2List' => $sensorCO2List,
@@ -59,14 +47,10 @@ $this->title = Yii::t('app', 'Сводная');
             'nodesGroup' => $nodesGroup, 'nodesList' => $nodesList,
             'camerasGroup' => $camerasGroup, 'camerasList' => $camerasList]); ?>
     </div>
-
-    <div class="col-md-4">
-        <?= $this->render('widget-equipments', ['devices' => $devices]); ?>
-    </div>
 </div>
 <div class="row">
     <div class="col-md-7">
-        <?= $this->render('widget-device-register', ['dataProviderSearch' => $dataProviderSearch]); ?>
+        <?= $this->render('widget-device-register', ['dataProviderRegister' => $dataProviderRegister]); ?>
     </div>
 
     <div class="col-md-5">

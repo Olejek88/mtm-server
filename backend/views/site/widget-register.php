@@ -16,7 +16,7 @@ use yii\helpers\Html;
             </button>
             <div class="btn-group">
                 <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
-                    <i class='fa fa-link'></i></button>", ['/site/timeline']); ?>
+                    <i class='fa fa-link'></i></button>", ['/device/register']); ?>
             </div>
             <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
             </button>

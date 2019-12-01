@@ -1,11 +1,9 @@
 <?php
 
-use common\models\Device;
+use common\models\Camera;
 use common\models\DeviceStatus;
-use common\models\DeviceType;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 ?>
@@ -40,22 +38,23 @@ use yii\helpers\Html;
                 'format' => 'raw',
             ],
             [
-                'attribute' => 'deviceTypeUuid',
-                'hAlign' => 'center',
+                'class' => 'kartik\grid\DataColumn',
+                'attribute' => 'title',
                 'vAlign' => 'middle',
-                'value' => 'deviceType.title',
+                'value' => function ($data) {
+                    return Html::a($data['title'], ['/camera/view', 'id' => $data['_id']]);
+                },
                 'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Тип',
-                'filter' => ArrayHelper::map(DeviceType::find()->orderBy('title')->all(),
-                    'uuid', 'title'),
-                'filterWidgetOptions' => [
-                    'pluginOptions' => ['allowClear' => true],
-                ],
+                'header' => 'Адрес',
                 'filterInputOptions' => ['placeholder' => 'Любой'],
                 'format' => 'raw',
-                'contentOptions' => [
-                    'class' => 'table_class'
-                ],
+            ],
+            [
+                'class' => 'kartik\grid\DataColumn',
+                'attribute' => 'address',
+                'vAlign' => 'middle',
+                'header' => 'Адрес',
+                'format' => 'raw',
             ],
             [
                 'attribute' => 'deviceStatusUuid',
@@ -85,11 +84,7 @@ use yii\helpers\Html;
             ],
         ];
 
-        $devices = Device::find()->where(['OR',
-            ['deviceTypeUuid' => DeviceType::DEVICE_LIGHT_WITHOUT_ZB],
-            ['deviceTypeUuid' => DeviceType::DEVICE_LIGHT],
-            ['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO],
-            ['deviceTypeUuid' => DeviceType::DEVICE_COUNTER]]);
+        $devices = Camera::find();
         $provider = new ActiveDataProvider(
             [
                 'query' => $devices,
