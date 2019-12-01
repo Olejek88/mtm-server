@@ -1061,7 +1061,8 @@ class DeviceController extends Controller
                             ->all();
                         foreach ($channels as $channel) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
-                            $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                            $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                                ->orderBy(['changedAt' => SORT_DESC])->one();
                             $date = '-';
                             if (!$measure) {
                                 $config = null;
