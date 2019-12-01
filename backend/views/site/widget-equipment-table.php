@@ -3,8 +3,6 @@
 use common\models\Device;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
-use common\models\ObjectContragent;
-use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -15,30 +13,28 @@ use yii\helpers\Html;
 ?>
 
 <div class="box box-primary">
-    <!-- /.box-header -->
+    <div class="box-header with-border">
+        <h3 class="box-title">Устройства системы</h3>
+        <div class="box-tools pull-right">
+            <div class="btn-group">
+                <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
+                    <i class='fa fa-link'></i></button>", ['/device']); ?>
+            </div>
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
     <div class="box-body">
         <?php
         $gridColumns = [
             [
-                'attribute' => '_id',
-                'hAlign' => 'center',
-                'vAlign' => 'middle',
-                'contentOptions' => [
-                    'class' => 'table_class',
-                    'style' => 'width: 50px; text-align: center'
-                ],
-                'headerOptions' => ['class' => 'text-center'],
-                'content' => function ($data) {
-                    return $data->_id;
-                }
-            ],
-            [
                 'class' => 'kartik\grid\DataColumn',
                 'attribute' => 'nodeUuid',
                 'vAlign' => 'middle',
-                'width' => '180px',
                 'value' => function ($data) {
-                    return $data['node']['object']->getAddress().' ['.$data['node']['address'].']';
+                    return $data['node']['object']->getAddress() . ' [' . $data['node']['address'] . ']';
                 },
                 'filterType' => GridView::FILTER_SELECT2,
                 'header' => 'Адрес',
@@ -46,16 +42,12 @@ use yii\helpers\Html;
                 'format' => 'raw',
             ],
             [
-                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'deviceTypeUuid',
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
-                'width' => '180px',
                 'value' => 'deviceType.title',
                 'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Тип ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
-                        '/device-type/create?from=device/index',
-                        ['title' => Yii::t('app', 'Добавить')]),
+                'header' => 'Тип',
                 'filter' => ArrayHelper::map(DeviceType::find()->orderBy('title')->all(),
                     'uuid', 'title'),
                 'filterWidgetOptions' => [
@@ -66,132 +58,38 @@ use yii\helpers\Html;
                 'contentOptions' => [
                     'class' => 'table_class'
                 ],
-                'editableOptions' => function ($model, $key, $index, $widget) {
-                    $models = ArrayHelper::map(DeviceType::find()->orderBy('title')->all(), 'uuid', 'title');
-                    return [
-                        'header' => 'Тип оборудования',
-                        'size' => 'lg',
-                        'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                        'displayValueConfig' => $models,
-                        'data' => $models
-                    ];
-                },
             ],
             [
-                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'deviceStatusUuid',
-                'header' => 'Статус ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
-                        '/device-status/create?from=device/index',
-                        ['title' => Yii::t('app', 'Добавить')]),
+                'header' => 'Статус',
+                'format' => 'raw',
                 'contentOptions' => [
                     'class' => 'table_class'
                 ],
                 'headerOptions' => ['class' => 'text-center'],
                 'hAlign' => 'center',
                 'vAlign' => 'middle',
-                'width' => '180px',
-                'editableOptions' => function () {
-                    $status = [];
-                    $list = [];
-                    $statuses = DeviceStatus::find()->orderBy('title')->all();
-                    foreach ($statuses as $stat) {
-                        $color = 'background-color: white';
-                        if ($stat['uuid'] == DeviceStatus::UNKNOWN ||
-                            $stat['uuid'] == DeviceStatus::NOT_MOUNTED)
-                            $color = 'background-color: gray';
-                        if ($stat['uuid'] == DeviceStatus::NOT_WORK)
-                            $color = 'background-color: lightred';
-                        if ($stat['uuid'] == DeviceStatus::WORK)
-                            $color = 'background-color: green';
-                        $list[$stat['uuid']] = $stat['title'];
-                        $status[$stat['uuid']] = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;" .
-                            $stat['title'];
-                    }
-                    return [
-                        'header' => 'Статус',
-                        'size' => 'md',
-                        'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                        'displayValueConfig' => $status,
-                        'data' => $list
-                    ];
+                'value' => function ($model) {
+                    $color = 'background-color: white';
+                    if ($model['deviceStatusUuid'] == DeviceStatus::UNKNOWN ||
+                        $model['deviceStatusUuid'] == DeviceStatus::NOT_MOUNTED)
+                        $color = 'background-color: gray';
+                    if ($model['deviceStatusUuid'] == DeviceStatus::NOT_WORK)
+                        $color = 'background-color: lightred';
+                    if ($model['deviceStatusUuid'] == DeviceStatus::WORK)
+                        $color = 'background-color: green';
+                    $status = "<span class='badge' style='" . $color . "; height: 12px; margin-top: -3px'> </span>&nbsp;" .
+                        $model->deviceStatus->title;
+                    return $status;
                 },
             ],
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'interface',
-                'hAlign' => 'center',
-                'vAlign' => 'middle',
-                'contentOptions' => [
-                    'class' => 'table_class'
-                ],
-                'headerOptions' => ['class' => 'text-center'],
-                'content' => function ($data) {
-                    $interfaces = [
-                        '0' => 'не указан',
-                        '1' => 'Последовательный порт',
-                        '2' => 'Zigbee',
-                        '3' => 'Ethernet'
-                    ];
-                    return $interfaces[$data["interface"]];
-                },
-                'editableOptions' => function () {
-                    $interfaces = [
-                        '0' => 'не указан',
-                        '1' => 'Последовательный порт',
-                        '2' => 'Zigbee',
-                        '3' => 'Ethernet'
-                    ];
-                    return [
-                        'header' => 'Статус',
-                        'size' => 'md',
-                        'inputType' => Editable::INPUT_DROPDOWN_LIST,
-                        'displayValueConfig' => $interfaces,
-                        'data' => $interfaces
-                    ];
-                },
-            ],
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'serial',
-                'vAlign' => 'middle',
-                'width' => '180px',
-                'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Серийный',
-                'filterInputOptions' => ['placeholder' => 'Любой'],
-                'format' => 'raw',
-            ],
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'port',
-                'vAlign' => 'middle',
-                'width' => '180px',
-                'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Порт',
-                'filterInputOptions' => ['placeholder' => 'Любой'],
-                'format' => 'raw',
-            ],
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'address',
-                'vAlign' => 'middle',
-                'width' => '180px',
-                'filterType' => GridView::FILTER_SELECT2,
-                'header' => 'Адрес',
-                'filterInputOptions' => ['placeholder' => 'Любой'],
-                'format' => 'raw',
-            ],
-            [
-                'class' => 'kartik\grid\ActionColumn',
-                'header' => 'Действия',
-                'headerOptions' => ['class' => 'kartik-sheet-style'],
-            ]
         ];
 
         $devices = Device::find();
         $provider = new ActiveDataProvider(
             [
                 'query' => $devices,
-                'sort' =>false,
+                'sort' => false,
             ]
         );
 
@@ -202,24 +100,10 @@ use yii\helpers\Html;
             'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
             'headerRowOptions' => ['class' => 'kartik-sheet-style'],
             'filterRowOptions' => ['class' => 'kartik-sheet-style'],
-            'beforeHeader' => [
-                '{toggleData}'
-            ],
-            'toolbar' => [
-                ['content' =>
-                /*            Html::a('Добавить недостающие', ['/equipment/new'], ['class'=>'btn btn-success']),*/
-                    Html::a('Новое', ['/device/create'], ['class' => 'btn btn-success']),
-                    Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['grid-demo'],
-                        ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('app', 'Reset Grid')])
-                ],
-                '{export}',
-            ],
-            'export' => [
-                'fontAwesome' => true,
-                'target' => GridView::TARGET_BLANK,
-                'filename' => 'equipments'
-            ],
             'pjax' => true,
+            'toolbar' => [
+                []
+            ],
             'showPageSummary' => false,
             'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
             'summary' => '',
@@ -229,11 +113,6 @@ use yii\helpers\Html;
             'responsive' => true,
             'persistResize' => false,
             'hover' => true,
-            'panel' => [
-                'type' => GridView::TYPE_PRIMARY,
-                'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Устройства',
-                'headingOptions' => ['style' => 'background: #337ab7']
-            ],
             'rowOptions' => function ($model) {
                 if ($model['deviceStatusUuid'] != DeviceStatus::WORK)
                     return ['class' => 'danger'];
@@ -242,4 +121,3 @@ use yii\helpers\Html;
         ?>
     </div>
 </div>
-<!-- /.box -->

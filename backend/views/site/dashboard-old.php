@@ -1,19 +1,31 @@
 <?php
-/* @var $devices
+/* @var $cityCount
+ * @var $streetCount
+ * @var $objectCount
+ * @var $nodesCount
+ * @var $channelsCount
+ * @var $deviceCount
+ * @var $deviceTypeCount
+ * @var $contragentCount
+ * @var $measures
+ * @var $devices
  * @var $cameras
  * @var $dataProviderSearch
  * @var $tree
  * @var $coordinates
  * @var $categories
+ * @var $equipments Device[]
  * @var $usersCount
  * @var $currentUser
  * @var $objectsCount
  * @var $objectsTypeCount
  * @var $events
- * @var $reportDataProvider
+ * @var $users User[]
  * @var $objectsList
  * @var $objectsGroup
  * @var $usersList
+ * @var $last_measures
+ * @var $complete
  * @var $lightList
  * @var $lightGoodList
  * @var $lightBadList
@@ -38,7 +50,7 @@ $this->title = Yii::t('app', 'Сводная');
 <br/>
 <!-- Main row -->
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
         <?= $this->render('widget-map', ['coordinates' => $coordinates,
             'lightList' => $lightList, 'lightGoodList' => $lightGoodList,
             'lightBadList' => $lightBadList, 'sensorCO2List' => $sensorCO2List,
@@ -47,20 +59,39 @@ $this->title = Yii::t('app', 'Сводная');
             'nodesGroup' => $nodesGroup, 'nodesList' => $nodesList,
             'camerasGroup' => $camerasGroup, 'camerasList' => $camerasList]); ?>
     </div>
+
+    <div class="col-md-4">
+        <?= $this->render('widget-equipments', ['devices' => $devices]); ?>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-7">
+        <?= $this->render('widget-device-register', ['dataProviderSearch' => $dataProviderSearch]); ?>
+    </div>
+
+    <div class="col-md-5">
+        <div class="row">
+            <?php
+            foreach ($cameras as $camera) {
+                echo '<div class="col-md-12">';
+                echo $this->render('widget-camera', ['camera' => $camera]);
+                echo '</div>';
+            }
+            ?>
+        </div>
+    </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <?= $this->render('widget-equipment-table', ['devices' => $devices]); ?>
+        <?= $this->render('widget-equipment-tree', ['devices' => $tree]); ?>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <?= $this->render('widget-calendar', ['events' => $events]); ?>
+
+    <!--    <div class="col-md-4">
+        <? /*= $this->render('widget-stats', ['counts' => $counts]);
+        */ ?>
     </div>
-    <div class="col-md-6">
-        <?= $this->render('widget-report', ['reportDataProvider' => $reportDataProvider]); ?>
-    </div>
-</div>
+--></div>
+<!-- /.content-wrapper -->
 
 <footer class="main-footer" style="margin-left: 0 !important;">
     <div class="pull-right hidden-xs" style="vertical-align: middle; text-align: center;">

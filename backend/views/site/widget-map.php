@@ -15,7 +15,7 @@
 // TODO переделать по уму
 //$this->registerJsFile('/js/custom/modules/map/leaflet.js', ['depends' => ['yii\jui\JuiAsset']]);
 //$this->registerCssFile('/css/custom/modules/map/leaflet.css');
-?>
+use yii\helpers\Html; ?>
 <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
         integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
         crossorigin=""></script>
@@ -27,6 +27,10 @@
     <div class="box-header with-border">
         <h3 class="box-title">Карта объектов и устройств</h3>
         <div class="box-tools pull-right">
+            <div class="btn-group">
+                <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
+                    <i class='fa fa-link'></i></button>", ['/site/map']); ?>
+            </div>
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
             </button>
             <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
