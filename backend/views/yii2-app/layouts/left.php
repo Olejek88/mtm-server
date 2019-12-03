@@ -130,6 +130,8 @@ $userImage = Yii::$app->view->params['userImage'];
                             ["label" => "Улицы", 'icon' => 'fa fa-street-view', "url" => ["/street"]],
                             ["label" => "Дома", 'icon' => 'fa fa-home', "url" => ["/house"]],
                             ["label" => "Объекты", 'icon' => 'fa fa-table', "url" => ["/object/table"]],
+                            ["label" => "Территории", 'icon' => 'fa fa-table', "url" => ["/area"]],
+                            ["label" => "Шкафы по территориям", 'icon' => 'fa fa-table', "url" => ["/area-node"]],
                         ],
                     ],
                 ],
