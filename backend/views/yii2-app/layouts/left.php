@@ -3,7 +3,7 @@
 $currentUser = Yii::$app->view->params['currentUser'];
 $userImage = Yii::$app->view->params['userImage'];
 ?>
-<aside class="main-sidebar">
+<aside class="main-sidebar" style="z-index: 9999;">
 
     <section class="sidebar">
         <!-- Sidebar user panel -->

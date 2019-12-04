@@ -7,6 +7,7 @@ use backend\models\DeviceSearch;
 use backend\models\SignupForm;
 use backend\models\UserSearch;
 use common\components\MainFunctions;
+use common\models\Area;
 use common\models\Camera;
 use common\models\City;
 use common\models\Device;
@@ -606,10 +607,25 @@ class SiteController extends Controller
      */
     public function getLayers()
     {
-        $devices = Device::find()
+        $areaUuid = Yii::$app->request->getQueryParam('area');
+        $nodeUuids = null;
+        if (!empty($areaUuid)) {
+            $area = Area::findOne(['uuid' => $areaUuid]);
+            $areaNodes = $area->getNodes()->all();
+            $nodeUuids = [];
+            foreach ($areaNodes as $areaNode) {
+                $nodeUuids[] = $areaNode->uuid;
+            }
+        }
+
+        $devQuery = Device::find()
             ->where(['NOT IN', 'deviceTypeUuid', [DeviceType::DEVICE_COUNTER, DeviceType::DEVICE_ZB_COORDINATOR]])
-            ->andWhere(['deleted' => 0])
-            ->all();
+            ->andWhere(['deleted' => 0]);
+        if (!empty($nodeUuids)) {
+            $devQuery->andWhere(['nodeUuid' => $nodeUuids]);
+        }
+
+        $devices = $devQuery->all();
 
         $cnt = 0;
         $cntGood = 0;
@@ -850,7 +866,14 @@ class SiteController extends Controller
         }
         $camerasGroup .= ']);' . PHP_EOL;
 
-        $nodes = Node::find()->where(['deleted' => '0'])->all();
+        $nodesQuery = Node::find()
+            ->andWhere(['deleted' => 0]);
+        if (!empty($nodeUuids)) {
+            $nodesQuery->andWhere(['uuid' => $nodeUuids]);
+        }
+
+        $nodes = $nodesQuery->all();
+
         $cnt = 0;
         $nodesGroup = 'var nodes=L.layerGroup([';
         $nodesList = '';

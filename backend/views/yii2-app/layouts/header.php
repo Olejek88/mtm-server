@@ -11,7 +11,7 @@ $currentUser = Yii::$app->view->params['currentUser'];
 $userImage = Yii::$app->view->params['userImage'];
 ?>
 
-<header class="main-header">
+<header class="main-header" style="z-index: 10000;">
 
     <?= Html::a('<span class="logo-mini">С</span><span class="logo-lg">' . Yii::$app->name = 'МТМ' . '</span>',
         Yii::$app->homeUrl, ['class' => 'logo']) ?>

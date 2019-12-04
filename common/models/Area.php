@@ -64,4 +64,20 @@ class Area extends MtmActiveRecord
     {
         return $this->hasOne(Organisation::class, ['uuid' => 'oid']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getAreaNodes()
+    {
+        return $this->hasMany(AreaNode::class, ['areaUuid' => 'uuid']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getNodes()
+    {
+        return $this->hasMany(Node::class, ['uuid' => 'nodeUuid'])->via('areaNodes');
+    }
 }

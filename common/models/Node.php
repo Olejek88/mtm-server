@@ -184,4 +184,20 @@ class Node extends MtmActiveRecord
     {
         return $this->hasMany(NodeControl::class, ['nodeUuid' => 'uuid']);
     }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getAreaNode()
+    {
+        return $this->hasOne(AreaNode::class, ['nodeUuid' => 'uuid']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getArea()
+    {
+        return $this->hasOne(Area::class, ['uuid' => 'areaUuid'])->via('areaNode');
+    }
 }

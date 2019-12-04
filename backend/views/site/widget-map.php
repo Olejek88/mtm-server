@@ -16,6 +16,9 @@
 // TODO переделать по уму
 //$this->registerJsFile('/js/custom/modules/map/leaflet.js', ['depends' => ['yii\jui\JuiAsset']]);
 //$this->registerCssFile('/css/custom/modules/map/leaflet.css');
+use common\models\Area;
+use kartik\widgets\Select2;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html; ?>
 <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
         integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
@@ -27,6 +30,34 @@ use yii\helpers\Html; ?>
 <div class="box box-success">
     <div class="box-header with-border box-success">
         <h3 class="box-title">Карта объектов и устройств</h3>
+        <?php
+        $list = Area::find()->all();
+        $items = ArrayHelper::map($list, 'uuid', 'title');
+
+        $script = <<< JS
+console.log("/?area=" + $(this).val());
+location = "/?area=" + $(this).val();
+JS;
+
+        $request = Yii::$app->request;
+        $areaUuid = $request->getQueryParam('area');
+        echo Select2::widget(
+            [
+//                'title' => 'Территория',
+                'id' => 'areaSelect',
+                'name' => 'area',
+                'data' => $items,
+                'language' => 'ru',
+                'value' => $areaUuid,
+                'options' => [
+                    'placeholder' => 'Выберите территорию..',
+                    'onchange' => $script,
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
+        ?>
         <div class="box-tools pull-right">
             <div class="btn-group">
                 <?php echo Html::a("<button type='button' class='btn btn-box-tool'>
