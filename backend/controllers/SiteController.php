@@ -175,13 +175,14 @@ class SiteController extends Controller
         $counts['street'] = Street::find()->where(['deleted' => 0])->count();
         $counts['objects'] = Objects::find()->where(['deleted' => 0])->count();
         $counts['device'] = Device::find()->where(['deleted' => 0])->count();
+        $counts['camera'] = Camera::find()->where(['deleted' => 0])->count();
         $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_COUNTER])
             ->andWhere(['deleted' => 0])
             ->count();
         $counts['light'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
             ->andWhere(['deleted' => 0])
             ->count();
-        $counts['channel'] = SensorChannel::find()->count();
+        $counts['sensors'] = SensorChannel::find()->where(['measureTypeUuid' => MeasureType::SENSOR_CO2])->count();
         $counts['node'] = Node::find()->where(['deleted' => 0])->count();
         $counts['deviceType'] = DeviceType::find()->count();
 
@@ -464,7 +465,9 @@ class SiteController extends Controller
                 'currentUser' => $currentUser,
                 'searchModel' => $searchModel,
                 'coordinates' => $layers['coordinates'],
-                'dataProvider' => $dataProvider
+                'dataProvider' => $dataProvider,
+                'define' => $layers['define'],
+                'postCode' => $layers['postCode']
             ]
         );
     }
@@ -661,7 +664,7 @@ class SiteController extends Controller
                     $current_power = '-';
                     $rssi = '-';
                     $hops = '-';
-                    $link = '<b>' . Html::a($device["deviceType"]["title"],
+                    $link = '<b>' . Html::a($device->name,
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
                     // реальные группы
@@ -763,14 +766,14 @@ class SiteController extends Controller
                         }
                     }
                 } else if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT_WITHOUT_ZB) {
-                    $link = '<b>' . $device["name"] . '</b>';
+                    $link = '<b>' . $device->name . '</b>';
                     // реальные группы
                     $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
                     if ($deviceGroup) {
                         $group = $deviceGroup['group']['title'];
                     }
                 } else {
-                    $link = '<b>' . Html::a($device["deviceType"]["title"],
+                    $link = '<b>' . Html::a($device->name,
                             ['/node/dashboard', 'uuid' => $device['node']['uuid'], 'type' => 'device']) . '</span>'
                         . '</b>';
                 }
