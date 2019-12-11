@@ -2,16 +2,16 @@
 
 namespace backend\controllers;
 
+use backend\models\AreaNodeSearch;
+use common\models\AreaNode;
 use common\models\User;
 use Throwable;
 use Yii;
-use common\models\AreaNode;
-use backend\models\AreaNodeSearch;
 use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * AreaNodeController implements the CRUD actions for AreaNode model.

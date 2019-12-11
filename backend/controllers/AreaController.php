@@ -2,16 +2,16 @@
 
 namespace backend\controllers;
 
+use backend\models\AreaSearch;
+use common\models\Area;
 use common\models\User;
 use Throwable;
 use Yii;
-use common\models\Area;
-use backend\models\AreaSearch;
 use yii\base\InvalidConfigException;
 use yii\db\StaleObjectException;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * AreaController implements the CRUD actions for Area model.

@@ -8,7 +8,6 @@ use common\models\User;
 use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
