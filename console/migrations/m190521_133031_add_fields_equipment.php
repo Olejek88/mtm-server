@@ -20,7 +20,7 @@ class m190521_133031_add_fields_equipment extends Migration
         $this->insertIntoType('device_type','0FBACF26-31CA-4B92-BCA3-220E09A6D2D3',
             'Электросчетчик', $currentTime, $currentTime);
         $this->insertIntoType('device_type','CFD3C7CC-170C-4764-9A8D-10047C8B8B1D',
-            'Умный светильник', $currentTime, $currentTime);
+            'Управлемый светильник', $currentTime, $currentTime);
     }
 
     /**

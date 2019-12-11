@@ -11,6 +11,8 @@
  * @var $nodesList
  * @var $camerasGroup
  * @var $camerasList
+ * @var $define
+ * @var $postCode
  */
 
 // TODO переделать по уму
@@ -145,6 +147,8 @@ JS;
 
 
     <?php
+    echo $define;
+
     $type = 1;
     $layers = 'lights_good, lights_bad, nodes';
     if (isset($_GET['type']) && $_GET['type'] == 2) {
@@ -202,5 +206,8 @@ JS;
     L.control.zoom({
         position: 'bottomleft'
     }).addTo(map);
-
+    <?php
+    //echo $polylineList;
+    echo $postCode;
+    ?>
 </script>

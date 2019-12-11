@@ -2,8 +2,10 @@
 
 namespace backend\controllers;
 
+use common\models\Camera;
 use common\models\Device;
 use common\models\DeviceType;
+use common\models\MeasureType;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Organisation;
@@ -26,6 +28,8 @@ $org = Organisation::find()->where(['uuid' => $user_id])->one();
 $counts['street'] = Street::find()->where(['deleted' => 0])->count();
 $counts['objects'] = Objects::find()->where(['deleted' => 0])->count();
 $counts['device'] = Device::find()->where(['deleted' => 0])->count();
+$counts['camera'] = Camera::find()->where(['deleted' => 0])->count();
+$counts['sensors'] = SensorChannel::find()->where(['measureTypeUuid' => MeasureType::SENSOR_CO2])->count();
 $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_COUNTER])
     ->andWhere(['deleted' => 0])
     ->count();

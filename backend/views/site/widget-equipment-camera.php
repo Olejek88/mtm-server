@@ -41,9 +41,6 @@ use yii\helpers\Html;
                 'class' => 'kartik\grid\DataColumn',
                 'attribute' => 'title',
                 'vAlign' => 'middle',
-                'value' => function ($data) {
-                    return Html::a($data['title'], ['/camera/view', 'id' => $data['_id']]);
-                },
                 'filterType' => GridView::FILTER_SELECT2,
                 'header' => 'Адрес',
                 'filterInputOptions' => ['placeholder' => 'Любой'],
