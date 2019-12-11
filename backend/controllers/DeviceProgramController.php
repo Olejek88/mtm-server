@@ -4,21 +4,21 @@ namespace backend\controllers;
 
 use common\components\MainFunctions;
 use common\models\DeviceConfig;
+use common\models\DeviceProgram;
 use common\models\Group;
 use common\models\GroupControl;
 use common\models\Node;
 use common\models\NodeControl;
 use common\models\User;
+use Throwable;
 use Yii;
-use common\models\DeviceProgram;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use Throwable;
-use yii\db\StaleObjectException;
 use yii2fullcalendar\models\Event;
 
 /**
