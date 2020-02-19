@@ -27,13 +27,12 @@
  * @var $camerasGroup
  * @var $camerasList
  * @var $nodesGroup
+ * @var $define
+ * @var $postCode
  * @var $sensorCO
  * @var $nodesList
  */
 
-use common\models\Device;
-use common\models\DeviceType;
-use common\models\User;
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Сводная');
@@ -51,6 +50,7 @@ else $type = 1;
             'lightGroup' => $lightGroup, 'lightGoodGroup' => $lightGoodGroup,
             'lightBadGroup' => $lightBadGroup, 'sensorCO2Group' => $sensorCO2Group,
             'nodesGroup' => $nodesGroup, 'nodesList' => $nodesList,
+            'define' => $define, 'postCode' => $postCode,
             'camerasGroup' => $camerasGroup, 'camerasList' => $camerasList]); ?>
     </div>
 </div>

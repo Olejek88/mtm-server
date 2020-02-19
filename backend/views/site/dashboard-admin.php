@@ -25,6 +25,8 @@
  * @var $sensorCO2Group
  * @var $camerasGroup
  * @var $camerasList
+ * @var $define
+ * @var $postCode
  * @var $nodesGroup
  * @var $nodesList
  */
@@ -45,6 +47,7 @@ $this->title = Yii::t('app', 'Сводная');
             'lightGroup' => $lightGroup, 'lightGoodGroup' => $lightGoodGroup,
             'lightBadGroup' => $lightBadGroup, 'sensorCO2Group' => $sensorCO2Group,
             'nodesGroup' => $nodesGroup, 'nodesList' => $nodesList,
+            'define' => $define, 'postCode' => $postCode,
             'camerasGroup' => $camerasGroup, 'camerasList' => $camerasList]); ?>
     </div>
 </div>

@@ -2,7 +2,7 @@
     position: relative;
     /*background-color: rgba(154, 219, 206, 0.44);*/
     /*background: #3c8dbc;*/
-    background: lightgrey;
+    background: #eeffee;
     z-index: 2;
     color: #fff;
     margin: 2px;
@@ -43,7 +43,7 @@
 }
 
 .pyramid li a {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid;
     color: #fff;
 }
 
@@ -52,7 +52,7 @@
 }*/
 .pyramid li:first-child a {
     border-bottom: none;
-    color: grey;
+'color: grey;
 }
 
 .pyramid a:hover {
@@ -118,18 +118,23 @@
 }
 
 .sidebar {
-    background-color: #3c8dbc;
+'background-color: #3c8dbc; background-color: #ffffff;
     height: 100%;
+}
+
+.ahead {
+    line-height: 1.3;
 }
 
 .org_title {
     color: white;
+'color: #3c8dbc;
     margin-right: 5px;
     font-size: medium;
 }
 
 .stat {
-    color: white;
+'color: white; color: #3c8dbc;
     font-size: small;
     text-align: left;
     margin-left: 10px;
