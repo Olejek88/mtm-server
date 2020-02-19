@@ -18,6 +18,7 @@ use common\models\DeviceType;
 use common\models\Group;
 use common\models\GroupControl;
 use common\models\House;
+use common\models\HouseType;
 use common\models\Journal;
 use common\models\LoginForm;
 use common\models\Measure;
@@ -172,21 +173,24 @@ class SiteController extends Controller
             ->one();
 
         $counts['city'] = City::find()->count();
-        $counts['street'] = Street::find()->where(['deleted' => 0])->count();
-        $counts['objects'] = Objects::find()->where(['deleted' => 0])->count();
-        $counts['device'] = Device::find()->where(['deleted' => 0])->count();
+        $counts['street'] = Street::find()->where(['deleted' => 0])->asArray()->count();
+        $counts['objects'] = Objects::find()->where(['deleted' => 0])->asArray()->count();
+        $counts['device'] = Device::find()->where(['deleted' => 0])->asArray()->count();
         $counts['elektro'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_COUNTER])
             ->andWhere(['deleted' => 0])
+            ->asArray()
             ->count();
         $counts['light'] = Device::find()->where(['deviceTypeUuid' => DeviceType::DEVICE_LIGHT])
             ->andWhere(['deleted' => 0])
+            ->asArray()
             ->count();
-        $counts['channel'] = SensorChannel::find()->count();
-        $counts['node'] = Node::find()->where(['deleted' => 0])->count();
+        $counts['channel'] = SensorChannel::find()->asArray()->count();
+        $counts['node'] = Node::find()->where(['deleted' => 0])->asArray()->count();
         $counts['deviceType'] = DeviceType::find()->count();
 
         $last_measures = Measure::find()
             ->where('createdAt > (NOW()-(4*24*3600000))')
+            ->asArray()
             ->count();
         $complete = 0;
 
@@ -196,6 +200,7 @@ class SiteController extends Controller
 
         $users = User::find()
             ->where(['oid' => User::getOid(Yii::$app->user->identity)])
+            ->asArray()
             ->all();
 
         /**
@@ -208,6 +213,7 @@ class SiteController extends Controller
         $streets = Street::find()
             ->select('*')
             ->orderBy('title')
+            ->asArray()
             ->all();
         foreach ($streets as $street) {
             $fullTree['children'][] = [
@@ -219,17 +225,27 @@ class SiteController extends Controller
                 ->where(['streetUuid' => $street['uuid']])
                 ->andWhere(['deleted' => 0])
                 ->orderBy('number')
+                ->with(['street'])
+                ->asArray()
                 ->all();
             foreach ($houses as $house) {
+                if ($house['houseTypeUuid'] != HouseType::HOUSE_TYPE_NO_NUMBER) {
+                    $fullTitle = 'ул.' . $house['street']['title'] . ', д.' . $house['number'];
+                } else {
+                    $fullTitle = 'ул.' . $house['street']['title'] . ' - без адреса';
+                }
+
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
-                    'title' => $house->getFullTitle(),
+                    'title' => $fullTitle,
                     'folder' => true,
                     'expanded' => true
                 ];
                 $objects = Objects::find()
                     ->where(['houseUuid' => $house['uuid']])
                     ->andWhere(['deleted' => 0])
+                    ->with(['objectType'])
+                    ->asArray()
                     ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
@@ -241,6 +257,8 @@ class SiteController extends Controller
                     $nodes = Node::find()
                         ->where(['objectUuid' => $object['uuid']])
                         ->andWhere(['deleted' => 0])
+                        ->with(['deviceStatus'])
+                        ->asArray()
                         ->all();
                     foreach ($nodes as $node) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
@@ -252,7 +270,7 @@ class SiteController extends Controller
                             $class = 'critical3';
                         }
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
+                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']['title'] . '</div></div>',
                             'title' => 'Контроллер [' . $node['address'] . ']',
                             'register' => $node['address'],
                             'expanded' => true,
@@ -264,6 +282,7 @@ class SiteController extends Controller
                                 ->where(['nodeUuid' => $node['uuid']])
                                 ->andWhere(['deviceTypeUuid' => $_GET['type']])
                                 ->andWhere(['deleted' => 0])
+                                ->asArray()
                                 ->all();
                         foreach ($devices as $device) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
@@ -283,14 +302,22 @@ class SiteController extends Controller
                                 'date' => $device['date'],
                                 'folder' => true
                             ];
-                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])->all();
+                            $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])
+                                ->asArray()
+                                ->all();
                             foreach ($channels as $channel) {
                                 $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
-                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                                    ->asArray()
+                                    ->limit(1)
+                                    ->one();
                                 $date = '-';
                                 if (!$measure) {
                                     $config = null;
-                                    $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                    $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                                        ->asArray()
+                                        ->limit(1)
+                                        ->one();
                                     if ($config) {
                                         $measure = Html::a('конфигурация', ['sensor-config/view', 'id' => $config['_id']]);
                                         $date = $config['changedAt'];
@@ -312,9 +339,10 @@ class SiteController extends Controller
                 }
             }
         }
-        $devices = Device::find();
+
+        $devices = Device::find()->asArray();
         $cameras = Camera::find()->all();
-        $sensorsCO = SensorChannel::find()->where(['measureTypeUuid' => MeasureType::SENSOR_CO2]);
+        $sensorsCO = SensorChannel::find()->where(['measureTypeUuid' => MeasureType::SENSOR_CO2])->asArray();
 
         $registerSearch = new DeviceRegisterSearch();
         $dataProviderRegister = $registerSearch->search(Yii::$app->request->queryParams);
@@ -336,9 +364,13 @@ class SiteController extends Controller
         else $group = 0;
         $groupControls = GroupControl::find()
             ->where(['groupUuid' => $group])
+            ->asArray()
             ->all();
         $group = Group::find()
             ->where(['uuid' => $group])
+            ->with(['deviceProgram'])
+            ->asArray()
+            ->limit(1)
             ->one();
         if ($group && $group['deviceProgramUuid'])
             $program = $group['deviceProgram']['title'];
@@ -404,17 +436,18 @@ class SiteController extends Controller
         $reportDataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $reportDataProvider->query->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]);
 
-        $sensorsCOData = $sensorsCO->one();
+        $sensorsCOData = $sensorsCO->asArray()->limit(1)->one();
         /** @var SensorChannel $sensorsCOData */
         /** @var Measure $measure */
         $measureTitle = 'Нет датчиков экологии';
         $measureChart['values'] = '';
         $measureChart['dates'] = '';
         if ($sensorsCOData) {
-            $measureTitle = $sensorsCOData->title;
+            $measureTitle = $sensorsCOData['title'];
             $measures = Measure::find()
-                ->where(['sensorChannelUuid' => $sensorsCOData->uuid])
+                ->where(['sensorChannelUuid' => $sensorsCOData['uuid']])
                 ->orderBy('date DESC')
+                ->asArray()
                 ->limit(10)
                 ->all();
             $count = 0;
@@ -423,8 +456,8 @@ class SiteController extends Controller
                     $measureChart['values'] .= ',';
                     $measureChart['dates'] .= ',';
                 }
-                $measureChart['values'] .= $measure->value;
-                $measureChart['dates'] .= '\'' . $measure->date . '\'';
+                $measureChart['values'] .= $measure['value'];
+                $measureChart['dates'] .= '\'' . $measure['date'] . '\'';
                 $count++;
             }
         }
@@ -610,11 +643,11 @@ class SiteController extends Controller
         $areaUuid = Yii::$app->request->getQueryParam('area');
         $nodeUuids = null;
         if (!empty($areaUuid)) {
-            $area = Area::findOne(['uuid' => $areaUuid]);
-            $areaNodes = $area->getNodes()->all();
+            $area = Area::find()->where(['uuid' => $areaUuid])->asArray()->with('areaNodes')->limit(1)->one();
+            $areaNodes = $area['areaNodes'];
             $nodeUuids = [];
             foreach ($areaNodes as $areaNode) {
-                $nodeUuids[] = $areaNode->uuid;
+                $nodeUuids[] = $areaNode['nodeUuid'];
             }
         }
 
@@ -665,7 +698,11 @@ class SiteController extends Controller
                             ['/device/dashboard', 'uuid' => $device['uuid'], 'type' => 'light']) . '</span>'
                         . '</b>';
                     // реальные группы
-                    $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
+                    $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])
+                        ->with(['group'])
+                        ->limit(1)
+                        ->asArray()
+                        ->one();
                     if ($deviceGroup) {
                         $group = $deviceGroup['group']['title'];
                     }
@@ -678,39 +715,39 @@ class SiteController extends Controller
 
                     $nominal_power = DeviceController::getParameter($device['uuid'], DeviceConfig::PARAM_POWER);
                     $nominal_power = MtmDevLightConfig::getPowerString($nominal_power);
-                    if ($device->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
+                    if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT) {
                         /** @var SensorChannel $sChannel */
-                        $sChannel = $device->getSensorChannel(MeasureType::POWER)->one();
+                        $sChannel = $device->getSensorChannel(MeasureType::POWER)->limit(1)->one();
                         if ($sChannel != null) {
                             /** @var Measure $cMeasure */
-                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            $cMeasure = $sChannel->getMeasureOne()->limit(1)->one();
                             if ($cMeasure != null) {
                                 $current_power = $cMeasure->value;
                             }
                         }
 
-                        $sChannel = $device->getSensorChannel(MeasureType::RSSI)->one();
+                        $sChannel = $device->getSensorChannel(MeasureType::RSSI)->limit(1)->one();
                         if ($sChannel != null) {
                             /** @var Measure $cMeasure */
-                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            $cMeasure = $sChannel->getMeasureOne()->limit(1)->one();
                             if ($cMeasure != null) {
                                 $rssi = $cMeasure->value;
                             }
                         }
 
-                        $sChannel = $device->getSensorChannel(MeasureType::HOP_COUNT)->one();
+                        $sChannel = $device->getSensorChannel(MeasureType::HOP_COUNT)->limit(1)->one();
                         if ($sChannel != null) {
                             /** @var Measure $cMeasure */
-                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            $cMeasure = $sChannel->getMeasureOne()->limit(1)->one();
                             if ($cMeasure != null) {
                                 $hops = $cMeasure->value;
                             }
                         }
 
-                        $sChannel = $device->getSensorChannel(MeasureType::SENSOR_CO2)->one();
+                        $sChannel = $device->getSensorChannel(MeasureType::SENSOR_CO2)->limit(1)->one();
                         if ($sChannel != null) {
                             /** @var Measure $cMeasure */
-                            $cMeasure = $sChannel->getMeasureOne()->one();
+                            $cMeasure = $sChannel->getMeasureOne()->limit(1)->one();
                             $sensorValue = '-';
                             if ($cMeasure != null) {
                                 $sensorValue = $cMeasure->value;
@@ -738,19 +775,28 @@ class SiteController extends Controller
                         ->where(['sensorChannelUuid' => (SensorChannel::find()
                             ->select('uuid')
                             ->where(['measureTypeUuid' => MeasureType::TEMPERATURE])
-                            ->andWhere(['deviceUuid' => $device['uuid']]))])->one();
-                    if ($measure)
+                            ->andWhere(['deviceUuid' => $device['uuid']]))])
+                        ->asArray()
+                        ->limit(1)
+                        ->one();
+                    if ($measure) {
                         $t = $measure['value'];
+                    }
+
                     $coordinator = Device::find()
                         ->where(['nodeUuid' => $device['node']['uuid']])
                         ->andWhere(['deleted' => 0])
                         ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                        ->asArray()
+                        ->limit(1)
                         ->one();
                     if ($coordinator) {
                         $measure = (Measure::find()
                             ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
                             ->joinWith('sensorChannel')
                             ->orderBy('date DESC'))
+                            ->asArray()
+                            ->limit(1)
                             ->one();
                         if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
                             $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
@@ -765,7 +811,10 @@ class SiteController extends Controller
                 } else if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT_WITHOUT_ZB) {
                     $link = '<b>' . $device["name"] . '</b>';
                     // реальные группы
-                    $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])->one();
+                    $deviceGroup = DeviceGroup::find()->where(['deviceUuid' => $device['uuid']])
+                        ->asArray()
+                        ->limit(1)
+                        ->one();
                     if ($deviceGroup) {
                         $group = $deviceGroup['group']['title'];
                     }
@@ -872,7 +921,11 @@ class SiteController extends Controller
             $nodesQuery->andWhere(['uuid' => $nodeUuids]);
         }
 
-        $nodes = $nodesQuery->all();
+        $nodes = $nodesQuery
+            ->with(['object.house.street'])
+            ->asArray()
+            ->limit(1)
+            ->all();
 
         $cnt = 0;
         $nodesGroup = 'var nodes=L.layerGroup([';
@@ -896,37 +949,52 @@ class SiteController extends Controller
                 $security = '-';
                 $temperature = '-';
                 $coordinator = Device::find()
-                    ->where(['nodeUuid' => $node->uuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])->one();
+                    ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])->one();
                 if ($coordinator != null) {
                     /** @var @var SensorChannel $sChannel */
                     // состояние контактора
-                    $sChannel = $coordinator->getSensorChannel(MeasureType::CONTACTOR_STATE)->one();
+                    $sChannel = $coordinator->getSensorChannel(MeasureType::CONTACTOR_STATE)
+                        ->limit(1)
+                        ->one();
                     if ($sChannel != null) {
-                        $value = $sChannel->getMeasureOne()->one();
+                        $value = $sChannel->getMeasureOne()
+                            ->asArray()
+                            ->limit(1)
+                            ->one();
                         if ($value != null) {
-                            $contactors = $value->value == 0 ? 'Включен' : 'Выключен';
-                            $contState = $value->value == 0 ? 'badge-green-small' : 'badge-red-small';
+                            $contactors = $value['value'] == 0 ? 'Включен' : 'Выключен';
+                            $contState = $value['value'] == 0 ? 'badge-green-small' : 'badge-red-small';
                             $contactors = '<span class="badge ' . $contState . '">' . $contactors . '</span>';
                         }
                     }
 
                     // состояние двери шкафа
-                    $sChannel = $coordinator->getSensorChannel(MeasureType::DOOR_STATE)->one();
+                    $sChannel = $coordinator->getSensorChannel(MeasureType::DOOR_STATE)
+                        ->limit(1)
+                        ->one();
                     if ($sChannel != null) {
-                        $value = $sChannel->getMeasureOne()->one();
+                        $value = $sChannel->getMeasureOne()
+                            ->asArray()
+                            ->limit(1)
+                            ->one();
                         if ($value != null) {
-                            $security = $value->value == 0 ? 'в норме' : 'сработала';
-                            $doorState = $value->value == 0 ? 'badge-green-small' : 'badge-red-small';
+                            $security = $value['value'] == 0 ? 'в норме' : 'сработала';
+                            $doorState = $value['value'] == 0 ? 'badge-green-small' : 'badge-red-small';
                             $security = '<span class="badge ' . $doorState . '">' . $security . '</span>';
                         }
                     }
 
                     // температура
-                    $sChannel = $coordinator->getSensorChannel(MeasureType::TEMPERATURE)->one();
+                    $sChannel = $coordinator->getSensorChannel(MeasureType::TEMPERATURE)
+                        ->limit(1)
+                        ->one();
                     if ($sChannel != null) {
-                        $value = $sChannel->getMeasureOne()->one();
+                        $value = $sChannel->getMeasureOne()
+                            ->asArray()
+                            ->limit(1)
+                            ->one();
                         if ($value != null) {
-                            $temperature = '<span class="badge badge-green-small">' . $value->value . '&deg;C</span>';
+                            $temperature = '<span class="badge badge-green-small">' . $value['value'] . '&deg;C</span>';
                         }
                     }
                 }
@@ -938,6 +1006,8 @@ class SiteController extends Controller
                     ->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
                     ->andWhere(['deleted' => 0])
                     ->andWhere(['nodeUuid' => $node['uuid']])
+                    ->asArray()
+                    ->limit(1)
                     ->one();
                 //echo json_encode($device['uuid']);
                 if ($device) {
@@ -951,6 +1021,8 @@ class SiteController extends Controller
                         $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
                             ->andWhere(['type' => MeasureType::MEASURE_TYPE_CURRENT])
                             ->orderBy('date DESC')
+                            ->asArray()
+                            ->limit(1)
                             ->one();
                         if ($measure) {
                             if ($channel['measureTypeUuid'] == MeasureType::POWER)
@@ -962,12 +1034,20 @@ class SiteController extends Controller
                             ->where(['sensorChannelUuid' => $channel['uuid']])
                             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL_CURRENT])
                             ->orderBy('date DESC')
+                            ->asArray()
+                            ->limit(1)
                             ->one();
                         if ($measure) {
                             if ($channel['measureTypeUuid'] == MeasureType::POWER)
                                 $w_total = number_format($measure['value'], 2);
                         }
                     }
+                }
+
+                if ($node['object']['house']['houseTypeUuid'] == HouseType::HOUSE_TYPE_NO_NUMBER) {
+                    $address = 'ул.' . $node['object']['house']['street']['title'] . ', без адреса';
+                } else {
+                    $address = 'ул.' . $node['object']['house']['street']['title'] . ', д.' . $node['object']['house']['number'] . ' ' . $node['object']['title'];
                 }
 
                 $software = $node["software"];
@@ -977,7 +1057,7 @@ class SiteController extends Controller
                     . '= L.marker([' . $node["object"]["latitude"]
                     . ',' . $node["object"]["longitude"]
                     . '], {icon: ' . $icon . '}).bindPopup(\'<b>'
-                    . Html::a($node["object"]->getAddress(),
+                    . Html::a($address,
                         ['/node/dashboard', 'uuid' => $node['uuid'], 'type' => 'node']) . '</span>'
                     . '</b><br/>'
                     . 'Связь: ' . $link . '<br/>'
@@ -989,7 +1069,7 @@ class SiteController extends Controller
                     . 'Мощность,кВт: ' . $w . '<br/>'
                     . 'Энергия,кВт/ч: ' . $w_total . '<br/>'
                     . 'Версия ПО: ' . $software . '<br/>'
-                    . 'Адрес: ' . $node->address . '<br/>'
+                    . 'Адрес: ' . $node['address'] . '<br/>'
                     . $warnings
                     . '\').openPopup();';
 
