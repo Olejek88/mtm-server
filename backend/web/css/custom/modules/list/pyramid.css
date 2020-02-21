@@ -1,3 +1,5 @@
+/* #ff9c00 */
+/* #03DA01 */
 .pyramid {
     position: relative;
     /*background-color: rgba(154, 219, 206, 0.44);*/
@@ -10,6 +12,14 @@
     clip-path: polygon(100% 100%, 0 100%, 50% 0);
     align-items: center;
     position: relative;
+}
+
+.skin-blue .main-header .logo {
+    background-color: #03DA01 !important;
+}
+
+.skin-blue .main-header .navbar {
+    background-color: #03DA01 !important;
 }
 
 .content-wrapper,

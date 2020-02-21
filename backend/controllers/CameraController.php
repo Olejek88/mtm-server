@@ -60,6 +60,7 @@ class CameraController extends Controller
             $model = Camera::find()
                 ->where(['_id' => $_POST['editableKey']])
                 ->andWhere(['deleted' => 0])
+                ->limit(1)
                 ->one();
 
             if ($_POST['editableAttribute'] == 'deviceStatusUuid') {
@@ -162,7 +163,7 @@ class CameraController extends Controller
     public function actionDashboard()
     {
         if (isset($_GET['uuid'])) {
-            $model = Camera::find()->where(['uuid' => $_GET['uuid']])->one();
+            $model = Camera::find()->where(['uuid' => $_GET['uuid']])->limit(1)->one();
             if ($model) {
                 if (!$model->startTranslation()) {
                     // по каким-то причинам команду на начало трансляции отправить не удалось

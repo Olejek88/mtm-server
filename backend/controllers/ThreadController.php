@@ -69,6 +69,7 @@ class ThreadController extends Controller
 
             $model = Threads::find()
                 ->where(['_id' => $_POST['editableKey']])
+                ->limit(1)
                 ->one();
             if ($_POST['editableAttribute'] == 'title') {
                 $model['title'] = $_POST['Threads'][$_POST['editableIndex']]['title'];

@@ -70,7 +70,7 @@ class SoundFileController extends Controller
      * Finds the SoundFile model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return SoundFile the loaded model
+     * @return array|SoundFile|\yii\db\ActiveRecord
      * @throws NotFoundHttpException if the model cannot be found
      * @throws InvalidConfigException
      */

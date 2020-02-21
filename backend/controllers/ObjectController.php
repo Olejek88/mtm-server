@@ -308,7 +308,7 @@ class ObjectController extends Controller
                 }
 
                 if ($type == 'object') {
-                    $object = Objects::find()->where(['uuid' => $uuid])->one();
+                    $object = Objects::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($object) {
                         return $this->renderAjax('_add_object_form', [
                             'objectUuid' => $uuid,
@@ -344,18 +344,18 @@ class ObjectController extends Controller
 
             if ($uuid && $type) {
                 if ($type == 'street') {
-                    $street = Street::find()->where(['uuid' => $uuid])->one();
+                    $street = Street::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($street) {
-                        $house = House::find()->where(['streetUuid' => $street['uuid']])->one();
+                        $house = House::find()->where(['streetUuid' => $street['uuid']])->limit(1)->one();
                         if (!$house) {
                             $street->delete();
                         }
                     }
                 }
                 if ($type == 'house') {
-                    $house = House::find()->where(['uuid' => $uuid])->one();
+                    $house = House::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($house) {
-                        $object = Objects::find()->where(['houseUuid' => $house['uuid']])->one();
+                        $object = Objects::find()->where(['houseUuid' => $house['uuid']])->limit(1)->one();
                         if (!$object) {
                             $house->delete();
                         }
@@ -407,7 +407,7 @@ class ObjectController extends Controller
             }
             if ($type == 'house') {
                 if (isset($_POST['houseUuid']))
-                    $model = House::find()->where(['uuid' => $_POST['houseUuid']])->one();
+                    $model = House::find()->where(['uuid' => $_POST['houseUuid']])->limit(1)->one();
                 else
                     $model = new House();
                 if ($model->load(Yii::$app->request->post())) {
@@ -420,7 +420,7 @@ class ObjectController extends Controller
             }
             if ($type == 'object') {
                 if (isset($_POST['objectUuid']))
-                    $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->one();
+                    $model = Objects::find()->where(['uuid' => $_POST['objectUuid']])->limit(1)->one();
                 else
                     $model = new Objects();
                 if ($model->load(Yii::$app->request->post())) {

@@ -10,6 +10,7 @@ use common\models\User;
 use Exception;
 use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -251,8 +252,9 @@ class UserController extends Controller
      * @param integer $id Id.
      *
      * @return mixed
-     * @throws NotFoundHttpException
      * @throws HttpException
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
      */
     public function actionView($id)
     {

@@ -75,6 +75,7 @@ class NodeController extends Controller
 
             $model = Node::find()
                 ->where(['_id' => $_POST['editableKey']])
+                ->limit(1)
                 ->one();
             if ($_POST['editableAttribute'] == 'address') {
                 $model['address'] = $_POST['Node'][$_POST['editableIndex']]['address'];
@@ -207,13 +208,14 @@ class NodeController extends Controller
     public function actionDashboard($uuid, $type)
     {
         if (isset($_POST['on'])) {
-            $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+            $device = Device::find()->where(['uuid' => $_POST['device']])->limit(1)->one();
             if ($device)
                 DeviceController::contactor($_POST['on'], $device);
         }
 
         $node = Node::find()
             ->where(['uuid' => $uuid])
+            ->limit(1)
             ->one();
         $camera = null;
         $energy = null;
@@ -225,7 +227,7 @@ class NodeController extends Controller
                 DeviceController::resetCoordinator($node);
             }
 
-            $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->one();
+            $camera = Camera::find()->where(['nodeUuid' => $node['uuid']])->limit(1)->one();
             if ($camera) {
                 $camera->startTranslation();
             }
@@ -234,11 +236,13 @@ class NodeController extends Controller
             $energy = Device::find()
                 ->where(['nodeUuid' => $node['uuid']])
                 ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                ->limit(1)
                 ->one();
 
             $coordinator = Device::find()
                 ->where(['nodeUuid' => $node['uuid']])
                 ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                ->limit(1)
                 ->one();
         }
 
@@ -272,8 +276,10 @@ class NodeController extends Controller
                 ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN1])
                 ->joinWith('sensorChannel')
                 ->orderBy('date DESC'))
+                ->limit(1)
                 ->one();
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN1 &&
+            if ($measure && $measure['sensorChannel'] &&
+                $measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN1 &&
                 $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
                 $parameters['control']['door'] = $measure['value'];
             }
@@ -282,8 +288,10 @@ class NodeController extends Controller
                 ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
                 ->joinWith('sensorChannel')
                 ->orderBy('date DESC'))
+                ->limit(1)
                 ->one();
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+            if ($measure && $measure['sensorChannel'] &&
+                $measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
                 $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
                 $parameters['control']['contactor'] = $measure['value'];
             }
@@ -291,8 +299,10 @@ class NodeController extends Controller
                 ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_DIGI1])
                 ->joinWith('sensorChannel')
                 ->orderBy('date DESC'))
+                ->limit(1)
                 ->one();
-            if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_DIGI1 &&
+            if ($measure && $measure['sensorChannel'] &&
+                $measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_DIGI1 &&
                 $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
                 $parameters['control']['relay'] = $measure['value'];
             }
@@ -441,6 +451,7 @@ class NodeController extends Controller
                     ->select('*')
                     ->where(['equipmentUuid' => $equipment['uuid']])
                     ->orderBy('date DESC')
+                    ->limit(1)
                     ->one();
                 if ($measure) {
                     $fullTree[$oCnt0][$c][$oCnt1]['measure_date'] = $measure['date'];
@@ -456,6 +467,7 @@ class NodeController extends Controller
                     ->select('*')
                     ->where(['objectUuid' => $equipment['uuid']])
                     ->orderBy('createdAt DESC')
+                    ->limit(1)
                     ->one();
                 if ($photo) {
                     $fullTree[$oCnt0][$c][$oCnt1]['photo_date'] = $photo['createdAt'];
@@ -672,6 +684,7 @@ class NodeController extends Controller
                             ->select('*')
                             ->where(['equipmentUuid' => $equipment['uuid']])
                             ->orderBy('date DESC')
+                            ->limit(1000)
                             ->all();
 
                         $measure_count_column = 0;
@@ -722,6 +735,7 @@ class NodeController extends Controller
                             ->select('*')
                             ->orderBy('date DESC')
                             ->where(['flatUuid' => $equipment['flat']['uuid']])
+                            ->limit(1)
                             ->one();
                         if ($message != null) {
                             $fullTree[$oCnt0]['message'] =

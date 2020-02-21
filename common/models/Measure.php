@@ -163,6 +163,7 @@ class Measure extends MtmActiveRecord
             ->andWhere('date >= "' . $startDate . '"')
             ->andWhere('date < "' . $endDate . '"')
             ->orderBy('date DESC')
+            ->limit(1)
             ->one();
         return $model;
     }
@@ -229,6 +230,7 @@ class Measure extends MtmActiveRecord
             $channel = SensorChannel::find()
                 ->where(['deviceUuid' => $device['uuid']])
                 ->andWhere(['measureTypeUuid' => $measureTypeUuid])
+                ->limit(1)
                 ->one();
             if ($channel) {
                 $measure = self::getLastMeasure($channel['uuid'], $type, $parameter);
