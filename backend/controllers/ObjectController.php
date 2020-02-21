@@ -450,6 +450,7 @@ class ObjectController extends Controller
         $objects = Objects::find()
             ->where('latitude > 0')
             ->andWhere('longitude > 0')
+            ->asArray()
             ->all();
         foreach ($objects as $object) {
             $sum_latitude += $object['latitude'];

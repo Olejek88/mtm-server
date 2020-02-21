@@ -1009,6 +1009,7 @@ class DeviceController extends Controller
             ->select('*')
             ->where(['deleted' => 0])
             ->orderBy('title')
+            ->asArray()
             ->all();
         foreach ($streets as $street) {
             $fullTree['children'][] = [
@@ -1022,19 +1023,28 @@ class DeviceController extends Controller
             $houses = House::find()
                 ->where(['streetUuid' => $street['uuid']])
                 ->andWhere(['deleted' => 0])
+                ->with(['street'])
                 ->orderBy('number')
+                ->asArray()
                 ->all();
             foreach ($houses as $house) {
+                if ($house['houseTypeUuid'] != HouseType::HOUSE_TYPE_NO_NUMBER) {
+                    $fullTitle = 'ул.' . $house['street']['title'] . ', д.' . $house['number'];
+                } else {
+                    $fullTitle = 'ул.' . $house['street']['title'] . ' - без адреса';
+                }
+
                 $childIdx = count($fullTree['children']) - 1;
                 $fullTree['children'][$childIdx]['children'][] = [
                     'uuid' => $house['uuid'],
                     'type' => 'house',
                     'expanded' => true,
-                    'title' => $house->getFullTitle(),
+                    'title' => $fullTitle,
                     'folder' => true
                 ];
                 $objects = Objects::find()->where(['houseUuid' => $house['uuid']])
                     ->andWhere(['deleted' => 0])
+                    ->asArray()
                     ->all();
                 foreach ($objects as $object) {
                     $childIdx2 = count($fullTree['children'][$childIdx]['children']) - 1;
@@ -1050,6 +1060,8 @@ class DeviceController extends Controller
                     $devices = Device::find()
                         ->where(['objectUuid' => $object['uuid']])
                         ->andWhere(['deleted' => 0])
+                        ->with(['deviceStatus'])
+                        ->asArray()
                         ->all();
                     foreach ($devices as $device) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
@@ -1064,9 +1076,9 @@ class DeviceController extends Controller
                         if ($device['deviceTypeUuid'] == DeviceType::DEVICE_LIGHT)
                             $light = "true";
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'title' => $device->name . ' [' . $device->serial . ']',
+                            'title' => $device['name'] . ' [' . $device['serial'] . ']',
                             'status' => '<div class="progress"><div class="'
-                                . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                                . $class . '">' . $device['deviceStatus']['title'] . '</div></div>',
                             'register' => $device['port'] . ' [' . $device['address'] . ']',
                             'uuid' => $device['uuid'],
                             'expanded' => true,
@@ -1083,11 +1095,17 @@ class DeviceController extends Controller
                         foreach ($channels as $channel) {
                             $childIdx4 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
                             $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
-                                ->orderBy(['changedAt' => SORT_DESC])->one();
+                                ->orderBy(['changedAt' => SORT_DESC])
+                                ->asArray()
+                                ->limit(1)
+                                ->one();
                             $date = '-';
                             if (!$measure) {
                                 $config = null;
-                                $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])->one();
+                                $config = SensorConfig::find()->where(['sensorChannelUuid' => $channel['uuid']])
+                                    ->asArray()
+                                    ->limit(1)
+                                    ->one();
                                 if ($config) {
                                     $measure = Html::a('конфигурация', ['sensor-config/view', 'id' => $config['_id']]);
                                     $date = $config['changedAt'];
@@ -1111,6 +1129,8 @@ class DeviceController extends Controller
 
                     $nodes = Node::find()->where(['objectUuid' => $object['uuid']])
                         ->andWhere(['deleted' => 0])
+                        ->with('deviceStatus')
+                        ->asArray()
                         ->all();
                     foreach ($nodes as $node) {
                         $childIdx3 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children']) - 1;
@@ -1122,7 +1142,7 @@ class DeviceController extends Controller
                             $class = 'critical3';
                         }
                         $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][] = [
-                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']->title . '</div></div>',
+                            'status' => '<div class="progress"><div class="' . $class . '">' . $node['deviceStatus']['title'] . '</div></div>',
                             'title' => 'Контроллер [' . $node['address'] . ']',
                             'source' => '../device/tree',
                             'objectUuid' => $object['uuid'],
@@ -1135,6 +1155,8 @@ class DeviceController extends Controller
                         $devices = Device::find()
                             ->where(['nodeUuid' => $node['uuid']])
                             ->andWhere(['deleted' => 0])
+                            ->with(['deviceType', 'deviceStatus'])
+                            ->asArray()
                             ->all();
                         if (isset($_GET['type']))
                             $devices = Device::find()->where(['nodeUuid' => $node['uuid']])
@@ -1152,7 +1174,7 @@ class DeviceController extends Controller
                             $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children'][] = [
                                 'title' => $device['deviceType']['title'] . ' [' . $device['address'] . ']',
                                 'status' => '<div class="progress"><div class="'
-                                    . $class . '">' . $device['deviceStatus']->title . '</div></div>',
+                                    . $class . '">' . $device['deviceStatus']['title'] . '</div></div>',
                                 'register' => $device['port'] . ' [' . $device['address'] . ']',
                                 'uuid' => $device['uuid'],
                                 'expanded' => false,
@@ -1165,11 +1187,14 @@ class DeviceController extends Controller
                                 'folder' => true
                             ];
                             $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])
+                                ->asArray()
                                 ->all();
                             foreach ($channels as $channel) {
                                 $childIdx5 = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$childIdx4]['children']) - 1;
                                 $measure = Measure::find()->where(['sensorChannelUuid' => $channel['uuid']])
-                                    ->orderBy(['_id' => SORT_DESC])->one();
+                                    ->limit(1)
+                                    ->orderBy(['_id' => SORT_DESC])
+                                    ->one();
                                 $date = '-';
                                 if (!$measure) {
                                     $config = null;
@@ -1198,7 +1223,8 @@ class DeviceController extends Controller
                 }
             }
         }
-        $deviceTypes = DeviceType::find()->all();
+
+        $deviceTypes = DeviceType::find()->asArray()->all();
         $items = ArrayHelper::map($deviceTypes, 'uuid', 'title');
 
         return $this->render(
