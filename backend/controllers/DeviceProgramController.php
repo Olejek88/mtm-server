@@ -182,7 +182,7 @@ class DeviceProgramController extends Controller
             ->where(['between', 'date', date('Y-m-d', $today),
                 date('Y-m-d', $today + 86400 * ($range + $shift))])
             ->all();
-        $group = Group::find()->where(['uuid' => $group])->one();
+        $group = Group::find()->where(['uuid' => $group])->limit(1)->one();
         if ($group && $group['deviceProgramUuid']) {
             $defProgram = $group['deviceProgram']['title'];
         }

@@ -81,7 +81,10 @@ if ($deviceElectro) {
     </div>
 
     <div class="col-md-5">
-        <?= $this->render('widget-camera', ['camera' => $camera]); ?>
+        <?php
+        if ($camera)
+            echo $this->render('widget-camera', ['camera' => $camera]);
+        ?>
     </div>
 </div>
 

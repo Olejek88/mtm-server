@@ -106,6 +106,7 @@ class MeasureController extends Controller
             $measure = Measure::find()
                 ->where(['sensorChannelUuid' => $_GET["sensorChannel"]])
                 ->orderBy('date')
+                ->limit(1000)
                 ->all();
             if ($measure[0] != null)
                 $name = $measure[0]['equipment']['equipmentType']->title;
@@ -121,21 +122,11 @@ class MeasureController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException
      */
     public function actionUpdate($id)
     {
         // вообще отлючаем возможность создавать новые записи
         return $this->redirect('/site/index');
-
-        $model = $this->findModel($id);
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->_id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
     }
 
     /**
@@ -143,18 +134,12 @@ class MeasureController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
-     * @throws NotFoundHttpException
      * @throws Throwable
-     * @throws StaleObjectExceptionAlias
      */
     public function actionDelete($id)
     {
         // вообще отлючаем возможность создавать новые записи
         return $this->redirect('/site/index');
-
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
     }
 
     /**

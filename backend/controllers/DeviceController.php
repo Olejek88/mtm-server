@@ -95,6 +95,7 @@ class DeviceController extends Controller
 
             $model = Device::find()
                 ->where(['_id' => $_POST['editableKey']])
+                ->limit(1)
                 ->one();
             if ($_POST['editableAttribute'] == 'port') {
                 $model['port'] = $_POST['Device'][$_POST['editableIndex']]['port'];
@@ -193,7 +194,10 @@ class DeviceController extends Controller
             // сохраняем запись
             if ($model->save(false)) {
                 if ($model->deviceTypeUuid == DeviceType::DEVICE_LIGHT) {
-                    $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])->one();
+                    $deviceConfig = DeviceConfig::find()
+                        ->where(['deviceUuid' => $model->uuid, 'parameter' => 'Программа'])
+                        ->limit(1)
+                        ->one();
                     if ($deviceConfig == null) {
                         $deviceConfig = new DeviceConfig();
                         $deviceConfig->uuid = MainFunctions::GUID();
@@ -274,6 +278,7 @@ class DeviceController extends Controller
         if (isset($_GET['uuid'])) {
             $device = Device::find()
                 ->where(['uuid' => $_GET['uuid']])
+                ->limit(1)
                 ->one();
             if ($device && $device['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO)
                 return self::actionDashboardElectro($device['uuid']);
@@ -282,7 +287,10 @@ class DeviceController extends Controller
 
         if (isset($_POST['type']) && $_POST['type'] == 'set') {
             if (isset($_POST['device'])) {
-                $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                $device = Device::find()
+                    ->where(['uuid' => $_POST['device']])
+                    ->limit(1)
+                    ->one();
                 if (isset($_POST['value'])) {
                     $this->set($device, $_POST['value']);
                     MainFunctions::deviceRegister($device['uuid'], "Обновлена конфигурация устройства");
@@ -293,7 +301,7 @@ class DeviceController extends Controller
 
         if (isset($_POST['type']) && $_POST['type'] == 'params') {
             if (isset($_POST['device'])) {
-                $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                $device = Device::find()->where(['uuid' => $_POST['device']])->limit(1)->one();
                 $lightConfig = new MtmDevLightConfig();
                 $lightConfig->mode = $_POST['mode'];
                 $lightConfig->power = $_POST['power'];
@@ -310,7 +318,7 @@ class DeviceController extends Controller
                     'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
                 ];
                 $org_id = User::getOid(Yii::$app->user->identity);
-                $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                $org_id = Organisation::find()->where(['uuid' => $org_id])->limit(1)->one()->_id;
                 $node_id = $device['node']['_id'];
                 self::sendConfig($pkt, $org_id, $node_id);
 
@@ -338,10 +346,10 @@ class DeviceController extends Controller
 
         if (isset($_POST['type']) && $_POST['type'] == 'config') {
             if (isset($_POST['device'])) {
-                $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                $device = Device::find()->where(['uuid' => $_POST['device']])->limit(1)->one();
                 $lightConfig = new MtmDevLightConfigLight();
                 if (isset($_POST['device'])) {
-                    $device = Device::find()->where(['uuid' => $_POST['device']])->one();
+                    $device = Device::find()->where(['uuid' => $_POST['device']])->limit(1)->one();
                     if ($device && isset($_POST['time0'])) {
                         $lightConfig->time[0] = $_POST['time0'];
                         $lightConfig->value[0] = $_POST['level0'];
@@ -362,7 +370,7 @@ class DeviceController extends Controller
                             'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
                         ];
                         $org_id = User::getOid(Yii::$app->user->identity);
-                        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                        $org_id = Organisation::find()->where(['uuid' => $org_id])->limit(1)->one()->_id;
                         $node_id = $device['node']['_id'];
                         self::sendConfig($pkt, $org_id, $node_id);
                         self::updateConfig($device['uuid'], DeviceConfig::PARAM_TIME0, $_POST['time0']);
@@ -414,13 +422,14 @@ class DeviceController extends Controller
         if (isset($_GET['uuid'])) {
             $device = Device::find()
                 ->where(['uuid' => $uuid])
+                ->limit(1)
                 ->one();
         } else {
             return $this->actionIndex();
         }
 
         // power by days
-        $sChannel = (SensorChannel::find()->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->one();
+        $sChannel = (SensorChannel::find()->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]))->limit(1)->one();
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
@@ -451,6 +460,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
             ->orderBy('date DESC'))
+            ->limit(200)
             ->all();
         $cnt = -1;
         $data['days'] = [];
@@ -480,6 +490,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
             ->orderBy('date DESC'))
+            ->limit(100)
             ->all();
         $cnt = -1;
         $last_date = '';
@@ -510,6 +521,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL_CURRENT])
             ->orderBy('date DESC'))
+            ->limit(300)
             ->all();
         foreach ($integrates as $measure) {
             if ($measure['parameter'] == 1)
@@ -564,6 +576,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_TOTAL])
             ->orderBy('date DESC'))
+            ->limit(200)
             ->all();
         foreach ($integrates as $measure) {
             if ($measure['parameter'] == 1) {
@@ -601,6 +614,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
             ->orderBy('date DESC'))
+            ->limit(100)
             ->all();
         foreach ($integrates as $measure) {
             if ($measure['parameter'] == 1) {
@@ -786,6 +800,7 @@ class DeviceController extends Controller
         if (isset($_GET['uuid'])) {
             $device = Device::find()
                 ->where(['uuid' => $uuid])
+                ->limit(1)
                 ->one();
         } else {
             return $this->actionIndex();
@@ -794,6 +809,7 @@ class DeviceController extends Controller
         // power by days
         $sChannel = SensorChannel::find()
             ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER])
+            ->limit(1)
             ->one();
         $last_measures = (Measure::find()
             ->where(['sensorChannelUuid' => $sChannel])
@@ -822,6 +838,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
             ->orderBy('date DESC'))
+            ->limit(200)
             ->all();
         $cnt = -1;
         $data['days'] = [];
@@ -872,6 +889,7 @@ class DeviceController extends Controller
             ->where(['sensorChannelUuid' => $sChannel])
             ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
             ->orderBy('date DESC'))
+            ->limit(100)
             ->all();
         $cnt = -1;
         $last_date = '';
@@ -916,6 +934,7 @@ class DeviceController extends Controller
         if (isset($_GET['uuid'])) {
             $device = Device::find()
                 ->where(['uuid' => $uuid])
+                ->limit(1)
                 ->one();
         } else {
             return $this->actionIndex();
@@ -924,6 +943,7 @@ class DeviceController extends Controller
         // power by days
         $sChannel = SensorChannel::find()
             ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER])
+            ->limit(1)
             ->one();
         // archive days
         $start_time = '2018-12-31 00:00:00';
@@ -941,6 +961,7 @@ class DeviceController extends Controller
             ->andWhere('date >= "' . $start_time . '"')
             ->andWhere('date < "' . $end_time . '"')
             ->orderBy('date DESC'))
+            ->limit(200)
             ->all();
         $cnt = -1;
         $data['days'] = [];
@@ -2074,7 +2095,11 @@ class DeviceController extends Controller
      */
     function updateConfig($deviceUuid, $parameter, $value)
     {
-        $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->one();
+        $deviceConfig = DeviceConfig::find()
+            ->where(['deviceUuid' => $deviceUuid])
+            ->andWhere(['parameter' => $parameter])
+            ->limit(1)
+            ->one();
         if ($deviceConfig) {
             $deviceConfig['value'] = $value;
             $deviceConfig->save();
@@ -2105,7 +2130,7 @@ class DeviceController extends Controller
      */
     static function getParameter($deviceUuid, $parameter)
     {
-        $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->one();
+        $deviceConfig = DeviceConfig::find()->where(['deviceUuid' => $deviceUuid])->andWhere(['parameter' => $parameter])->limit(1)->one();
         if ($deviceConfig) {
             return $deviceConfig['value'];
         } else {
@@ -2158,9 +2183,9 @@ class DeviceController extends Controller
 
             if ($uuid && $type) {
                 if ($type == 'street') {
-                    $street = Street::find()->where(['uuid' => $uuid])->one();
+                    $street = Street::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($street) {
-                        $house = House::find()->where(['streetUuid' => $street['uuid']])->one();
+                        $house = House::find()->where(['streetUuid' => $street['uuid']])->limit(1)->one();
                         if (!$house) {
                             $street->delete();
                             return 'ok';
@@ -2168,7 +2193,7 @@ class DeviceController extends Controller
                     }
                 }
                 if ($type == 'house') {
-                    $house = House::find()->where(['uuid' => $uuid])->one();
+                    $house = House::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($house) {
                         $house['deleted'] = 1;
                         $house->save();
@@ -2176,7 +2201,7 @@ class DeviceController extends Controller
                     }
                 }
                 if ($type == 'object') {
-                    $object = Objects::find()->where(['uuid' => $uuid])->one();
+                    $object = Objects::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($object) {
                         $object['deleted'] = 1;
                         $object->save();
@@ -2184,7 +2209,7 @@ class DeviceController extends Controller
                     }
                 }
                 if ($type == 'channel') {
-                    $channel = SensorChannel::find()->where(['uuid' => $uuid])->one();
+                    $channel = SensorChannel::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($channel) {
                         MainFunctions::register("Удален канал измерения " . $channel['title']);
                         $channel->delete();
@@ -2193,7 +2218,7 @@ class DeviceController extends Controller
                 }
 
                 if ($type == 'device') {
-                    $device = Device::find()->where(['uuid' => $uuid])->one();
+                    $device = Device::find()->where(['uuid' => $uuid])->limit(1)->one();
                     if ($device) {
                         $device['deleted'] = 1;
                         $device->save();
@@ -2217,21 +2242,22 @@ class DeviceController extends Controller
     public
     function actionTrends($uuid)
     {
-        $deviceElectro = Device::find()->where(['uuid' => $uuid])->one();
+        $deviceElectro = Device::find()->where(['uuid' => $uuid])->limit(1)->one();
         $parameters1 = [];
         $parameters2 = [];
         $parameters3 = [];
 
         if ($deviceElectro) {
             $sensorChannel1 = SensorChannel::find()->where(['deviceUuid' => $deviceElectro['uuid']])
-                ->andWhere(['measureTypeUuid' => MeasureType::POWER])->one();
+                ->andWhere(['measureTypeUuid' => MeasureType::POWER])->limit(1)->one();
 
             if ($sensorChannel1) {
                 $measures = (Measure::find()
                     ->where(['sensorChannelUuid' => $sensorChannel1['uuid']])
                     ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
                     ->orderBy('date DESC'))
-                    ->limit(200)->all();
+                    ->limit(200)
+                    ->all();
 
                 $cnt = 0;
                 $parameters1['uuid'] = $sensorChannel1['_id'];
@@ -2256,7 +2282,8 @@ class DeviceController extends Controller
                     ->where(['sensorChannelUuid' => $sensorChannel2['uuid']])
                     ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
                     ->orderBy('date DESC'))
-                    ->limit(200)->all();
+                    ->limit(200)
+                    ->all();
 
                 $cnt = 0;
                 $parameters2['uuid'] = $sensorChannel2['_id'];
@@ -2281,7 +2308,8 @@ class DeviceController extends Controller
                     ->where(['sensorChannelUuid' => $sensorChannel3['uuid']])
                     ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
                     ->orderBy('date DESC'))
-                    ->limit(200)->all();
+                    ->limit(200)
+                    ->all();
 
                 $cnt = 0;
                 $parameters3['uuid'] = $sensorChannel3['_id'];
@@ -2380,7 +2408,7 @@ class DeviceController extends Controller
             $changed = false;
             $devUuid = $_POST['dev'];
             $grpUuid = $_POST['grp'];
-            $devGrp = DeviceGroup::find()->where(['deviceUuid' => $devUuid])->one();
+            $devGrp = DeviceGroup::find()->where(['deviceUuid' => $devUuid])->limit(1)->one();
 
             if ($devGrp == null && $grpUuid != '0') {
                 // создаём связь
@@ -2446,7 +2474,7 @@ class DeviceController extends Controller
                     'data' => $lightConfig->getBase64Data(), // закодированые бинарные данные
                 ];
                 $org_id = User::getOid(Yii::$app->user->identity);
-                $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+                $org_id = Organisation::find()->where(['uuid' => $org_id])->limit(1)->one()->_id;
                 $node_id = $device->node->_id;
                 self::sendConfig($pkt, $org_id, $node_id);
             }
@@ -2472,7 +2500,7 @@ class DeviceController extends Controller
         ];
 
         $org_id = User::getOid(Yii::$app->user->identity);
-        $org_id = Organisation::find()->where(['uuid' => $org_id])->one()->_id;
+        $org_id = Organisation::find()->where(['uuid' => $org_id])->limit(1)->one()->_id;
         $node_id = $device->node->_id;
         self::sendConfig($pkt, $org_id, $node_id);
         if ($state == 0)
@@ -2494,7 +2522,7 @@ class DeviceController extends Controller
         ];
 
         $org_oid = User::getOid(Yii::$app->user->identity);
-        $org_id = Organisation::find()->where(['uuid' => $org_oid])->one()->_id;
+        $org_id = Organisation::find()->where(['uuid' => $org_oid])->limit(1)->one()->_id;
         $node_id = $node->_id;
         self::sendConfig($pkt, $org_id, $node_id);
 
@@ -2595,10 +2623,12 @@ class DeviceController extends Controller
                 $counter = Device::find()
                     ->where(['nodeUuid' => $device['device']['nodeUuid']])
                     ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
+                    ->limit(1)
                     ->one();
                 if ($counter && $knt > 0) {
                     $sChannel = SensorChannel::find()
                         ->where(['deviceUuid' => $counter['uuid'], 'measureTypeUuid' => MeasureType::POWER])
+                        ->limit(1)
                         ->one();
                     if ($sChannel) {
                         for ($mon = 0; $mon < 12; $mon++) {
@@ -2613,6 +2643,7 @@ class DeviceController extends Controller
                                 ->where(['sensorChannelUuid' => $sChannel['uuid']])
                                 ->andWhere(['date' => $month])
                                 ->andWhere(['type' => MeasureType::MEASURE_TYPE_MONTH])
+                                ->limit(1000)
                                 ->all();
                             foreach ($last_measures as $measure) {
                                 $value = $measure['value'] * $knt;
@@ -2684,6 +2715,7 @@ class DeviceController extends Controller
             $house = House::find()
                 ->where(['streetUuid' => $_POST['street']])
                 ->andWhere(['houseTypeUuid' => HouseType::HOUSE_TYPE_NO_NUMBER])
+                ->limit(1)
                 ->one();
             if (!$house) {
                 $house = new House();
@@ -2724,6 +2756,7 @@ class DeviceController extends Controller
                 ->where(['groupUuid' => $_POST["group"]])
                 ->andWhere(['date' => $date])
                 ->andWhere(['type' => $_POST["type"]])
+                ->limit(1)
                 ->one();
             if ($groupControl) {
                 $groupControl['date'] = date("Y-m-d H:i:00", strtotime($_POST["event_end"]));
@@ -2757,6 +2790,7 @@ class DeviceController extends Controller
                 ->where(['nodeUuid' => $_POST["node"]])
                 ->andWhere(['date' => $date])
                 ->andWhere(['type' => $_POST["type"]])
+                ->limit(1)
                 ->one();
             if ($nodeControl) {
                 $nodeControl['date'] = date("Y-m-d H:i:00", strtotime($_POST["event_end"]));
@@ -2842,6 +2876,7 @@ class DeviceController extends Controller
         $groupControl = GroupControl::find()
             ->where(['groupUuid' => $group])
             ->andWhere(['date' => $date])
+            ->limit(1)
             ->one();
         if ($groupControl) {
             $program = $groupControl['deviceProgramUuid'];
@@ -2872,6 +2907,7 @@ class DeviceController extends Controller
         if ($uuid != '') {
             $group = Group::find()
                 ->where(['uuid' => $uuid])
+                ->limit(1)
                 ->one();
             if ($group) {
                 return $this->renderAjax('_set_default_program', [
@@ -2906,6 +2942,7 @@ class DeviceController extends Controller
             ->andWhere('date>="' . $date_start . '"')
             ->andWhere('date<="' . $date_end . '"')
             ->andWhere(['type' => 1])
+            ->limit(1)
             ->one();
         if ($deviceProgram == '' || $deviceProgram == null)
             $deviceProgram = null;
@@ -2941,6 +2978,7 @@ class DeviceController extends Controller
 
         $group = Group::find()
             ->where(['uuid' => $groupUuid])
+            ->limit(1)
             ->one();
         if ($deviceProgram == '')
             $deviceProgram = null;

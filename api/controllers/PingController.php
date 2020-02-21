@@ -7,7 +7,6 @@ use common\models\Alarm;
 
 class PingController extends BaseController
 {
-    /** @var Alarm $modelClass */
     public $modelClass = null;
 
     public function actionIndex() {

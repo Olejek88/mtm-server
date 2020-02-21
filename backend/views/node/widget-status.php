@@ -64,7 +64,8 @@ use yii\widgets\Pjax;
                     if (!in_array($node->deviceStatusUuid, $deviceStatuses)) {
                         $options = array_merge($options, ['disabled' => 'disabled']);
                     }
-                    echo Html::hiddenInput('device', $device['uuid']);
+                    if ($device)
+                        echo Html::hiddenInput('device', $device['uuid']);
                     echo Html::hiddenInput('type', 'node');
                     echo Html::hiddenInput('on', $value);
                     echo Html::submitButton(Yii::t('app', $title), $options);
@@ -155,7 +156,8 @@ console.log('contact click...');
                     }
 
                     echo Html::submitButton(Yii::t('app', 'Сбросить'), $options);
-                    echo Html::hiddenInput('device', $device['uuid']);
+                    if ($device)
+                        echo Html::hiddenInput('device', $device['uuid']);
                     echo Html::hiddenInput('type','node');
                     echo Html::hiddenInput('reset',1);
                     echo Html::endForm();

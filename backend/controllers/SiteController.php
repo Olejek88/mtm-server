@@ -800,7 +800,8 @@ class SiteController extends Controller
                             ->asArray()
                             ->limit(1)
                             ->one();
-                        if ($measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+                        if ($measure && $measure['sensorChannel'] &&
+                            $measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
                             $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
                             $contactor = $measure['value'];
                             if ($contactor) {
@@ -925,6 +926,7 @@ class SiteController extends Controller
 
         $nodes = $nodesQuery
             ->with(['object.house.street'])
+            ->with(['deviceStatus'])
             ->asArray()
             ->limit(1)
             ->all();

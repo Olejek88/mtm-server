@@ -40,8 +40,14 @@ use yii\helpers\Html;
             <br/>
             <small class="float-right">Телефон: <?php echo $node['phone'] ?></small>
             <br/>
-            <span class="float-right"><?php echo Html::a('<i class="fa fa-bar-chart"></i> Тренды', ['../device/trends', 'uuid' => $device['uuid']]) ?></span><br/>
-            <span class="float-right"><?php echo Html::a('<i class="fa fa-table"></i> Журнал', ['../device/register', 'uuid' => $device['uuid']]) ?></span>
+            <span class="float-right"><?php
+                if ($device)
+                    echo Html::a('<i class="fa fa-bar-chart"></i> Тренды', ['../device/trends', 'uuid' => $device['uuid']]);
+                ?></span><br/>
+            <span class="float-right"><?php
+                if ($device)
+                    echo Html::a('<i class="fa fa-table"></i> Журнал', ['../device/register', 'uuid' => $device['uuid']]);
+                ?></span>
         </div>
     </div>
 </div>

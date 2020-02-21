@@ -294,9 +294,9 @@ class Device extends MtmActiveRecord
      */
     public function getDeviceProgram()
     {
-        $config = DeviceConfig::find()->where(['deviceUuid' => $this->uuid, 'parameter' => 'Программа'])->one();
+        $config = DeviceConfig::find()->where(['deviceUuid' => $this->uuid, 'parameter' => 'Программа'])->limit(1)->one();
         if ($config != null) {
-            return DeviceProgram::find()->where(['title' => $config->value])->one();
+            return DeviceProgram::find()->where(['title' => $config->value])->limit(1)->one();
         } else {
             return null;
         }
