@@ -3,8 +3,10 @@
 namespace backend\controllers;
 
 use backend\models\NodeSearch;
+use common\components\MainFunctions;
 use common\models\Camera;
 use common\models\Device;
+use common\models\DeviceConfig;
 use common\models\DeviceRegister;
 use common\models\DeviceStatus;
 use common\models\DeviceType;
@@ -26,6 +28,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * NodeController implements the CRUD actions for Node model.
@@ -361,6 +364,7 @@ class NodeController extends Controller
      *
      * @return mixed
      * @throws NotFoundHttpException
+     * @throws InvalidConfigException
      */
     public
     function actionUpdate($id)
@@ -370,6 +374,22 @@ class NodeController extends Controller
         }
 
         $model = $this->findModel($id);
+        $zbcDevice = Device::find()->where([
+            'nodeUuid' => $model->uuid,
+            'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR,
+        ])->limit(1)->one();
+        $zbcMode = null;
+        if ($zbcDevice != null) {
+            $config = DeviceConfig::find()->where([
+                'deviceUuid' => $zbcDevice->uuid,
+                'parameter' => DeviceConfig::PARAM_ZB_COORDINATOR_MODE,
+            ])->limit(1)->one();
+            if ($config != null) {
+                $zbcMode = $config->value;
+            } else {
+                $zbcMode = 0;
+            }
+        }
         if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->_id]);
@@ -378,6 +398,7 @@ class NodeController extends Controller
                     'update',
                     [
                         'model' => $model,
+                        'zbcMode' => $zbcMode,
                     ]
                 );
             }
@@ -386,6 +407,7 @@ class NodeController extends Controller
                 'update',
                 [
                     'model' => $model,
+                    'zbcMode' => $zbcMode,
                 ]
             );
         }
@@ -856,5 +878,62 @@ class NodeController extends Controller
                 'provider' => $provider
             ]
         );
+    }
+
+    /**
+     * @param $id
+     * @return Response
+     * @throws InvalidConfigException
+     * @throws NotFoundHttpException
+     */
+    public function actionSetManualMode($id)
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $model = $this->findModel($id);
+        $zbcDevice = Device::find()->where([
+            'nodeUuid' => $model->uuid,
+            'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR,
+        ])->limit(1)->one();
+        if (Yii::$app->request->isPost && $zbcDevice != null) {
+            $mode = Yii::$app->request->getBodyParam('zbcmode');
+            $config = DeviceConfig::find()->where([
+                'deviceUuid' => $zbcDevice->uuid,
+                'parameter' => DeviceConfig::PARAM_ZB_COORDINATOR_MODE,
+            ])->limit(1)->one();
+            if ($config == null) {
+                $config = new DeviceConfig();
+                $config->uuid = MainFunctions::GUID();
+                $config->oid = User::getOid(Yii::$app->user->identity);
+                $config->deviceUuid = $zbcDevice->uuid;
+                $config->parameter = DeviceConfig::PARAM_ZB_COORDINATOR_MODE;
+            }
+
+            $config->value = $mode == 1 ? 1 : 0;
+            $config->save();
+        }
+
+        return $this->redirect(['view', 'id' => $model->_id]);
+//        if ($model->load(Yii::$app->request->post())) {
+//            if ($model->save()) {
+//                return $this->redirect(['view', 'id' => $model->_id]);
+//            } else {
+//                return $this->render(
+//                    'update',
+//                    [
+//                        'model' => $model,
+//                    ]
+//                );
+//            }
+//        } else {
+//            return $this->render(
+//                'update',
+//                [
+//                    'model' => $model,
+//                ]
+//            );
+//        }
     }
 }
