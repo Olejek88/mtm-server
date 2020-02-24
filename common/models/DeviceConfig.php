@@ -41,6 +41,8 @@ class DeviceConfig extends MtmActiveRecord
 
     const PARAM_LIGHT_PROGRAM = 'Программа';
 
+    const PARAM_ZB_COORDINATOR_MODE = 'Ручной режим работы координатора';
+
     /**
      * Behaviors
      *
