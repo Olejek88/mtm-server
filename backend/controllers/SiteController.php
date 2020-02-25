@@ -188,10 +188,6 @@ class SiteController extends Controller
         $counts['node'] = Node::find()->where(['deleted' => 0])->asArray()->count();
         $counts['deviceType'] = DeviceType::find()->count();
 
-        $last_measures = Measure::find()
-            ->where('createdAt > (NOW()-(4*24*3600000))')
-            ->asArray()
-            ->count();
         $complete = 0;
 
 //        $measures = Measure::find()
@@ -492,7 +488,6 @@ class SiteController extends Controller
                 'camerasGroup' => $layers['camerasGroup'],
                 'nodesList' => $layers['nodesList'],
                 'nodesGroup' => $layers['nodesGroup'],
-                'last_measures' => $last_measures,
                 'complete' => $complete,
                 'currentUser' => $currentUser,
                 'searchModel' => $searchModel,
