@@ -15,7 +15,6 @@
  * @var $objectsList
  * @var $objectsGroup
  * @var $usersList
- * @var $last_measures
  * @var $complete
  * @var $devicesGroup
  * @var $devicesList

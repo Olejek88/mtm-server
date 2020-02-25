@@ -160,8 +160,8 @@ class Measure extends MtmActiveRecord
     public static function getLastMeasureBetweenDates($sensorChannelUuid, $startDate, $endDate)
     {
         $model = Measure::find()->where(["sensorChannelUuid" => $sensorChannelUuid])
-            ->andWhere('date >= "' . $startDate . '"')
-            ->andWhere('date < "' . $endDate . '"')
+            ->andWhere(['>=', 'date', $startDate])
+            ->andWhere(['<', 'date', $endDate])
             ->orderBy('date DESC')
             ->limit(1)
             ->one();
@@ -178,24 +178,15 @@ class Measure extends MtmActiveRecord
      */
     public static function getSumMeasureBetweenDates($sensorChannelUuid, $startDate, $endDate, $parameter)
     {
-        if ($parameter > 0) {
-            $sum = Measure::find()
-                ->where(["sensorChannelUuid" => $sensorChannelUuid])
-                ->andWhere(['parameter' => $parameter])
-                ->andWhere('date >= "' . $startDate . '"')
-                ->andWhere('date < "' . $endDate . '"')
-                ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-                ->sum('value');
-        } else {
-            $sum = Measure::find()
-                ->where(["sensorChannelUuid" => $sensorChannelUuid])
-                ->andWhere('parameter > 0')
-                ->andWhere('date >= "' . $startDate . '"')
-                ->andWhere('date < "' . $endDate . '"')
-                ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-                ->sum('value');
-        }
-        return number_format($sum,3);
+        $parameter = $parameter > 0 ? $parameter : 0;
+        $sum = Measure::find()
+            ->where(["sensorChannelUuid" => $sensorChannelUuid])
+            ->andWhere(['parameter' => $parameter])
+            ->andWhere(['>=', 'date', $startDate])
+            ->andWhere(['<', 'date', $endDate])
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
+            ->sum('value');
+        return number_format($sum, 3);
     }
 
     /**
@@ -211,6 +202,7 @@ class Measure extends MtmActiveRecord
             ->andWhere(['type' => $type])
             ->andWhere(['parameter' => $parameter])
             ->orderBy('date DESC')
+            ->limit(1)
             ->one();
         return $model;
     }
