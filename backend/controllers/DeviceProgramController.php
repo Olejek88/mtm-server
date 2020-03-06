@@ -255,7 +255,7 @@ class DeviceProgramController extends Controller
 
         return $this->render('calendar', [
             'events' => $events,
-            'groupTitle' => $group->title,
+            'groupTitle' => $group['title'],
         ]);
     }
 
