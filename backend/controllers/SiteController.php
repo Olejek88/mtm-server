@@ -1005,6 +1005,7 @@ class SiteController extends Controller
                     ->where(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO])
                     ->andWhere(['deleted' => 0])
                     ->andWhere(['nodeUuid' => $node['uuid']])
+                    ->with(['deviceStatus'])
                     ->asArray()
                     ->limit(1)
                     ->one();
