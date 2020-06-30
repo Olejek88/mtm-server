@@ -109,7 +109,7 @@ $gridColumns = [
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 1);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 1);
                 return $value;
             }
             return '-';
@@ -138,7 +138,7 @@ $gridColumns = [
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time,2);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 2);
                 return $value;
             }
             return '-';
@@ -167,7 +167,7 @@ $gridColumns = [
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 3);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 3);
                 return $value;
             }
             return '-';
@@ -196,7 +196,7 @@ $gridColumns = [
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 4);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 4);
                 return $value;
             }
             return '-';
@@ -225,7 +225,7 @@ $gridColumns = [
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel, $start_time, $end_time, 0);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 0);
                 return $value;
             }
             return '-';

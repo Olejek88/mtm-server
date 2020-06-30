@@ -178,14 +178,18 @@ class Measure extends MtmActiveRecord
      */
     public static function getSumMeasureBetweenDates($sensorChannelUuid, $startDate, $endDate, $parameter)
     {
-        $parameter = $parameter > 0 ? $parameter : 0;
-        $sum = Measure::find()
+        $q = Measure::find()
             ->where(["sensorChannelUuid" => $sensorChannelUuid])
-            ->andWhere(['parameter' => $parameter])
             ->andWhere(['>=', 'date', $startDate])
             ->andWhere(['<', 'date', $endDate])
-            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS])
-            ->sum('value');
+            ->andWhere(['type' => MeasureType::MEASURE_TYPE_DAYS]);
+        if ($parameter > 0) {
+            $q->andWhere(['parameter' => $parameter]);
+        } else {
+            $q->andWhere(['>', 'parameter', $parameter]);
+        }
+
+        $sum = $q->sum('value');
         return number_format($sum, 3);
     }
 
