@@ -1,5 +1,7 @@
 <?php
 
+use yii\web\View;
+
 /* @var $device
  * @var $parameters1
  * @var $parameters2
