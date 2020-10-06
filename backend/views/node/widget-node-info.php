@@ -4,6 +4,7 @@
  */
 
 use common\models\DeviceStatus;
+use common\models\User;
 use yii\helpers\Html;
 
 ?>
@@ -47,7 +48,14 @@ use yii\helpers\Html;
             <span class="float-right"><?php
                 if ($device)
                     echo Html::a('<i class="fa fa-table"></i> Журнал', ['../device/register', 'uuid' => $device['uuid']]);
-                ?></span>
+                ?></span><br/>
+            <span class="float-right">
+                <?php
+                if ($node && Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+                    echo Html::a('<i class="fa fa-terminal"></i> ssh', ['../ssh', 'uuid' => $node['uuid']]);
+                }
+                ?>
+            </span>
         </div>
     </div>
 </div>
