@@ -63,6 +63,7 @@ use yii\data\ActiveDataProvider;
                     $measure = Measure::find()
                         ->where(['sensorChannelUuid' => $data['uuid']])
                         ->orderBy('createdAt DESC')
+                        ->limit(1)
                         ->one();
                     if ($measure)
                         return $measure['value'].' ['.$measure['date'].']';

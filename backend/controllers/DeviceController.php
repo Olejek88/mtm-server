@@ -115,7 +115,13 @@ class DeviceController extends Controller
             if ($_POST['editableAttribute'] == 'address') {
                 $model['address'] = $_POST['Device'][$_POST['editableIndex']]['address'];
             }
-            $model->save();
+            if ($_POST['editableAttribute'] == 'serial') {
+                $model['serial'] = $_POST['Device'][$_POST['editableIndex']]['serial'];
+            }
+            if ($model->save()) {
+                return json_encode($model->errors);
+            }
+
             return json_encode('');
         }
 

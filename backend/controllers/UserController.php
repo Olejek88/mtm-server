@@ -170,18 +170,42 @@ class UserController extends Controller
 
             $model = User::find()->where(['_id' => $_POST['editableKey']])->one();
             if ($_POST['editableAttribute'] == 'type') {
-                $model['type'] = intval($_POST['Users'][$_POST['editableIndex']]['type']);
-                if ($model['active'] == true) $model['active'] = 1;
-                else $model['active'] = 0;
-                $model->save();
-                return json_encode($model->errors);
+                $model['type'] = intval($_POST['User'][$_POST['editableIndex']]['type']);
+                if (!$model->save()) {
+                    return json_encode($model->errors);
+                }
+
+                $am = Yii::$app->authManager;
+                $adminRole = $am->getRole(User::ROLE_ADMIN);
+                $operatorRole = $am->getRole(User::ROLE_OPERATOR);
+                $revoke = $model['type'] == 0 ? $operatorRole : $adminRole;
+                $assign = $model['type'] == 0 ? $adminRole : $operatorRole;
+                if ($am->getAssignment($revoke->name, $_POST['editableKey'])) {
+                    $am->revoke($revoke, $model->_id);
+                }
+
+                if (!$am->getAssignment($assign->name, $_POST['editableKey'])) {
+                    $am->assign($assign, $model->_id);
+                }
+
+                return json_encode([]);
             }
-            if ($_POST['editableAttribute'] == 'active') {
-                if ($_POST['Users'][$_POST['editableIndex']]['active'] == true)
-                    $model['active'] = 1;
-                else $model['active'] = 0;
+            if ($_POST['editableAttribute'] == 'status') {
+                if ($_POST['User'][$_POST['editableIndex']]['status'] == User::STATUS_ACTIVE)
+                    $model['status'] = User::STATUS_ACTIVE;
+                else $model['status'] = User::STATUS_DELETED;
+                if (!$model->save()) {
+                    return json_encode($model->errors);
+                }
+                return json_encode([]);
+            }
+            if ($_POST['editableAttribute'] == 'name') {
+                $model->name = $_POST['User'][$_POST['editableIndex']]['name'];
                 $model->save();
-                return json_encode("hui2");
+                if (!$model->save()) {
+                    return json_encode($model->errors);
+                }
+                return json_encode([]);
             }
         }
 

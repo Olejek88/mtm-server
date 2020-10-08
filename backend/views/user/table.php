@@ -2,7 +2,6 @@
 /* @var $searchModel backend\models\UserSearch */
 
 use common\models\User;
-use common\models\Users;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 
@@ -13,7 +12,7 @@ $gridColumns = [
         'attribute' => '_id',
         'hAlign' => 'center',
         'vAlign' => 'middle',
-        'name' => '#',
+//        'name' => '#',
         'contentOptions' => [
             'class' => 'table_class',
             'style' => 'width: 50px; text-align: center'
@@ -27,7 +26,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\EditableColumn',
         'attribute' => 'name',
-        'name' => 'Название',
+//        'name' => 'Название',
         'vAlign' => 'middle',
         'contentOptions' => [
             'class' => 'table_class'
@@ -49,20 +48,55 @@ $gridColumns = [
         'mergeHeader' => true,
         'format' => 'raw',
         'value' => function ($model, $key, $index, $widget) {
-            if ($model->type==User::ROLE_ADMIN)
+            if ($model->type == 0)
                 return 'Администратор';
-            if ($model->type==User::ROLE_OPERATOR)
+            if ($model->type == 1)
                 return 'Оператор';
             return 'Пользователь';
         },
-        'editableOptions'=> function ($model, $key, $index, $widget) {
+        'editableOptions' => function ($model, $key, $index, $widget) {
             return [
                 'header' => 'Тип',
                 'size' => 'lg',
                 'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                'displayValueConfig' => [
+                    0 => 'Администратор',
+                    1 => 'Оператор'
+                ],
                 'data' => [
-                    User::ROLE_ADMIN =>'Администратор',
-                    User::ROLE_OPERATOR =>'Оператор'
+                    0 => 'Администратор',
+                    1 => 'Оператор'
+                ]
+            ];
+        },
+    ],
+    [
+        'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'status',
+        'vAlign' => 'middle',
+        'width' => '180px',
+        'header' => 'Статус',
+        'mergeHeader' => true,
+        'format' => 'raw',
+        'value' => function ($model, $key, $index, $widget) {
+            if ($model->status == User::STATUS_ACTIVE) {
+                return 'Активен';
+            } else {
+                return 'Отключен';
+            }
+        },
+        'editableOptions' => function ($model, $key, $index, $widget) {
+            return [
+                'header' => 'Тип',
+                'size' => 'lg',
+                'inputType' => Editable::INPUT_DROPDOWN_LIST,
+                'displayValueConfig' => [
+                    User::STATUS_ACTIVE => 'Активен',
+                    User::STATUS_DELETED => 'Отключен'
+                ],
+                'data' => [
+                    User::STATUS_ACTIVE => 'Активен',
+                    User::STATUS_DELETED => 'Отключен'
                 ]
             ];
         },
@@ -108,7 +142,7 @@ echo GridView::widget([
     'pjax' => true,
     'showPageSummary' => false,
     'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
-    'summary'=>'',
+    'summary' => '',
     'bordered' => true,
     'striped' => false,
     'condensed' => false,
