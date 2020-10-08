@@ -62,6 +62,20 @@ class User extends Model
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'name' => 'Имя',
+            'username' => 'Логин',
+            'password' => 'Пароль',
+            'status' => 'Статус',
+            'role' => 'Права',
+        ];
+    }
+
+    /**
      * Signs user up.
      *
      * @return \common\models\User|null the saved model or null if saving fails
@@ -125,6 +139,7 @@ class User extends Model
 
         $roleItem = $am->getRole($this->role);
         $am->assign($roleItem, $user->_id);
+        $user->type = $this->role == \common\models\User::ROLE_ADMIN ? 0 : 1;
 
         return $user->save() ? $user : null;
     }
