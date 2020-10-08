@@ -75,6 +75,7 @@ use yii\helpers\Html;
                     $measure = Measure::find()
                         ->where(['sensorChannelUuid' => $data['uuid']])
                         ->orderBy('date DESC')
+                        ->limit(1)
                         ->one();
                     $value = "-";
                     if ($measure)
@@ -96,6 +97,7 @@ use yii\helpers\Html;
                     $measure = Measure::find()
                         ->where(['sensorChannelUuid' => $data['uuid']])
                         ->orderBy('date DESC')
+                        ->limit(1)
                         ->one();
                     $value = "-";
                     if ($measure)
