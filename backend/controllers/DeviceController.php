@@ -37,6 +37,7 @@ use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\StaleObjectException;
 use yii\filters\AccessControl;
@@ -2599,25 +2600,29 @@ class DeviceController extends Controller
         $startTime = strtotime($startDate);
         $groupUuid = $request->getQueryParam('group', '0');
 
-        $groups = Group::find();
+        $groups = Group::find()->orderBy('_id');
         $groups = $groupUuid != '0' ? $groups->where(['uuid' => $groupUuid])->all() : $groups->all();
-        $data['group'] = [];
+        $groupNames = [];
+        foreach ($groups as $key => $group) {
+            $groupNames[$key] = $group->title;
+        }
+
         $group_num = 0;
+        $newData = [];
         foreach ($groups as $group) {
-            $data['group'][$group_num]['title'] = $group['title'];
-            $data['group'][$group_num]['month'] = [];
+            $groupId = 'g' . $group_num;
             for ($mon = 0; $mon < 12; $mon++) {
                 if ($mon > 0) {
-                    $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m", strtotime("-" . $mon . " months", $startTime));
+                    $newData[$mon]['date'] = date("Y-m", strtotime("-" . $mon . " months", $startTime));
                 } else {
-                    $data['group'][$group_num]['month'][$mon]['date'] = date('Y-m', $startTime);
+                    $newData[$mon]['date'] = date('Y-m', $startTime);
                 }
 
-                $data['group'][$group_num]['month'][$mon]['w1'] = 0;
-                $data['group'][$group_num]['month'][$mon]['w2'] = 0;
-                $data['group'][$group_num]['month'][$mon]['w3'] = 0;
-                $data['group'][$group_num]['month'][$mon]['w4'] = 0;
-                $data['group'][$group_num]['month'][$mon]['ws'] = 0;
+                $newData[$mon][$groupId . 'w1'] = 0;
+                $newData[$mon][$groupId . 'w2'] = 0;
+                $newData[$mon][$groupId . 'w3'] = 0;
+                $newData[$mon][$groupId . 'w4'] = 0;
+                $newData[$mon][$groupId . 'ws'] = 0;
             }
 
             $devices = DeviceGroup::find()
@@ -2663,16 +2668,21 @@ class DeviceController extends Controller
                                 ->all();
                             foreach ($last_measures as $measure) {
                                 $value = $measure['value'] * $knt;
-                                if ($measure['parameter'] == 1)
-                                    $data['group'][$group_num]['month'][$mon]['w1'] += $value;
-                                if ($measure['parameter'] == 2)
-                                    $data['group'][$group_num]['month'][$mon]['w2'] += $value;
-                                if ($measure['parameter'] == 3)
-                                    $data['group'][$group_num]['month'][$mon]['w3'] += $value;
-                                if ($measure['parameter'] == 4)
-                                    $data['group'][$group_num]['month'][$mon]['w4'] += $value;
-                                if ($measure['parameter'] > 0)
-                                    $data['group'][$group_num]['month'][$mon]['ws'] += $value;
+                                if ($measure['parameter'] == 1) {
+                                    $newData[$mon][$groupId . 'w1'] += $value;
+                                }
+                                if ($measure['parameter'] == 2) {
+                                    $newData[$mon][$groupId . 'w2'] += $value;
+                                }
+                                if ($measure['parameter'] == 3) {
+                                    $newData[$mon][$groupId . 'w3'] += $value;
+                                }
+                                if ($measure['parameter'] == 4) {
+                                    $newData[$mon][$groupId . 'w4'] += $value;
+                                }
+                                if ($measure['parameter'] > 0) {
+                                    $newData[$mon][$groupId . 'ws'] += $value;
+                                }
                             }
                         }
                     }
@@ -2683,17 +2693,22 @@ class DeviceController extends Controller
 
         $groups = Group::find()->asArray()->all();
         $groups = ArrayHelper::map($groups, 'uuid', 'title');
-        $groups = array_merge([0 => 'Все'], $groups);
 
-        return $this->render(
-            'report-group',
-            [
-                'dataAll' => $data,
-                'startDate' => $startDate,
-                'groups' => $groups,
-                'groupUuid' => $groupUuid,
-            ]
-        );
+        $dataProvider = new ArrayDataProvider();
+        $dataProvider->allModels = $newData;
+        $viewParams = [
+            'startDate' => $startDate,
+            'groups' => $groups,
+            'groupUuid' => $groupUuid,
+            'dataProvider' => $dataProvider,
+            'groupNames' => $groupNames,
+        ];
+
+        if ($request->isPjax) {
+            return $this->renderAjax('report-group', $viewParams);
+        } else {
+            return $this->render('report-group', $viewParams);
+        }
     }
 
     /**
