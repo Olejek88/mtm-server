@@ -10,6 +10,8 @@ use yii\web\View;
  * @var $camera
  * @var $coordinator
  * @var $parameters
+ * @var $counterValue
+ * @var $counterDate
  */
 
 $this->title = Yii::t('app', 'Контроллер');
@@ -47,6 +49,10 @@ if ($deviceElectro) {
 
     <div class="col-md-4">
         <?= $this->render('widget-status', ['node' => $node, 'parameters' => $parameters, 'device' => $coordinator]); ?>
+    </div>
+
+    <div class="col-md-4">
+        <?= $this->render('widget-counter-value', ['counterDate' => $counterDate, 'counterValue' => $counterValue, 'node' => $node]); ?>
     </div>
 
     <div class="col-md-7">
