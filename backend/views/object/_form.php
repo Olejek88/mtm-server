@@ -32,6 +32,8 @@ $lngDefault = 61.402738;
     <?php
     if (!$model->isNewRecord) {
         echo $form->field($model, 'uuid')->hiddenInput()->label(false);
+        $latDefault = $model->latitude;
+        $lngDefault = $model->longitude;
     } else {
         echo $form->field($model, 'uuid')->hiddenInput(['value' => (new MainFunctions)->GUID()])->label(false);
     }

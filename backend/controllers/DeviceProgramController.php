@@ -126,7 +126,7 @@ class DeviceProgramController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            MainFunctions::deviceRegister($model->uuid, "Изменена программа работы");
+            MainFunctions::register("Изменена программа работы: '{$model->title}'");
             return $this->redirect(['view', 'id' => $model->_id]);
         }
 

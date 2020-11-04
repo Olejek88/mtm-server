@@ -2594,20 +2594,32 @@ class DeviceController extends Controller
      */
     public function actionReportGroup()
     {
+        $request = Yii::$app->request;
+        $startDate = $request->getQueryParam('start_time', date('Y-m'));
+        $startTime = strtotime($startDate);
+        $groupUuid = $request->getQueryParam('group', '0');
+
+        $groups = Group::find();
+        $groups = $groupUuid != '0' ? $groups->where(['uuid' => $groupUuid])->all() : $groups->all();
         $data['group'] = [];
         $group_num = 0;
-        $groups = Group::find()->all();
         foreach ($groups as $group) {
             $data['group'][$group_num]['title'] = $group['title'];
             $data['group'][$group_num]['month'] = [];
             for ($mon = 0; $mon < 12; $mon++) {
-                $data['group'][$group_num]['month'][$mon]['date'] = '-';
+                if ($mon > 0) {
+                    $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m", strtotime("-" . $mon . " months", $startTime));
+                } else {
+                    $data['group'][$group_num]['month'][$mon]['date'] = date('Y-m', $startTime);
+                }
+
                 $data['group'][$group_num]['month'][$mon]['w1'] = 0;
                 $data['group'][$group_num]['month'][$mon]['w2'] = 0;
                 $data['group'][$group_num]['month'][$mon]['w3'] = 0;
                 $data['group'][$group_num]['month'][$mon]['w4'] = 0;
                 $data['group'][$group_num]['month'][$mon]['ws'] = 0;
             }
+
             $devices = DeviceGroup::find()
                 ->where(['groupUuid' => $group['uuid']])
                 ->all();
@@ -2639,11 +2651,9 @@ class DeviceController extends Controller
                     if ($sChannel) {
                         for ($mon = 0; $mon < 12; $mon++) {
                             if ($mon > 0) {
-                                $month = date("Ym01000000", strtotime("-" . $mon . " months"));
-                                $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01", strtotime("-" . $mon . " months"));
+                                $month = date("Ym01000000", strtotime("-" . $mon . " months", $startTime));
                             } else {
-                                $month = date("Ym01000000");
-                                $data['group'][$group_num]['month'][$mon]['date'] = date("Y-m-01");
+                                $month = date("Ym01000000", $startTime);
                             }
                             $last_measures = Measure::find()
                                 ->where(['sensorChannelUuid' => $sChannel['uuid']])
@@ -2670,10 +2680,18 @@ class DeviceController extends Controller
             }
             $group_num++;
         }
+
+        $groups = Group::find()->asArray()->all();
+        $groups = ArrayHelper::map($groups, 'uuid', 'title');
+        $groups = array_merge([0 => 'Все'], $groups);
+
         return $this->render(
             'report-group',
             [
-                'dataAll' => $data
+                'dataAll' => $data,
+                'startDate' => $startDate,
+                'groups' => $groups,
+                'groupUuid' => $groupUuid,
             ]
         );
     }
