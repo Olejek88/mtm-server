@@ -215,7 +215,10 @@ class Node extends MtmActiveRecord
             return '-';
         }
 
-        $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $counter->uuid])->limit(1)->one();
+        $sensorChannel = SensorChannel::find()->where([
+            'deviceUuid' => $counter->uuid,
+            'measureTypeUuid' => MeasureType::POWER,
+        ])->limit(1)->one();
         if ($counter == null) {
             return '-';
         }
@@ -225,7 +228,7 @@ class Node extends MtmActiveRecord
             'type' => MeasureType::MEASURE_TYPE_TOTAL,
             'parameter' => 0,
             'date' => $date,
-        ])->orderBy(['date' => SORT_DESC])->limit(1)->one();
+        ])->limit(1)->one();
 
         return $counterValue != null ? $counterValue->value : '-';
     }
