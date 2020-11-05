@@ -1593,6 +1593,10 @@ class DeviceController extends Controller
     public
     function actionReport()
     {
+        $request = Yii::$app->request;
+        $startDate = $request->getQueryParam('start_date', date('Y-m-d'));
+        $endDate = $request->getQueryParam('end_date', date('Y-m-d'));
+
         $searchModel = new DeviceSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ELECTRO]);
@@ -1602,6 +1606,8 @@ class DeviceController extends Controller
             [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
             ]
         );
     }

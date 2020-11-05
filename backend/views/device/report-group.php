@@ -4,7 +4,6 @@ use kartik\grid\GridView;
 use kartik\widgets\DatePicker;
 use kartik\widgets\Select2;
 use yii\data\ArrayDataProvider;
-use yii\widgets\ActiveForm;
 
 /** @var $groupUuid */
 /** @var $startDate */
@@ -37,10 +36,11 @@ $beforeHeaderColumns = [
 $groupCount = (count($dataProvider->allModels[0]) - 1) / 5;
 for ($i = 0; $i < $groupCount; $i++) {
     $groupId = 'g' . $i;
-    $beforeHeaderColumns[] = ['content' => 'Группа №' . $groupNames[$i], 'options' => ['colspan' => 3, 'class' => 'text-center warning']];
+    $beforeHeaderColumns[] = ['content' => $groupNames[$i], 'options' => ['colspan' => 3, 'class' => 'text-center warning']];
     $gridColumns[] = [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'mergeHeader' => true,
         'width' => '180px',
         'header' => 'Тариф1, кВт*ч',
@@ -52,6 +52,7 @@ for ($i = 0; $i < $groupCount; $i++) {
     $gridColumns[] = [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'mergeHeader' => true,
         'width' => '180px',
         'header' => 'Тариф2, кВт*ч',
@@ -63,6 +64,7 @@ for ($i = 0; $i < $groupCount; $i++) {
     $gridColumns[] = [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'mergeHeader' => true,
         'width' => '180px',
         'header' => 'Сумма, кВт*ч',
@@ -75,7 +77,6 @@ for ($i = 0; $i < $groupCount; $i++) {
 
 
 $datePicker = DatePicker::widget([
-//    'id' => 'start_time',
     'name' => 'start_time',
     'value' => $startDate,
     'removeButton' => false,
@@ -87,13 +88,12 @@ $datePicker = DatePicker::widget([
         'minViewMode' => 'months',
     ],
     'options' => [
-        'width' => '300px',
+        'readonly' => true,
         'class' => ['add-filter'],
     ],
 ]);
 
 $groupSelect = Select2::widget([
-//    'id' => 'group',
     'name' => 'group',
     'data' => $groups,
     'value' => $groupUuid,
@@ -101,30 +101,15 @@ $groupSelect = Select2::widget([
     'pjaxContainerId' => 'report-group-container',
     'pluginOptions' => [
 //        'allowClear' => true,
-//        'multiple' => true,
         'width' => '600px',
-//        'showToggleAll' => false,
     ],
     'options' => [
-//        'width' => '600px',
-        'class' => ['add-filter'/*, 'input-group'*/],
+        'class' => ['add-filter'],
         'placeholder' => 'Выберите группу',
         'multiple' => true,
+        'readonly' => true,
     ],
 ]);
-
-ob_start();
-// форма указания периода
-$form = ActiveForm::begin([
-    'action' => ['device/report-group'],
-    'method' => 'get',
-]);
-echo $groupSelect;
-echo $datePicker;
-echo '{export}';
-ActiveForm::end();
-$formHtml = ob_get_contents();
-ob_end_clean();
 
 echo GridView::widget([
     'id' => 'program-report-table',
@@ -139,40 +124,28 @@ echo GridView::widget([
     'beforeHeader' => [
         '{toggleData}',
         [
+            'columns' => [
+                [
+                    'content' => 'За период с ' . date('Y-m', strtotime($startDate . ' -12 month')) . " по $startDate",
+                    'options' => ['colspan' => 1 + $groupCount * 5, 'class' => 'text-center warning']
+                ],
+            ],
+        ],
+        [
             'columns' => $beforeHeaderColumns,
         ]
     ],
     'toolbar' => [
         [
-            'content' => $formHtml,
+            'content' => $groupSelect,
         ],
-//        [
-//            'content' => $datePicker,
-//            'options' => ['class' => 'input-group'],
-//        ],
-//        [
-//            'content' => $groupSelect . Html::submitButton(Yii::t('app', 'Выбрать'), [
-//                    'id' => 'filter',
-//                    'class' => [
-//                        'btn',
-//                        'btn-success',
-//                    ],
-//                    'data-pjax'  => '1',
-//                    'data-url' => '/device/report-group',
-//                ]),
-//            'options' => ['class' => 'input-group'],
-//        ],
-//        [
-//            'content' => Html::button('Supprimer', [
-//                'type' => 'button',
-//                'class' => 'btn btn-success',
-//                'id' => 'bulk_delete',
-////                'model' => 'club',
-//                'data-url' => '/device/report-group',
-//            ]),
-//        ],
-//        ],
-//        '{export}',
+        [
+            'content' => $datePicker,
+            'options' => [
+                'style' => 'width:200px',
+            ],
+        ],
+        '{export}',
     ],
 
     'export' => [
