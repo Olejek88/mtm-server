@@ -48,7 +48,7 @@ $gridColumns = [
         'mergeHeader' => true,
         'value' => function ($data) {
             return Html::a($data['object']['house']['street']->title . ', ' . $data['object']['house']->number . '-' . $data['object']->title,
-                ['/node/dashboard','uuid' => $data['uuid'], 'type' => 'node']);
+                ['/node/dashboard', 'uuid' => $data['uuid'], 'type' => 'node'], ['data-pjax' => 0]);
         },
         'header' => 'Объект ' . Html::a('<span class="glyphicon glyphicon-plus"></span>',
                 '/object/create?from=equipment/index',

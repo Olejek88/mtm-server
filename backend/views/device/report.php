@@ -1,5 +1,4 @@
 <?php
-/* @var $searchModel backend\models\DeviceSearch */
 
 use common\models\Measure;
 use common\models\MeasureType;
@@ -8,24 +7,11 @@ use kartik\grid\GridView;
 use kartik\widgets\DatePicker;
 use yii\helpers\Html;
 
+/** @var $searchModel backend\models\DeviceSearch */
+/** @var $start_date */
+/** @var $end_date */
+
 $this->title = Yii::t('app', 'Отчет по потреблению электроэнергии');
-
-$start_date = '2018-12-31';
-$end_date = '2021-12-31';
-$start_time = '2018-12-31 00:00:00';
-$end_time = '2021-12-31 00:00:00';
-
-$type = '';
-if (isset($_GET['type']))
-    $type = $_GET['type'];
-if (isset($_GET['end_time'])) {
-    $end_date = $_GET['end_time'];
-    $end_time = date('Y-m-d H:i:s', strtotime($end_date));
-}
-if (isset($_GET['start_time'])) {
-    $start_date = $_GET['start_time'];
-    $start_time = date('Y-m-d H:i:s', strtotime($start_date));
-}
 
 $gridColumns = [
     [
@@ -57,6 +43,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
         'value' => function ($data) {
             return $data['name'];
@@ -68,6 +55,7 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
         'value' => function ($data) {
             return $data['serial'];
@@ -79,11 +67,12 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\DataColumn',
         'vAlign' => 'middle',
+        'hAlign' => 'center',
         'width' => '100px',
         'mergeHeader' => true,
         'pageSummary' => false,
         'value' => function ($data) {
-            return $data['node']['phone'];
+            return $data['address'];
         },
         'header' => 'Адрес',
         'format' => 'raw',
@@ -95,21 +84,13 @@ $gridColumns = [
         'width' => '100px',
         'mergeHeader' => true,
         'pageSummary' => true,
-        'value' => function ($data) {
-            $start_time = '2018-12-31 00:00:00';
-            $end_time = '2021-12-31 00:00:00';
-            if (isset($_GET['end_time'])) {
-                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
-            }
-            if (isset($_GET['start_time'])) {
-                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
-            }
+        'value' => function ($data) use ($start_date, $end_date) {
             $sensorChannel = SensorChannel::find()
                 ->where(['deviceUuid' => $data['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 1);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_date, date('Y-m-d', strtotime($end_date . ' +1 day')), 1);
                 return $value;
             }
             return '-';
@@ -124,21 +105,13 @@ $gridColumns = [
         'width' => '100px',
         'mergeHeader' => true,
         'pageSummary' => true,
-        'value' => function ($data) {
-            $start_time = '2018-12-31 00:00:00';
-            $end_time = '2021-12-31 00:00:00';
-            if (isset($_GET['end_time'])) {
-                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
-            }
-            if (isset($_GET['start_time'])) {
-                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
-            }
+        'value' => function ($data) use ($start_date, $end_date) {
             $sensorChannel = SensorChannel::find()
                 ->where(['deviceUuid' => $data['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 2);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_date, date('Y-m-d', strtotime($end_date . ' +1 day')), 2);
                 return $value;
             }
             return '-';
@@ -153,21 +126,13 @@ $gridColumns = [
         'width' => '100px',
         'mergeHeader' => true,
         'pageSummary' => true,
-        'value' => function ($data) {
-            $start_time = '2018-12-31 00:00:00';
-            $end_time = '2021-12-31 00:00:00';
-            if (isset($_GET['end_time'])) {
-                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
-            }
-            if (isset($_GET['start_time'])) {
-                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
-            }
+        'value' => function ($data) use ($start_date, $end_date) {
             $sensorChannel = SensorChannel::find()
                 ->where(['deviceUuid' => $data['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 3);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_date, date('Y-m-d', strtotime($end_date . ' +1 day')), 3);
                 return $value;
             }
             return '-';
@@ -182,21 +147,13 @@ $gridColumns = [
         'width' => '100px',
         'mergeHeader' => true,
         'pageSummary' => true,
-        'value' => function ($data) {
-            $start_time = '2018-12-31 00:00:00';
-            $end_time = '2021-12-31 00:00:00';
-            if (isset($_GET['end_time'])) {
-                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
-            }
-            if (isset($_GET['start_time'])) {
-                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
-            }
+        'value' => function ($data) use ($start_date, $end_date) {
             $sensorChannel = SensorChannel::find()
                 ->where(['deviceUuid' => $data['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 4);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_date, date('Y-m-d', strtotime($end_date . ' +1 day')), 4);
                 return $value;
             }
             return '-';
@@ -211,21 +168,13 @@ $gridColumns = [
         'width' => '100px',
         'mergeHeader' => true,
         'pageSummary' => true,
-        'value' => function ($data) {
-            $start_time = '2018-12-31 00:00:00';
-            $end_time = '2021-12-31 00:00:00';
-            if (isset($_GET['end_time'])) {
-                $end_time = date('Y-m-d H:i:s', strtotime($_GET['end_time']));
-            }
-            if (isset($_GET['start_time'])) {
-                $start_time = date('Y-m-d H:i:s', strtotime($_GET['start_time']));
-            }
+        'value' => function ($data) use ($start_date, $end_date) {
             $sensorChannel = SensorChannel::find()
                 ->where(['deviceUuid' => $data['uuid']])
                 ->andWhere(['measureTypeUuid' => MeasureType::POWER])
                 ->one();
             if ($sensorChannel) {
-                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_time, $end_time, 0);
+                $value = Measure::getSumMeasureBetweenDates($sensorChannel['uuid'], $start_date, date('Y-m-d', strtotime($end_date . ' +1 day')), 0);
                 return $value;
             }
             return '-';
@@ -246,33 +195,40 @@ echo GridView::widget([
     'headerRowOptions' => ['class' => 'kartik-sheet-style'],
     'filterRowOptions' => ['class' => 'kartik-sheet-style'],
     'beforeHeader' => [
-        '{toggleData}'
+        [
+            'columns' => [
+                [
+                    'content' => "За период с $start_date по $end_date",
+                    'options' => ['colspan' => 10, 'class' => 'text-center warning']
+                ],
+            ],
+        ],
     ],
     'toolbar' => [
         ['content' =>
             '<form action="report"><table style="width: 800px; padding: 3px"><tr><td style="width: 300px">' .
             DatePicker::widget([
-                'name' => 'start_time',
+                'name' => 'start_date',
                 'value' => $start_date,
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
                     'format' => 'yyyy-mm-dd'
                 ]
-            ]).'</td><td style="width: 300px">'.
+            ]) . '</td><td style="width: 300px">' .
             DatePicker::widget([
-                'name' => 'end_time',
+                'name' => 'end_date',
                 'value' => $end_date,
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
                     'format' => 'yyyy-mm-dd'
                 ]
-            ]).'</td><td style="width: 100px">'.Html::submitButton(Yii::t('app', 'Выбрать'), [
-                'class' => 'btn btn-info']).'</td>
+            ]) . '</td><td style="width: 100px">' . Html::submitButton(Yii::t('app', 'Выбрать'), [
+                'class' => 'btn btn-info']) . '</td>
                 <td style="width: 100px">{export}</td></tr></table></form>',
             'options' => ['style' => 'width:100%']
-            ]
+        ]
     ],
     'export' => [
         'fontAwesome' => true,

@@ -1,106 +1,176 @@
 <?php
-/* @var $device
- * @var $dataAll
- */
 
+use kartik\grid\GridView;
 use kartik\widgets\DatePicker;
-use yii\helpers\Html;
+use kartik\widgets\Select2;
+use yii\data\ArrayDataProvider;
 
-$start_date = '2018-12-31';
-$end_date = '2021-12-31';
-$start_time = '2018-12-31 00:00:00';
-$end_time = '2021-12-31 00:00:00';
+/** @var $groupUuid */
+/** @var $startDate */
+/** @var $dataProvider */
+/** @var $groupNames */
+/** @var $groups */
 
-$type = '';
 $this->title = Yii::t('app', 'Архив по группам');
 
-if (isset($_GET['type']))
-    $type = $_GET['type'];
-if (isset($_GET['end_time'])) {
-    $end_date = $_GET['end_time'];
-    $end_time = date('Y-m-d H:i:s', strtotime($end_date));
+$gridColumns = [
+    [
+        'hAlign' => 'center',
+        'vAlign' => 'middle',
+        'mergeHeader' => true,
+        'contentOptions' => [
+            'class' => 'table_class',
+            'style' => 'width: 40px'
+        ],
+        'headerOptions' => ['class' => 'text-center'],
+        'content' => function ($value) {
+            return $value['date'];
+        }
+    ],
+];
+
+$beforeHeaderColumns = [
+    ['content' => 'Дата', 'options' => ['colspan' => 1, 'class' => 'text-center warning']],
+];
+/** @var ArrayDataProvider $dataProvider */
+$groupCount = (count($dataProvider->allModels[0]) - 1) / 5;
+for ($i = 0; $i < $groupCount; $i++) {
+    $groupId = 'g' . $i;
+    $beforeHeaderColumns[] = ['content' => $groupNames[$i], 'options' => ['colspan' => 3, 'class' => 'text-center warning']];
+    $gridColumns[] = [
+        'class' => 'kartik\grid\DataColumn',
+        'vAlign' => 'middle',
+        'hAlign' => 'center',
+        'mergeHeader' => true,
+        'width' => '180px',
+        'header' => 'Тариф1, кВт*ч',
+        'format' => 'raw',
+        'content' => function ($value) use ($groupId) {
+            return number_format($value[$groupId . 'w1'], 3);
+        }
+    ];
+    $gridColumns[] = [
+        'class' => 'kartik\grid\DataColumn',
+        'vAlign' => 'middle',
+        'hAlign' => 'center',
+        'mergeHeader' => true,
+        'width' => '180px',
+        'header' => 'Тариф2, кВт*ч',
+        'format' => 'raw',
+        'content' => function ($value) use ($groupId) {
+            return number_format($value[$groupId . 'w2'], 3);
+        }
+    ];
+    $gridColumns[] = [
+        'class' => 'kartik\grid\DataColumn',
+        'vAlign' => 'middle',
+        'hAlign' => 'center',
+        'mergeHeader' => true,
+        'width' => '180px',
+        'header' => 'Сумма, кВт*ч',
+        'format' => 'raw',
+        'content' => function ($value) use ($groupId) {
+            return number_format($value[$groupId . 'ws'], 3);
+        }
+    ];
 }
-if (isset($_GET['start_time'])) {
-    $start_date = $_GET['start_time'];
-    $start_time = date('Y-m-d H:i:s', strtotime($start_date));
-}
-?>
-<div class="row">
-    <form action="report-group">
-        <table style="width: 800px; padding: 3px; background-color: white; align-content: center">
-            <tr><td style="width: 300px">
-                <?php echo DatePicker::widget([
-                'name' => 'start_time',
-                'value' => $start_date,
-                'removeButton' => false,
-                'pluginOptions' => [
-                'autoclose' => true,
-                'format' => 'yyyy-mm-dd'
-                ]
-                ]).'</td><td style="width: 300px">'.
-                DatePicker::widget([
-                'name' => 'end_time',
-                'value' => $end_date,
-                'removeButton' => false,
-                'pluginOptions' => [
-                'autoclose' => true,
-                'format' => 'yyyy-mm-dd'
-                ]
-                ]).'</td><td style="width: 100px">'.
-                Html::submitButton(Yii::t('app', 'Выбрать'), ['class' => 'btn btn-info']).'</td></tr>' ?>
-        </table>
-    </form>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="box box-success">
-            <div class="box-header with-border">
-                <h3 class="box-title"><?= $this->title ?></h3>
-            </div>
-            <div class="box-body">
-                <div id="requests-table-container" class="panel table-responsive kv-grid-container" style="overflow: auto">
-                    <table class="kv-grid-table table table-hover table-bordered table-condensed kv-table-wrap">
-                        <thead>
-                        <tr class="kartik-sheet-style" style="height: 20px">
-                            <th class="text-center kv-align-middle" data-col-seq="0" style="width: 25%;">Дата</th>
-                            <?php
-                                foreach ($dataAll['group'] as $data) {
-                                    echo '<th class="text-center kv-align-middle" colspan="3">'.$data['title'].'</th>';
-                                }
-                            ?>
-                        </tr>
-                        <tr class="kartik-sheet-style" style="height: 20px">
-                            <th class="text-center kv-align-middle" data-col-seq="0" style="width: 25%;"></th>
-                            <?php
-                            foreach ($dataAll['group'] as $data) {
-                                echo '<th class="text-center kv-align-middle">Тариф1, кВт*ч</th>';
-                                echo '<th class="text-center kv-align-middle">Тариф2, кВт*ч</th>';
-                                echo '<th class="text-center kv-align-middle">Сумма, кВт*ч</th>';
-                            }
-                            ?>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-                        $group_num=0;
-                        for ($mon=0; $mon<12; $mon++) {
-                            echo '<tr data-key="1">';
-                            $cnt=0;
-                            foreach ($dataAll['group'] as $data) {
-                                if ($cnt == 0)
-                                    echo '<td class="text-center kv-align-center kv-align-middle">' . $data['month'][$mon]['date'] . '</td>';
-                                echo '<td class="text-center kv-align-center kv-align-middle">' . number_format($data['month'][$mon]['w1'], 3) . '</td>';
-                                echo '<td class="text-center kv-align-center kv-align-middle">' . number_format($data['month'][$mon]['w2'], 3) . '</td>';
-                                echo '<td class="text-center kv-align-center kv-align-middle">' . number_format($data['month'][$mon]['ws'], 3) . '</td>';
-                                $cnt++;
-                            }
-                            echo '</tr>';
-                        }
-                        ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+$datePicker = DatePicker::widget([
+    'name' => 'start_time',
+    'value' => $startDate,
+    'removeButton' => false,
+    'pjaxContainerId' => 'report-group-container',
+    'pluginOptions' => [
+        'autoclose' => true,
+        'format' => 'yyyy-mm',
+        'startView' => 'year',
+        'minViewMode' => 'months',
+    ],
+    'options' => [
+        'readonly' => true,
+        'class' => ['add-filter'],
+    ],
+]);
+
+$groupSelect = Select2::widget([
+    'name' => 'group',
+    'data' => $groups,
+    'value' => $groupUuid,
+    'class' => 'add-filter',
+    'pjaxContainerId' => 'report-group-container',
+    'pluginOptions' => [
+//        'allowClear' => true,
+        'width' => '600px',
+    ],
+    'options' => [
+        'class' => ['add-filter'],
+        'placeholder' => 'Выберите группу',
+        'multiple' => true,
+        'readonly' => true,
+    ],
+]);
+
+echo GridView::widget([
+    'id' => 'program-report-table',
+    'filterSelector' => '.add-filter',
+    'dataProvider' => $dataProvider,
+//    'filterModel' => $searchModel,
+    'columns' => $gridColumns,
+    'showPageSummary' => true,
+    'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
+    'headerRowOptions' => ['class' => 'kartik-sheet-style'],
+    'filterRowOptions' => ['class' => 'kartik-sheet-style'],
+    'beforeHeader' => [
+        '{toggleData}',
+        [
+            'columns' => [
+                [
+                    'content' => 'За период с ' . date('Y-m', strtotime($startDate . ' -12 month')) . " по $startDate",
+                    'options' => ['colspan' => 1 + $groupCount * 5, 'class' => 'text-center warning']
+                ],
+            ],
+        ],
+        [
+            'columns' => $beforeHeaderColumns,
+        ]
+    ],
+    'toolbar' => [
+        [
+            'content' => $groupSelect,
+        ],
+        [
+            'content' => $datePicker,
+            'options' => [
+                'style' => 'width:200px',
+            ],
+        ],
+        '{export}',
+    ],
+
+    'export' => [
+        'fontAwesome' => true,
+        'target' => GridView::TARGET_BLANK,
+        'filename' => 'report-group'
+    ],
+    'pjax' => true,
+    'pjaxSettings' => [
+        'options' => [
+            'id' => 'report-group-container',
+            'enablePushState' => false,
+        ],
+    ],
+    'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
+    'summary' => '',
+    'bordered' => true,
+    'striped' => false,
+    'condensed' => false,
+    'responsive' => true,
+    'persistResize' => false,
+    'hover' => true,
+    'panel' => [
+        'type' => GridView::TYPE_PRIMARY,
+        'heading' => '<i class="glyphicon glyphicon-tags"></i>&nbsp; Потребление по группам',
+        'headingOptions' => ['style' => 'background: #337ab7']
+    ],
+]);

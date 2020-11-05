@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\components\MtmActiveRecord;
@@ -95,7 +96,7 @@ class Node extends MtmActiveRecord
                 ],
                 'required'
             ],
-            [['address', 'oid', 'phone','software','createdAt', 'changedAt'], 'safe'],
+            [['address', 'oid', 'phone', 'software', 'createdAt', 'changedAt'], 'safe'],
             [['deleted'], 'boolean'],
             [
                 [
@@ -199,5 +200,33 @@ class Node extends MtmActiveRecord
     public function getArea()
     {
         return $this->hasOne(Area::class, ['uuid' => 'areaUuid'])->via('areaNode');
+    }
+
+    public function getCounterValue($date = null)
+    {
+        $date = $date == null ? date('Y-m-d') : $date;
+
+        $counter = Device::find()->where([
+            'deviceTypeUuid' => DeviceType::DEVICE_COUNTER,
+            'nodeUuid' => $this->uuid,
+        ])->limit(1)->one();
+
+        if ($counter == null) {
+            return '-';
+        }
+
+        $sensorChannel = SensorChannel::find()->where(['deviceUuid' => $counter->uuid])->limit(1)->one();
+        if ($counter == null) {
+            return '-';
+        }
+
+        $counterValue = Measure::find()->where([
+            'sensorChannelUuid' => $sensorChannel->uuid,
+            'type' => MeasureType::MEASURE_TYPE_TOTAL,
+            'parameter' => 0,
+            'date' => $date,
+        ])->orderBy(['date' => SORT_DESC])->limit(1)->one();
+
+        return $counterValue != null ? $counterValue->value : '-';
     }
 }

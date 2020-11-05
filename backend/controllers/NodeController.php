@@ -353,7 +353,6 @@ class NodeController extends Controller
         if (!$w) $w = '-';
         else $w = $w['value'];
         $parameters['total'] = "<span style='color: darkgreen'>" . $w . "</span>";
-
         return $this->render(
             'dashboard',
             [
@@ -361,7 +360,9 @@ class NodeController extends Controller
                 'coordinator' => $coordinator,
                 'camera' => $camera,
                 'type' => $type,
-                'parameters' => $parameters
+                'parameters' => $parameters,
+                'counterDate' => date('Y-m-d'),
+                'counterValue' => $node->getCounterValue() . ' кВт',
             ]
         );
     }
@@ -949,5 +950,28 @@ class NodeController extends Controller
 //                ]
 //            );
 //        }
+    }
+
+    public function actionCounterValue()
+    {
+        $request = Yii::$app->request;
+        $nodeUuid = $request->getQueryParam('n', null);
+        $date = $request->getQueryParam('d', date('Y-m-d'));
+
+        $node = Node::find()->where(['uuid' => $nodeUuid])->limit(1)->one();
+        if ($node == null) {
+            return json_encode($this->render('widget-counter-value', [
+                'counterValue' => '-',
+                'counterDate' => $date,
+                'node' => $node,
+            ]));
+        }
+
+        $counterValue = $node->getCounterValue($date);
+        return json_encode($this->render('widget-counter-value', [
+            'counterValue' => $counterValue . ' кВт',
+            'counterDate' => $date,
+            'node' => $node,
+        ]));
     }
 }

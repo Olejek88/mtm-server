@@ -31,7 +31,7 @@ $gridColumns = [
         'mergeHeader' => true,
         'value' => function ($data) {
             return Html::a($data['object']->getAddress(),
-                ['/node/dashboard', 'uuid' => $data['uuid'], 'type' => 0]);
+                ['/node/dashboard', 'uuid' => $data['uuid'], 'type' => 0], ['data-pjax' => 0]);
         },
         'header' => 'Адрес',
         'format' => 'raw',
