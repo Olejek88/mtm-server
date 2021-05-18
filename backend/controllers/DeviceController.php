@@ -289,6 +289,10 @@ class DeviceController extends Controller
                 ->one();
             if ($device && $device['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO)
                 return self::actionDashboardElectro($device['uuid']);
+            if ($device && $device['deviceTypeUuid'] == DeviceType::DEVICE_ZB_COORDINATOR) {
+//                return self::actionDashboardElectro($device['uuid']);
+                return $this->redirect(['node/dashboard', 'uuid' => $device->nodeUuid, 'type' => 'node']);
+            }
         } else
             return self::actionIndex();
 

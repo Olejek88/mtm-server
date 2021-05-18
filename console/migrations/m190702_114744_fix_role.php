@@ -22,7 +22,7 @@ class m190702_114744_fix_role extends Migration
         $role = $am->getRole(User::ROLE_OPERATOR);
         $role->description = 'Оператор';
         $am->update(User::ROLE_OPERATOR, $role);
-
+/*
         $role = $am->getRole('analyst');
         $am->removeChildren($role);
         $am->remove($role);
@@ -34,6 +34,7 @@ class m190702_114744_fix_role extends Migration
         $am->remove($role);
         $perm = $am->getPermission('permissionUser');
         $am->remove($perm);
+*/
     }
 
     /**

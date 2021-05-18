@@ -19,7 +19,6 @@ use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-
 ?>
 
 <?php $form = ActiveForm::begin([
@@ -108,13 +107,14 @@ use yii\helpers\Html;
     // The Tile Layer (very important)
     $tileLayer = new TileLayer([
 //        'urlTemplate' => 'http://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        'urlTemplate' => 'http://{s}.tiles.mapbox.com/v4/mapquest.streets-mb/{z}/{x}/{y}.{ext}?access_token=pk.eyJ1IjoibWFwcXVlc3QiLCJhIjoiY2Q2N2RlMmNhY2NiZTRkMzlmZjJmZDk0NWU0ZGJlNTMifQ.mPRiEubbajc6a5y9ISgydg',
+        'urlTemplate' => 'http://{s}.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwcXVlc3QiLCJhIjoiY2Q2N2RlMmNhY2NiZTRkMzlmZjJmZDk0NWU0ZGJlNTMifQ.mPRiEubbajc6a5y9ISgydg',
         'clientOptions' => [
             'attribution' => 'Tiles &copy; <a href="http://www.osm.org/copyright" target="_blank">OpenStreetMap contributors</a> />',
             'subdomains' => '1234',
-//            'id' => 'mapbox.streets',
+            'id' => 'mapbox/streets-v11',
+//            'id' => 'mapquest/streets-mb',
             'type' => 'osm',
-            's' => 'a',
+            's' => 'api',
             'ext' => 'png',
 
         ]

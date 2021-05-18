@@ -36,6 +36,10 @@ class m190412_142135_insert_references_ extends Migration
             'updated_at' => $currentTime
         ]);
 
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole(User::ROLE_ADMIN);
+        $auth->assign($role, 1);
+
         $this->insertIntoType('device_status','E681926C-F4A3-44BD-9F96-F0493712798D',
             'В порядке', $currentTime, $currentTime);
         $this->insertIntoType('device_status','D5D31037-6640-4A8B-8385-355FC71DEBD7',
