@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6b2a86768dcf50cfef573f6cb421776",
+    "content-hash": "58c8c0a92b4e181d34e8c0986a4b053e",
     "packages": [
         {
             "name": "2amigos/yii2-leaflet-extension",
@@ -4293,6 +4293,7 @@
                 "faker",
                 "fixtures"
             ],
+            "abandoned": true,
             "time": "2018-07-12T10:23:15+00:00"
         },
         {
@@ -4488,7 +4489,9 @@
     "platform": {
         "php": ">=7.1",
         "ext-json": "*",
-        "ext-pcntl": "*"
+        "ext-pcntl": "*",
+        "ext-http": "2.0.4 || 3.2.0 || 3.2.4"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

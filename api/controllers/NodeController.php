@@ -91,6 +91,10 @@ class NodeController extends Controller
             return [];
         }
 
+        // обновляем дату связи с контроллером
+        $node->lastDate = date('Y-m-d H:i:s');
+        $node->save();
+
         /** @var Node $result */
         $result = $query->one();
         if ($result != null) {
