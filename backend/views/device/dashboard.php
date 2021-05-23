@@ -1,5 +1,8 @@
 <?php
-/* @var $device
+
+use common\models\Device;
+
+/* @var Device $device
  * @var $parameters
  */
 
@@ -7,10 +10,15 @@ $this->title = Yii::t('app', 'Сводная страница по устрой�
 ?>
 
 <br/>
+<div class="row row-message" style="display: none;">
+    <div class="col-md-12 col-message bg-red">
+    </div>
+</div>
+
 <!-- Info boxes -->
 <div class="row">
     <div class="col-md-12">
-    <?= $this->render('widget-light-info', ['device' => $device]); ?>
+        <?= $this->render('widget-light-info', ['device' => $device]); ?>
     </div>
 </div>
 <!-- /.row -->
@@ -40,4 +48,28 @@ $this->title = Yii::t('app', 'Сводная страница по устрой�
         <?= $this->render('widget-light-list', ['device' => $device]); ?>
     </div>
 </div>
+
+<script>
+    let interval = setInterval(function () {
+        $.ajax({
+            url: "/device/is-work",
+            type: "get",
+            data: {
+                id: <?= $device->_id ?>
+            },
+            success: function (result) {
+                if (result.isWork) {
+                    $('.row-message').hide();
+                } else {
+                    $('.row-message').show();
+                }
+
+                $('.col-message').html(result.message);
+            },
+            error: function (result) {
+            }
+        })
+    }, 3000);
+</script>
+
 

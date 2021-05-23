@@ -974,4 +974,29 @@ class NodeController extends Controller
             'node' => $node,
         ]));
     }
+
+    /**
+     *
+     * @param $id
+     * @return array
+     *
+     * @throws NotFoundHttpException
+     */
+    public function actionIsWork($id)
+    {
+        $model = $this->findModel($id);
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $zbCoordinator = Device::findOne(['nodeUuid' => $model->uuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR]);
+        // check work zbcoord
+        if ($zbCoordinator->deviceStatusUuid != DeviceStatus::WORK) {
+            return ['isWork' => false, 'message' => 'Координатор не доступен'];
+        }
+
+        // check work node
+        if ($model->deviceStatusUuid == DeviceStatus::WORK) {
+            return ['isWork' => true, 'message' => ''];
+        } else {
+            return ['isWork' => false, 'message' => 'Контроллер не доступен'];
+        }
+    }
 }

@@ -3,10 +3,11 @@
 use common\models\Device;
 use common\models\DeviceType;
 use common\models\MeasureType;
+use common\models\Node;
 use common\models\SensorChannel;
 use yii\web\View;
 
-/* @var $node
+/* @var Node $node
  * @var $camera
  * @var $coordinator
  * @var $parameters
@@ -30,6 +31,11 @@ if ($deviceElectro) {
 
 
 <br/>
+<div class="row row-message" style="display: none;">
+    <div class="col-md-12 col-message bg-red">
+    </div>
+</div>
+
 <!-- Info boxes -->
 <div class="row">
     <div class="col-md-4">
@@ -95,3 +101,25 @@ if ($deviceElectro) {
 </div>
 
 <!-- /.content-wrapper -->
+<script>
+    let interval = setInterval(function () {
+        $.ajax({
+            url: "/node/is-work",
+            type: "get",
+            data: {
+                id: <?= $node->_id ?>
+            },
+            success: function (result) {
+                if (result.isWork) {
+                    $('.row-message').hide();
+                } else {
+                    $('.row-message').show();
+                }
+
+                $('.col-message').html(result.message);
+            },
+            error: function (result) {
+            }
+        })
+    }, 3000);
+</script>
