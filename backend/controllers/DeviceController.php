@@ -46,6 +46,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii\web\UnauthorizedHttpException;
 
 /**
@@ -3034,6 +3035,36 @@ class DeviceController extends Controller
         if ($group) {
             $group['deviceProgramUuid'] = $deviceProgram;
             $group->save();
+        }
+    }
+
+    /**
+     *
+     * @param $id
+     * @return array
+     *
+     * @throws NotFoundHttpException
+     */
+    public function actionIsWork($id)
+    {
+        $model = $this->findModel($id);
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $zbCoordinator = Device::findOne(['nodeUuid' => $model->nodeUuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR]);
+        // check work node
+        if ($zbCoordinator->node->deviceStatusUuid != DeviceStatus::WORK) {
+            return ['isWork' => false, 'message' => 'Контроллер не доступен'];
+        }
+
+        // check work zbcoord
+        if ($zbCoordinator->deviceStatusUuid != DeviceStatus::WORK) {
+            return ['isWork' => false, 'message' => 'Координатор не доступен'];
+        }
+
+        // check work device
+        if ($model->deviceStatusUuid == DeviceStatus::WORK) {
+            return ['isWork' => true, 'message' => ''];
+        } else {
+            return ['isWork' => false, 'message' => 'Устройство не доступно'];
         }
     }
 }
