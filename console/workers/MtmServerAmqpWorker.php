@@ -130,7 +130,8 @@ class MtmServerAmqpWorker extends Worker
                     ':measureType' => MeasureType::COORD_DIGI1,
                 ];
                 $command = $db->createCommand("
-SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, nt.address as nodeAddr, dt.deviceTypeUuid, dt.address as devAddr, nt.oid
+SELECT * FROM (
+SELECT max(mt.changedAt) maxChangedAt, nt.uuid as nodeUuid, dt.uuid as deviceUuid, nt.address as nodeAddr, dt.deviceTypeUuid, dt.address as devAddr, nt.oid
 FROM node AS nt
 LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
@@ -138,8 +139,8 @@ LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND nt.deviceStatusUuid=:workUuid
 AND sct.measureTypeUuid=:measureType
-AND (timestampdiff(second,  mt.changedAt, current_timestamp()) > :timeOut OR mt.changedAt IS NULL)
-GROUP BY dt.uuid", $params);
+GROUP BY dt.uuid) tmptable
+WHERE timestampdiff(second,  maxChangedAt, current_timestamp()) > :timeOut OR maxChangedAt IS NULL", $params);
 //ORDER BY mt.changedAt DESC", $params);
                 $result = $command->query()->readAll();
 //                $this->log('sel query: ' . $command->rawSql);
@@ -176,7 +177,8 @@ WHERE $inParamSql", $params);
                 ];
 
                 $command = $db->createCommand("
-SELECT nt.uuid as nodeUuid, dt.uuid as deviceUuid, nt.address as nodeAddr, dt.deviceTypeUuid, dt.address as devAddr, nt.oid
+SELECT * FROM (
+SELECT max(mt.changedAt) maxChangedAt, nt.uuid as nodeUuid, dt.uuid as deviceUuid, nt.address as nodeAddr, dt.deviceTypeUuid, dt.address as devAddr, nt.oid
 FROM node AS nt
 LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
@@ -184,8 +186,8 @@ LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
 WHERE dt.deviceTypeUuid=:deviceType
 AND nt.deviceStatusUuid=:noLinkUuid
 AND sct.measureTypeUuid=:measureType
-AND (timestampdiff(second,  mt.changedAt, current_timestamp()) < :timeOut)
-GROUP BY dt.uuid", $params);
+GROUP BY dt.uuid) tmptable
+WHERE timestampdiff(second,  maxChangedAt, current_timestamp()) < :timeOut", $params);
 //ORDER BY mt.changedAt DESC ", $params);
 //                $this->log('upd query: ' . $command->rawSql);
                 $result = $command->query()->readAll();
