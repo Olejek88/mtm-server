@@ -40,13 +40,15 @@ class DeviceRegisterSearch extends DeviceRegister
      */
     public function search($params)
     {
-        $query = DeviceRegister::find();
+        $query = DeviceRegister::find()->orderBy(['date' => SORT_DESC])->limit(15);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => false,
         ]);
+        return $dataProvider;
 
         $this->load($params);
 

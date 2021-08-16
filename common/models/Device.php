@@ -266,6 +266,11 @@ class Device extends MtmActiveRecord
         return $this->object->getFullTitle() . ' [' . $this->name . ']';
     }
 
+    public static function getFullTitleStatic($device)
+    {
+        return Objects::getFullTitleStatic($device['object']) . ' [' . $device['name'] . ']';
+    }
+
     /**
      * Объект связанного поля.
      *

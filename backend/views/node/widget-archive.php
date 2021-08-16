@@ -7,6 +7,7 @@ use common\models\MeasureType;
 use common\models\SensorChannel;
 use kartik\grid\GridView;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 /* @var $node
  */
@@ -54,13 +55,17 @@ use yii\data\ActiveDataProvider;
 
         $measures = [];
         $device = (Device::find()->select('uuid')->where(['deleted' => 0])
-            ->andWhere(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]));
+            ->andWhere(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]))->asArray()->all();
         if ($device) {
-            $sChannel = (SensorChannel::find()->select('uuid')
-                ->where(['deviceUuid' => $device, 'measureTypeUuid' => MeasureType::POWER]));
+            $sChannel = SensorChannel::find()->select('uuid')
+                ->where([
+                    'deviceUuid' => ArrayHelper::map($device, 'uuid', 'uuid'),
+                    'measureTypeUuid' => MeasureType::POWER
+                ])
+                ->asArray()->all();
             if ($sChannel) {
                 $measures = (Measure::find()
-                    ->where(['sensorChannelUuid' => $sChannel])
+                    ->where(['sensorChannelUuid' => ArrayHelper::map($sChannel, 'uuid', 'uuid')])
                     ->andWhere(['parameter' => 0])
                     ->andWhere(['type' => MeasureType::MEASURE_TYPE_INTERVAL])
                     ->limit(5)

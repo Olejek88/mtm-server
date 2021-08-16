@@ -342,7 +342,6 @@ class SiteController extends Controller
 
         $registerSearch = new DeviceRegisterSearch();
         $dataProviderRegister = $registerSearch->search(Yii::$app->request->queryParams);
-        $dataProviderRegister->pagination->pageSize = 15;
 
         foreach ($cameras as $camera) {
             $camera->startTranslation();
@@ -350,7 +349,7 @@ class SiteController extends Controller
 
         $searchModel = new DeviceSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->pagination->pageSize = 15;
+//        $dataProvider->pagination->pageSize = 15;
 
         $events = [];
         $program = "";
@@ -789,8 +788,13 @@ class SiteController extends Controller
                         ->one();
                     if ($coordinator) {
                         $measure = (Measure::find()
-                            ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
-                            ->joinWith('sensorChannel')
+                            ->with('sensorChannel')
+                            ->leftJoin('sensor_channel',
+                                'sensor_channel.oid=:oid and sensor_channel.measureTypeUuid=:mtype and measure.sensorChannelUuid=sensor_channel.uuid',
+                                [
+                                    ':mtype' => MeasureType::COORD_IN2,
+                                    ':oid' => User::getOid(Yii::$app->user->identity),
+                                ])
                             ->orderBy('date DESC'))
                             ->asArray()
                             ->limit(1)
