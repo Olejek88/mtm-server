@@ -24,7 +24,7 @@ use yii\data\ActiveDataProvider;
                 'headerOptions' => ['class' => 'text-center'],
                 'mergeHeader' => true,
                 'content' => function ($data) {
-                    return $data->_id;
+                    return $data['_id'];
                 }
             ],
             [
@@ -37,7 +37,7 @@ use yii\data\ActiveDataProvider;
                 ],
                 'headerOptions' => ['class' => 'text-center'],
                 'content' => function ($data) {
-                    return $data['device']->getFullTitle();
+                    return Device::getFullTitleStatic($data['device']);
                 }
             ],
             [
@@ -66,7 +66,7 @@ use yii\data\ActiveDataProvider;
                         ->limit(1)
                         ->one();
                     if ($measure)
-                        return $measure['value'].' ['.$measure['date'].']';
+                        return $measure['value'] . ' [' . $measure['date'] . ']';
                     else
                         return '-';
                 }
@@ -88,16 +88,19 @@ use yii\data\ActiveDataProvider;
         $devices = Device::find()->select('uuid')
             ->where(['nodeUuid' => $node['uuid']])
             ->andWhere(['deleted' => 0])
+            ->asArray()
             ->all();
         $devicesList2 = [];
         foreach ($devices as $device) {
             $devicesList2[] = $device['uuid'];
         }
-        $channels = SensorChannel::find()->where(['IN','deviceUuid', $devicesList2]);
+        $channels = SensorChannel::find()->where(['IN', 'deviceUuid', $devicesList2])
+            ->with(['measureType', 'device.object.house.street'])
+            ->asArray();
         $provider = new ActiveDataProvider(
             [
                 'query' => $channels,
-                'sort' =>false,
+                'sort' => false,
             ]
         );
 

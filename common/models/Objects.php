@@ -128,6 +128,15 @@ class Objects extends MtmActiveRecord
             return 'ул.' . $house->street->title . ', д.' . $house->number . ',' . $this->title;
     }
 
+    public static function getFullTitleStatic($object)
+    {
+        $house = $object['house'];
+        if ($house['houseTypeUuid'] == HouseType::HOUSE_TYPE_NO_NUMBER)
+            return 'ул.' . $house['street']['title'] . ', ' . $object['title'];
+        else
+            return 'ул.' . $house['street']['title'] . ', д.' . $house['number'] . ',' . $object['title'];
+    }
+
     public function getAddress()
     {
         $house = $this->house;

@@ -288,11 +288,12 @@ class NodeController extends Controller
             }
 
             $measure = (Measure::find()
-                ->where(['sensor_channel.measureTypeUuid' => MeasureType::COORD_IN2])
-                ->joinWith('sensorChannel')
+                ->leftJoin('sensor_channel',
+                    'sensor_channel.oid=:oid and sensor_channel.measureTypeUuid=:mtype and measure.sensorChannelUuid=sensor_channel.uuid'
+                    , [':oid' => User::getOid(Yii::$app->user->identity), ':mtype' => MeasureType::COORD_IN2])
                 ->orderBy('date DESC'))
-                ->limit(1)
-                ->one();
+                ->limit(1);
+            $measure = $measure->one();
             if ($measure && $measure['sensorChannel'] &&
                 $measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
                 $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
