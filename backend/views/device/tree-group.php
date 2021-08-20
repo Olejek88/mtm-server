@@ -157,6 +157,10 @@ echo FancytreeWidget::widget([
     ]
 ]);
 
+$this->registerJs('$("#modalAddProgram").on("hidden.bs.modal",
+function () {
+window.location.reload();
+})');
 $this->registerJs('$("#modalAddConfig").on("hidden.bs.modal",
 function () {
 })');
