@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\web\JsExpression;
+use \common\models\Objects;
 
 $this->title = 'Расписание работы шкафов';
 
@@ -19,7 +19,7 @@ $this->title = 'Расписание работы шкафов';
     <div class="body-content">
         <?php
         foreach ($nodes as $node) {
-            echo Html::a($node['address'], '/device-program/calendar-node?node=' . $node['uuid']) . '</br>';
+            echo Html::a(Objects::getFullTitleStatic($node['object']), '/device-program/calendar-node?node=' . $node['uuid']) . '</br>';
         }
         ?>
     </div>
