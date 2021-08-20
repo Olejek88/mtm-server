@@ -363,7 +363,7 @@ class DeviceProgramController extends Controller
             return $this->redirect('/site/index');
         }
 
-        $nodes = Node::find()->where(['deleted' => 0])->asArray()->all();
+        $nodes = Node::find()->where(['deleted' => 0])->with(['object.house.street'])->asArray()->all();
         if (count($nodes) == 1) {
             return Yii::$app->response->redirect('/device-program/calendar-node?node=' . $nodes[0]['uuid']);
         }
