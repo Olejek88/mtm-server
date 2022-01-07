@@ -1,6 +1,5 @@
 <?php
 
-use common\models\User;
 use yii\db\Migration;
 
 /**
@@ -14,8 +13,8 @@ class m190616_074109_add_references extends Migration
     public function safeUp()
     {
         $currentTime = date('Y-m-d\TH:i:s');
-//        $this->insertIntoType('measure_type','7BDB38C7-EF93-49D4-8FE3-89F2A2AEDB48',
-//            'Мощность электроэнергии', $currentTime, $currentTime);
+        $this->insertIntoType('measure_type','7BDB38C7-EF93-49D4-8FE3-89F2A2AEDB48',
+            'Мощность электроэнергии', $currentTime, $currentTime);
         $this->insertIntoType('measure_type','54051538-38F7-44A3-A9B5-C8B5CD4A2936',
             'Температура', $currentTime, $currentTime);
         $this->insertIntoType('measure_type','29A52371-E9EC-4D1F-8BCB-80F489A96DD3',

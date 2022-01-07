@@ -53,7 +53,7 @@ use yii\helpers\ArrayHelper;
                         ]*/
         ];
 
-        $measures = [];
+        $measures = null;
         $device = (Device::find()->select('uuid')->where(['deleted' => 0])
             ->andWhere(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_COUNTER]))->asArray()->all();
         if ($device) {
@@ -74,7 +74,7 @@ use yii\helpers\ArrayHelper;
         }
         $provider = new ActiveDataProvider(
             [
-                'query' => $measures,
+                'query' => $measures != null ? $measures : Measure::find()->where('1=0'),
                 'sort' => false,
                 'pagination' => false,
             ]
