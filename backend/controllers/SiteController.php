@@ -648,7 +648,11 @@ class SiteController extends Controller
         }
 
         $devQuery = Device::find()
-            ->where(['NOT IN', 'deviceTypeUuid', [DeviceType::DEVICE_COUNTER, DeviceType::DEVICE_ZB_COORDINATOR]])
+            ->where(['NOT IN', 'deviceTypeUuid', [
+                DeviceType::DEVICE_COUNTER,
+                DeviceType::DEVICE_ZB_COORDINATOR,
+                DeviceType::DEVICE_ZB_COORDINATOR_E18,
+            ]])
             ->andWhere(['deleted' => 0]);
         if (!empty($nodeUuids)) {
             $devQuery->andWhere(['nodeUuid' => $nodeUuids]);
@@ -782,7 +786,10 @@ class SiteController extends Controller
                     $coordinator = Device::find()
                         ->where(['nodeUuid' => $device['node']['uuid']])
                         ->andWhere(['deleted' => 0])
-                        ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                        ->andWhere(['deviceTypeUuid' => [
+                            DeviceType::DEVICE_ZB_COORDINATOR,
+                            DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                        ]])
                         ->asArray()
                         ->limit(1)
                         ->one();
@@ -952,7 +959,10 @@ class SiteController extends Controller
                 $security = '-';
                 $temperature = '-';
                 $coordinator = Device::find()
-                    ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])->one();
+                    ->where(['nodeUuid' => $node['uuid'], 'deviceTypeUuid' => [
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ]])->one();
                 if ($coordinator != null) {
                     /** @var @var SensorChannel $sChannel */
                     // состояние контактора

@@ -124,7 +124,10 @@ class MtmServerAmqpWorker extends Worker
                 $db = Yii::$app->db;
                 // выбираем все шкафы которые будут менять статус с WORK на NOT_LINK
                 $params = [
-                    ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                    ':deviceType' => [
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ],
                     ':timeOut' => $linkTimeOut,
                     ':workUuid' => DeviceStatus::WORK,
                     ':measureType' => MeasureType::COORD_DIGI1,
@@ -136,7 +139,7 @@ FROM node AS nt
 LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
 LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
-WHERE dt.deviceTypeUuid=:deviceType
+WHERE dt.deviceTypeUuid IN (:deviceType)
 AND nt.deviceStatusUuid=:workUuid
 AND sct.measureTypeUuid=:measureType
 GROUP BY dt.uuid) tmptable
@@ -149,7 +152,11 @@ WHERE timestampdiff(second,  maxChangedAt, current_timestamp()) > :timeOut OR ma
                 $uuid2Update = [];
                 foreach ($result as $device) {
                     $uuid2Update[] = $device['nodeUuid'];
-                    $address = $device['deviceTypeUuid'] == DeviceType::DEVICE_ZB_COORDINATOR ? $device['nodeAddr'] : $device['devAddr'];
+                    $isZBCoordinator = in_array($device['deviceTypeUuid'], [
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ]);
+                    $address = $device['deviceTypeUuid'] == $isZBCoordinator ? $device['nodeAddr'] : $device['devAddr'];
                     $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'Нет связи' (" . $address . ")", $device['oid']);
                     $this->log('MainFunctions::deviceRegister: ' . $rc);
                 }
@@ -172,7 +179,10 @@ WHERE $inParamSql", $params);
                 $params = [
                     ':timeOut' => $linkTimeOut,
                     ':noLinkUuid' => DeviceStatus::NOT_LINK,
-                    ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                    ':deviceType' => [
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ],
                     ':measureType' => MeasureType::COORD_DIGI1,
                 ];
 
@@ -183,7 +193,7 @@ FROM node AS nt
 LEFT JOIN device AS dt ON dt.nodeUuid=nt.uuid
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
 LEFT JOIN measure AS mt ON mt.sensorChannelUuid=sct.uuid
-WHERE dt.deviceTypeUuid=:deviceType
+WHERE dt.deviceTypeUuid IN (:deviceType)
 AND nt.deviceStatusUuid=:noLinkUuid
 AND sct.measureTypeUuid=:measureType
 GROUP BY dt.uuid) tmptable
@@ -196,7 +206,11 @@ WHERE timestampdiff(second,  maxChangedAt, current_timestamp()) < :timeOut", $pa
                 $uuid2Update = [];
                 foreach ($result as $device) {
                     $uuid2Update[] = $device['nodeUuid'];
-                    $address = $device['deviceTypeUuid'] == DeviceType::DEVICE_ZB_COORDINATOR ? $device['nodeAddr'] : $device['devAddr'];
+                    $isZBCoordinator = in_array($device['deviceTypeUuid'], [
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ]);
+                    $address = $device['deviceTypeUuid'] == $isZBCoordinator ? $device['nodeAddr'] : $device['devAddr'];
                     $rc = MainFunctions::deviceRegister($device['deviceUuid'], "Устройство изменило статус на 'В порядке' (" . $address . ")", $device['oid']);
                     $this->log('MainFunctions::deviceRegister: ' . $rc);
                 }
@@ -217,14 +231,17 @@ WHERE $inParamSql", $params);
                 $params = [
                     ':workUuid' => DeviceStatus::WORK,
                     ':noLinkUuid' => DeviceStatus::NOT_LINK,
-                    ':deviceType' => DeviceType::DEVICE_ZB_COORDINATOR,
+                    ':deviceType' => [
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ],
                 ];
 
                 $command = $db->createCommand("UPDATE node AS nt SET nt.deviceStatusUuid=:noLinkUuid
 WHERE nt.uuid NOT IN (
 SELECT dt.nodeUuid FROM device AS dt
 LEFT JOIN sensor_channel AS sct ON sct.deviceUuid=dt.uuid
-WHERE dt.deviceTypeUuid=:deviceType
+WHERE dt.deviceTypeUuid IN (:deviceType)
 GROUP BY dt.uuid
 )
 AND nt.deviceStatusUuid=:workUuid", $params);

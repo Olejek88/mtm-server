@@ -139,7 +139,11 @@ class Device extends MtmActiveRecord
             ],
             [['address'], 'string', 'min' => 16, 'max' => 16, 'when' => function ($model) {
                 /** @var Device $model */
-                if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                if (in_array($model->deviceTypeUuid, [
+                    DeviceType::DEVICE_LIGHT,
+                    DeviceType::DEVICE_ZB_COORDINATOR,
+                    DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                ])) {
                     return true;
                 } else {
                     return false;
@@ -148,7 +152,11 @@ class Device extends MtmActiveRecord
             [['address'], 'checkUniqueAddress',
                 'when' => function ($model) {
                     /** @var Device $model */
-                    if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                    if (in_array($model->deviceTypeUuid, [
+                        DeviceType::DEVICE_LIGHT,
+                        DeviceType::DEVICE_ZB_COORDINATOR,
+                        DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                    ])) {
                         return true;
                     } else {
                         return false;
@@ -156,7 +164,11 @@ class Device extends MtmActiveRecord
                 }],
             ['address', 'filter', 'filter' => 'strtoupper', 'when' => function ($model) {
                 /** @var Device $model */
-                if (in_array($model->deviceTypeUuid, [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR])) {
+                if (in_array($model->deviceTypeUuid, [
+                    DeviceType::DEVICE_LIGHT,
+                    DeviceType::DEVICE_ZB_COORDINATOR,
+                    DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                ])) {
                     return true;
                 } else {
                     return false;
@@ -326,7 +338,11 @@ class Device extends MtmActiveRecord
             }
         }
 
-        $existDevices = Device::find()->where([$attr => $this->$attr, 'deviceTypeUuid' => [DeviceType::DEVICE_LIGHT, DeviceType::DEVICE_ZB_COORDINATOR]])->all();
+        $existDevices = Device::find()->where([$attr => $this->$attr, 'deviceTypeUuid' => [
+            DeviceType::DEVICE_LIGHT,
+            DeviceType::DEVICE_ZB_COORDINATOR,
+            DeviceType::DEVICE_ZB_COORDINATOR_E18,
+        ]])->all();
         if (count($existDevices) > 0) {
             $this->addError($attr, 'Это адрес уже занят.');
         }

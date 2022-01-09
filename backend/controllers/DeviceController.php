@@ -290,7 +290,10 @@ class DeviceController extends Controller
                 ->one();
             if ($device && $device['deviceTypeUuid'] == DeviceType::DEVICE_ELECTRO)
                 return self::actionDashboardElectro($device['uuid']);
-            if ($device && $device['deviceTypeUuid'] == DeviceType::DEVICE_ZB_COORDINATOR) {
+            if ($device && in_array($device['deviceTypeUuid'], [
+                    DeviceType::DEVICE_ZB_COORDINATOR,
+                    DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                ])) {
 //                return self::actionDashboardElectro($device['uuid']);
                 return $this->redirect(['node/dashboard', 'uuid' => $device->nodeUuid, 'type' => 'node']);
             }
@@ -3049,7 +3052,10 @@ class DeviceController extends Controller
     {
         $model = $this->findModel($id);
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $zbCoordinator = Device::findOne(['nodeUuid' => $model->nodeUuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR]);
+        $zbCoordinator = Device::findOne(['nodeUuid' => $model->nodeUuid, 'deviceTypeUuid' => [
+            DeviceType::DEVICE_ZB_COORDINATOR,
+            DeviceType::DEVICE_ZB_COORDINATOR_E18,
+        ]]);
         // check work node
         if ($zbCoordinator->node->deviceStatusUuid != DeviceStatus::WORK) {
             return ['isWork' => false, 'message' => 'Контроллер не доступен'];

@@ -21,6 +21,7 @@ class DeviceTypeController extends Controller
     private static $hardUuid = [
         DeviceType::DEVICE_COUNTER,
         DeviceType::DEVICE_ZB_COORDINATOR,
+        DeviceType::DEVICE_ZB_COORDINATOR_E18,
         DeviceType::DEVICE_LIGHT,
         DeviceType::DEVICE_LIGHT_WITHOUT_ZB
     ];

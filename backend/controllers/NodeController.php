@@ -244,7 +244,10 @@ class NodeController extends Controller
 
             $coordinator = Device::find()
                 ->where(['nodeUuid' => $node['uuid']])
-                ->andWhere(['deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR])
+                ->andWhere(['deviceTypeUuid' => [
+                    DeviceType::DEVICE_ZB_COORDINATOR,
+                    DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                ]])
                 ->limit(1)
                 ->one();
         }
@@ -388,8 +391,10 @@ class NodeController extends Controller
         $model = $this->findModel($id);
         $zbcDevice = Device::find()->where([
             'nodeUuid' => $model->uuid,
-            'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR,
-        ])->limit(1)->one();
+            'deviceTypeUuid' => [
+                DeviceType::DEVICE_ZB_COORDINATOR,
+                DeviceType::DEVICE_ZB_COORDINATOR_E18,
+            ]])->limit(1)->one();
         $zbcMode = null;
         if ($zbcDevice != null) {
             $config = DeviceConfig::find()->where([
@@ -911,8 +916,11 @@ class NodeController extends Controller
         $model = $this->findModel($id);
         $zbcDevice = Device::find()->where([
             'nodeUuid' => $model->uuid,
-            'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR,
-        ])->limit(1)->one();
+            'deviceTypeUuid' =>
+                [
+                    DeviceType::DEVICE_ZB_COORDINATOR,
+                    DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                ]])->limit(1)->one();
         if (Yii::$app->request->isPost && $zbcDevice != null) {
             $mode = Yii::$app->request->getBodyParam('zbcmode');
             $config = DeviceConfig::find()->where([
@@ -987,7 +995,10 @@ class NodeController extends Controller
     {
         $model = $this->findModel($id);
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $zbCoordinator = Device::findOne(['nodeUuid' => $model->uuid, 'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR]);
+        $zbCoordinator = Device::findOne(['nodeUuid' => $model->uuid, 'deviceTypeUuid' => [
+            DeviceType::DEVICE_ZB_COORDINATOR,
+            DeviceType::DEVICE_ZB_COORDINATOR_E18,
+        ]]);
         // check work zbcoord
         if ($zbCoordinator->deviceStatusUuid != DeviceStatus::WORK) {
             return ['isWork' => false, 'message' => 'Координатор не доступен'];
