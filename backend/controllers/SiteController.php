@@ -799,7 +799,7 @@ class SiteController extends Controller
                             ->leftJoin('sensor_channel',
                                 'sensor_channel.oid=:oid and sensor_channel.measureTypeUuid=:mtype and measure.sensorChannelUuid=sensor_channel.uuid',
                                 [
-                                    ':mtype' => MeasureType::COORD_IN2,
+                                    ':mtype' => MeasureType::CONTACTOR_STATE,
                                     ':oid' => User::getOid(Yii::$app->user->identity),
                                 ])
                             ->orderBy('date DESC'))
@@ -807,7 +807,7 @@ class SiteController extends Controller
                             ->limit(1)
                             ->one();
                         if ($measure && $measure['sensorChannel'] &&
-                            $measure['sensorChannel']['measureTypeUuid'] == MeasureType::COORD_IN2 &&
+                            $measure['sensorChannel']['measureTypeUuid'] == MeasureType::CONTACTOR_STATE &&
                             $measure['sensorChannel']['deviceUuid'] == $coordinator['uuid']) {
                             $contactor = $measure['value'];
                             if ($contactor) {

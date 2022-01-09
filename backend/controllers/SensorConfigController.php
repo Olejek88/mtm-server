@@ -90,7 +90,7 @@ class SensorConfigController extends Controller
     {
         $model = $this->findModel($id);
         $form = 'view';
-        if ($model != null && in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+        if ($model != null && in_array($model->sensorChannel->measureTypeUuid, [MeasureType::DOOR_STATE, MeasureType::CONTACTOR_STATE])) {
             $value = json_decode($model->config, true);
             $model->threshold = $value['threshold'];
             $form = 'view_in';
@@ -125,7 +125,7 @@ class SensorConfigController extends Controller
         $sensorChannelUuid = Yii::$app->request->get('sc');
         if ($sensorChannelUuid != null) {
             $model->sensorChannelUuid = $sensorChannelUuid;
-            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::DOOR_STATE, MeasureType::CONTACTOR_STATE])) {
                 $model->threshold = 1024;
                 $form = '_form_in';
             }
@@ -143,7 +143,7 @@ class SensorConfigController extends Controller
                 );
             }
 
-            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::DOOR_STATE, MeasureType::CONTACTOR_STATE])) {
                 $model->config = json_encode(['threshold' => $model->config]);
                 $form = '_form_in';
             }
@@ -188,7 +188,7 @@ class SensorConfigController extends Controller
         $form = '_form';
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post())) {
-            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::DOOR_STATE, MeasureType::CONTACTOR_STATE])) {
                 $model->config = json_encode(['threshold' => $model->threshold]);
                 $form = '_form_in';
             }
@@ -206,7 +206,7 @@ class SensorConfigController extends Controller
                 );
             }
         } else {
-            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::COORD_IN1, MeasureType::COORD_IN2])) {
+            if (in_array($model->sensorChannel->measureTypeUuid, [MeasureType::DOOR_STATE, MeasureType::CONTACTOR_STATE])) {
                 $value = json_decode($model->config, true);
                 $model->threshold = isset($value['threshold']) ? $value['threshold'] : 1024;
                 $form = '_form_in';

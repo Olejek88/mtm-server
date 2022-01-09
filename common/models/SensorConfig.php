@@ -22,7 +22,7 @@ use yii\db\Expression;
  */
 class SensorConfig extends MtmActiveRecord
 {
-    // параметр который задаётся для типов измерений COORD_IN1 и COORD_IN2
+    // параметр который задаётся для типов измерений DOOR_STATE и CONTACTOR_STATE
     public $threshold;
 
     /**

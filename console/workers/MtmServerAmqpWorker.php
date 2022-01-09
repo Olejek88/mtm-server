@@ -130,7 +130,7 @@ class MtmServerAmqpWorker extends Worker
                     ],
                     ':timeOut' => $linkTimeOut,
                     ':workUuid' => DeviceStatus::WORK,
-                    ':measureType' => MeasureType::COORD_DIGI1,
+                    ':measureType' => MeasureType::RELAY_STATE,
                 ];
                 $command = $db->createCommand("
 SELECT * FROM (
@@ -183,7 +183,7 @@ WHERE $inParamSql", $params);
                         DeviceType::DEVICE_ZB_COORDINATOR,
                         DeviceType::DEVICE_ZB_COORDINATOR_E18,
                     ],
-                    ':measureType' => MeasureType::COORD_DIGI1,
+                    ':measureType' => MeasureType::RELAY_STATE,
                 ];
 
                 $command = $db->createCommand("
