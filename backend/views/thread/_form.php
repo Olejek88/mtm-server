@@ -37,7 +37,7 @@ use yii\widgets\ActiveForm;
     <?php
     $nodes = Node::find()->all();
     $items = ArrayHelper::map($nodes, 'uuid', function ($model) {
-        return $model['object']['address'].' ['.$model['address'].']';
+        return $model['object']['address'] . ' [' . $model['address'] . ']';
     });
     echo $form->field($model, 'nodeUuid')->widget(Select2::class,
         [
@@ -52,7 +52,11 @@ use yii\widgets\ActiveForm;
         ]);
     ?>
     <?php
-    $devices = Device::find()->where(['deviceTypeUuid' => [DeviceType::DEVICE_COUNTER, DeviceType::DEVICE_ZB_COORDINATOR]])->all();
+    $devices = Device::find()->where(['deviceTypeUuid' => [
+        DeviceType::DEVICE_COUNTER,
+        DeviceType::DEVICE_ZB_COORDINATOR,
+        DeviceType::DEVICE_ZB_COORDINATOR_E18
+    ]])->all();
     $items = ArrayHelper::map($devices, 'uuid', 'name');
     echo $form->field($model, 'deviceUuid',
         ['template' => MainFunctions::getAddButton("/device-type/create")])->widget(Select2::class,
