@@ -172,7 +172,10 @@ class ThreadController extends Controller
         }
 
         $model = $this->findModel($id);
+        $isWork = $model->work;
         if ($model->load(Yii::$app->request->post())) {
+            $model->deviceTypeUuid = $model->device->deviceType->uuid;
+            $model->work = $isWork;
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->_id]);
             } else {

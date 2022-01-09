@@ -5,7 +5,7 @@ use yii\helpers\Html;
 
 /* @var $model Device */
 
-$this->title = 'Обновить оборудование';
+$this->title = 'Обновить поток сбора информации';
 ?>
 <div class="equipment-update box-padding">
 
