@@ -39,6 +39,7 @@ use yii\db\Expression;
  * @property Node $node
  * @property SensorChannel[] $sensorChannels
  * @property DeviceProgram $deviceProgram
+ * @property EntityParameter $parentMac
  */
 class Device extends MtmActiveRecord
 {
@@ -234,6 +235,18 @@ class Device extends MtmActiveRecord
         return $this->hasOne(
             DeviceStatus::class, ['uuid' => 'deviceStatusUuid']
         );
+    }
+
+    /**
+     * Объект связанного поля.
+     *
+     * @return ActiveQuery
+     */
+    public function getParentMac()
+    {
+        return $this->hasOne(
+            EntityParameter::class, ['entityUuid' => 'uuid']
+        )->where(['parameter' => 'parentAddr']);
     }
 
     /**

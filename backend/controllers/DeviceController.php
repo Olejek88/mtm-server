@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\DeviceParentMacSearch;
 use backend\models\DeviceSearch;
 use common\components\MainFunctions;
 use common\models\Device;
@@ -1076,6 +1077,7 @@ class DeviceController extends Controller
                         ->where(['objectUuid' => $object['uuid']])
                         ->andWhere(['deleted' => 0])
                         ->with(['deviceStatus'])
+                        ->with(['parentMac'])
                         ->asArray()
                         ->all();
                     foreach ($devices as $device) {
@@ -1105,6 +1107,19 @@ class DeviceController extends Controller
                             'date' => $device['date'],
                             'folder' => true
                         ];
+                        $curIdx = count($fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children']) - 1;
+                        if (!is_null($device['parentMac'])) {
+                            $fullTree['children'][$childIdx]['children'][$childIdx2]['children'][$childIdx3]['children'][$curIdx]['children'][] = [
+                                'title' => 'Родительский MAC',
+                                'register' => '-',
+                                'uuid' => '-',
+                                'source' => '../device/tree',
+                                'type' => 'mac',
+                                'measure' => $device['parentMac']['value'],
+                                'date' => $device['parentMac']['changedAt'],
+                                'folder' => false
+                            ];
+                        }
                         $channels = SensorChannel::find()->where(['deviceUuid' => $device['uuid']])
                             ->all();
                         foreach ($channels as $channel) {
@@ -3072,5 +3087,30 @@ class DeviceController extends Controller
         } else {
             return ['isWork' => false, 'message' => 'Устройство не доступно'];
         }
+    }
+
+    public function actionParentMac($uuid)
+    {
+        $isE18 = Device::find()->where([
+            'nodeUuid' => $uuid,
+            'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR_E18,
+            'deleted' => false,
+        ])->count();
+
+        if (!$isE18) {
+            return $this->redirect('/site/index');
+        }
+
+        $searchModel = new DeviceParentMacSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->pagination->pageSize = 60;
+
+        return $this->render(
+            'parent-mac',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]
+        );
     }
 }

@@ -1,8 +1,11 @@
 <?php
 /* @var $searchModel backend\models\NodeSearch */
 
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+use common\models\Device;
 use common\models\DeviceStatus;
-use common\models\Operation;
+use common\models\DeviceType;
 use kartik\editable\Editable;
 use kartik\grid\GridView;
 use yii\helpers\Html;
@@ -136,7 +139,29 @@ $gridColumns = [
     [
         'class' => 'kartik\grid\ActionColumn',
         'header' => 'Действия',
-        'template' => '{update} {delete}',
+        'buttons' => [
+            'parent' => function ($url, $model) {
+                if ($model->uuid) {
+                    $isE18 = Device::find()->where([
+                        'nodeUuid' => $model->uuid,
+                        'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR_E18,
+                        'deleted' => false,
+                    ])->count();
+                    if ($isE18) {
+                        return Html::a('<span class="fa fa-child"></span>',
+                            ['/device/parent-mac', 'uuid' => $model->uuid],
+                            [
+                                'title' => Yii::t('app', 'Родительские MAC'),
+                            ]);
+                    } else {
+                        return '';
+                    }
+                } else {
+                    return '';
+                }
+            },
+        ],
+        'template' => '{update} {delete} {parent}',
         'headerOptions' => ['class' => 'kartik-sheet-style'],
     ]
 ];
