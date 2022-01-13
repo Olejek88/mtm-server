@@ -20,6 +20,7 @@ class HouseType extends ActiveRecord
 {
     const HOUSE_TYPE_PRIVATE = "6A0AB43B-AEA7-44BE-8E6C-001F4F854A4F";
     const HOUSE_TYPE_NO_NUMBER = "2C5A96E4-BA8D-4715-9A12-80CBA64888E7";
+    const HOUSE_TYPE_NUMBER = "69DA4C65-B6A1-4BFB-91BE-D64CA57E7114";
 
     public function behaviors()
     {

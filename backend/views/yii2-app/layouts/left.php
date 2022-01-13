@@ -95,7 +95,8 @@ $userImage = Yii::$app->view->params['userImage'];
                         'icon' => 'glyphicon glyphicon-stats',
                         "items" => [
                             ["label" => "Отчет о потреблении", 'icon' => 'fa fa-table', "url" => ["/device/report"]],
-                            ["label" => "Отчет по группам", 'icon' => 'fa fa-table', "url" => ["/device/report-group"]]
+                            ["label" => "Отчет по группам", 'icon' => 'fa fa-table', "url" => ["/device/report-group"]],
+                            ["label" => "Неисправные светильники", 'icon' => 'fa fa-table', "url" => ["/lost-light/index"]],
                         ],
                     ],
                 ],
