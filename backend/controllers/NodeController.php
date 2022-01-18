@@ -14,6 +14,7 @@ use common\models\House;
 use common\models\Measure;
 use common\models\MeasureType;
 use common\models\Message;
+use common\models\mtm\MtmClearNetwork;
 use common\models\Node;
 use common\models\Objects;
 use common\models\Photo;
@@ -939,7 +940,7 @@ class NodeController extends Controller
             $config->save();
         }
 
-        return $this->redirect(['view', 'id' => $model->_id]);
+        return $this->redirect(['update', 'id' => $model->_id]);
 //        if ($model->load(Yii::$app->request->post())) {
 //            if ($model->save()) {
 //                return $this->redirect(['view', 'id' => $model->_id]);
@@ -959,6 +960,42 @@ class NodeController extends Controller
 //                ]
 //            );
 //        }
+    }
+
+    /**
+     * @param $id
+     * @return Response
+     * @throws NotFoundHttpException|InvalidConfigException
+     */
+    public function actionClearNetwork($id): Response
+    {
+        if (!Yii::$app->user->can(User::PERMISSION_ADMIN)) {
+            return $this->redirect('/site/index');
+        }
+
+        $model = $this->findModel($id);
+        /** @var Device $coordinator */
+        $coordinator = Device::find()->where([
+            'nodeUuid' => $model->uuid,
+            'deviceTypeUuid' => DeviceType::DEVICE_ZB_COORDINATOR_E18,
+            'deleted' => false,
+        ])->limit(1)->one();
+
+        if ($coordinator == null) {
+            return $this->redirect(['update', 'id' => $model->_id]);
+        }
+
+        $reset = new MtmClearNetwork();
+        $pkt = [
+            'type' => 'light',
+            'address' => $coordinator->address,
+            'data' => $reset->getBase64Data(),
+        ];
+
+        DeviceController::sendConfig($pkt, $model->organisation->_id, $model->_id);
+        MainFunctions::register("В шкафу " . $model->object->getFullTitle() . " сброшена сеть Zigbee");
+
+        return $this->redirect(['update', 'id' => $model->_id]);
     }
 
     public function actionCounterValue()

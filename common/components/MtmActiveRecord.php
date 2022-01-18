@@ -3,6 +3,7 @@
 
 namespace common\components;
 
+use common\models\Organisation;
 use common\models\User;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -10,6 +11,11 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\web\Application;
 
+/**
+ * Class MtmActiveRecord
+ * @package common\components
+ * @property Organisation $organisation
+ */
 class MtmActiveRecord extends ActiveRecord
 {
 
@@ -48,5 +54,10 @@ class MtmActiveRecord extends ActiveRecord
         } else {
             // TODO: как проверить что создаваемая запись принадлежит той организации которой она должна принадлежать?
         }
+    }
+
+    public function getOrganisation()
+    {
+        return Organisation::find()->where(['oid' => $this->oid]);
     }
 }

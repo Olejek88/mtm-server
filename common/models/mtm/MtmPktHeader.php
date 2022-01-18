@@ -11,6 +11,7 @@ class MtmPktHeader extends Model
     public static $MTM_CMD_TYPE_ACTION = 5;
     public static $MTM_CMD_TYPE_CONTACTOR = 6;
     public static $MTM_CMD_TYPE_RESET_COORDINATOR = 7;
+    public static $MTM_CMD_TYPE_CLEAR_NETWORK = 8;
 
     public static $MTM_CMD_PROTO_VERSION_0 = 0;
 

@@ -2550,10 +2550,24 @@ class DeviceController extends Controller
      */
     public static function resetCoordinator($node)
     {
+        /** @var Device $coordinator */
+        $coordinator = Device::find()->where([
+            'nodeUuid' => $node->uuid,
+            'deviceTypeUuid' => [
+                DeviceType::DEVICE_ZB_COORDINATOR,
+                DeviceType::DEVICE_ZB_COORDINATOR_E18,
+            ],
+            'deleted' => false,
+        ])->limit(1)->one();
+
+        if ($coordinator == null) {
+            return;
+        }
+
         $reset = new MtmResetCoordinator();
         $pkt = [
             'type' => 'light',
-            'address' => 0x0000,
+            'address' => $coordinator->address,
             'data' => $reset->getBase64Data(),
         ];
 
