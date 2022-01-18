@@ -5,11 +5,17 @@
 
 /* @var $this yii\web\View */
 
+use kartik\export\ExportMenu;
 use kartik\grid\GridView;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 $this->title = 'Неисправные светильники';
 
 $gridColumns = [
+    [
+        'class' => 'kartik\grid\SerialColumn',
+    ],
     [
         'attribute' => 'title',
         'hAlign' => 'center',
@@ -50,6 +56,38 @@ $gridColumns = [
 ];
 
 $reportDate = date('d.m.Y', strtotime(Yii::$app->request->getQueryParam('date')));
+$exportMenu = ExportMenu::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => $gridColumns,
+        'autoWidth' => false,
+        'onRenderSheet' => function ($sheet, $widget) use ($reportDate) {
+            /** @var $sheet Worksheet */
+            $sheet->getColumnDimension('A')->setWidth(5);
+            $sheet->getColumnDimension('B')->setWidth(25);
+            $sheet->getColumnDimension('C')->setWidth(30);
+            $sheet->getColumnDimension('D')->setWidth(20);
+            $sheet->getColumnDimension('E')->setWidth(40);
+            $sheet->insertNewRowBefore(1);
+            $sheet->mergeCells('A1:E1');
+            $sheet->setCellValue('A1', 'Неисправные светильники на ' . $reportDate);
+            $sheet->getRowDimension('1')->setRowHeight(50);
+            $sheet->getStyle('A1')->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_TOP);
+        },
+        'batchSize' => 10,
+        'target' => '_blank',
+//        'folder' => '@webroot/tmp', // this is default save folder on server
+//        'dropdownOptions' => [
+//            'label' => 'Export All', 'class' => 'btn btn-default'
+//        ],
+        'exportConfig' => [
+            ExportMenu::FORMAT_CSV => false,
+            ExportMenu::FORMAT_TEXT => false,
+            ExportMenu::FORMAT_HTML => false,
+        ],
+        'filename' => 'Неисправные светильники - ' . $reportDate,
+    ]) . "<hr>\n";
 echo GridView::widget([
     'id' => 'equipment-table',
     'dataProvider' => $dataProvider,
@@ -58,9 +96,16 @@ echo GridView::widget([
     'containerOptions' => ['style' => 'overflow: auto'], // only set when $responsive = false
     'headerRowOptions' => ['class' => 'kartik-sheet-style'],
     'filterRowOptions' => ['class' => 'kartik-sheet-style'],
-//    'beforeHeader' => [
-//        '{toggleData}'
-//    ],
+    'beforeHeader' => [
+        [
+            'columns' => [
+                [
+                    'content' => "Неисправные светильника на $reportDate",
+                    'options' => ['colspan' => 10, 'class' => 'text-center warning']
+                ],
+            ],
+        ],
+    ],
     'toolbar' => [
         [
             'content' =>
@@ -68,9 +113,15 @@ echo GridView::widget([
 //            Html::a('Новое', ['/device/create'], ['class' => 'btn btn-success']),
 //            Html::a('<i class="glyphicon glyphicon-repeat"></i>', ['grid-demo'],
 //                ['data-pjax' => 0, 'class' => 'btn btn-default', 'title' => Yii::t('app', 'Reset Grid')]),
-                '',
+//                '',
+                $exportMenu,
         ],
-        '{export}',
+//        '{export}',
+    ],
+    'toolbarContainerOptions' => [
+        'class' => [
+            'pull-left',
+        ],
     ],
     'export' => [
         'fontAwesome' => true,
