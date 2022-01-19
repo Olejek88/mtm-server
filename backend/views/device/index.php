@@ -1,6 +1,8 @@
 <?php
 /* @var $searchModel backend\models\DeviceSearch */
 
+/* @var $dataProvider yii\data\DataProviderInterface */
+
 use common\models\DeviceStatus;
 use common\models\DeviceType;
 use kartik\editable\Editable;
@@ -224,7 +226,7 @@ echo GridView::widget([
         'target' => GridView::TARGET_BLANK,
         'filename' => 'equipments'
     ],
-    'pjax' => true,
+    'pjax' => false,
     'showPageSummary' => false,
     'pageSummaryRowOptions' => ['style' => 'line-height: 0; padding: 0'],
     'summary' => '',
